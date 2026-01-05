@@ -58,6 +58,11 @@ public interface IFinancialReportService
     Task<CashFlowStatementReport> GetCashFlowStatementAsync(ReportDateRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets trial balance as of a specific date
+    /// </summary>
+    Task<TrialBalanceReport> GetTrialBalanceAsync(DateTime asOfDate, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Exports report to PDF
     /// </summary>
     byte[] ExportToPdf<T>(T report, string reportTitle) where T : class;
@@ -523,6 +528,65 @@ public class MonthlyCashFlow
     public decimal Financing { get; set; }
     public decimal NetChange { get; set; }
     public decimal EndingBalance { get; set; }
+}
+
+public class TrialBalanceReport
+{
+    public DateTime AsOfDate { get; set; } = DateTime.Today;
+
+    // Summary Totals
+    public decimal TotalDebits { get; set; }
+    public decimal TotalCredits { get; set; }
+    public decimal Difference { get; set; }
+    public bool IsBalanced => Math.Abs(TotalDebits - TotalCredits) < 0.01m;
+
+    // Account Lines
+    public List<TrialBalanceLineItem> Accounts { get; set; } = new();
+
+    // Grouped by Account Type
+    public List<TrialBalanceSection> Sections { get; set; } = new();
+
+    // Statistics
+    public int TotalAccounts { get; set; }
+    public int AccountsWithActivity { get; set; }
+    public int ZeroBalanceAccounts { get; set; }
+
+    // Comparative Data
+    public TrialBalanceComparison? PreviousPeriod { get; set; }
+}
+
+public class TrialBalanceLineItem
+{
+    public Guid AccountId { get; set; }
+    public string AccountCode { get; set; } = string.Empty;
+    public string AccountName { get; set; } = string.Empty;
+    public AccountType AccountType { get; set; }
+    public AccountSubType? SubType { get; set; }
+    public decimal Debit { get; set; }
+    public decimal Credit { get; set; }
+    public decimal Balance { get; set; }
+    public decimal? PreviousBalance { get; set; }
+    public decimal? ChangeAmount { get; set; }
+    public decimal? ChangePercent { get; set; }
+}
+
+public class TrialBalanceSection
+{
+    public AccountType AccountType { get; set; }
+    public string SectionName { get; set; } = string.Empty;
+    public decimal TotalDebits { get; set; }
+    public decimal TotalCredits { get; set; }
+    public int AccountCount { get; set; }
+    public List<TrialBalanceLineItem> Accounts { get; set; } = new();
+}
+
+public class TrialBalanceComparison
+{
+    public DateTime AsOfDate { get; set; }
+    public decimal TotalDebits { get; set; }
+    public decimal TotalCredits { get; set; }
+    public decimal DebitsChange { get; set; }
+    public decimal CreditsChange { get; set; }
 }
 
 #endregion

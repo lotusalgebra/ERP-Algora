@@ -1102,6 +1102,231 @@ public class FinancialReportService : IFinancialReportService
         return report;
     }
 
+    public async Task<TrialBalanceReport> GetTrialBalanceAsync(DateTime asOfDate, CancellationToken cancellationToken = default)
+    {
+        // Get all accounts with their current balances from posted journal entries up to the as-of date
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= asOfDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        // Get all accounts
+        var accounts = await _context.Accounts
+            .Where(a => a.IsActive)
+            .OrderBy(a => a.Code)
+            .ToListAsync(cancellationToken);
+
+        var report = new TrialBalanceReport
+        {
+            AsOfDate = asOfDate,
+            TotalAccounts = accounts.Count
+        };
+
+        // Calculate account balances
+        var accountItems = new List<TrialBalanceLineItem>();
+
+        foreach (var account in accounts)
+        {
+            var lines = journalLines.Where(l => l.AccountId == account.Id).ToList();
+            decimal balance;
+            decimal debit = 0;
+            decimal credit = 0;
+
+            // Calculate balance based on account type (normal balance rules)
+            if (account.AccountType == AccountType.Asset || account.AccountType == AccountType.Expense)
+            {
+                // Assets and Expenses have normal debit balances
+                balance = account.OpeningBalance + lines.Sum(l => l.DebitAmount - l.CreditAmount);
+                if (balance >= 0)
+                    debit = balance;
+                else
+                    credit = Math.Abs(balance);
+            }
+            else
+            {
+                // Liabilities, Equity, and Revenue have normal credit balances
+                balance = account.OpeningBalance + lines.Sum(l => l.CreditAmount - l.DebitAmount);
+                if (balance >= 0)
+                    credit = balance;
+                else
+                    debit = Math.Abs(balance);
+            }
+
+            accountItems.Add(new TrialBalanceLineItem
+            {
+                AccountId = account.Id,
+                AccountCode = account.Code,
+                AccountName = account.Name,
+                AccountType = account.AccountType,
+                SubType = account.AccountSubType,
+                Debit = debit,
+                Credit = credit,
+                Balance = balance
+            });
+        }
+
+        // Filter to only accounts with balances (or show all based on requirement)
+        report.Accounts = accountItems.Where(a => a.Debit != 0 || a.Credit != 0).OrderBy(a => a.AccountCode).ToList();
+        report.AccountsWithActivity = report.Accounts.Count;
+        report.ZeroBalanceAccounts = accountItems.Count - report.AccountsWithActivity;
+
+        // Calculate totals
+        report.TotalDebits = report.Accounts.Sum(a => a.Debit);
+        report.TotalCredits = report.Accounts.Sum(a => a.Credit);
+        report.Difference = report.TotalDebits - report.TotalCredits;
+
+        // Group by account type
+        report.Sections = report.Accounts
+            .GroupBy(a => a.AccountType)
+            .Select(g => new TrialBalanceSection
+            {
+                AccountType = g.Key,
+                SectionName = g.Key.ToString(),
+                TotalDebits = g.Sum(a => a.Debit),
+                TotalCredits = g.Sum(a => a.Credit),
+                AccountCount = g.Count(),
+                Accounts = g.OrderBy(a => a.AccountCode).ToList()
+            })
+            .OrderBy(s => s.AccountType)
+            .ToList();
+
+        // Previous period comparison (same day last year)
+        var previousDate = asOfDate.AddYears(-1);
+        var previousData = await GetPreviousTrialBalanceDataAsync(previousDate, cancellationToken);
+        if (previousData.HasValue)
+        {
+            var prev = previousData.Value;
+            report.PreviousPeriod = new TrialBalanceComparison
+            {
+                AsOfDate = previousDate,
+                TotalDebits = prev.TotalDebits,
+                TotalCredits = prev.TotalCredits,
+                DebitsChange = prev.TotalDebits != 0
+                    ? ((report.TotalDebits - prev.TotalDebits) / prev.TotalDebits) * 100
+                    : 0,
+                CreditsChange = prev.TotalCredits != 0
+                    ? ((report.TotalCredits - prev.TotalCredits) / prev.TotalCredits) * 100
+                    : 0
+            };
+
+            // Add previous balances to line items
+            var previousLines = await GetPreviousTrialBalanceLinesAsync(previousDate, cancellationToken);
+            foreach (var item in report.Accounts)
+            {
+                var prevItem = previousLines.FirstOrDefault(p => p.AccountId == item.AccountId);
+                if (prevItem != null)
+                {
+                    item.PreviousBalance = prevItem.Balance;
+                    item.ChangeAmount = item.Balance - prevItem.Balance;
+                    item.ChangePercent = prevItem.Balance != 0
+                        ? ((item.Balance - prevItem.Balance) / Math.Abs(prevItem.Balance)) * 100
+                        : 0;
+                }
+            }
+        }
+
+        return report;
+    }
+
+    private async Task<(decimal TotalDebits, decimal TotalCredits)?> GetPreviousTrialBalanceDataAsync(
+        DateTime asOfDate, CancellationToken cancellationToken)
+    {
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= asOfDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        var accounts = await _context.Accounts
+            .Where(a => a.IsActive)
+            .ToListAsync(cancellationToken);
+
+        if (!accounts.Any())
+            return null;
+
+        decimal totalDebits = 0;
+        decimal totalCredits = 0;
+
+        foreach (var account in accounts)
+        {
+            var lines = journalLines.Where(l => l.AccountId == account.Id).ToList();
+            decimal balance;
+
+            if (account.AccountType == AccountType.Asset || account.AccountType == AccountType.Expense)
+            {
+                balance = account.OpeningBalance + lines.Sum(l => l.DebitAmount - l.CreditAmount);
+                if (balance > 0) totalDebits += balance;
+                else totalCredits += Math.Abs(balance);
+            }
+            else
+            {
+                balance = account.OpeningBalance + lines.Sum(l => l.CreditAmount - l.DebitAmount);
+                if (balance > 0) totalCredits += balance;
+                else totalDebits += Math.Abs(balance);
+            }
+        }
+
+        return (totalDebits, totalCredits);
+    }
+
+    private async Task<List<TrialBalanceLineItem>> GetPreviousTrialBalanceLinesAsync(
+        DateTime asOfDate, CancellationToken cancellationToken)
+    {
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= asOfDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        var accounts = await _context.Accounts
+            .Where(a => a.IsActive)
+            .ToListAsync(cancellationToken);
+
+        var result = new List<TrialBalanceLineItem>();
+
+        foreach (var account in accounts)
+        {
+            var lines = journalLines.Where(l => l.AccountId == account.Id).ToList();
+            decimal balance;
+            decimal debit = 0;
+            decimal credit = 0;
+
+            if (account.AccountType == AccountType.Asset || account.AccountType == AccountType.Expense)
+            {
+                balance = account.OpeningBalance + lines.Sum(l => l.DebitAmount - l.CreditAmount);
+                if (balance >= 0) debit = balance;
+                else credit = Math.Abs(balance);
+            }
+            else
+            {
+                balance = account.OpeningBalance + lines.Sum(l => l.CreditAmount - l.DebitAmount);
+                if (balance >= 0) credit = balance;
+                else debit = Math.Abs(balance);
+            }
+
+            if (debit != 0 || credit != 0)
+            {
+                result.Add(new TrialBalanceLineItem
+                {
+                    AccountId = account.Id,
+                    AccountCode = account.Code,
+                    AccountName = account.Name,
+                    AccountType = account.AccountType,
+                    SubType = account.AccountSubType,
+                    Debit = debit,
+                    Credit = credit,
+                    Balance = balance
+                });
+            }
+        }
+
+        return result;
+    }
+
     private async Task<List<MonthlyCashFlow>> GetMonthlyCashFlowTrendAsync(ReportDateRange range, CancellationToken cancellationToken)
     {
         var result = new List<MonthlyCashFlow>();
@@ -1376,6 +1601,10 @@ public class FinancialReportService : IFinancialReportService
                     else if (report is CashFlowStatementReport cashFlowReport)
                     {
                         RenderCashFlowStatementPdf(column, cashFlowReport);
+                    }
+                    else if (report is TrialBalanceReport trialBalanceReport)
+                    {
+                        RenderTrialBalancePdf(column, trialBalanceReport);
                     }
                 });
 
@@ -2030,6 +2259,142 @@ public class FinancialReportService : IFinancialReportService
             table.Cell().Padding(5).Text(report.FreeCashFlow.ToString("C2"));
             table.Cell().Padding(5).Text($"{report.CashFlowToDebtRatio:F2}");
         });
+    }
+
+    private void RenderTrialBalancePdf(ColumnDescriptor column, TrialBalanceReport report)
+    {
+        column.Item().Text($"As of: {report.AsOfDate:MMMM dd, yyyy}").FontSize(11);
+        column.Item().Height(15);
+
+        // Balance Status
+        column.Item().Row(row =>
+        {
+            row.RelativeItem().Text("Balance Status:").Bold();
+            if (report.IsBalanced)
+            {
+                row.RelativeItem().Text("BALANCED").FontColor(Colors.Green.Medium).Bold();
+            }
+            else
+            {
+                row.RelativeItem().Text($"OUT OF BALANCE (Difference: {report.Difference:C2})").FontColor(Colors.Red.Medium).Bold();
+            }
+        });
+        column.Item().Height(15);
+
+        // Summary Totals
+        column.Item().Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+            });
+
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Total Debits").Bold();
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Total Credits").Bold();
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Accounts w/ Activity").Bold();
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Zero Balance Accounts").Bold();
+
+            table.Cell().Padding(8).Text(report.TotalDebits.ToString("C2"));
+            table.Cell().Padding(8).Text(report.TotalCredits.ToString("C2"));
+            table.Cell().Padding(8).Text(report.AccountsWithActivity.ToString());
+            table.Cell().Padding(8).Text(report.ZeroBalanceAccounts.ToString());
+        });
+
+        column.Item().Height(20);
+
+        // Account Details by Section
+        foreach (var section in report.Sections)
+        {
+            column.Item().Text(section.SectionName.ToUpper()).Bold().FontSize(12);
+            column.Item().Height(5);
+
+            column.Item().Table(table =>
+            {
+                table.ColumnsDefinition(columns =>
+                {
+                    columns.ConstantColumn(80);  // Account Code
+                    columns.RelativeColumn(3);   // Account Name
+                    columns.RelativeColumn();    // Debit
+                    columns.RelativeColumn();    // Credit
+                });
+
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text("Code").Bold();
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text("Account Name").Bold();
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text("Debit").Bold();
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text("Credit").Bold();
+
+                foreach (var account in section.Accounts)
+                {
+                    table.Cell().Padding(5).Text(account.AccountCode);
+                    table.Cell().Padding(5).Text(account.AccountName);
+                    table.Cell().Padding(5).AlignRight().Text(account.Debit > 0 ? account.Debit.ToString("C2") : "-");
+                    table.Cell().Padding(5).AlignRight().Text(account.Credit > 0 ? account.Credit.ToString("C2") : "-");
+                }
+
+                // Section subtotals
+                table.Cell().Background(Colors.Grey.Lighten4).Padding(5).Text("");
+                table.Cell().Background(Colors.Grey.Lighten4).Padding(5).Text($"{section.SectionName} Total").Bold();
+                table.Cell().Background(Colors.Grey.Lighten4).Padding(5).AlignRight().Text(section.TotalDebits.ToString("C2")).Bold();
+                table.Cell().Background(Colors.Grey.Lighten4).Padding(5).AlignRight().Text(section.TotalCredits.ToString("C2")).Bold();
+            });
+
+            column.Item().Height(15);
+        }
+
+        // Grand Totals
+        column.Item().LineHorizontal(2).LineColor(Colors.Black);
+        column.Item().Height(5);
+        column.Item().Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.ConstantColumn(80);
+                columns.RelativeColumn(3);
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+            });
+
+            table.Cell().Padding(5).Text("");
+            table.Cell().Padding(5).Text("GRAND TOTAL").Bold().FontSize(12);
+            table.Cell().Padding(5).AlignRight().Text(report.TotalDebits.ToString("C2")).Bold().FontSize(12);
+            table.Cell().Padding(5).AlignRight().Text(report.TotalCredits.ToString("C2")).Bold().FontSize(12);
+        });
+
+        // Previous Period Comparison
+        if (report.PreviousPeriod != null)
+        {
+            column.Item().Height(20);
+            column.Item().Text("YEAR-OVER-YEAR COMPARISON").Bold().FontSize(12);
+            column.Item().Height(10);
+            column.Item().Table(table =>
+            {
+                table.ColumnsDefinition(columns =>
+                {
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                });
+
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text("").Bold();
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text($"Current ({report.AsOfDate:MMM yyyy})").Bold();
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text($"Prior ({report.PreviousPeriod.AsOfDate:MMM yyyy})").Bold();
+                table.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text("Change %").Bold();
+
+                table.Cell().Padding(5).Text("Total Debits");
+                table.Cell().Padding(5).Text(report.TotalDebits.ToString("C2"));
+                table.Cell().Padding(5).Text(report.PreviousPeriod.TotalDebits.ToString("C2"));
+                table.Cell().Padding(5).Text($"{report.PreviousPeriod.DebitsChange:F1}%");
+
+                table.Cell().Padding(5).Text("Total Credits");
+                table.Cell().Padding(5).Text(report.TotalCredits.ToString("C2"));
+                table.Cell().Padding(5).Text(report.PreviousPeriod.TotalCredits.ToString("C2"));
+                table.Cell().Padding(5).Text($"{report.PreviousPeriod.CreditsChange:F1}%");
+            });
+        }
     }
 
     #endregion

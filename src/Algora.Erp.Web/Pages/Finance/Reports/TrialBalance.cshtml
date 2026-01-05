@@ -1,0 +1,420 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.TrialBalanceModel
+@{
+    ViewData["Title"] = "Trial Balance";
+}
+
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Trial Balance</h1>
+            <p class="text-muted mb-0">As of @Model.Report.AsOfDate.ToString("MMMM dd, yyyy")</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/Finance/Reports/TrialBalance?handler=ExportPdf&asOfDate=@Model.AsOfDate?.ToString("yyyy-MM-dd")"
+               class="btn btn-outline-primary">
+                <i class="bi bi-file-pdf me-1"></i> Export PDF
+            </a>
+            <a href="/Finance/Reports/TrialBalance?handler=ExportCsv&asOfDate=@Model.AsOfDate?.ToString("yyyy-MM-dd")"
+               class="btn btn-outline-success">
+                <i class="bi bi-file-csv me-1"></i> Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Selector -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">As of Date</label>
+                    <input type="date" class="form-control" name="asOfDate"
+                           value="@Model.AsOfDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group" role="group">
+                        <a href="/Finance/Reports/TrialBalance?asOfDate=@DateTime.Today.ToString("yyyy-MM-dd")"
+                           class="btn btn-outline-secondary @(Model.AsOfDate?.Date == DateTime.Today ? "active" : "")">Today</a>
+                        <a href="/Finance/Reports/TrialBalance?asOfDate=@(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddDays(-1).ToString("yyyy-MM-dd"))"
+                           class="btn btn-outline-secondary">Last Month End</a>
+                        <a href="/Finance/Reports/TrialBalance?asOfDate=@(new DateTime(DateTime.Today.Year, 1, 1).AddDays(-1).ToString("yyyy-MM-dd"))"
+                           class="btn btn-outline-secondary">Last Year End</a>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Total Debits</h6>
+                            <h4 class="card-title mb-0">@Model.Report.TotalDebits.ToString("C0")</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-left-circle fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                    @if (Model.Report.PreviousPeriod != null)
+                    {
+                        var change = Model.Report.PreviousPeriod.DebitsChange;
+                        <small class="@(change >= 0 ? "text-success-emphasis" : "text-danger-emphasis")">
+                            <i class="bi bi-arrow-@(change >= 0 ? "up" : "down")"></i>
+                            @Math.Abs(change).ToString("F1")% vs last year
+                        </small>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Total Credits</h6>
+                            <h4 class="card-title mb-0">@Model.Report.TotalCredits.ToString("C0")</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-right-circle fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                    @if (Model.Report.PreviousPeriod != null)
+                    {
+                        var change = Model.Report.PreviousPeriod.CreditsChange;
+                        <small class="@(change >= 0 ? "text-success-emphasis" : "text-danger-emphasis")">
+                            <i class="bi bi-arrow-@(change >= 0 ? "up" : "down")"></i>
+                            @Math.Abs(change).ToString("F1")% vs last year
+                        </small>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card @(Model.Report.IsBalanced ? "bg-info" : "bg-danger") text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Balance Status</h6>
+                            <h4 class="card-title mb-0">
+                                @if (Model.Report.IsBalanced)
+                                {
+                                    <i class="bi bi-check-circle me-1"></i> <span>Balanced</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-exclamation-triangle me-1"></i> <span>Unbalanced</span>
+                                }
+                            </h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-balance-scale fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                    @if (!Model.Report.IsBalanced)
+                    {
+                        <small>Difference: @Model.Report.Difference.ToString("C2")</small>
+                    }
+                    else
+                    {
+                        <small>Debits = Credits</small>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50">Accounts</h6>
+                            <h4 class="card-title mb-0">@Model.Report.AccountsWithActivity</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-journal-text fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                    <small>@Model.Report.ZeroBalanceAccounts zero balance accounts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trial Balance Table -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-table me-2"></i>Trial Balance Details</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 100px;">Code</th>
+                            <th>Account Name</th>
+                            <th style="width: 100px;">Type</th>
+                            <th class="text-end" style="width: 150px;">Debit</th>
+                            <th class="text-end" style="width: 150px;">Credit</th>
+                            @if (Model.Report.PreviousPeriod != null)
+                            {
+                                <th class="text-end" style="width: 120px;">Change</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var section in Model.Report.Sections)
+                        {
+                            <!-- Section Header -->
+                            <tr class="table-secondary">
+                                <td colspan="@(Model.Report.PreviousPeriod != null ? 6 : 5)" class="fw-bold text-uppercase">
+                                    @(section.SectionName) (@(section.AccountCount) accounts)
+                                </td>
+                            </tr>
+
+                            @foreach (var account in section.Accounts)
+                            {
+                                <tr>
+                                    <td><code>@account.AccountCode</code></td>
+                                    <td>@account.AccountName</td>
+                                    <td>
+                                        <span class="badge @GetTypeBadgeClass(account.AccountType)">
+                                            @account.AccountType
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (account.Debit > 0)
+                                        {
+                                            <span class="text-primary">@account.Debit.ToString("C2")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (account.Credit > 0)
+                                        {
+                                            <span class="text-success">@account.Credit.ToString("C2")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    @if (Model.Report.PreviousPeriod != null)
+                                    {
+                                        <td class="text-end">
+                                            @if (account.ChangePercent.HasValue)
+                                            {
+                                                var change = account.ChangePercent.Value;
+                                                <span class="@(change >= 0 ? "text-success" : "text-danger")">
+                                                    <i class="bi bi-arrow-@(change >= 0 ? "up" : "down")"></i>
+                                                    @Math.Abs(change).ToString("F1")%
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">New</span>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+
+                            <!-- Section Subtotal -->
+                            <tr class="table-light fw-bold">
+                                <td></td>
+                                <td>@(section.SectionName) Total</td>
+                                <td></td>
+                                <td class="text-end text-primary">@(section.TotalDebits.ToString("C2"))</td>
+                                <td class="text-end text-success">@(section.TotalCredits.ToString("C2"))</td>
+                                @if (Model.Report.PreviousPeriod != null)
+                                {
+                                    <td></td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-dark">
+                        <tr class="fw-bold">
+                            <td colspan="3">GRAND TOTAL</td>
+                            <td class="text-end">@Model.Report.TotalDebits.ToString("C2")</td>
+                            <td class="text-end">@Model.Report.TotalCredits.ToString("C2")</td>
+                            @if (Model.Report.PreviousPeriod != null)
+                            {
+                                <td></td>
+                            }
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Debit/Credit by Account Type</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="typeChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="distributionChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Report.PreviousPeriod != null)
+    {
+        <!-- Year-over-Year Comparison -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Year-over-Year Comparison</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th class="text-end">@Model.Report.AsOfDate.ToString("MMM yyyy")</th>
+                                    <th class="text-end">@Model.Report.PreviousPeriod.AsOfDate.ToString("MMM yyyy")</th>
+                                    <th class="text-end">Change</th>
+                                    <th class="text-end">% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Total Debits</strong></td>
+                                    <td class="text-end">@Model.Report.TotalDebits.ToString("C2")</td>
+                                    <td class="text-end">@Model.Report.PreviousPeriod.TotalDebits.ToString("C2")</td>
+                                    <td class="text-end @(Model.Report.TotalDebits - Model.Report.PreviousPeriod.TotalDebits >= 0 ? "text-success" : "text-danger")">
+                                        @((Model.Report.TotalDebits - Model.Report.PreviousPeriod.TotalDebits).ToString("C2"))
+                                    </td>
+                                    <td class="text-end @(Model.Report.PreviousPeriod.DebitsChange >= 0 ? "text-success" : "text-danger")">
+                                        <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.DebitsChange >= 0 ? "up" : "down")"></i>
+                                        @Math.Abs(Model.Report.PreviousPeriod.DebitsChange).ToString("F1")%
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Credits</strong></td>
+                                    <td class="text-end">@Model.Report.TotalCredits.ToString("C2")</td>
+                                    <td class="text-end">@Model.Report.PreviousPeriod.TotalCredits.ToString("C2")</td>
+                                    <td class="text-end @(Model.Report.TotalCredits - Model.Report.PreviousPeriod.TotalCredits >= 0 ? "text-success" : "text-danger")">
+                                        @((Model.Report.TotalCredits - Model.Report.PreviousPeriod.TotalCredits).ToString("C2"))
+                                    </td>
+                                    <td class="text-end @(Model.Report.PreviousPeriod.CreditsChange >= 0 ? "text-success" : "text-danger")">
+                                        <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.CreditsChange >= 0 ? "up" : "down")"></i>
+                                        @Math.Abs(Model.Report.PreviousPeriod.CreditsChange).ToString("F1")%
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    string GetTypeBadgeClass(Algora.Erp.Domain.Entities.Finance.AccountType type)
+    {
+        return type switch
+        {
+            Algora.Erp.Domain.Entities.Finance.AccountType.Asset => "bg-primary",
+            Algora.Erp.Domain.Entities.Finance.AccountType.Liability => "bg-danger",
+            Algora.Erp.Domain.Entities.Finance.AccountType.Equity => "bg-success",
+            Algora.Erp.Domain.Entities.Finance.AccountType.Revenue => "bg-info",
+            Algora.Erp.Domain.Entities.Finance.AccountType.Expense => "bg-warning text-dark",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Debit/Credit by Account Type Chart
+        const typeCtx = document.getElementById('typeChart').getContext('2d');
+        new Chart(typeCtx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.Sections.Select(s => $"'{s.SectionName}'")))],
+                datasets: [
+                    {
+                        label: 'Debits',
+                        data: [@string.Join(",", Model.Report.Sections.Select(s => s.TotalDebits))],
+                        backgroundColor: '#0d6efd'
+                    },
+                    {
+                        label: 'Credits',
+                        data: [@string.Join(",", Model.Report.Sections.Select(s => s.TotalCredits))],
+                        backgroundColor: '#198754'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Account Distribution Pie Chart
+        const distCtx = document.getElementById('distributionChart').getContext('2d');
+        new Chart(distCtx, {
+            type: 'pie',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.Sections.Select(s => $"'{s.SectionName} ({s.AccountCount})'")))],
+                datasets: [{
+                    data: [@string.Join(",", Model.Report.Sections.Select(s => s.AccountCount))],
+                    backgroundColor: ['#0d6efd', '#dc3545', '#198754', '#0dcaf0', '#ffc107'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}
