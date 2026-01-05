@@ -1230,6 +1230,126 @@ public class FinancialReportService : IFinancialReportService
         return report;
     }
 
+    public async Task<GeneralLedgerReport> GetGeneralLedgerAsync(ReportDateRange range, Guid? accountId = null, CancellationToken cancellationToken = default)
+    {
+        var report = new GeneralLedgerReport
+        {
+            DateRange = range,
+            FilteredAccountId = accountId
+        };
+
+        // Get all accounts (or filtered account)
+        var accountsQuery = _context.Accounts.Where(a => a.IsActive);
+        if (accountId.HasValue)
+        {
+            accountsQuery = accountsQuery.Where(a => a.Id == accountId.Value);
+        }
+        var accounts = await accountsQuery.OrderBy(a => a.Code).ToListAsync(cancellationToken);
+
+        if (accountId.HasValue && accounts.Any())
+        {
+            report.FilteredAccountName = accounts.First().Name;
+        }
+
+        // Get journal entries before the period (for opening balances)
+        var priorLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate < range.StartDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        // Get journal entries within the period
+        var periodEntries = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate >= range.StartDate && j.EntryDate <= range.EndDate && j.Status == JournalEntryStatus.Posted)
+            .OrderBy(j => j.EntryDate)
+            .ThenBy(j => j.EntryNumber)
+            .ToListAsync(cancellationToken);
+
+        foreach (var account in accounts)
+        {
+            // Calculate opening balance
+            var priorAccountLines = priorLines.Where(l => l.AccountId == account.Id).ToList();
+            decimal openingBalance;
+
+            if (account.AccountType == AccountType.Asset || account.AccountType == AccountType.Expense)
+            {
+                openingBalance = account.OpeningBalance + priorAccountLines.Sum(l => l.DebitAmount - l.CreditAmount);
+            }
+            else
+            {
+                openingBalance = account.OpeningBalance + priorAccountLines.Sum(l => l.CreditAmount - l.DebitAmount);
+            }
+
+            // Get transactions for this account in the period
+            var accountTransactions = new List<LedgerTransaction>();
+            decimal runningBalance = openingBalance;
+            decimal totalDebits = 0;
+            decimal totalCredits = 0;
+
+            foreach (var entry in periodEntries)
+            {
+                var lines = entry.Lines.Where(l => l.AccountId == account.Id).ToList();
+                foreach (var line in lines)
+                {
+                    // Update running balance based on account type
+                    if (account.AccountType == AccountType.Asset || account.AccountType == AccountType.Expense)
+                    {
+                        runningBalance += line.DebitAmount - line.CreditAmount;
+                    }
+                    else
+                    {
+                        runningBalance += line.CreditAmount - line.DebitAmount;
+                    }
+
+                    totalDebits += line.DebitAmount;
+                    totalCredits += line.CreditAmount;
+
+                    accountTransactions.Add(new LedgerTransaction
+                    {
+                        JournalEntryId = entry.Id,
+                        EntryNumber = entry.EntryNumber,
+                        EntryDate = entry.EntryDate,
+                        Description = line.Description ?? entry.Description ?? "",
+                        Reference = entry.Reference,
+                        Debit = line.DebitAmount,
+                        Credit = line.CreditAmount,
+                        RunningBalance = runningBalance
+                    });
+                }
+            }
+
+            // Only include accounts with transactions or non-zero opening balance
+            if (accountTransactions.Any() || openingBalance != 0)
+            {
+                report.Accounts.Add(new AccountLedger
+                {
+                    AccountId = account.Id,
+                    AccountCode = account.Code,
+                    AccountName = account.Name,
+                    AccountType = account.AccountType,
+                    SubType = account.AccountSubType,
+                    OpeningBalance = openingBalance,
+                    TotalDebits = totalDebits,
+                    TotalCredits = totalCredits,
+                    ClosingBalance = runningBalance,
+                    NetChange = runningBalance - openingBalance,
+                    Transactions = accountTransactions
+                });
+
+                report.TotalDebits += totalDebits;
+                report.TotalCredits += totalCredits;
+                report.TotalTransactions += accountTransactions.Count;
+            }
+        }
+
+        report.AccountsWithActivity = report.Accounts.Count;
+
+        return report;
+    }
+
     private async Task<(decimal TotalDebits, decimal TotalCredits)?> GetPreviousTrialBalanceDataAsync(
         DateTime asOfDate, CancellationToken cancellationToken)
     {
@@ -1605,6 +1725,10 @@ public class FinancialReportService : IFinancialReportService
                     else if (report is TrialBalanceReport trialBalanceReport)
                     {
                         RenderTrialBalancePdf(column, trialBalanceReport);
+                    }
+                    else if (report is GeneralLedgerReport generalLedgerReport)
+                    {
+                        RenderGeneralLedgerPdf(column, generalLedgerReport);
                     }
                 });
 
@@ -2394,6 +2518,106 @@ public class FinancialReportService : IFinancialReportService
                 table.Cell().Padding(5).Text(report.PreviousPeriod.TotalCredits.ToString("C2"));
                 table.Cell().Padding(5).Text($"{report.PreviousPeriod.CreditsChange:F1}%");
             });
+        }
+    }
+
+    private void RenderGeneralLedgerPdf(ColumnDescriptor column, GeneralLedgerReport report)
+    {
+        column.Item().Text($"Period: {report.DateRange.StartDate:MMM dd, yyyy} - {report.DateRange.EndDate:MMM dd, yyyy}").FontSize(11);
+        if (!string.IsNullOrEmpty(report.FilteredAccountName))
+        {
+            column.Item().Text($"Filtered by: {report.FilteredAccountName}").FontSize(10).FontColor(Colors.Blue.Medium);
+        }
+        column.Item().Height(15);
+
+        // Summary
+        column.Item().Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+            });
+
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Total Debits").Bold();
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Total Credits").Bold();
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Transactions").Bold();
+            table.Cell().Background(Colors.Grey.Lighten3).Padding(8).Text("Accounts").Bold();
+
+            table.Cell().Padding(8).Text(report.TotalDebits.ToString("C2"));
+            table.Cell().Padding(8).Text(report.TotalCredits.ToString("C2"));
+            table.Cell().Padding(8).Text(report.TotalTransactions.ToString());
+            table.Cell().Padding(8).Text(report.AccountsWithActivity.ToString());
+        });
+
+        column.Item().Height(20);
+
+        // Account Ledgers
+        foreach (var account in report.Accounts)
+        {
+            // Account Header
+            column.Item().Background(Colors.Grey.Lighten2).Padding(8).Row(row =>
+            {
+                row.RelativeItem(2).Text($"{account.AccountCode} - {account.AccountName}").Bold();
+                row.RelativeItem().AlignRight().Text($"Opening: {account.OpeningBalance:C2}").FontSize(9);
+            });
+
+            if (account.Transactions.Any())
+            {
+                column.Item().Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
+                    {
+                        columns.ConstantColumn(70);  // Date
+                        columns.ConstantColumn(70);  // Entry #
+                        columns.RelativeColumn(3);   // Description
+                        columns.RelativeColumn();    // Debit
+                        columns.RelativeColumn();    // Credit
+                        columns.RelativeColumn();    // Balance
+                    });
+
+                    // Header
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).Text("Date").Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).Text("Entry #").Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).Text("Description").Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).AlignRight().Text("Debit").Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).AlignRight().Text("Credit").Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).AlignRight().Text("Balance").Bold().FontSize(8);
+
+                    foreach (var txn in account.Transactions)
+                    {
+                        table.Cell().Padding(3).Text(txn.EntryDate.ToString("MM/dd/yy")).FontSize(8);
+                        table.Cell().Padding(3).Text(txn.EntryNumber).FontSize(8);
+                        table.Cell().Padding(3).Text(txn.Description.Length > 40 ? txn.Description[..40] + "..." : txn.Description).FontSize(8);
+                        table.Cell().Padding(3).AlignRight().Text(txn.Debit > 0 ? txn.Debit.ToString("C2") : "-").FontSize(8);
+                        table.Cell().Padding(3).AlignRight().Text(txn.Credit > 0 ? txn.Credit.ToString("C2") : "-").FontSize(8);
+                        table.Cell().Padding(3).AlignRight().Text(txn.RunningBalance.ToString("C2")).FontSize(8);
+                    }
+
+                    // Totals row
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).Text("");
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).Text("");
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).Text("Totals").Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).AlignRight().Text(account.TotalDebits.ToString("C2")).Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).AlignRight().Text(account.TotalCredits.ToString("C2")).Bold().FontSize(8);
+                    table.Cell().Background(Colors.Grey.Lighten4).Padding(4).AlignRight().Text(account.ClosingBalance.ToString("C2")).Bold().FontSize(8);
+                });
+            }
+            else
+            {
+                column.Item().Padding(5).Text("No transactions in this period").FontColor(Colors.Grey.Medium).FontSize(9);
+            }
+
+            // Account Footer
+            column.Item().Row(row =>
+            {
+                row.RelativeItem().Text($"Net Change: {account.NetChange:C2}").FontSize(9);
+                row.RelativeItem().AlignRight().Text($"Closing Balance: {account.ClosingBalance:C2}").Bold().FontSize(9);
+            });
+
+            column.Item().Height(15);
         }
     }
 

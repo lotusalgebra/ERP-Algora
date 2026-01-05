@@ -63,6 +63,11 @@ public interface IFinancialReportService
     Task<TrialBalanceReport> GetTrialBalanceAsync(DateTime asOfDate, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets general ledger for a date range, optionally filtered by account
+    /// </summary>
+    Task<GeneralLedgerReport> GetGeneralLedgerAsync(ReportDateRange range, Guid? accountId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Exports report to PDF
     /// </summary>
     byte[] ExportToPdf<T>(T report, string reportTitle) where T : class;
@@ -587,6 +592,53 @@ public class TrialBalanceComparison
     public decimal TotalCredits { get; set; }
     public decimal DebitsChange { get; set; }
     public decimal CreditsChange { get; set; }
+}
+
+public class GeneralLedgerReport
+{
+    public ReportDateRange DateRange { get; set; } = new();
+    public Guid? FilteredAccountId { get; set; }
+    public string? FilteredAccountName { get; set; }
+
+    // Summary
+    public decimal TotalDebits { get; set; }
+    public decimal TotalCredits { get; set; }
+    public int TotalTransactions { get; set; }
+    public int AccountsWithActivity { get; set; }
+
+    // Account Ledgers
+    public List<AccountLedger> Accounts { get; set; } = new();
+}
+
+public class AccountLedger
+{
+    public Guid AccountId { get; set; }
+    public string AccountCode { get; set; } = string.Empty;
+    public string AccountName { get; set; } = string.Empty;
+    public AccountType AccountType { get; set; }
+    public AccountSubType? SubType { get; set; }
+
+    // Balances
+    public decimal OpeningBalance { get; set; }
+    public decimal TotalDebits { get; set; }
+    public decimal TotalCredits { get; set; }
+    public decimal ClosingBalance { get; set; }
+    public decimal NetChange { get; set; }
+
+    // Transactions
+    public List<LedgerTransaction> Transactions { get; set; } = new();
+}
+
+public class LedgerTransaction
+{
+    public Guid JournalEntryId { get; set; }
+    public string EntryNumber { get; set; } = string.Empty;
+    public DateTime EntryDate { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public string? Reference { get; set; }
+    public decimal Debit { get; set; }
+    public decimal Credit { get; set; }
+    public decimal RunningBalance { get; set; }
 }
 
 #endregion

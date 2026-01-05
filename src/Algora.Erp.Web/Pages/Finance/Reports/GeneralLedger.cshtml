@@ -1,0 +1,303 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.GeneralLedgerModel
+@{
+    ViewData["Title"] = "General Ledger";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">General Ledger</h4>
+            <p class="text-muted mb-0">
+                @Model.Report.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.Report.DateRange.EndDate.ToString("MMM dd, yyyy")
+                @if (Model.Report.FilteredAccountId.HasValue)
+                {
+                    <span class="badge bg-info ms-2">@Model.Report.FilteredAccountName</span>
+                }
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/Finance/Reports/GeneralLedger?handler=ExportCsv&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")@(Model.AccountId.HasValue ? $"&accountId={Model.AccountId}" : "")"
+               class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+            </a>
+            <a href="/Finance/Reports/GeneralLedger?handler=ExportPdf&startDate=@Model.StartDate?.ToString("yyyy-MM-dd")&endDate=@Model.EndDate?.ToString("yyyy-MM-dd")@(Model.AccountId.HasValue ? $"&accountId={Model.AccountId}" : "")"
+               class="btn btn-outline-danger">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+            </a>
+            <a href="/Finance/Reports" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" name="startDate" class="form-control"
+                           value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" name="endDate" class="form-control"
+                           value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Account</label>
+                    <select name="accountId" class="form-select">
+                        @foreach (var option in Model.AccountOptions)
+                        {
+                            if (option.Value == Model.AccountId?.ToString())
+                            {
+                                <option value="@option.Value" selected>@option.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@option.Value">@option.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel me-1"></i> Apply Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Total Debits</h6>
+                            <h3 class="mb-0">@Model.Report.TotalDebits.ToString("C2")</h3>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-arrow-up-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Total Credits</h6>
+                            <h3 class="mb-0">@Model.Report.TotalCredits.ToString("C2")</h3>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-arrow-down-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Transactions</h6>
+                            <h3 class="mb-0">@Model.Report.TotalTransactions</h3>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-dark opacity-75">Active Accounts</h6>
+                            <h3 class="mb-0">@Model.Report.AccountsWithActivity</h3>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-journal-text"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ledger by Account -->
+    @if (Model.Report.Accounts.Any())
+    {
+        @foreach (var account in Model.Report.Accounts)
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">@account.AccountCode - @account.AccountName</h5>
+                        <small class="text-muted">@account.AccountType</small>
+                    </div>
+                    <div class="text-end">
+                        <small class="d-block text-muted">Closing Balance</small>
+                        <span class="fs-5 fw-bold @(account.ClosingBalance >= 0 ? "text-success" : "text-danger")">
+                            @account.ClosingBalance.ToString("C2")
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 100px;">Date</th>
+                                    <th style="width: 120px;">Entry #</th>
+                                    <th>Description</th>
+                                    <th style="width: 120px;">Reference</th>
+                                    <th class="text-end" style="width: 120px;">Debit</th>
+                                    <th class="text-end" style="width: 120px;">Credit</th>
+                                    <th class="text-end" style="width: 140px;">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Opening Balance Row -->
+                                <tr class="table-secondary">
+                                    <td>@Model.Report.DateRange.StartDate.ToString("MM/dd/yyyy")</td>
+                                    <td>-</td>
+                                    <td><em>Opening Balance</em></td>
+                                    <td>-</td>
+                                    <td class="text-end">-</td>
+                                    <td class="text-end">-</td>
+                                    <td class="text-end fw-bold">@account.OpeningBalance.ToString("C2")</td>
+                                </tr>
+                                @foreach (var txn in account.Transactions)
+                                {
+                                    <tr>
+                                        <td>@txn.EntryDate.ToString("MM/dd/yyyy")</td>
+                                        <td>
+                                            <a href="/Finance/JournalEntries/Details/@txn.JournalEntryId" class="text-decoration-none">
+                                                @txn.EntryNumber
+                                            </a>
+                                        </td>
+                                        <td>@txn.Description</td>
+                                        <td>@(string.IsNullOrEmpty(txn.Reference) ? "-" : txn.Reference)</td>
+                                        <td class="text-end">@(txn.Debit > 0 ? txn.Debit.ToString("N2") : "-")</td>
+                                        <td class="text-end">@(txn.Credit > 0 ? txn.Credit.ToString("N2") : "-")</td>
+                                        <td class="text-end fw-semibold @(txn.RunningBalance >= 0 ? "text-dark" : "text-danger")">
+                                            @txn.RunningBalance.ToString("C2")
+                                        </td>
+                                    </tr>
+                                }
+                                <!-- Closing Balance Row -->
+                                <tr class="table-secondary">
+                                    <td>@Model.Report.DateRange.EndDate.ToString("MM/dd/yyyy")</td>
+                                    <td>-</td>
+                                    <td><em>Closing Balance</em></td>
+                                    <td>-</td>
+                                    <td class="text-end fw-bold">@account.TotalDebits.ToString("N2")</td>
+                                    <td class="text-end fw-bold">@account.TotalCredits.ToString("N2")</td>
+                                    <td class="text-end fw-bold @(account.ClosingBalance >= 0 ? "text-success" : "text-danger")">
+                                        @account.ClosingBalance.ToString("C2")
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @if (account.Transactions.Count == 0)
+                {
+                    <div class="card-footer text-muted text-center py-3">
+                        <i class="bi bi-info-circle me-1"></i> No transactions during this period
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-journal-x fs-1 text-muted"></i>
+                <h5 class="mt-3 text-muted">No Ledger Data</h5>
+                <p class="text-muted">No accounts with activity found for the selected period.</p>
+            </div>
+        </div>
+    }
+
+    <!-- Summary Chart -->
+    @if (Model.Report.Accounts.Count > 1)
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Account Activity Summary</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" height="100"></canvas>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        @if (Model.Report.Accounts.Count > 1)
+        {
+            <text>
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.Report.Accounts.Take(10).Select(a => $"'{a.AccountCode}'")))],
+                    datasets: [
+                        {
+                            label: 'Debits',
+                            data: [@string.Join(",", Model.Report.Accounts.Take(10).Select(a => a.TotalDebits.ToString("F2")))],
+                            backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                            borderColor: 'rgb(13, 110, 253)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Credits',
+                            data: [@string.Join(",", Model.Report.Accounts.Take(10).Select(a => a.TotalCredits.ToString("F2")))],
+                            backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                            borderColor: 'rgb(25, 135, 84)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top 10 Accounts by Activity'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}
