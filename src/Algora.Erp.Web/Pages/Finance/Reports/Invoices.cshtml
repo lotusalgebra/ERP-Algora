@@ -1,0 +1,267 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.InvoicesModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Invoice Reports";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Invoice Reports</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
+                    <li class="breadcrumb-item active">Invoices</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </a>
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                    </button>
+                    <a href="/Finance/Reports/Invoices" class="btn btn-outline-secondary">Reset</a>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>
+                        @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Report.TotalInvoices</h3>
+                    <small class="text-muted">Total Invoices</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-primary">@Model.Report.TotalInvoiced.ToString("C0")</h3>
+                    <small class="text-muted">Total Invoiced</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-success">@Model.Report.TotalPaid.ToString("C0")</h3>
+                    <small class="text-muted">Total Paid</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-warning">@Model.Report.TotalOutstanding.ToString("C0")</h3>
+                    <small class="text-muted">Outstanding</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-danger">@Model.Report.TotalOverdue.ToString("C0")</h3>
+                    <small class="text-muted">Overdue</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Report.AverageInvoiceAmount.ToString("C0")</h3>
+                    <small class="text-muted">Average Amount</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Invoice Count by Status -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Invoice Count by Status</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Status</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end pe-4">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var status in Model.Report.ByStatus)
+                                {
+                                    var badgeClass = status.Status switch
+                                    {
+                                        InvoiceStatus.Draft => "bg-secondary",
+                                        InvoiceStatus.Pending => "bg-warning text-dark",
+                                        InvoiceStatus.Sent => "bg-info",
+                                        InvoiceStatus.PartiallyPaid => "bg-primary",
+                                        InvoiceStatus.Paid => "bg-success",
+                                        InvoiceStatus.Overdue => "bg-danger",
+                                        InvoiceStatus.Void => "bg-dark",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="badge @badgeClass">@status.Status</span>
+                                        </td>
+                                        <td class="text-center fw-medium">@status.Count</td>
+                                        <td class="text-end">@status.Amount.ToString("C0")</td>
+                                        <td class="text-end pe-4">@status.Percentage.ToString("F1")%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td class="ps-4 fw-bold">Total</td>
+                                    <td class="text-center fw-bold">@Model.Report.TotalInvoices</td>
+                                    <td class="text-end fw-bold">@Model.Report.TotalInvoiced.ToString("C0")</td>
+                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collection Efficiency -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Collection Efficiency</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4 mb-4">
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h3 class="mb-1 @(Model.CollectionReport.CollectionRate >= 80 ? "text-success" : Model.CollectionReport.CollectionRate >= 50 ? "text-warning" : "text-danger")">
+                                    @Model.CollectionReport.CollectionRate.ToString("F1")%
+                                </h3>
+                                <small class="text-muted">Collection Rate</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h3 class="mb-1">@Model.CollectionReport.AverageDaysToPayment.ToString("F1")</h3>
+                                <small class="text-muted">Avg Days to Payment</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h3 class="mb-1 text-success">@Model.CollectionReport.InvoicesPaidOnTime</h3>
+                                <small class="text-muted">Paid On Time</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h3 class="mb-1 text-danger">@Model.CollectionReport.InvoicesPaidLate</h3>
+                                <small class="text-muted">Paid Late</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="text-muted mb-3">On-Time Payment Rate</h6>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div class="progress-bar bg-success" style="width: @Model.CollectionReport.OnTimePaymentRate%">
+                                @Model.CollectionReport.OnTimePaymentRate.ToString("F1")% On Time
+                            </div>
+                            <div class="progress-bar bg-danger" style="width: @(100 - Model.CollectionReport.OnTimePaymentRate)%">
+                                @((100 - Model.CollectionReport.OnTimePaymentRate).ToString("F1"))% Late
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Trend Chart -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Daily Invoice Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('dailyTrendChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.DailyTrend.Select(d => $"'{d.Date:MMM dd}'")))],
+                datasets: [{
+                    label: 'Invoice Amount',
+                    data: [@string.Join(",", Model.Report.DailyTrend.Select(d => d.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

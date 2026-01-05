@@ -1,0 +1,322 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.PaymentsModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Payment Reports";
+
+    var currentWeek = Model.Report.WeeklyTrend.FirstOrDefault();
+    var lastWeek = Model.Report.WeeklyTrend.Skip(1).FirstOrDefault();
+    var thisWeekAmount = currentWeek?.Amount ?? 0;
+    var lastWeekAmount = lastWeek?.Amount ?? 0;
+    var weekChange = lastWeekAmount > 0
+        ? ((thisWeekAmount - lastWeekAmount) / lastWeekAmount * 100)
+        : 0;
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Payment Reports</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
+                    <li class="breadcrumb-item active">Payments</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </a>
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                    </button>
+                    <a href="/Finance/Reports/Payments" class="btn btn-outline-secondary">Reset</a>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>
+                        @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Report.TotalPayments</h3>
+                    <small class="text-muted">Total Payments</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-success">@Model.Report.TotalReceived.ToString("C0")</h3>
+                    <small class="text-muted">Total Received</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Report.AveragePayment.ToString("C0")</h3>
+                    <small class="text-muted">Average Payment</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-primary">@Model.Report.LargestPayment.ToString("C0")</h3>
+                    <small class="text-muted">Largest Payment</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Report.SmallestPayment.ToString("C0")</h3>
+                    <small class="text-muted">Smallest Payment</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    @{
+                        var changeClass = weekChange >= 0 ? "text-success" : "text-danger";
+                        var changeIcon = weekChange >= 0 ? "bi-arrow-up" : "bi-arrow-down";
+                    }
+                    <h3 class="mb-1 @changeClass">
+                        <i class="bi @changeIcon"></i> @Math.Abs(weekChange).ToString("F1")%
+                    </h3>
+                    <small class="text-muted">Week over Week</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Payment by Method -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment by Method</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Method</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end pe-4">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var method in Model.Report.ByMethod)
+                                {
+                                    var iconClass = method.Method switch
+                                    {
+                                        PaymentMethod.Cash => "bi-cash-coin text-success",
+                                        PaymentMethod.Check => "bi-file-text text-secondary",
+                                        PaymentMethod.BankTransfer => "bi-bank text-primary",
+                                        PaymentMethod.CreditCard => "bi-credit-card text-info",
+                                        PaymentMethod.DebitCard => "bi-credit-card-2-front text-warning",
+                                        PaymentMethod.PayPal => "bi-paypal text-primary",
+                                        _ => "bi-question-circle text-muted"
+                                    };
+
+                                    <tr>
+                                        <td class="ps-4">
+                                            <i class="bi @iconClass me-2"></i>@method.Method
+                                        </td>
+                                        <td class="text-center fw-medium">@method.Count</td>
+                                        <td class="text-end">@method.Amount.ToString("C0")</td>
+                                        <td class="text-end pe-4">@method.Percentage.ToString("F1")%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td class="ps-4 fw-bold">Total</td>
+                                    <td class="text-center fw-bold">@Model.Report.TotalPayments</td>
+                                    <td class="text-end fw-bold">@Model.Report.TotalReceived.ToString("C0")</td>
+                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cash Flow Summary -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Cash Flow Insights</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4 mb-4">
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-success bg-opacity-10 rounded">
+                                <h3 class="mb-1 text-success">@Model.CashFlow.TotalInflow.ToString("C0")</h3>
+                                <small class="text-muted">Actual Inflow</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-primary bg-opacity-10 rounded">
+                                <h3 class="mb-1 text-primary">@Model.CashFlow.ProjectedInflow.ToString("C0")</h3>
+                                <small class="text-muted">Projected Inflow</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    @{
+                        var collectionRate = Model.CashFlow.ProjectedInflow > 0
+                            ? (Model.CashFlow.TotalInflow / Model.CashFlow.ProjectedInflow * 100)
+                            : 100;
+                    }
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Collection Rate</span>
+                            <span class="fw-medium @(collectionRate >= 80 ? "text-success" : collectionRate >= 50 ? "text-warning" : "text-danger")">
+                                @collectionRate.ToString("F1")%
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: @Math.Min(collectionRate, 100)%"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-center p-3 bg-danger bg-opacity-10 rounded">
+                        <h3 class="mb-1 text-danger">@Model.CashFlow.OverdueReceivables.ToString("C0")</h3>
+                        <small class="text-muted">Overdue Receivables</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Trend Chart -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Daily Payment Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Trend Chart -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Weekly Payment Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="weeklyTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Daily Trend Chart
+        const dailyCtx = document.getElementById('dailyTrendChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.DailyTrend.Select(d => $"'{d.Date:MMM dd}'")))],
+                datasets: [{
+                    label: 'Payment Amount',
+                    data: [@string.Join(",", Model.Report.DailyTrend.Select(d => d.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                    borderColor: 'rgb(34, 197, 94)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Weekly Trend Chart
+        const weeklyCtx = document.getElementById('weeklyTrendChart').getContext('2d');
+        new Chart(weeklyCtx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.WeeklyTrend.Select(w => $"'Week of {w.WeekStart:MMM dd}'")))],
+                datasets: [{
+                    label: 'Weekly Payments',
+                    data: [@string.Join(",", Model.Report.WeeklyTrend.Select(w => w.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

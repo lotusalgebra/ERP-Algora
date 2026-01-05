@@ -1,0 +1,455 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.IndexModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Financial Reports";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Financial Reports</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item active">Reports</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <select class="form-select" style="width: auto;" onchange="window.location.href='?Period=' + this.value">
+                <option value="thismonth" selected="@(Model.Period == "thismonth")">This Month</option>
+                <option value="lastmonth" selected="@(Model.Period == "lastmonth")">Last Month</option>
+                <option value="thisquarter" selected="@(Model.Period == "thisquarter")">This Quarter</option>
+                <option value="thisyear" selected="@(Model.Period == "thisyear")">This Year</option>
+                <option value="lastyear" selected="@(Model.Period == "lastyear")">Last Year</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <a href="/Finance/Reports/Invoices" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Invoice Reports</h6>
+                        <small class="text-muted">Detailed invoice analysis</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="/Finance/Reports/Payments" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-cash-stack text-success fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Payment Reports</h6>
+                        <small class="text-muted">Payment collection analysis</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="/Finance/Reports/Aging" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-clock-history text-warning fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Aging Report</h6>
+                        <small class="text-muted">Accounts receivable aging</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="/Finance/Reports/Customers" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center">
+                    <div class="bg-info bg-opacity-10 p-3 rounded me-3">
+                        <i class="bi bi-people text-info fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Customer Revenue</h6>
+                        <small class="text-muted">Revenue by customer</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Invoiced</h6>
+                            <h3 class="mb-0">@Model.InvoiceSummary.TotalInvoiced.ToString("C0")</h3>
+                            <small class="text-muted">@Model.InvoiceSummary.TotalInvoices invoices</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Collected</h6>
+                            <h3 class="mb-0 text-success">@Model.PaymentSummary.TotalReceived.ToString("C0")</h3>
+                            <small class="text-muted">@Model.PaymentSummary.TotalPayments payments</small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-cash-stack text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Outstanding</h6>
+                            <h3 class="mb-0 text-warning">@Model.InvoiceSummary.TotalOutstanding.ToString("C0")</h3>
+                            <small class="text-muted">Balance due</small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Overdue</h6>
+                            <h3 class="mb-0 text-danger">@Model.InvoiceSummary.TotalOverdue.ToString("C0")</h3>
+                            <small class="text-muted">@Model.InvoiceSummary.OverdueInvoices invoices overdue</small>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Revenue Trend Chart -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Revenue Trend (12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueTrendChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aging Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Aging Summary</h5>
+                    <a href="/Finance/Reports/Aging" class="btn btn-sm btn-outline-primary">View Details</a>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Current</span>
+                            <span class="fw-medium">@Model.Aging.Current.Amount.ToString("C0")</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: @Model.Aging.Current.Percentage%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>1-30 Days</span>
+                            <span class="fw-medium">@Model.Aging.Days1To30.Amount.ToString("C0")</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: @Model.Aging.Days1To30.Percentage%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>31-60 Days</span>
+                            <span class="fw-medium">@Model.Aging.Days31To60.Amount.ToString("C0")</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: @Model.Aging.Days31To60.Percentage%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>61-90 Days</span>
+                            <span class="fw-medium">@Model.Aging.Days61To90.Amount.ToString("C0")</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-orange" style="width: @Model.Aging.Days61To90.Percentage%; background-color: #fd7e14;"></div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Over 90 Days</span>
+                            <span class="fw-medium text-danger">@Model.Aging.Over90Days.Amount.ToString("C0")</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" style="width: @Model.Aging.Over90Days.Percentage%"></div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Total Outstanding</span>
+                        <span class="fw-bold">@Model.Aging.TotalOutstanding.ToString("C0")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Status Breakdown -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Invoice Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="invoiceStatusChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Customers -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Top 5 Customers</h5>
+                    <a href="/Finance/Reports/Customers" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Customer</th>
+                                    <th class="text-center">Invoices</th>
+                                    <th class="text-end">Revenue</th>
+                                    <th class="text-end pe-4">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.TopCustomers.Any())
+                                {
+                                    foreach (var customer in Model.TopCustomers)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-decoration-none">
+                                                    @customer.CustomerName
+                                                </a>
+                                            </td>
+                                            <td class="text-center">@customer.InvoiceCount</td>
+                                            <td class="text-end fw-medium">@customer.TotalRevenue.ToString("C0")</td>
+                                            <td class="text-end pe-4">
+                                                <span class="badge bg-primary">@customer.Percentage.ToString("F1")%</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">No customer data</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.PaymentSummary.ByMethod.Any())
+                    {
+                        foreach (var method in Model.PaymentSummary.ByMethod)
+                        {
+                            var badgeClass = method.Method switch
+                            {
+                                PaymentMethod.Cash => "bg-success",
+                                PaymentMethod.BankTransfer => "bg-primary",
+                                PaymentMethod.CreditCard => "bg-info",
+                                PaymentMethod.Check => "bg-warning text-dark",
+                                _ => "bg-secondary"
+                            };
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>
+                                        <span class="badge @badgeClass me-2">@method.Method</span>
+                                        <small class="text-muted">@method.Count payments</small>
+                                    </span>
+                                    <span class="fw-medium">@method.Amount.ToString("C0")</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar @badgeClass" style="width: @method.Percentage%"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">No payment data</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Key Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h4 class="mb-1">@Model.InvoiceSummary.AverageInvoiceAmount.ToString("C0")</h4>
+                                <small class="text-muted">Avg Invoice Amount</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h4 class="mb-1">@Model.PaymentSummary.AveragePayment.ToString("C0")</h4>
+                                <small class="text-muted">Avg Payment Amount</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                @{
+                                    var collectionRate = Model.InvoiceSummary.TotalInvoiced > 0
+                                        ? (Model.InvoiceSummary.TotalPaid / Model.InvoiceSummary.TotalInvoiced) * 100
+                                        : 0;
+                                }
+                                <h4 class="mb-1 @(collectionRate >= 80 ? "text-success" : collectionRate >= 50 ? "text-warning" : "text-danger")">
+                                    @collectionRate.ToString("F1")%
+                                </h4>
+                                <small class="text-muted">Collection Rate</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h4 class="mb-1">@Model.PaymentSummary.LargestPayment.ToString("C0")</h4>
+                                <small class="text-muted">Largest Payment</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Revenue Trend Chart
+        const revenueTrendCtx = document.getElementById('revenueTrendChart').getContext('2d');
+        new Chart(revenueTrendCtx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.RevenueTrend.Select(r => $"'{r.MonthName}'")))],
+                datasets: [
+                    {
+                        label: 'Invoiced',
+                        data: [@string.Join(",", Model.RevenueTrend.Select(r => r.Invoiced.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Collected',
+                        data: [@string.Join(",", Model.RevenueTrend.Select(r => r.Collected.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                        borderColor: 'rgb(34, 197, 94)',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Invoice Status Chart
+        const invoiceStatusCtx = document.getElementById('invoiceStatusChart').getContext('2d');
+        new Chart(invoiceStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.InvoiceSummary.ByStatus.Select(s => $"'{s.Status}'")))],
+                datasets: [{
+                    data: [@string.Join(",", Model.InvoiceSummary.ByStatus.Select(s => s.Count))],
+                    backgroundColor: [
+                        '#6c757d', // Draft
+                        '#ffc107', // Pending
+                        '#17a2b8', // Sent
+                        '#007bff', // PartiallyPaid
+                        '#28a745', // Paid
+                        '#dc3545', // Overdue
+                        '#343a40', // Void
+                        '#adb5bd'  // Cancelled
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    </script>
+}

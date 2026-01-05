@@ -1,0 +1,313 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.AgingModel
+@{
+    ViewData["Title"] = "Accounts Receivable Aging";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Accounts Receivable Aging</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
+                    <li class="breadcrumb-item active">Aging</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="?handler=ExportPdf" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </a>
+            <a href="?handler=ExportCsv" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- As of Date -->
+    <div class="alert alert-info d-flex align-items-center mb-4">
+        <i class="bi bi-calendar-check me-2"></i>
+        <span>Report as of <strong>@Model.Report.AsOfDate.ToString("MMMM dd, yyyy")</strong></span>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Report.TotalOutstanding.ToString("C0")</h3>
+                    <small class="opacity-75">Total Outstanding</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-success">@Model.Report.Current.Amount.ToString("C0")</h3>
+                    <small class="text-muted">Current</small>
+                    <div class="small text-muted">@Model.Report.Current.InvoiceCount invoices</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-info">@Model.Report.Days1To30.Amount.ToString("C0")</h3>
+                    <small class="text-muted">1-30 Days</small>
+                    <div class="small text-muted">@Model.Report.Days1To30.InvoiceCount invoices</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-warning">@Model.Report.Days31To60.Amount.ToString("C0")</h3>
+                    <small class="text-muted">31-60 Days</small>
+                    <div class="small text-muted">@Model.Report.Days31To60.InvoiceCount invoices</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-orange">@Model.Report.Days61To90.Amount.ToString("C0")</h3>
+                    <small class="text-muted">61-90 Days</small>
+                    <div class="small text-muted">@Model.Report.Days61To90.InvoiceCount invoices</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-danger">@Model.Report.Over90Days.Amount.ToString("C0")</h3>
+                    <small class="text-muted">Over 90 Days</small>
+                    <div class="small text-muted">@Model.Report.Over90Days.InvoiceCount invoices</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Aging Distribution Chart -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Aging Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="agingChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aging Breakdown Table -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>Aging Breakdown</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Period</th>
+                                    <th class="text-center">Invoices</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end pe-4">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var buckets = new[]
+                                    {
+                                        (Model.Report.Current, "bg-success"),
+                                        (Model.Report.Days1To30, "bg-info"),
+                                        (Model.Report.Days31To60, "bg-warning"),
+                                        (Model.Report.Days61To90, "bg-orange"),
+                                        (Model.Report.Over90Days, "bg-danger")
+                                    };
+                                }
+                                @foreach (var (bucket, colorClass) in buckets)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="badge @colorClass">@bucket.Label</span>
+                                        </td>
+                                        <td class="text-center">@bucket.InvoiceCount</td>
+                                        <td class="text-end">@bucket.Amount.ToString("C0")</td>
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <div class="progress flex-grow-1" style="width: 60px; height: 6px;">
+                                                    <div class="progress-bar @colorClass" style="width: @bucket.Percentage%"></div>
+                                                </div>
+                                                <span class="small">@bucket.Percentage.ToString("F1")%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td class="ps-4 fw-bold">Total</td>
+                                    <td class="text-center fw-bold">
+                                        @(Model.Report.Current.InvoiceCount + Model.Report.Days1To30.InvoiceCount +
+                                          Model.Report.Days31To60.InvoiceCount + Model.Report.Days61To90.InvoiceCount +
+                                          Model.Report.Over90Days.InvoiceCount)
+                                    </td>
+                                    <td class="text-end fw-bold">@Model.Report.TotalOutstanding.ToString("C0")</td>
+                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- By Customer Table -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Aging by Customer</h5>
+                    <div class="input-group" style="width: 250px;">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="customerSearch" placeholder="Search customers...">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="customerTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Customer</th>
+                                    <th class="text-end">Current</th>
+                                    <th class="text-end">1-30 Days</th>
+                                    <th class="text-end">31-60 Days</th>
+                                    <th class="text-end">61-90 Days</th>
+                                    <th class="text-end">Over 90</th>
+                                    <th class="text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var customer in Model.Report.ByCustomer.OrderByDescending(c => c.Total))
+                                {
+                                    <tr class="customer-row">
+                                        <td class="ps-4">
+                                            <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-decoration-none">
+                                                @customer.CustomerName
+                                            </a>
+                                        </td>
+                                        <td class="text-end @(customer.Current > 0 ? "text-success" : "text-muted")">
+                                            @(customer.Current > 0 ? customer.Current.ToString("C0") : "-")
+                                        </td>
+                                        <td class="text-end @(customer.Days1To30 > 0 ? "text-info" : "text-muted")">
+                                            @(customer.Days1To30 > 0 ? customer.Days1To30.ToString("C0") : "-")
+                                        </td>
+                                        <td class="text-end @(customer.Days31To60 > 0 ? "text-warning" : "text-muted")">
+                                            @(customer.Days31To60 > 0 ? customer.Days31To60.ToString("C0") : "-")
+                                        </td>
+                                        <td class="text-end @(customer.Days61To90 > 0 ? "" : "text-muted")" style="@(customer.Days61To90 > 0 ? "color: #fd7e14;" : "")">
+                                            @(customer.Days61To90 > 0 ? customer.Days61To90.ToString("C0") : "-")
+                                        </td>
+                                        <td class="text-end @(customer.Over90Days > 0 ? "text-danger fw-bold" : "text-muted")">
+                                            @(customer.Over90Days > 0 ? customer.Over90Days.ToString("C0") : "-")
+                                        </td>
+                                        <td class="text-end pe-4 fw-bold">@customer.Total.ToString("C0")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td class="ps-4 fw-bold">Total</td>
+                                    <td class="text-end fw-bold text-success">@Model.Report.Current.Amount.ToString("C0")</td>
+                                    <td class="text-end fw-bold text-info">@Model.Report.Days1To30.Amount.ToString("C0")</td>
+                                    <td class="text-end fw-bold text-warning">@Model.Report.Days31To60.Amount.ToString("C0")</td>
+                                    <td class="text-end fw-bold" style="color: #fd7e14;">@Model.Report.Days61To90.Amount.ToString("C0")</td>
+                                    <td class="text-end fw-bold text-danger">@Model.Report.Over90Days.Amount.ToString("C0")</td>
+                                    <td class="text-end pe-4 fw-bold">@Model.Report.TotalOutstanding.ToString("C0")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-orange { color: #fd7e14 !important; }
+    .bg-orange { background-color: #fd7e14 !important; }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Aging Distribution Chart
+        const ctx = document.getElementById('agingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Current', '1-30 Days', '31-60 Days', '61-90 Days', 'Over 90 Days'],
+                datasets: [{
+                    data: [
+                        @Model.Report.Current.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                        @Model.Report.Days1To30.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                        @Model.Report.Days31To60.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                        @Model.Report.Days61To90.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                        @Model.Report.Over90Days.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+                    ],
+                    backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(14, 165, 233, 0.8)',
+                        'rgba(234, 179, 8, 0.8)',
+                        'rgba(253, 126, 20, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(34, 197, 94)',
+                        'rgb(14, 165, 233)',
+                        'rgb(234, 179, 8)',
+                        'rgb(253, 126, 20)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': $' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Customer search functionality
+        document.getElementById('customerSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.customer-row');
+
+            rows.forEach(row => {
+                const customerName = row.querySelector('td:first-child').textContent.toLowerCase();
+                row.style.display = customerName.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+}
