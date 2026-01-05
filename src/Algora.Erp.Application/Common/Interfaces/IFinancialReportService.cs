@@ -53,6 +53,11 @@ public interface IFinancialReportService
     Task<BalanceSheetReport> GetBalanceSheetAsync(DateTime asOfDate, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets cash flow statement for a date range
+    /// </summary>
+    Task<CashFlowStatementReport> GetCashFlowStatementAsync(ReportDateRange range, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Exports report to PDF
     /// </summary>
     byte[] ExportToPdf<T>(T report, string reportTitle) where T : class;
@@ -435,6 +440,89 @@ public class BalanceSheetComparison
     public decimal AssetsChange { get; set; }
     public decimal LiabilitiesChange { get; set; }
     public decimal EquityChange { get; set; }
+}
+
+public class CashFlowStatementReport
+{
+    public ReportDateRange DateRange { get; set; } = new();
+
+    // Operating Activities
+    public decimal NetIncome { get; set; }
+    public List<CashFlowLineItem> OperatingAdjustments { get; set; } = new();
+    public List<CashFlowLineItem> WorkingCapitalChanges { get; set; } = new();
+    public decimal NetCashFromOperating { get; set; }
+
+    // Investing Activities
+    public List<CashFlowLineItem> InvestingActivities { get; set; } = new();
+    public decimal NetCashFromInvesting { get; set; }
+
+    // Financing Activities
+    public List<CashFlowLineItem> FinancingActivities { get; set; } = new();
+    public decimal NetCashFromFinancing { get; set; }
+
+    // Summary
+    public decimal NetChangeInCash { get; set; }
+    public decimal BeginningCashBalance { get; set; }
+    public decimal EndingCashBalance { get; set; }
+
+    // Validation
+    public bool IsBalanced => Math.Abs(EndingCashBalance - (BeginningCashBalance + NetChangeInCash)) < 0.01m;
+
+    // Comparative Data
+    public CashFlowComparison? PreviousPeriod { get; set; }
+
+    // Monthly Trend
+    public List<MonthlyCashFlow> MonthlyTrend { get; set; } = new();
+
+    // Key Metrics
+    public decimal OperatingCashFlowRatio { get; set; }
+    public decimal FreeCashFlow { get; set; }
+    public decimal CashFlowToDebtRatio { get; set; }
+}
+
+public class CashFlowLineItem
+{
+    public string Description { get; set; } = string.Empty;
+    public string AccountCode { get; set; } = string.Empty;
+    public CashFlowCategory Category { get; set; }
+    public decimal Amount { get; set; }
+    public decimal? PreviousAmount { get; set; }
+    public decimal? ChangePercent { get; set; }
+    public bool IsSubtotal { get; set; }
+}
+
+public enum CashFlowCategory
+{
+    OperatingAdjustment,
+    WorkingCapitalChange,
+    Investing,
+    Financing
+}
+
+public class CashFlowComparison
+{
+    public ReportDateRange DateRange { get; set; } = new();
+    public decimal NetCashFromOperating { get; set; }
+    public decimal NetCashFromInvesting { get; set; }
+    public decimal NetCashFromFinancing { get; set; }
+    public decimal NetChangeInCash { get; set; }
+
+    public decimal OperatingChange { get; set; }
+    public decimal InvestingChange { get; set; }
+    public decimal FinancingChange { get; set; }
+    public decimal TotalChange { get; set; }
+}
+
+public class MonthlyCashFlow
+{
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public string MonthName { get; set; } = string.Empty;
+    public decimal Operating { get; set; }
+    public decimal Investing { get; set; }
+    public decimal Financing { get; set; }
+    public decimal NetChange { get; set; }
+    public decimal EndingBalance { get; set; }
 }
 
 #endregion

@@ -812,6 +812,382 @@ public class FinancialReportService : IFinancialReportService
         return report;
     }
 
+    public async Task<CashFlowStatementReport> GetCashFlowStatementAsync(ReportDateRange range, CancellationToken cancellationToken = default)
+    {
+        var report = new CashFlowStatementReport
+        {
+            DateRange = range
+        };
+
+        // Get journal entries for the period
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate >= range.StartDate && j.EntryDate <= range.EndDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        // Get all accounts
+        var accounts = await _context.Accounts
+            .Where(a => a.IsActive)
+            .ToListAsync(cancellationToken);
+
+        // Calculate Net Income (Revenue - Expenses)
+        var revenueTotal = journalLines
+            .Where(l => l.Account.AccountType == AccountType.Revenue)
+            .Sum(l => l.CreditAmount - l.DebitAmount);
+
+        var expenseTotal = journalLines
+            .Where(l => l.Account.AccountType == AccountType.Expense)
+            .Sum(l => l.DebitAmount - l.CreditAmount);
+
+        report.NetIncome = revenueTotal - expenseTotal;
+
+        // ===== OPERATING ACTIVITIES =====
+        // Non-cash adjustments (depreciation, amortization)
+        var depreciation = journalLines
+            .Where(l => l.Account.AccountSubType == AccountSubType.Depreciation)
+            .Sum(l => l.DebitAmount - l.CreditAmount);
+
+        if (depreciation != 0)
+        {
+            report.OperatingAdjustments.Add(new CashFlowLineItem
+            {
+                Description = "Depreciation & Amortization",
+                Category = CashFlowCategory.OperatingAdjustment,
+                Amount = depreciation // Add back (non-cash expense)
+            });
+        }
+
+        // Changes in working capital
+        // Get beginning and ending balances for working capital accounts
+        var beginningDate = range.StartDate.AddDays(-1);
+        var beginningLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= beginningDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        var endingLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= range.EndDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        // Accounts Receivable change (increase = cash outflow)
+        var arAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.AccountsReceivable).ToList();
+        foreach (var arAccount in arAccounts)
+        {
+            var beginningBalance = arAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == arAccount.Id).Sum(l => l.DebitAmount - l.CreditAmount);
+            var endingBalance = arAccount.OpeningBalance + endingLines.Where(l => l.AccountId == arAccount.Id).Sum(l => l.DebitAmount - l.CreditAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                report.WorkingCapitalChanges.Add(new CashFlowLineItem
+                {
+                    Description = $"Change in {arAccount.Name}",
+                    AccountCode = arAccount.Code,
+                    Category = CashFlowCategory.WorkingCapitalChange,
+                    Amount = -change // Increase in AR = decrease in cash
+                });
+            }
+        }
+
+        // Inventory change (increase = cash outflow)
+        var inventoryAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.Inventory).ToList();
+        foreach (var invAccount in inventoryAccounts)
+        {
+            var beginningBalance = invAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == invAccount.Id).Sum(l => l.DebitAmount - l.CreditAmount);
+            var endingBalance = invAccount.OpeningBalance + endingLines.Where(l => l.AccountId == invAccount.Id).Sum(l => l.DebitAmount - l.CreditAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                report.WorkingCapitalChanges.Add(new CashFlowLineItem
+                {
+                    Description = $"Change in {invAccount.Name}",
+                    AccountCode = invAccount.Code,
+                    Category = CashFlowCategory.WorkingCapitalChange,
+                    Amount = -change // Increase in inventory = decrease in cash
+                });
+            }
+        }
+
+        // Accounts Payable change (increase = cash inflow)
+        var apAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.AccountsPayable).ToList();
+        foreach (var apAccount in apAccounts)
+        {
+            var beginningBalance = apAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == apAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var endingBalance = apAccount.OpeningBalance + endingLines.Where(l => l.AccountId == apAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                report.WorkingCapitalChanges.Add(new CashFlowLineItem
+                {
+                    Description = $"Change in {apAccount.Name}",
+                    AccountCode = apAccount.Code,
+                    Category = CashFlowCategory.WorkingCapitalChange,
+                    Amount = change // Increase in AP = increase in cash
+                });
+            }
+        }
+
+        // Accrued Liabilities change
+        var accruedAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.AccruedLiabilities || a.AccountSubType == AccountSubType.PayrollLiabilities).ToList();
+        foreach (var accAccount in accruedAccounts)
+        {
+            var beginningBalance = accAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == accAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var endingBalance = accAccount.OpeningBalance + endingLines.Where(l => l.AccountId == accAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                report.WorkingCapitalChanges.Add(new CashFlowLineItem
+                {
+                    Description = $"Change in {accAccount.Name}",
+                    AccountCode = accAccount.Code,
+                    Category = CashFlowCategory.WorkingCapitalChange,
+                    Amount = change
+                });
+            }
+        }
+
+        report.NetCashFromOperating = report.NetIncome
+            + report.OperatingAdjustments.Sum(a => a.Amount)
+            + report.WorkingCapitalChanges.Sum(a => a.Amount);
+
+        // ===== INVESTING ACTIVITIES =====
+        // Fixed Assets purchases/sales
+        var fixedAssetAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.FixedAssets).ToList();
+        foreach (var faAccount in fixedAssetAccounts)
+        {
+            var beginningBalance = faAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == faAccount.Id).Sum(l => l.DebitAmount - l.CreditAmount);
+            var endingBalance = faAccount.OpeningBalance + endingLines.Where(l => l.AccountId == faAccount.Id).Sum(l => l.DebitAmount - l.CreditAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                report.InvestingActivities.Add(new CashFlowLineItem
+                {
+                    Description = change > 0 ? $"Purchase of {faAccount.Name}" : $"Sale of {faAccount.Name}",
+                    AccountCode = faAccount.Code,
+                    Category = CashFlowCategory.Investing,
+                    Amount = -change // Purchase = cash outflow (negative)
+                });
+            }
+        }
+
+        report.NetCashFromInvesting = report.InvestingActivities.Sum(a => a.Amount);
+
+        // ===== FINANCING ACTIVITIES =====
+        // Long-term debt changes
+        var debtAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.LongTermDebt || a.AccountSubType == AccountSubType.ShortTermDebt).ToList();
+        foreach (var debtAccount in debtAccounts)
+        {
+            var beginningBalance = debtAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == debtAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var endingBalance = debtAccount.OpeningBalance + endingLines.Where(l => l.AccountId == debtAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                report.FinancingActivities.Add(new CashFlowLineItem
+                {
+                    Description = change > 0 ? $"Proceeds from {debtAccount.Name}" : $"Repayment of {debtAccount.Name}",
+                    AccountCode = debtAccount.Code,
+                    Category = CashFlowCategory.Financing,
+                    Amount = change
+                });
+            }
+        }
+
+        // Equity changes (capital contributions, dividends)
+        var equityAccounts = accounts.Where(a => a.AccountType == AccountType.Equity && a.AccountSubType != AccountSubType.RetainedEarnings).ToList();
+        foreach (var eqAccount in equityAccounts)
+        {
+            var beginningBalance = eqAccount.OpeningBalance + beginningLines.Where(l => l.AccountId == eqAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var endingBalance = eqAccount.OpeningBalance + endingLines.Where(l => l.AccountId == eqAccount.Id).Sum(l => l.CreditAmount - l.DebitAmount);
+            var change = endingBalance - beginningBalance;
+
+            if (change != 0)
+            {
+                // Drawings reduce cash (negative), contributions increase cash (positive)
+                var isDrawings = eqAccount.AccountSubType == AccountSubType.Drawings;
+                report.FinancingActivities.Add(new CashFlowLineItem
+                {
+                    Description = isDrawings ? "Owner Drawings" : $"Change in {eqAccount.Name}",
+                    AccountCode = eqAccount.Code,
+                    Category = CashFlowCategory.Financing,
+                    Amount = isDrawings ? -Math.Abs(change) : change
+                });
+            }
+        }
+
+        report.NetCashFromFinancing = report.FinancingActivities.Sum(a => a.Amount);
+
+        // ===== SUMMARY =====
+        report.NetChangeInCash = report.NetCashFromOperating + report.NetCashFromInvesting + report.NetCashFromFinancing;
+
+        // Calculate beginning and ending cash balances
+        var cashAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.Cash || a.AccountSubType == AccountSubType.Bank).ToList();
+        report.BeginningCashBalance = cashAccounts.Sum(ca =>
+            ca.OpeningBalance + beginningLines.Where(l => l.AccountId == ca.Id).Sum(l => l.DebitAmount - l.CreditAmount));
+        report.EndingCashBalance = cashAccounts.Sum(ca =>
+            ca.OpeningBalance + endingLines.Where(l => l.AccountId == ca.Id).Sum(l => l.DebitAmount - l.CreditAmount));
+
+        // ===== KEY METRICS =====
+        // Operating Cash Flow Ratio = Operating Cash Flow / Current Liabilities
+        var currentLiabilities = accounts
+            .Where(a => a.AccountType == AccountType.Liability &&
+                (a.AccountSubType == AccountSubType.AccountsPayable ||
+                 a.AccountSubType == AccountSubType.AccruedLiabilities ||
+                 a.AccountSubType == AccountSubType.PayrollLiabilities ||
+                 a.AccountSubType == AccountSubType.ShortTermDebt ||
+                 a.AccountSubType == AccountSubType.OtherCurrentLiabilities))
+            .Sum(a => a.OpeningBalance + endingLines.Where(l => l.AccountId == a.Id).Sum(l => l.CreditAmount - l.DebitAmount));
+
+        report.OperatingCashFlowRatio = currentLiabilities != 0 ? report.NetCashFromOperating / currentLiabilities : 0;
+
+        // Free Cash Flow = Operating Cash Flow - Capital Expenditures
+        var capex = report.InvestingActivities.Where(i => i.Amount < 0).Sum(i => i.Amount);
+        report.FreeCashFlow = report.NetCashFromOperating + capex; // capex is negative
+
+        // Cash Flow to Debt Ratio = Operating Cash Flow / Total Debt
+        var totalDebt = accounts
+            .Where(a => a.AccountSubType == AccountSubType.ShortTermDebt || a.AccountSubType == AccountSubType.LongTermDebt)
+            .Sum(a => a.OpeningBalance + endingLines.Where(l => l.AccountId == a.Id).Sum(l => l.CreditAmount - l.DebitAmount));
+
+        report.CashFlowToDebtRatio = totalDebt != 0 ? report.NetCashFromOperating / totalDebt : 0;
+
+        // ===== MONTHLY TREND =====
+        report.MonthlyTrend = await GetMonthlyCashFlowTrendAsync(range, cancellationToken);
+
+        // ===== PREVIOUS PERIOD COMPARISON =====
+        var periodLength = (range.EndDate - range.StartDate).Days;
+        var previousRange = new ReportDateRange
+        {
+            StartDate = range.StartDate.AddDays(-periodLength - 1),
+            EndDate = range.StartDate.AddDays(-1)
+        };
+
+        var previousData = await GetPreviousCashFlowDataAsync(previousRange, cancellationToken);
+        if (previousData.HasValue)
+        {
+            var prev = previousData.Value;
+            report.PreviousPeriod = new CashFlowComparison
+            {
+                DateRange = previousRange,
+                NetCashFromOperating = prev.Operating,
+                NetCashFromInvesting = prev.Investing,
+                NetCashFromFinancing = prev.Financing,
+                NetChangeInCash = prev.Operating + prev.Investing + prev.Financing,
+                OperatingChange = prev.Operating != 0
+                    ? ((report.NetCashFromOperating - prev.Operating) / Math.Abs(prev.Operating)) * 100
+                    : 0,
+                InvestingChange = prev.Investing != 0
+                    ? ((report.NetCashFromInvesting - prev.Investing) / Math.Abs(prev.Investing)) * 100
+                    : 0,
+                FinancingChange = prev.Financing != 0
+                    ? ((report.NetCashFromFinancing - prev.Financing) / Math.Abs(prev.Financing)) * 100
+                    : 0,
+                TotalChange = (prev.Operating + prev.Investing + prev.Financing) != 0
+                    ? ((report.NetChangeInCash - (prev.Operating + prev.Investing + prev.Financing)) / Math.Abs(prev.Operating + prev.Investing + prev.Financing)) * 100
+                    : 0
+            };
+        }
+
+        return report;
+    }
+
+    private async Task<List<MonthlyCashFlow>> GetMonthlyCashFlowTrendAsync(ReportDateRange range, CancellationToken cancellationToken)
+    {
+        var result = new List<MonthlyCashFlow>();
+        var accounts = await _context.Accounts.Where(a => a.IsActive).ToListAsync(cancellationToken);
+        var cashAccounts = accounts.Where(a => a.AccountSubType == AccountSubType.Cash || a.AccountSubType == AccountSubType.Bank).ToList();
+
+        var currentDate = new DateTime(range.StartDate.Year, range.StartDate.Month, 1);
+        var endDate = range.EndDate;
+        decimal runningCashBalance = 0;
+
+        // Get initial cash balance before the period
+        var initialLines = await _context.JournalEntries
+            .Where(j => j.EntryDate < currentDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        runningCashBalance = cashAccounts.Sum(ca =>
+            ca.OpeningBalance + initialLines.Where(l => l.AccountId == ca.Id).Sum(l => l.DebitAmount - l.CreditAmount));
+
+        while (currentDate <= endDate)
+        {
+            var monthStart = currentDate;
+            var monthEnd = currentDate.AddMonths(1).AddDays(-1);
+            if (monthEnd > endDate) monthEnd = endDate;
+
+            var monthLines = await _context.JournalEntries
+                .Include(j => j.Lines)
+                    .ThenInclude(l => l.Account)
+                .Where(j => j.EntryDate >= monthStart && j.EntryDate <= monthEnd && j.Status == JournalEntryStatus.Posted)
+                .SelectMany(j => j.Lines)
+                .ToListAsync(cancellationToken);
+
+            // Calculate operating, investing, financing for the month (simplified)
+            var revenue = monthLines.Where(l => l.Account.AccountType == AccountType.Revenue).Sum(l => l.CreditAmount - l.DebitAmount);
+            var expenses = monthLines.Where(l => l.Account.AccountType == AccountType.Expense).Sum(l => l.DebitAmount - l.CreditAmount);
+            var operating = revenue - expenses;
+
+            var investing = -monthLines.Where(l => l.Account.AccountSubType == AccountSubType.FixedAssets).Sum(l => l.DebitAmount - l.CreditAmount);
+            var financing = monthLines.Where(l => l.Account.AccountSubType == AccountSubType.LongTermDebt || l.Account.AccountSubType == AccountSubType.ShortTermDebt)
+                .Sum(l => l.CreditAmount - l.DebitAmount);
+
+            var netChange = operating + investing + financing;
+            runningCashBalance += netChange;
+
+            result.Add(new MonthlyCashFlow
+            {
+                Year = currentDate.Year,
+                Month = currentDate.Month,
+                MonthName = currentDate.ToString("MMM yyyy"),
+                Operating = operating,
+                Investing = investing,
+                Financing = financing,
+                NetChange = netChange,
+                EndingBalance = runningCashBalance
+            });
+
+            currentDate = currentDate.AddMonths(1);
+        }
+
+        return result;
+    }
+
+    private async Task<(decimal Operating, decimal Investing, decimal Financing)?> GetPreviousCashFlowDataAsync(
+        ReportDateRange range, CancellationToken cancellationToken)
+    {
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate >= range.StartDate && j.EntryDate <= range.EndDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        if (!journalLines.Any())
+            return null;
+
+        var revenue = journalLines.Where(l => l.Account.AccountType == AccountType.Revenue).Sum(l => l.CreditAmount - l.DebitAmount);
+        var expenses = journalLines.Where(l => l.Account.AccountType == AccountType.Expense).Sum(l => l.DebitAmount - l.CreditAmount);
+        var operating = revenue - expenses;
+
+        var investing = -journalLines.Where(l => l.Account.AccountSubType == AccountSubType.FixedAssets).Sum(l => l.DebitAmount - l.CreditAmount);
+        var financing = journalLines.Where(l => l.Account.AccountSubType == AccountSubType.LongTermDebt || l.Account.AccountSubType == AccountSubType.ShortTermDebt)
+            .Sum(l => l.CreditAmount - l.DebitAmount);
+
+        return (operating, investing, financing);
+    }
+
     private async Task<(decimal TotalAssets, decimal TotalLiabilities, decimal TotalEquity)?> GetPreviousBalanceSheetDataAsync(
         DateTime asOfDate, CancellationToken cancellationToken)
     {
@@ -996,6 +1372,10 @@ public class FinancialReportService : IFinancialReportService
                     else if (report is BalanceSheetReport balanceSheetReport)
                     {
                         RenderBalanceSheetPdf(column, balanceSheetReport);
+                    }
+                    else if (report is CashFlowStatementReport cashFlowReport)
+                    {
+                        RenderCashFlowStatementPdf(column, cashFlowReport);
                     }
                 });
 
@@ -1489,6 +1869,166 @@ public class FinancialReportService : IFinancialReportService
             table.Cell().Padding(5).Text($"{report.QuickRatio:F2}");
             table.Cell().Padding(5).Text($"{report.DebtToEquityRatio:F2}");
             table.Cell().Padding(5).Text(report.WorkingCapital.ToString("C2"));
+        });
+    }
+
+    private void RenderCashFlowStatementPdf(ColumnDescriptor column, CashFlowStatementReport report)
+    {
+        column.Item().Text($"Period: {report.DateRange.StartDate:MMM dd, yyyy} - {report.DateRange.EndDate:MMM dd, yyyy}").FontSize(11);
+        column.Item().Height(15);
+
+        // ===== OPERATING ACTIVITIES =====
+        column.Item().Text("CASH FLOWS FROM OPERATING ACTIVITIES").Bold().FontSize(12);
+        column.Item().Height(5);
+
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("  Net Income");
+            row.RelativeItem(1).AlignRight().Text(report.NetIncome.ToString("C2"));
+        });
+
+        column.Item().Height(5);
+        column.Item().Text("  Adjustments to reconcile net income:").FontSize(9);
+
+        foreach (var item in report.OperatingAdjustments)
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text($"    {item.Description}");
+                row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+            });
+        }
+
+        column.Item().Height(5);
+        column.Item().Text("  Changes in operating assets and liabilities:").FontSize(9);
+
+        foreach (var item in report.WorkingCapitalChanges)
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text($"    {item.Description}");
+                row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+            });
+        }
+
+        column.Item().Height(5);
+        column.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Net Cash from Operating Activities").Bold();
+            row.RelativeItem(1).AlignRight().Text(report.NetCashFromOperating.ToString("C2")).Bold();
+        });
+        column.Item().Height(15);
+
+        // ===== INVESTING ACTIVITIES =====
+        column.Item().Text("CASH FLOWS FROM INVESTING ACTIVITIES").Bold().FontSize(12);
+        column.Item().Height(5);
+
+        if (report.InvestingActivities.Any())
+        {
+            foreach (var item in report.InvestingActivities)
+            {
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem(3).Text($"  {item.Description}");
+                    row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+                });
+            }
+        }
+        else
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text("  (No investing activities)").FontColor(Colors.Grey.Medium);
+                row.RelativeItem(1).AlignRight().Text("$0.00").FontColor(Colors.Grey.Medium);
+            });
+        }
+
+        column.Item().Height(5);
+        column.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Net Cash from Investing Activities").Bold();
+            row.RelativeItem(1).AlignRight().Text(report.NetCashFromInvesting.ToString("C2")).Bold();
+        });
+        column.Item().Height(15);
+
+        // ===== FINANCING ACTIVITIES =====
+        column.Item().Text("CASH FLOWS FROM FINANCING ACTIVITIES").Bold().FontSize(12);
+        column.Item().Height(5);
+
+        if (report.FinancingActivities.Any())
+        {
+            foreach (var item in report.FinancingActivities)
+            {
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem(3).Text($"  {item.Description}");
+                    row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+                });
+            }
+        }
+        else
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text("  (No financing activities)").FontColor(Colors.Grey.Medium);
+                row.RelativeItem(1).AlignRight().Text("$0.00").FontColor(Colors.Grey.Medium);
+            });
+        }
+
+        column.Item().Height(5);
+        column.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Net Cash from Financing Activities").Bold();
+            row.RelativeItem(1).AlignRight().Text(report.NetCashFromFinancing.ToString("C2")).Bold();
+        });
+        column.Item().Height(20);
+
+        // ===== SUMMARY =====
+        column.Item().LineHorizontal(2).LineColor(Colors.Black);
+        column.Item().Height(5);
+
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Net Change in Cash").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.NetChangeInCash.ToString("C2")).Bold().FontSize(12);
+        });
+
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Beginning Cash Balance");
+            row.RelativeItem(1).AlignRight().Text(report.BeginningCashBalance.ToString("C2"));
+        });
+
+        column.Item().LineHorizontal(1).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Ending Cash Balance").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.EndingCashBalance.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Height(20);
+
+        // ===== KEY METRICS =====
+        column.Item().Text("KEY CASH FLOW METRICS").Bold().FontSize(12);
+        column.Item().Height(10);
+        column.Item().Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+            });
+
+            table.Cell().Padding(5).Text("Operating CF Ratio").Bold();
+            table.Cell().Padding(5).Text("Free Cash Flow").Bold();
+            table.Cell().Padding(5).Text("CF to Debt Ratio").Bold();
+
+            table.Cell().Padding(5).Text($"{report.OperatingCashFlowRatio:F2}");
+            table.Cell().Padding(5).Text(report.FreeCashFlow.ToString("C2"));
+            table.Cell().Padding(5).Text($"{report.CashFlowToDebtRatio:F2}");
         });
     }
 
