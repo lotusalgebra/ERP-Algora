@@ -1,0 +1,348 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.CustomersModel
+@{
+    ViewData["Title"] = "Customer Revenue Report";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Customer Revenue Report</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
+                    <li class="breadcrumb-item active">Customers</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")&TopN=@Model.TopN" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </a>
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")&TopN=@Model.TopN" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Show Top</label>
+                    <select class="form-select" name="TopN">
+                        <option value="10" selected="@(Model.TopN == 10)">Top 10</option>
+                        <option value="25" selected="@(Model.TopN == 25)">Top 25</option>
+                        <option value="50" selected="@(Model.TopN == 50)">Top 50</option>
+                        <option value="100" selected="@(Model.TopN == 100)">Top 100</option>
+                        <option value="999" selected="@(Model.TopN >= 999)">All</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                    </button>
+                    <a href="/Finance/Reports/Customers" class="btn btn-outline-secondary">Reset</a>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>
+                        @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1">@Model.Customers.Count</h3>
+                    <small class="text-muted">Total Customers</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-primary">@Model.TotalRevenue.ToString("C0")</h3>
+                    <small class="text-muted">Total Revenue</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-success">@Model.TotalPaid.ToString("C0")</h3>
+                    <small class="text-muted">Total Paid</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h3 class="mb-1 text-warning">@Model.TotalOutstanding.ToString("C0")</h3>
+                    <small class="text-muted">Outstanding</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Revenue Distribution Chart -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Top 10 Revenue Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Customers Bar Chart -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Top Customers by Revenue</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="customerBarChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Table -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>Customer Revenue Details</h5>
+                    <div class="input-group" style="width: 250px;">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="customerSearch" placeholder="Search customers...">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="customerTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">#</th>
+                                    <th>Customer</th>
+                                    <th>Code</th>
+                                    <th class="text-center">Invoices</th>
+                                    <th class="text-end">Revenue</th>
+                                    <th class="text-end">Paid</th>
+                                    <th class="text-end">Outstanding</th>
+                                    <th class="text-end pe-4">% of Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var rank = 1;
+                                }
+                                @foreach (var customer in Model.Customers)
+                                {
+                                    var collectionRate = customer.TotalRevenue > 0
+                                        ? (customer.PaidAmount / customer.TotalRevenue * 100)
+                                        : 0;
+
+                                    <tr class="customer-row">
+                                        <td class="ps-4">
+                                            @if (rank <= 3)
+                                            {
+                                                var medalClass = rank switch
+                                                {
+                                                    1 => "text-warning",
+                                                    2 => "text-secondary",
+                                                    3 => "text-danger",
+                                                    _ => ""
+                                                };
+                                                <i class="bi bi-trophy-fill @medalClass"></i>
+                                            }
+                                            else
+                                            {
+                                                @rank
+                                            }
+                                        </td>
+                                        <td>
+                                            <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-decoration-none fw-medium">
+                                                @customer.CustomerName
+                                            </a>
+                                        </td>
+                                        <td class="text-muted">@customer.CustomerCode</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark">@customer.InvoiceCount</span>
+                                        </td>
+                                        <td class="text-end fw-medium">@customer.TotalRevenue.ToString("C0")</td>
+                                        <td class="text-end text-success">@customer.PaidAmount.ToString("C0")</td>
+                                        <td class="text-end @(customer.OutstandingAmount > 0 ? "text-warning" : "text-muted")">
+                                            @(customer.OutstandingAmount > 0 ? customer.OutstandingAmount.ToString("C0") : "-")
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <div class="progress flex-grow-1" style="width: 60px; height: 6px;">
+                                                    <div class="progress-bar bg-primary" style="width: @customer.Percentage%"></div>
+                                                </div>
+                                                <span class="small text-muted">@customer.Percentage.ToString("F1")%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    rank++;
+                                }
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <td class="ps-4 fw-bold" colspan="3">Total</td>
+                                    <td class="text-center fw-bold">@Model.Customers.Sum(c => c.InvoiceCount)</td>
+                                    <td class="text-end fw-bold">@Model.TotalRevenue.ToString("C0")</td>
+                                    <td class="text-end fw-bold text-success">@Model.TotalPaid.ToString("C0")</td>
+                                    <td class="text-end fw-bold text-warning">@Model.TotalOutstanding.ToString("C0")</td>
+                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Get top 10 customers for charts
+        const top10 = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.Customers.Take(10).Select(c => new {
+                name = c.CustomerName.Length > 20 ? c.CustomerName.Substring(0, 17) + "..." : c.CustomerName,
+                revenue = c.TotalRevenue,
+                paid = c.PaidAmount,
+                outstanding = c.OutstandingAmount
+            })
+        ));
+
+        // Revenue Distribution Pie Chart
+        const pieCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: top10.map(c => c.name),
+                datasets: [{
+                    data: top10.map(c => c.revenue),
+                    backgroundColor: [
+                        'rgba(79, 70, 229, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(14, 165, 233, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(234, 179, 8, 0.8)',
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(168, 85, 247, 0.8)',
+                        'rgba(236, 72, 153, 0.8)',
+                        'rgba(107, 114, 128, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': $' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Top Customers Bar Chart
+        const barCtx = document.getElementById('customerBarChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: top10.map(c => c.name),
+                datasets: [{
+                    label: 'Paid',
+                    data: top10.map(c => c.paid),
+                    backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                    borderColor: 'rgb(34, 197, 94)',
+                    borderWidth: 1
+                }, {
+                    label: 'Outstanding',
+                    data: top10.map(c => c.outstanding),
+                    backgroundColor: 'rgba(234, 179, 8, 0.8)',
+                    borderColor: 'rgb(234, 179, 8)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Customer search functionality
+        document.getElementById('customerSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.customer-row');
+
+            rows.forEach(row => {
+                const customerName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const customerCode = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                row.style.display = (customerName.includes(searchTerm) || customerCode.includes(searchTerm)) ? '' : 'none';
+            });
+        });
+    </script>
+}
