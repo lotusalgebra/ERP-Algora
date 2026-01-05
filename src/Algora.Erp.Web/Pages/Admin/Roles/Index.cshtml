@@ -1,0 +1,151 @@
+@page
+@model Algora.Erp.Web.Pages.Admin.Roles.IndexModel
+@{
+    ViewData["Title"] = "Roles";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Role Management</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Admin">Admin</a></li>
+                    <li class="breadcrumb-item active">Roles</li>
+                </ol>
+            </nav>
+        </div>
+        <button type="button" class="btn btn-primary" hx-get="/Admin/Roles?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-bs-toggle="modal" data-bs-target="#roleModal">
+            <i class="bi bi-plus-lg me-1"></i> New Role
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Roles</h6>
+                            <h3 class="mb-0">@Model.TotalRoles</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-shield text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">System Roles</h6>
+                            <h3 class="mb-0 text-info">@Model.SystemRoles</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-shield-lock text-info fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Custom Roles</h6>
+                            <h3 class="mb-0 text-success">@Model.CustomRoles</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-shield-plus text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search roles...">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Role</th>
+                            <th>Description</th>
+                            <th>Permissions</th>
+                            <th>Users</th>
+                            <th class="text-center">Type</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTableBody" hx-get="/Admin/Roles?handler=Table" hx-trigger="load" hx-swap="innerHTML">
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="formContainer"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+
+        function loadTable(page = 1) {
+            const params = new URLSearchParams({
+                handler: 'Table',
+                page: page,
+                search: searchInput.value
+            });
+            htmx.ajax('GET', `/Admin/Roles?${params}`, {target: '#rolesTableBody', swap: 'innerHTML'});
+        }
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadTable(), 300);
+        });
+
+        document.getElementById('roleModal').addEventListener('hidden.bs.modal', () => {
+            document.getElementById('formContainer').innerHTML = '';
+        });
+
+        document.body.addEventListener('htmx:afterRequest', (e) => {
+            if (e.detail.elt.closest('#roleModal')) {
+                bootstrap.Modal.getInstance(document.getElementById('roleModal'))?.hide();
+            }
+        });
+    </script>
+}

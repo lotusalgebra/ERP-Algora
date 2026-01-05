@@ -1,0 +1,376 @@
+@page
+@model Algora.Erp.Web.Pages.Admin.Settings.IndexModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">System Settings</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Admin">Admin</a></li>
+                    <li class="breadcrumb-item active">Settings</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Settings Navigation -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="nav flex-column nav-pills" id="settingsTabs" role="tablist">
+                        <button class="nav-link active text-start rounded-0 border-bottom" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button">
+                            <i class="bi bi-gear me-2"></i>General
+                        </button>
+                        <button class="nav-link text-start rounded-0 border-bottom" id="email-tab" data-bs-toggle="pill" data-bs-target="#email" type="button">
+                            <i class="bi bi-envelope me-2"></i>Email
+                        </button>
+                        <button class="nav-link text-start rounded-0 border-bottom" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button">
+                            <i class="bi bi-shield-lock me-2"></i>Security
+                        </button>
+                        <button class="nav-link text-start rounded-0 border-bottom" id="backup-tab" data-bs-toggle="pill" data-bs-target="#backup" type="button">
+                            <i class="bi bi-cloud-upload me-2"></i>Backup
+                        </button>
+                        <button class="nav-link text-start rounded-0" id="about-tab" data-bs-toggle="pill" data-bs-target="#about" type="button">
+                            <i class="bi bi-info-circle me-2"></i>About
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="col-md-9">
+            <div class="tab-content" id="settingsTabContent">
+                <!-- General Settings -->
+                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="bi bi-gear me-2"></i>General Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="General">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Company Name</label>
+                                        <input type="text" class="form-control" asp-for="General.CompanyName" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Time Zone</label>
+                                        <select class="form-select" asp-for="General.TimeZone">
+                                            <option value="UTC">UTC</option>
+                                            <option value="America/New_York">Eastern Time (US)</option>
+                                            <option value="America/Chicago">Central Time (US)</option>
+                                            <option value="America/Denver">Mountain Time (US)</option>
+                                            <option value="America/Los_Angeles">Pacific Time (US)</option>
+                                            <option value="Europe/London">London (UK)</option>
+                                            <option value="Europe/Paris">Paris (France)</option>
+                                            <option value="Asia/Tokyo">Tokyo (Japan)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date Format</label>
+                                        <select class="form-select" asp-for="General.DateFormat">
+                                            <option value="MM/dd/yyyy">MM/dd/yyyy</option>
+                                            <option value="dd/MM/yyyy">dd/MM/yyyy</option>
+                                            <option value="yyyy-MM-dd">yyyy-MM-dd</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Currency</label>
+                                        <select class="form-select" asp-for="General.Currency">
+                                            <option value="USD">USD - US Dollar</option>
+                                            <option value="EUR">EUR - Euro</option>
+                                            <option value="GBP">GBP - British Pound</option>
+                                            <option value="JPY">JPY - Japanese Yen</option>
+                                            <option value="CAD">CAD - Canadian Dollar</option>
+                                            <option value="AUD">AUD - Australian Dollar</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Language</label>
+                                        <select class="form-select" asp-for="General.Language">
+                                            <option value="en-US">English (US)</option>
+                                            <option value="en-GB">English (UK)</option>
+                                            <option value="es-ES">Spanish</option>
+                                            <option value="fr-FR">French</option>
+                                            <option value="de-DE">German</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-lg me-1"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Settings -->
+                <div class="tab-pane fade" id="email" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Email Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="Email">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label">SMTP Host</label>
+                                        <input type="text" class="form-control" asp-for="Email.SmtpHost" placeholder="smtp.example.com" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">SMTP Port</label>
+                                        <input type="number" class="form-control" asp-for="Email.SmtpPort" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">SMTP Username</label>
+                                        <input type="text" class="form-control" asp-for="Email.SmtpUsername" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">SMTP Password</label>
+                                        <input type="password" class="form-control" asp-for="Email.SmtpPassword" placeholder="Enter to change" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">From Email</label>
+                                        <input type="email" class="form-control" asp-for="Email.FromEmail" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">From Name</label>
+                                        <input type="text" class="form-control" asp-for="Email.FromName" />
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" asp-for="Email.EnableSsl" />
+                                            <label class="form-check-label" asp-for="Email.EnableSsl">Enable SSL/TLS</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-lg me-1"></i>Save Changes
+                                    </button>
+                                    <button type="submit" asp-page-handler="TestEmail" class="btn btn-outline-secondary">
+                                        <i class="bi bi-send me-1"></i>Send Test Email
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Security Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="Security">
+                                <h6 class="text-muted mb-3">Password Policy</h6>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Minimum Length</label>
+                                        <input type="number" class="form-control" asp-for="Security.PasswordMinLength" min="6" max="32" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Requirements</label>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" asp-for="Security.RequireUppercase" />
+                                                <label class="form-check-label">Uppercase</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" asp-for="Security.RequireLowercase" />
+                                                <label class="form-check-label">Lowercase</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" asp-for="Security.RequireDigit" />
+                                                <label class="form-check-label">Digit</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" asp-for="Security.RequireSpecialChar" />
+                                                <label class="form-check-label">Special Character</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h6 class="text-muted mb-3">Session & Lockout</h6>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Session Timeout (minutes)</label>
+                                        <input type="number" class="form-control" asp-for="Security.SessionTimeoutMinutes" min="5" max="480" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Max Login Attempts</label>
+                                        <input type="number" class="form-control" asp-for="Security.MaxLoginAttempts" min="3" max="10" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Lockout Duration (minutes)</label>
+                                        <input type="number" class="form-control" asp-for="Security.LockoutDurationMinutes" min="5" max="60" />
+                                    </div>
+                                </div>
+
+                                <h6 class="text-muted mb-3">Two-Factor Authentication</h6>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" asp-for="Security.EnableTwoFactor" />
+                                    <label class="form-check-label" asp-for="Security.EnableTwoFactor">Enable Two-Factor Authentication</label>
+                                    <small class="text-muted d-block">Users will be required to set up 2FA on next login</small>
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-lg me-1"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup Settings -->
+                <div class="tab-pane fade" id="backup" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>Backup & Restore</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body text-center py-4">
+                                            <i class="bi bi-cloud-download fs-1 text-primary mb-3"></i>
+                                            <h6>Create Backup</h6>
+                                            <p class="text-muted small mb-3">Download a complete backup of your data</p>
+                                            <button type="button" class="btn btn-primary">
+                                                <i class="bi bi-download me-1"></i>Download Backup
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body text-center py-4">
+                                            <i class="bi bi-cloud-upload fs-1 text-warning mb-3"></i>
+                                            <h6>Restore Backup</h6>
+                                            <p class="text-muted small mb-3">Restore your data from a backup file</p>
+                                            <button type="button" class="btn btn-outline-warning">
+                                                <i class="bi bi-upload me-1"></i>Upload Backup
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h6 class="text-muted mb-3">Automatic Backups</h6>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="autoBackup" checked>
+                                <label class="form-check-label" for="autoBackup">Enable automatic daily backups</label>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">Backup Time</label>
+                                    <input type="time" class="form-control" value="02:00">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Retention (days)</label>
+                                    <input type="number" class="form-control" value="30" min="7" max="365">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="tab-pane fade" id="about" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>About</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center py-4">
+                                <h2 class="text-primary mb-1">Algora ERP</h2>
+                                <p class="text-muted">Enterprise Resource Planning System</p>
+                                <span class="badge bg-primary fs-6 mb-4">Version 1.0.0</span>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6><i class="bi bi-cpu me-2"></i>System Information</h6>
+                                            <table class="table table-sm table-borderless mb-0">
+                                                <tr>
+                                                    <td class="text-muted">.NET Version</td>
+                                                    <td>8.0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Database</td>
+                                                    <td>SQL Server</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Server OS</td>
+                                                    <td>@Environment.OSVersion</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6><i class="bi bi-building me-2"></i>License Information</h6>
+                                            <table class="table table-sm table-borderless mb-0">
+                                                <tr>
+                                                    <td class="text-muted">License Type</td>
+                                                    <td>Enterprise</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Licensed To</td>
+                                                    <td>Algora Corp</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Valid Until</td>
+                                                    <td>Dec 31, 2026</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="text-center text-muted">
+                                <p class="mb-1">&copy; 2024 Algora. All rights reserved.</p>
+                                <p class="small mb-0">
+                                    <a href="#" class="text-muted">Documentation</a> |
+                                    <a href="#" class="text-muted">Support</a> |
+                                    <a href="#" class="text-muted">Privacy Policy</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

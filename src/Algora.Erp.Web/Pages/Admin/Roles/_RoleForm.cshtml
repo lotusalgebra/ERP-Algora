@@ -1,0 +1,72 @@
+@model Algora.Erp.Web.Pages.Admin.Roles.RoleFormViewModel
+
+<form hx-post="/Admin/Roles" hx-target="#rolesTableBody" hx-swap="innerHTML">
+    <div class="modal-header">
+        <h5 class="modal-title">@(Model.IsEdit ? "Edit Role" : "New Role")</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        @if (Model.IsEdit)
+        {
+            <input type="hidden" name="Id" value="@Model.Role?.Id" />
+        }
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Role Name <span class="text-danger">*</span></label>
+                <input type="text" name="Name" class="form-control" value="@Model.Role?.Name" required
+                       @(Model.IsEdit && Model.Role?.IsSystemRole == true ? "readonly" : "") />
+                @if (Model.IsEdit && Model.Role?.IsSystemRole == true)
+                {
+                    <small class="text-muted">System role names cannot be changed</small>
+                }
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Description</label>
+                <input type="text" name="Description" class="form-control" value="@Model.Role?.Description" />
+            </div>
+            <div class="col-12">
+                <label class="form-label">Permissions</label>
+                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                    @{
+                        var groupedPermissions = Model.Permissions.GroupBy(p => p.Module).OrderBy(g => g.Key);
+                    }
+                    @foreach (var group in groupedPermissions)
+                    {
+                        <div class="mb-3">
+                            <h6 class="text-muted border-bottom pb-1 mb-2">
+                                <i class="bi bi-folder me-1"></i>@group.Key
+                            </h6>
+                            <div class="row g-2">
+                                @foreach (var perm in group)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input type="checkbox" name="PermissionIds" value="@perm.Id" class="form-check-input" id="perm_@perm.Id"
+                                                   checked="@Model.SelectedPermissionIds.Contains(perm.Id)" />
+                                            <label class="form-check-label" for="perm_@perm.Id">
+                                                @perm.Name
+                                                @if (!string.IsNullOrEmpty(perm.Description))
+                                                {
+                                                    <small class="text-muted d-block">@perm.Description</small>
+                                                }
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    @if (!Model.Permissions.Any())
+                    {
+                        <p class="text-muted mb-0">No permissions available. Create permissions first.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Update" : "Create") Role</button>
+    </div>
+</form>

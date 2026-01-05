@@ -1,0 +1,52 @@
+@model Algora.Erp.Web.Pages.Admin.Permissions.PermissionFormViewModel
+
+<form hx-post="/Admin/Permissions" hx-target="#permissionsTableBody" hx-swap="innerHTML">
+    <div class="modal-header">
+        <h5 class="modal-title">@(Model.IsEdit ? "Edit Permission" : "New Permission")</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        @if (Model.IsEdit)
+        {
+            <input type="hidden" name="Id" value="@Model.Permission?.Id" />
+        }
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label">Code <span class="text-danger">*</span></label>
+                <input type="text" name="Code" class="form-control" value="@Model.Permission?.Code" required
+                       placeholder="e.g., users.create" />
+                <small class="text-muted">Unique identifier (e.g., module.action)</small>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" name="Name" class="form-control" value="@Model.Permission?.Name" required
+                       placeholder="e.g., Create Users" />
+            </div>
+            <div class="col-12">
+                <label class="form-label">Module <span class="text-danger">*</span></label>
+                <input type="text" name="Module" class="form-control" value="@Model.Permission?.Module" required
+                       placeholder="e.g., Administration" list="modulesList" />
+                <datalist id="modulesList">
+                    <option value="Administration"></option>
+                    <option value="Finance"></option>
+                    <option value="HR"></option>
+                    <option value="Payroll"></option>
+                    <option value="Inventory"></option>
+                    <option value="Procurement"></option>
+                    <option value="Sales"></option>
+                    <option value="Manufacturing"></option>
+                    <option value="Projects"></option>
+                </datalist>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea name="Description" class="form-control" rows="2" placeholder="Brief description of what this permission allows">@Model.Permission?.Description</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Update" : "Create") Permission</button>
+    </div>
+</form>

@@ -1,0 +1,81 @@
+@model Algora.Erp.Web.Pages.Admin.Permissions.PermissionsTableViewModel
+
+@if (Model.Permissions.Any())
+{
+    foreach (var perm in Model.Permissions)
+    {
+        <tr>
+            <td class="ps-4">
+                <code class="bg-light px-2 py-1 rounded">@perm.Code</code>
+            </td>
+            <td>
+                <div class="fw-medium">@perm.Name</div>
+            </td>
+            <td>@(perm.Description ?? "-")</td>
+            <td>
+                <span class="badge bg-info">@perm.Module</span>
+            </td>
+            <td class="text-center">
+                <span class="badge bg-secondary">@perm.RolePermissions.Count</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary"
+                            hx-get="/Admin/Permissions?handler=EditForm&id=@perm.Id"
+                            hx-target="#formContainer"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            data-bs-target="#permissionModal">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    @if (!perm.RolePermissions.Any())
+                    {
+                        <button type="button" class="btn btn-outline-danger"
+                                hx-delete="/Admin/Permissions?id=@perm.Id"
+                                hx-target="#permissionsTableBody"
+                                hx-swap="innerHTML"
+                                hx-confirm="Delete this permission?">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="6" class="bg-light">
+            <div class="d-flex justify-content-between align-items-center px-2 py-1">
+                <small class="text-muted">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                        </li>
+                        @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td colspan="6" class="text-center py-5 text-muted">
+            <i class="bi bi-key fs-1 d-block mb-2"></i>
+            No permissions found
+        </td>
+    </tr>
+}
