@@ -74,6 +74,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<SalesOrderLine> SalesOrderLines => Set<SalesOrderLine>();
+    public DbSet<Lead> Leads => Set<Lead>();
 
     // Payroll
     public DbSet<SalaryComponent> SalaryComponents => Set<SalaryComponent>();
@@ -689,7 +690,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.QuantityOnOrder).HasPrecision(18, 4);
 
             entity.HasOne(e => e.Product)
-                .WithMany()
+                .WithMany(p => p.StockLevels)
                 .HasForeignKey(e => e.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -718,7 +719,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Notes).HasMaxLength(500);
 
             entity.HasOne(e => e.Product)
-                .WithMany()
+                .WithMany(p => p.StockMovements)
                 .HasForeignKey(e => e.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -857,6 +858,30 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.CreditLimit).HasPrecision(18, 2);
             entity.Property(e => e.CurrentBalance).HasPrecision(18, 2);
             entity.Property(e => e.Notes).HasMaxLength(1000);
+        });
+
+        // Lead configuration
+        modelBuilder.Entity<Lead>(entity =>
+        {
+            entity.ToTable("Leads");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Email);
+            entity.HasIndex(e => e.Status);
+            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Company).HasMaxLength(200);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Website).HasMaxLength(500);
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.State).HasMaxLength(100);
+            entity.Property(e => e.Country).HasMaxLength(100);
+            entity.Property(e => e.PostalCode).HasMaxLength(20);
+            entity.Property(e => e.AssignedToName).HasMaxLength(200);
+            entity.Property(e => e.Notes).HasMaxLength(2000);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+            entity.Property(e => e.EstimatedValue).HasPrecision(18, 2);
         });
 
         // SalesOrder configuration

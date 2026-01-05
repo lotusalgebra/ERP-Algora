@@ -1,0 +1,79 @@
+@model Algora.Erp.Web.Pages.Inventory.Stock.StockTableViewModel
+
+@if (Model.StockLevels.Any())
+{
+    foreach (var stock in Model.StockLevels)
+    {
+        var statusClass = stock.QuantityOnHand <= 0 ? "danger" :
+            stock.QuantityOnHand <= stock.Product.ReorderLevel ? "warning" :
+            (stock.Product.MaximumStock > 0 && stock.QuantityOnHand > stock.Product.MaximumStock) ? "info" : "success";
+        var statusText = stock.QuantityOnHand <= 0 ? "Out of Stock" :
+            stock.QuantityOnHand <= stock.Product.ReorderLevel ? "Low Stock" :
+            (stock.Product.MaximumStock > 0 && stock.QuantityOnHand > stock.Product.MaximumStock) ? "Overstock" : "In Stock";
+
+        <tr>
+            <td class="ps-4">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <a href="/Inventory/Products/Details/@stock.ProductId" class="text-decoration-none fw-medium">
+                            @stock.Product.Name
+                        </a>
+                    </div>
+                </div>
+            </td>
+            <td><code>@stock.Product.Sku</code></td>
+            <td>@(stock.Product.Category?.Name ?? "-")</td>
+            <td>@stock.Warehouse.Name</td>
+            <td>@(stock.Location?.Code ?? "-")</td>
+            <td class="text-end fw-medium">@stock.QuantityOnHand.ToString("N2")</td>
+            <td class="text-end">@stock.QuantityReserved.ToString("N2")</td>
+            <td class="text-end fw-medium text-primary">@stock.AvailableQuantity.ToString("N2")</td>
+            <td class="text-end">@stock.Product.ReorderLevel.ToString("N2")</td>
+            <td class="text-center">
+                <span class="badge bg-@statusClass">@statusText</span>
+            </td>
+            <td class="text-end pe-4">
+                <button type="button" class="btn btn-sm btn-outline-primary"
+                        onclick="openAdjustmentModal('@stock.Id', '@stock.Product.Name.Replace("'", "\\'")', '@stock.QuantityOnHand')">
+                    <i class="bi bi-pencil-square"></i> Adjust
+                </button>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="11" class="bg-light">
+            <div class="d-flex justify-content-between align-items-center px-2 py-1">
+                <small class="text-muted">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                        </li>
+                        @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td colspan="11" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No stock records found
+        </td>
+    </tr>
+}

@@ -1,0 +1,178 @@
+@page
+@model Algora.Erp.Web.Pages.Admin.Users.IndexModel
+@using Algora.Erp.Domain.Enums
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">User Management</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Admin">Admin</a></li>
+                    <li class="breadcrumb-item active">Users</li>
+                </ol>
+            </nav>
+        </div>
+        <button type="button" class="btn btn-primary" hx-get="/Admin/Users?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-bs-toggle="modal" data-bs-target="#userModal">
+            <i class="bi bi-plus-lg me-1"></i> New User
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Users</h6>
+                            <h3 class="mb-0">@Model.TotalUsers</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-people text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Active Users</h6>
+                            <h3 class="mb-0 text-success">@Model.ActiveUsers</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-person-check text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Inactive Users</h6>
+                            <h3 class="mb-0 text-secondary">@Model.InactiveUsers</h3>
+                        </div>
+                        <div class="bg-secondary bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-person-x text-secondary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search users...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        @foreach (UserStatus s in Enum.GetValues(typeof(UserStatus)))
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="roleFilter">
+                        <option value="">All Roles</option>
+                        @foreach (var role in Model.Roles)
+                        {
+                            <option value="@role.Id">@role.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">User</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Roles</th>
+                            <th>Last Login</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody" hx-get="/Admin/Users?handler=Table" hx-trigger="load" hx-swap="innerHTML">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="formContainer"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const roleFilter = document.getElementById('roleFilter');
+
+        function loadTable(page = 1) {
+            const params = new URLSearchParams({
+                handler: 'Table',
+                page: page,
+                search: searchInput.value,
+                statusFilter: statusFilter.value,
+                roleFilter: roleFilter.value
+            });
+            htmx.ajax('GET', `/Admin/Users?${params}`, {target: '#usersTableBody', swap: 'innerHTML'});
+        }
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadTable(), 300);
+        });
+
+        statusFilter.addEventListener('change', () => loadTable());
+        roleFilter.addEventListener('change', () => loadTable());
+
+        document.getElementById('userModal').addEventListener('hidden.bs.modal', () => {
+            document.getElementById('formContainer').innerHTML = '';
+        });
+
+        document.body.addEventListener('htmx:afterRequest', (e) => {
+            if (e.detail.elt.closest('#userModal')) {
+                bootstrap.Modal.getInstance(document.getElementById('userModal'))?.hide();
+            }
+        });
+    </script>
+}

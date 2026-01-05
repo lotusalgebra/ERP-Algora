@@ -59,6 +59,7 @@ public interface IApplicationDbContext
     DbSet<Customer> Customers { get; }
     DbSet<SalesOrder> SalesOrders { get; }
     DbSet<SalesOrderLine> SalesOrderLines { get; }
+    DbSet<Lead> Leads { get; }
 
     // Payroll
     DbSet<SalaryComponent> SalaryComponents { get; }

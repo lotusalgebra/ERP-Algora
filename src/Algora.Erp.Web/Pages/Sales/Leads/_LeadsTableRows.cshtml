@@ -1,0 +1,112 @@
+@model Algora.Erp.Web.Pages.Sales.Leads.LeadsTableViewModel
+@using Algora.Erp.Domain.Entities.Sales
+
+@if (Model.Leads.Any())
+{
+    foreach (var lead in Model.Leads)
+    {
+        var statusClass = lead.Status switch
+        {
+            LeadStatus.New => "info",
+            LeadStatus.Contacted => "primary",
+            LeadStatus.Qualified => "success",
+            LeadStatus.Proposal => "warning",
+            LeadStatus.Negotiation => "warning",
+            LeadStatus.Won => "success",
+            LeadStatus.Lost => "danger",
+            LeadStatus.Unqualified => "secondary",
+            _ => "secondary"
+        };
+        var ratingClass = lead.Rating switch
+        {
+            LeadRating.Hot => "danger",
+            LeadRating.Warm => "warning",
+            LeadRating.Cold => "info",
+            _ => "secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <div class="fw-medium">@lead.Name</div>
+                @if (!string.IsNullOrEmpty(lead.Phone))
+                {
+                    <small class="text-muted">@lead.Phone</small>
+                }
+            </td>
+            <td>@(lead.Company ?? "-")</td>
+            <td>
+                @if (!string.IsNullOrEmpty(lead.Email))
+                {
+                    <a href="mailto:@lead.Email">@lead.Email</a>
+                }
+                else
+                {
+                    <span>-</span>
+                }
+            </td>
+            <td>@lead.Source</td>
+            <td>
+                <span class="badge bg-@ratingClass">@lead.Rating</span>
+            </td>
+            <td class="text-end">@(lead.EstimatedValue?.ToString("C0") ?? "-")</td>
+            <td class="text-center">
+                <span class="badge bg-@statusClass">@lead.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary"
+                            hx-get="/Sales/Leads?handler=EditForm&id=@lead.Id"
+                            hx-target="#formContainer"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            data-bs-target="#leadModal">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger"
+                            hx-delete="/Sales/Leads?id=@lead.Id"
+                            hx-target="#leadsTableBody"
+                            hx-swap="innerHTML"
+                            hx-confirm="Delete this lead?">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="8" class="bg-light">
+            <div class="d-flex justify-content-between align-items-center px-2 py-1">
+                <small class="text-muted">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                        </li>
+                        @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td colspan="8" class="text-center py-5 text-muted">
+            <i class="bi bi-people fs-1 d-block mb-2"></i>
+            No leads found
+        </td>
+    </tr>
+}

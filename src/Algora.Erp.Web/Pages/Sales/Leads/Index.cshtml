@@ -1,0 +1,206 @@
+@page
+@model Algora.Erp.Web.Pages.Sales.Leads.IndexModel
+@using Algora.Erp.Domain.Entities.Sales
+@{
+    ViewData["Title"] = "Leads";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Leads</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Sales">Sales</a></li>
+                    <li class="breadcrumb-item active">Leads</li>
+                </ol>
+            </nav>
+        </div>
+        <button type="button" class="btn btn-primary" hx-get="/Sales/Leads?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-bs-toggle="modal" data-bs-target="#leadModal">
+            <i class="bi bi-plus-lg me-1"></i> New Lead
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Leads</h6>
+                            <h3 class="mb-0">@Model.TotalLeads</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-people text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">New Leads</h6>
+                            <h3 class="mb-0 text-info">@Model.NewLeads</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-star text-info fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Qualified</h6>
+                            <h3 class="mb-0 text-success">@Model.QualifiedLeads</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-check-circle text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Pipeline Value</h6>
+                            <h3 class="mb-0 text-warning">@Model.PipelineValue.ToString("C0")</h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-currency-dollar text-warning fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search leads...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        @foreach (LeadStatus s in Enum.GetValues(typeof(LeadStatus)))
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="sourceFilter">
+                        <option value="">All Sources</option>
+                        @foreach (LeadSource s in Enum.GetValues(typeof(LeadSource)))
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="ratingFilter">
+                        <option value="">All Ratings</option>
+                        @foreach (LeadRating r in Enum.GetValues(typeof(LeadRating)))
+                        {
+                            <option value="@r">@r</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Name</th>
+                            <th>Company</th>
+                            <th>Email</th>
+                            <th>Source</th>
+                            <th>Rating</th>
+                            <th class="text-end">Est. Value</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTableBody" hx-get="/Sales/Leads?handler=Table" hx-trigger="load" hx-swap="innerHTML">
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lead Modal -->
+<div class="modal fade" id="leadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="formContainer"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const sourceFilter = document.getElementById('sourceFilter');
+        const ratingFilter = document.getElementById('ratingFilter');
+
+        function loadTable(page = 1) {
+            const params = new URLSearchParams({
+                handler: 'Table',
+                page: page,
+                search: searchInput.value,
+                statusFilter: statusFilter.value,
+                sourceFilter: sourceFilter.value,
+                ratingFilter: ratingFilter.value
+            });
+            htmx.ajax('GET', `/Sales/Leads?${params}`, {target: '#leadsTableBody', swap: 'innerHTML'});
+        }
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadTable(), 300);
+        });
+
+        statusFilter.addEventListener('change', () => loadTable());
+        sourceFilter.addEventListener('change', () => loadTable());
+        ratingFilter.addEventListener('change', () => loadTable());
+
+        document.getElementById('leadModal').addEventListener('hidden.bs.modal', () => {
+            document.getElementById('formContainer').innerHTML = '';
+        });
+
+        document.body.addEventListener('htmx:afterRequest', (e) => {
+            if (e.detail.elt.closest('#leadModal')) {
+                bootstrap.Modal.getInstance(document.getElementById('leadModal'))?.hide();
+            }
+        });
+    </script>
+}

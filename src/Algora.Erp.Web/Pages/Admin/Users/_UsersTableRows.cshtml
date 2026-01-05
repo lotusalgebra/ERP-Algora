@@ -1,0 +1,124 @@
+@model Algora.Erp.Web.Pages.Admin.Users.UsersTableViewModel
+@using Algora.Erp.Domain.Enums
+
+@if (Model.Users.Any())
+{
+    foreach (var user in Model.Users)
+    {
+        var statusClass = user.Status == UserStatus.Active ? "success" :
+                          user.Status == UserStatus.Inactive ? "secondary" :
+                          user.Status == UserStatus.Locked ? "danger" : "warning";
+
+        <tr>
+            <td class="ps-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar me-2">
+                        @if (!string.IsNullOrEmpty(user.Avatar))
+                        {
+                            <img src="@user.Avatar" class="rounded-circle" width="40" height="40" alt="">
+                        }
+                        else
+                        {
+                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="text-primary fw-bold">@user.FirstName[0]@user.LastName[0]</span>
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <div class="fw-medium">@user.FullName</div>
+                    </div>
+                </div>
+            </td>
+            <td>@user.Email</td>
+            <td>@(user.PhoneNumber ?? "-")</td>
+            <td>
+                @if (user.UserRoles.Any())
+                {
+                    foreach (var ur in user.UserRoles)
+                    {
+                        <span class="badge bg-primary me-1">@ur.Role.Name</span>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted">No roles</span>
+                }
+            </td>
+            <td>
+                @if (user.LastLoginAt.HasValue)
+                {
+                    @user.LastLoginAt.Value.ToString("MMM dd, yyyy HH:mm")
+                }
+                else
+                {
+                    <span class="text-muted">Never</span>
+                }
+            </td>
+            <td class="text-center">
+                <span class="badge bg-@statusClass">@user.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary"
+                            hx-get="/Admin/Users?handler=EditForm&id=@user.Id"
+                            hx-target="#formContainer"
+                            hx-swap="innerHTML"
+                            data-bs-toggle="modal"
+                            data-bs-target="#userModal">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-@(user.Status == UserStatus.Active ? "warning" : "success")"
+                            hx-post="/Admin/Users?handler=ToggleStatus&id=@user.Id"
+                            hx-target="#usersTableBody"
+                            hx-swap="innerHTML"
+                            title="@(user.Status == UserStatus.Active ? "Deactivate" : "Activate")">
+                        <i class="bi bi-@(user.Status == UserStatus.Active ? "pause" : "play")"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger"
+                            hx-delete="/Admin/Users?id=@user.Id"
+                            hx-target="#usersTableBody"
+                            hx-swap="innerHTML"
+                            hx-confirm="Delete this user?">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="7" class="bg-light">
+            <div class="d-flex justify-content-between align-items-center px-2 py-1">
+                <small class="text-muted">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                        </li>
+                        @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td colspan="7" class="text-center py-5 text-muted">
+            <i class="bi bi-people fs-1 d-block mb-2"></i>
+            No users found
+        </td>
+    </tr>
+}

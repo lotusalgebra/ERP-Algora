@@ -37,7 +37,7 @@ public class IndexModel : PageModel
             .Where(o => o.Status != SalesOrderStatus.Delivered &&
                        o.Status != SalesOrderStatus.Paid &&
                        o.Status != SalesOrderStatus.Cancelled)
-            .SumAsync(o => o.AmountDue);
+            .SumAsync(o => o.TotalAmount - o.AmountPaid);
 
         Customers = await _context.Customers.Where(c => c.IsActive).ToListAsync();
     }
