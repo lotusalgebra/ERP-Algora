@@ -1,0 +1,266 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Payments.IndexModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Payments";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Payments</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item active">Payments</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-cash-stack text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">This Month</h6>
+                            <h3 class="mb-0">@Model.Statistics.ThisMonthReceived.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-calendar-week text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">This Week</h6>
+                            <h3 class="mb-0">@Model.Statistics.ThisWeekReceived.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-calendar-day text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Today</h6>
+                            <h3 class="mb-0">@Model.Statistics.TodayReceived.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-receipt text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Payments Count</h6>
+                            <h3 class="mb-0">@Model.Statistics.PaymentCount</h3>
+                            <small class="text-muted">Avg: @Model.Statistics.AveragePayment.ToString("C2")</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search payments..."
+                               value="@Model.SearchTerm"
+                               hx-get="/Finance/Payments?handler=TableRows"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#paymentsTableBody"
+                               hx-include="[name='PaymentMethod'], [name='FromDate'], [name='ToDate'], [name='PageSize']"
+                               name="SearchTerm">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="PaymentMethod"
+                            hx-get="/Finance/Payments?handler=TableRows"
+                            hx-trigger="change"
+                            hx-target="#paymentsTableBody"
+                            hx-include="#searchInput, [name='FromDate'], [name='ToDate'], [name='PageSize']">
+                        @foreach (var item in Model.PaymentMethodOptions)
+                        {
+                            <option value="@item.Value" selected="@(Model.PaymentMethod?.ToString() == item.Value)">
+                                @item.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" name="FromDate" placeholder="From Date"
+                           value="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                           hx-get="/Finance/Payments?handler=TableRows"
+                           hx-trigger="change"
+                           hx-target="#paymentsTableBody"
+                           hx-include="#searchInput, [name='PaymentMethod'], [name='ToDate'], [name='PageSize']">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" name="ToDate" placeholder="To Date"
+                           value="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                           hx-get="/Finance/Payments?handler=TableRows"
+                           hx-trigger="change"
+                           hx-target="#paymentsTableBody"
+                           hx-include="#searchInput, [name='PaymentMethod'], [name='FromDate'], [name='PageSize']">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="PageSize"
+                            hx-get="/Finance/Payments?handler=TableRows"
+                            hx-trigger="change"
+                            hx-target="#paymentsTableBody"
+                            hx-include="#searchInput, [name='PaymentMethod'], [name='FromDate'], [name='ToDate']">
+                        <option value="10" selected="@(Model.PageSize == 10)">10 per page</option>
+                        <option value="20" selected="@(Model.PageSize == 20)">20 per page</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50 per page</option>
+                        <option value="100" selected="@(Model.PageSize == 100)">100 per page</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Payment #</th>
+                            <th>Date</th>
+                            <th>Invoice</th>
+                            <th>Customer</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        @await Html.PartialAsync("_PaymentsTableRows", Model)
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (Model.PaymentResult.TotalPages > 1)
+        {
+            <div class="card-footer bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted">
+                        Showing @(((Model.Page - 1) * Model.PageSize) + 1) to
+                        @(Math.Min(Model.Page * Model.PageSize, Model.PaymentResult.TotalCount)) of
+                        @Model.PaymentResult.TotalCount payments
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="?Page=@(Model.Page - 1)&PageSize=@Model.PageSize&SearchTerm=@Model.SearchTerm">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.PaymentResult.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="?Page=@i&PageSize=@Model.PageSize&SearchTerm=@Model.SearchTerm">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page >= Model.PaymentResult.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="?Page=@(Model.Page + 1)&PageSize=@Model.PageSize&SearchTerm=@Model.SearchTerm">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Payment Method Breakdown -->
+    @if (Model.Statistics.ByPaymentMethod.Any())
+    {
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Payment Methods (This Month)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var method in Model.Statistics.ByPaymentMethod.OrderByDescending(m => m.Value))
+                    {
+                        var percentage = Model.Statistics.TotalReceived > 0
+                            ? (method.Value / Model.Statistics.TotalReceived) * 100
+                            : 0;
+
+                        var badgeClass = method.Key switch
+                        {
+                            PaymentMethod.Cash => "bg-success",
+                            PaymentMethod.BankTransfer => "bg-primary",
+                            PaymentMethod.CreditCard => "bg-info",
+                            PaymentMethod.Check => "bg-warning text-dark",
+                            _ => "bg-secondary"
+                        };
+
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="badge @badgeClass">@method.Key</span>
+                                <span class="fw-medium">@method.Value.ToString("C2")</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar @badgeClass" style="width: @percentage.ToString("0")%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

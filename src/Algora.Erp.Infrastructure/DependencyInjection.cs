@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddSingleton<IDateTime, DateTimeService>();
         services.AddScoped<IInvoicePdfService, InvoicePdfService>();
         services.AddScoped<IRecurringInvoiceService, RecurringInvoiceService>();
+        services.AddScoped<IPaymentService, PaymentService>();
 
         // Email service
         services.Configure<EmailSettings>(configuration.GetSection("Email"));
