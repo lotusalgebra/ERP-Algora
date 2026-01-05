@@ -43,6 +43,11 @@ public interface IFinancialReportService
     Task<CashFlowReport> GetCashFlowReportAsync(ReportDateRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets profit and loss statement
+    /// </summary>
+    Task<ProfitAndLossReport> GetProfitAndLossAsync(ReportDateRange range, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Exports report to PDF
     /// </summary>
     byte[] ExportToPdf<T>(T report, string reportTitle) where T : class;
@@ -285,6 +290,82 @@ public class WeeklyCashFlow
     public DateTime WeekStart { get; set; }
     public decimal Inflow { get; set; }
     public decimal ProjectedInflow { get; set; }
+}
+
+public class ProfitAndLossReport
+{
+    public ReportDateRange DateRange { get; set; } = new();
+
+    // Revenue Section
+    public decimal TotalRevenue { get; set; }
+    public List<PnLLineItem> RevenueItems { get; set; } = new();
+
+    // Cost of Goods Sold Section
+    public decimal TotalCOGS { get; set; }
+    public List<PnLLineItem> COGSItems { get; set; } = new();
+
+    // Gross Profit
+    public decimal GrossProfit { get; set; }
+    public decimal GrossProfitMargin { get; set; }
+
+    // Operating Expenses Section
+    public decimal TotalOperatingExpenses { get; set; }
+    public List<PnLLineItem> OperatingExpenseItems { get; set; } = new();
+
+    // Operating Income
+    public decimal OperatingIncome { get; set; }
+    public decimal OperatingMargin { get; set; }
+
+    // Other Income/Expenses
+    public decimal OtherIncome { get; set; }
+    public decimal OtherExpenses { get; set; }
+    public List<PnLLineItem> OtherIncomeItems { get; set; } = new();
+    public List<PnLLineItem> OtherExpenseItems { get; set; } = new();
+
+    // Net Income
+    public decimal NetIncome { get; set; }
+    public decimal NetProfitMargin { get; set; }
+
+    // Comparative Data
+    public PnLComparison? PreviousPeriod { get; set; }
+    public List<MonthlyPnL> MonthlyTrend { get; set; } = new();
+}
+
+public class PnLLineItem
+{
+    public string AccountCode { get; set; } = string.Empty;
+    public string AccountName { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public decimal Percentage { get; set; }
+    public decimal? PreviousAmount { get; set; }
+    public decimal? ChangePercent { get; set; }
+}
+
+public class PnLComparison
+{
+    public ReportDateRange DateRange { get; set; } = new();
+    public decimal TotalRevenue { get; set; }
+    public decimal GrossProfit { get; set; }
+    public decimal OperatingIncome { get; set; }
+    public decimal NetIncome { get; set; }
+
+    public decimal RevenueChange { get; set; }
+    public decimal GrossProfitChange { get; set; }
+    public decimal OperatingIncomeChange { get; set; }
+    public decimal NetIncomeChange { get; set; }
+}
+
+public class MonthlyPnL
+{
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public string MonthName { get; set; } = string.Empty;
+    public decimal Revenue { get; set; }
+    public decimal COGS { get; set; }
+    public decimal GrossProfit { get; set; }
+    public decimal OperatingExpenses { get; set; }
+    public decimal NetIncome { get; set; }
 }
 
 #endregion

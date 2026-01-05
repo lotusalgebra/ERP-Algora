@@ -1,0 +1,484 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Reports.ProfitLossModel
+@{
+    ViewData["Title"] = "Profit & Loss Statement";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Profit & Loss Statement</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
+                    <li class="breadcrumb-item active">Profit & Loss</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </a>
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label">Period</label>
+                    <select class="form-select" name="Period" onchange="this.form.submit()">
+                        <option value="thismonth" selected="@(Model.Period == "thismonth")">This Month</option>
+                        <option value="lastmonth" selected="@(Model.Period == "lastmonth")">Last Month</option>
+                        <option value="thisquarter" selected="@(Model.Period == "thisquarter")">This Quarter</option>
+                        <option value="thisyear" selected="@(Model.Period == "thisyear")">This Year</option>
+                        <option value="lastyear" selected="@(Model.Period == "lastyear")">Last Year</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                    </button>
+                    <a href="/Finance/Reports/ProfitLoss" class="btn btn-outline-secondary">Reset</a>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>
+                        @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Key Metrics -->
+        <div class="col-12">
+            <div class="row g-3">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="text-muted mb-2">Total Revenue</h6>
+                                    <h3 class="mb-0 text-primary">@Model.Report.TotalRevenue.ToString("C0")</h3>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-2 rounded">
+                                    <i class="bi bi-graph-up-arrow text-primary fs-4"></i>
+                                </div>
+                            </div>
+                            @if (Model.Report.PreviousPeriod != null)
+                            {
+                                var change = Model.Report.PreviousPeriod.RevenueChange;
+                                <div class="mt-2">
+                                    <span class="badge @(change >= 0 ? "bg-success" : "bg-danger")">
+                                        <i class="bi @(change >= 0 ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                        @Math.Abs(change).ToString("F1")%
+                                    </span>
+                                    <small class="text-muted ms-1">vs prior period</small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="text-muted mb-2">Gross Profit</h6>
+                                    <h3 class="mb-0 @(Model.Report.GrossProfit >= 0 ? "text-success" : "text-danger")">
+                                        @Model.Report.GrossProfit.ToString("C0")
+                                    </h3>
+                                </div>
+                                <div class="bg-success bg-opacity-10 p-2 rounded">
+                                    <i class="bi bi-cash-coin text-success fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark">@Model.Report.GrossProfitMargin.ToString("F1")% margin</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="text-muted mb-2">Operating Income</h6>
+                                    <h3 class="mb-0 @(Model.Report.OperatingIncome >= 0 ? "text-info" : "text-danger")">
+                                        @Model.Report.OperatingIncome.ToString("C0")
+                                    </h3>
+                                </div>
+                                <div class="bg-info bg-opacity-10 p-2 rounded">
+                                    <i class="bi bi-briefcase text-info fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark">@Model.Report.OperatingMargin.ToString("F1")% margin</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card border-0 shadow-sm h-100 @(Model.Report.NetIncome >= 0 ? "border-success" : "border-danger")" style="border-width: 2px !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="text-muted mb-2">Net Income</h6>
+                                    <h3 class="mb-0 @(Model.Report.NetIncome >= 0 ? "text-success" : "text-danger")">
+                                        @Model.Report.NetIncome.ToString("C0")
+                                    </h3>
+                                </div>
+                                <div class="@(Model.Report.NetIncome >= 0 ? "bg-success" : "bg-danger") bg-opacity-10 p-2 rounded">
+                                    <i class="bi @(Model.Report.NetIncome >= 0 ? "bi-trophy" : "bi-exclamation-triangle") @(Model.Report.NetIncome >= 0 ? "text-success" : "text-danger") fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark">@Model.Report.NetProfitMargin.ToString("F1")% margin</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- P&L Statement -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Income Statement</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Account</th>
+                                    <th class="text-end pe-4">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Revenue Section -->
+                                <tr class="table-primary">
+                                    <td class="ps-4 fw-bold" colspan="2">REVENUE</td>
+                                </tr>
+                                @foreach (var item in Model.Report.RevenueItems)
+                                {
+                                    <tr>
+                                        <td class="ps-5">@item.AccountName</td>
+                                        <td class="text-end pe-4">@item.Amount.ToString("C0")</td>
+                                    </tr>
+                                }
+                                <tr class="bg-light">
+                                    <td class="ps-4 fw-bold">Total Revenue</td>
+                                    <td class="text-end pe-4 fw-bold text-primary">@Model.Report.TotalRevenue.ToString("C0")</td>
+                                </tr>
+
+                                <!-- COGS Section -->
+                                <tr class="table-warning">
+                                    <td class="ps-4 fw-bold" colspan="2">COST OF GOODS SOLD</td>
+                                </tr>
+                                @foreach (var item in Model.Report.COGSItems)
+                                {
+                                    <tr>
+                                        <td class="ps-5">@item.AccountName</td>
+                                        <td class="text-end pe-4">@item.Amount.ToString("C0")</td>
+                                    </tr>
+                                }
+                                @if (!Model.Report.COGSItems.Any())
+                                {
+                                    <tr>
+                                        <td class="ps-5 text-muted fst-italic">No COGS recorded</td>
+                                        <td class="text-end pe-4">$0</td>
+                                    </tr>
+                                }
+                                <tr class="bg-light">
+                                    <td class="ps-4 fw-bold">Total COGS</td>
+                                    <td class="text-end pe-4 fw-bold">@Model.Report.TotalCOGS.ToString("C0")</td>
+                                </tr>
+
+                                <!-- Gross Profit -->
+                                <tr class="table-success">
+                                    <td class="ps-4 fw-bold">GROSS PROFIT</td>
+                                    <td class="text-end pe-4 fw-bold text-success">@Model.Report.GrossProfit.ToString("C0")</td>
+                                </tr>
+
+                                <!-- Operating Expenses -->
+                                <tr class="table-danger">
+                                    <td class="ps-4 fw-bold" colspan="2">OPERATING EXPENSES</td>
+                                </tr>
+                                @foreach (var item in Model.Report.OperatingExpenseItems)
+                                {
+                                    <tr>
+                                        <td class="ps-5">@item.AccountName</td>
+                                        <td class="text-end pe-4">@item.Amount.ToString("C0")</td>
+                                    </tr>
+                                }
+                                @if (!Model.Report.OperatingExpenseItems.Any())
+                                {
+                                    <tr>
+                                        <td class="ps-5 text-muted fst-italic">No operating expenses recorded</td>
+                                        <td class="text-end pe-4">$0</td>
+                                    </tr>
+                                }
+                                <tr class="bg-light">
+                                    <td class="ps-4 fw-bold">Total Operating Expenses</td>
+                                    <td class="text-end pe-4 fw-bold text-danger">@Model.Report.TotalOperatingExpenses.ToString("C0")</td>
+                                </tr>
+
+                                <!-- Operating Income -->
+                                <tr class="table-info">
+                                    <td class="ps-4 fw-bold">OPERATING INCOME</td>
+                                    <td class="text-end pe-4 fw-bold text-info">@Model.Report.OperatingIncome.ToString("C0")</td>
+                                </tr>
+
+                                <!-- Other Income/Expenses -->
+                                @if (Model.Report.OtherIncomeItems.Any() || Model.Report.OtherExpenseItems.Any())
+                                {
+                                    <tr class="table-secondary">
+                                        <td class="ps-4 fw-bold" colspan="2">OTHER INCOME / EXPENSES</td>
+                                    </tr>
+                                    @foreach (var item in Model.Report.OtherIncomeItems)
+                                    {
+                                        <tr>
+                                            <td class="ps-5 text-success">@item.AccountName</td>
+                                            <td class="text-end pe-4 text-success">@item.Amount.ToString("C0")</td>
+                                        </tr>
+                                    }
+                                    @foreach (var item in Model.Report.OtherExpenseItems)
+                                    {
+                                        <tr>
+                                            <td class="ps-5 text-danger">@item.AccountName</td>
+                                            <td class="text-end pe-4 text-danger">(@item.Amount.ToString("C0"))</td>
+                                        </tr>
+                                    }
+                                }
+
+                                <!-- Net Income -->
+                                <tr class="@(Model.Report.NetIncome >= 0 ? "table-success" : "table-danger")">
+                                    <td class="ps-4 fw-bold fs-5">NET INCOME</td>
+                                    <td class="text-end pe-4 fw-bold fs-5 @(Model.Report.NetIncome >= 0 ? "text-success" : "text-danger")">
+                                        @Model.Report.NetIncome.ToString("C0")
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="col-lg-5">
+            <!-- Monthly Trend -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Monthly Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyTrendChart" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Expense Breakdown -->
+            @if (Model.Report.OperatingExpenseItems.Any())
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Expense Breakdown</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="expenseChart" height="250"></canvas>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Comparison with Previous Period -->
+        @if (Model.Report.PreviousPeriod != null)
+        {
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Period Comparison</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">Metric</th>
+                                        <th class="text-end">Current Period</th>
+                                        <th class="text-end">Prior Period</th>
+                                        <th class="text-end pe-4">Change</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="ps-4">Total Revenue</td>
+                                        <td class="text-end">@Model.Report.TotalRevenue.ToString("C0")</td>
+                                        <td class="text-end">@Model.Report.PreviousPeriod.TotalRevenue.ToString("C0")</td>
+                                        <td class="text-end pe-4">
+                                            @{
+                                                var revChange = Model.Report.PreviousPeriod.RevenueChange;
+                                            }
+                                            <span class="badge @(revChange >= 0 ? "bg-success" : "bg-danger")">
+                                                @(revChange >= 0 ? "+" : "")@revChange.ToString("F1")%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4">Gross Profit</td>
+                                        <td class="text-end">@Model.Report.GrossProfit.ToString("C0")</td>
+                                        <td class="text-end">@Model.Report.PreviousPeriod.GrossProfit.ToString("C0")</td>
+                                        <td class="text-end pe-4">
+                                            @{
+                                                var gpChange = Model.Report.PreviousPeriod.GrossProfitChange;
+                                            }
+                                            <span class="badge @(gpChange >= 0 ? "bg-success" : "bg-danger")">
+                                                @(gpChange >= 0 ? "+" : "")@gpChange.ToString("F1")%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4">Operating Income</td>
+                                        <td class="text-end">@Model.Report.OperatingIncome.ToString("C0")</td>
+                                        <td class="text-end">@Model.Report.PreviousPeriod.OperatingIncome.ToString("C0")</td>
+                                        <td class="text-end pe-4">
+                                            @{
+                                                var oiChange = Model.Report.PreviousPeriod.OperatingIncomeChange;
+                                            }
+                                            <span class="badge @(oiChange >= 0 ? "bg-success" : "bg-danger")">
+                                                @(oiChange >= 0 ? "+" : "")@oiChange.ToString("F1")%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td class="ps-4 fw-bold">Net Income</td>
+                                        <td class="text-end fw-bold">@Model.Report.NetIncome.ToString("C0")</td>
+                                        <td class="text-end fw-bold">@Model.Report.PreviousPeriod.NetIncome.ToString("C0")</td>
+                                        <td class="text-end pe-4">
+                                            @{
+                                                var niChange = Model.Report.PreviousPeriod.NetIncomeChange;
+                                            }
+                                            <span class="badge @(niChange >= 0 ? "bg-success" : "bg-danger") fs-6">
+                                                @(niChange >= 0 ? "+" : "")@niChange.ToString("F1")%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Monthly Trend Chart
+        const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.MonthlyTrend.Select(m => $"'{m.MonthName}'")))],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [@string.Join(",", Model.Report.MonthlyTrend.Select(m => m.Revenue.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Net Income',
+                    data: [@string.Join(",", Model.Report.MonthlyTrend.Select(m => m.NetIncome.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+
+        @if (Model.Report.OperatingExpenseItems.Any())
+        {
+            <text>
+        // Expense Breakdown Chart
+        const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+        new Chart(expenseCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.Report.OperatingExpenseItems.Take(8).Select(e => $"'{e.AccountName}'")))],
+                datasets: [{
+                    data: [@string.Join(",", Model.Report.OperatingExpenseItems.Take(8).Select(e => e.Amount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(234, 179, 8, 0.8)',
+                        'rgba(132, 204, 22, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(20, 184, 166, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(168, 85, 247, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { boxWidth: 12, padding: 8, font: { size: 10 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': $' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+            </text>
+        }
+    </script>
+}

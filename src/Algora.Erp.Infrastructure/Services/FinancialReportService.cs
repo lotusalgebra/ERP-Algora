@@ -389,6 +389,272 @@ public class FinancialReportService : IFinancialReportService
         return report;
     }
 
+    public async Task<ProfitAndLossReport> GetProfitAndLossAsync(ReportDateRange range, CancellationToken cancellationToken = default)
+    {
+        // Get all journal entries within the date range
+        var journalEntries = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate >= range.StartDate && j.EntryDate <= range.EndDate && j.Status == JournalEntryStatus.Posted)
+            .ToListAsync(cancellationToken);
+
+        var allLines = journalEntries.SelectMany(j => j.Lines).ToList();
+
+        // Get invoices for revenue data (if journal entries are limited)
+        var invoices = await _context.Invoices
+            .Where(i => i.InvoiceDate >= range.StartDate && i.InvoiceDate <= range.EndDate
+                && i.Status != InvoiceStatus.Void && i.Status != InvoiceStatus.Cancelled)
+            .ToListAsync(cancellationToken);
+
+        var report = new ProfitAndLossReport
+        {
+            DateRange = range
+        };
+
+        // Revenue items from accounts
+        var revenueAccounts = allLines
+            .Where(l => l.Account.AccountType == AccountType.Revenue)
+            .GroupBy(l => l.Account)
+            .Select(g => new PnLLineItem
+            {
+                AccountCode = g.Key.Code,
+                AccountName = g.Key.Name,
+                Category = "Revenue",
+                Amount = g.Sum(l => l.CreditAmount - l.DebitAmount) // Revenue increases with credits
+            })
+            .Where(i => i.Amount != 0)
+            .OrderByDescending(i => i.Amount)
+            .ToList();
+
+        // If no journal entries, use invoice data for revenue
+        if (!revenueAccounts.Any() && invoices.Any())
+        {
+            revenueAccounts.Add(new PnLLineItem
+            {
+                AccountCode = "4000",
+                AccountName = "Sales Revenue",
+                Category = "Revenue",
+                Amount = invoices.Sum(i => i.TotalAmount)
+            });
+        }
+
+        report.RevenueItems = revenueAccounts;
+        report.TotalRevenue = revenueAccounts.Sum(i => i.Amount);
+
+        // COGS items
+        var cogsAccounts = allLines
+            .Where(l => l.Account.AccountType == AccountType.Expense && l.Account.AccountSubType == AccountSubType.CostOfGoodsSold)
+            .GroupBy(l => l.Account)
+            .Select(g => new PnLLineItem
+            {
+                AccountCode = g.Key.Code,
+                AccountName = g.Key.Name,
+                Category = "COGS",
+                Amount = g.Sum(l => l.DebitAmount - l.CreditAmount) // Expenses increase with debits
+            })
+            .Where(i => i.Amount != 0)
+            .OrderByDescending(i => i.Amount)
+            .ToList();
+
+        report.COGSItems = cogsAccounts;
+        report.TotalCOGS = cogsAccounts.Sum(i => i.Amount);
+
+        // Gross Profit
+        report.GrossProfit = report.TotalRevenue - report.TotalCOGS;
+        report.GrossProfitMargin = report.TotalRevenue != 0 ? (report.GrossProfit / report.TotalRevenue) * 100 : 0;
+
+        // Operating Expenses (all expense accounts except COGS)
+        var operatingExpenseAccounts = allLines
+            .Where(l => l.Account.AccountType == AccountType.Expense && l.Account.AccountSubType != AccountSubType.CostOfGoodsSold)
+            .GroupBy(l => l.Account)
+            .Select(g => new PnLLineItem
+            {
+                AccountCode = g.Key.Code,
+                AccountName = g.Key.Name,
+                Category = GetExpenseCategory(g.Key.AccountSubType),
+                Amount = g.Sum(l => l.DebitAmount - l.CreditAmount)
+            })
+            .Where(i => i.Amount != 0)
+            .OrderByDescending(i => i.Amount)
+            .ToList();
+
+        report.OperatingExpenseItems = operatingExpenseAccounts;
+        report.TotalOperatingExpenses = operatingExpenseAccounts.Sum(i => i.Amount);
+
+        // Operating Income
+        report.OperatingIncome = report.GrossProfit - report.TotalOperatingExpenses;
+        report.OperatingMargin = report.TotalRevenue != 0 ? (report.OperatingIncome / report.TotalRevenue) * 100 : 0;
+
+        // Other Income (e.g., interest income, other income accounts)
+        var otherIncomeAccounts = allLines
+            .Where(l => l.Account.AccountType == AccountType.Revenue &&
+                (l.Account.AccountSubType == AccountSubType.OtherIncome || l.Account.AccountSubType == AccountSubType.InterestIncome))
+            .GroupBy(l => l.Account)
+            .Select(g => new PnLLineItem
+            {
+                AccountCode = g.Key.Code,
+                AccountName = g.Key.Name,
+                Category = "Other Income",
+                Amount = g.Sum(l => l.CreditAmount - l.DebitAmount)
+            })
+            .Where(i => i.Amount != 0)
+            .ToList();
+
+        report.OtherIncomeItems = otherIncomeAccounts;
+        report.OtherIncome = otherIncomeAccounts.Sum(i => i.Amount);
+
+        // Net Income
+        report.NetIncome = report.OperatingIncome + report.OtherIncome - report.OtherExpenses;
+        report.NetProfitMargin = report.TotalRevenue != 0 ? (report.NetIncome / report.TotalRevenue) * 100 : 0;
+
+        // Calculate percentages for line items
+        foreach (var item in report.RevenueItems)
+        {
+            item.Percentage = report.TotalRevenue != 0 ? (item.Amount / report.TotalRevenue) * 100 : 0;
+        }
+        foreach (var item in report.OperatingExpenseItems)
+        {
+            item.Percentage = report.TotalOperatingExpenses != 0 ? (item.Amount / report.TotalOperatingExpenses) * 100 : 0;
+        }
+
+        // Monthly trend
+        report.MonthlyTrend = await GetMonthlyPnLTrendAsync(range, cancellationToken);
+
+        // Previous period comparison
+        var periodLength = (range.EndDate - range.StartDate).Days;
+        var previousRange = new ReportDateRange
+        {
+            StartDate = range.StartDate.AddDays(-periodLength - 1),
+            EndDate = range.StartDate.AddDays(-1)
+        };
+
+        var previousReport = await GetPreviousPeriodDataAsync(previousRange, cancellationToken);
+        if (previousReport.HasValue)
+        {
+            var prev = previousReport.Value;
+            report.PreviousPeriod = new PnLComparison
+            {
+                DateRange = previousRange,
+                TotalRevenue = prev.TotalRevenue,
+                GrossProfit = prev.GrossProfit,
+                OperatingIncome = prev.OperatingIncome,
+                NetIncome = prev.NetIncome,
+                RevenueChange = prev.TotalRevenue != 0
+                    ? ((report.TotalRevenue - prev.TotalRevenue) / prev.TotalRevenue) * 100
+                    : 0,
+                GrossProfitChange = prev.GrossProfit != 0
+                    ? ((report.GrossProfit - prev.GrossProfit) / Math.Abs(prev.GrossProfit)) * 100
+                    : 0,
+                OperatingIncomeChange = prev.OperatingIncome != 0
+                    ? ((report.OperatingIncome - prev.OperatingIncome) / Math.Abs(prev.OperatingIncome)) * 100
+                    : 0,
+                NetIncomeChange = prev.NetIncome != 0
+                    ? ((report.NetIncome - prev.NetIncome) / Math.Abs(prev.NetIncome)) * 100
+                    : 0
+            };
+        }
+
+        return report;
+    }
+
+    private async Task<List<MonthlyPnL>> GetMonthlyPnLTrendAsync(ReportDateRange range, CancellationToken cancellationToken)
+    {
+        var result = new List<MonthlyPnL>();
+        var currentDate = new DateTime(range.StartDate.Year, range.StartDate.Month, 1);
+        var endDate = range.EndDate;
+
+        while (currentDate <= endDate)
+        {
+            var monthStart = currentDate;
+            var monthEnd = currentDate.AddMonths(1).AddDays(-1);
+            if (monthEnd > endDate) monthEnd = endDate;
+
+            var journalLines = await _context.JournalEntries
+                .Include(j => j.Lines)
+                    .ThenInclude(l => l.Account)
+                .Where(j => j.EntryDate >= monthStart && j.EntryDate <= monthEnd && j.Status == JournalEntryStatus.Posted)
+                .SelectMany(j => j.Lines)
+                .ToListAsync(cancellationToken);
+
+            var revenue = journalLines
+                .Where(l => l.Account.AccountType == AccountType.Revenue)
+                .Sum(l => l.CreditAmount - l.DebitAmount);
+
+            var cogs = journalLines
+                .Where(l => l.Account.AccountType == AccountType.Expense && l.Account.AccountSubType == AccountSubType.CostOfGoodsSold)
+                .Sum(l => l.DebitAmount - l.CreditAmount);
+
+            var opex = journalLines
+                .Where(l => l.Account.AccountType == AccountType.Expense && l.Account.AccountSubType != AccountSubType.CostOfGoodsSold)
+                .Sum(l => l.DebitAmount - l.CreditAmount);
+
+            result.Add(new MonthlyPnL
+            {
+                Year = currentDate.Year,
+                Month = currentDate.Month,
+                MonthName = currentDate.ToString("MMM yyyy"),
+                Revenue = revenue,
+                COGS = cogs,
+                GrossProfit = revenue - cogs,
+                OperatingExpenses = opex,
+                NetIncome = revenue - cogs - opex
+            });
+
+            currentDate = currentDate.AddMonths(1);
+        }
+
+        return result;
+    }
+
+    private async Task<(decimal TotalRevenue, decimal GrossProfit, decimal OperatingIncome, decimal NetIncome)?> GetPreviousPeriodDataAsync(
+        ReportDateRange range, CancellationToken cancellationToken)
+    {
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate >= range.StartDate && j.EntryDate <= range.EndDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        if (!journalLines.Any())
+            return null;
+
+        var revenue = journalLines
+            .Where(l => l.Account.AccountType == AccountType.Revenue)
+            .Sum(l => l.CreditAmount - l.DebitAmount);
+
+        var cogs = journalLines
+            .Where(l => l.Account.AccountType == AccountType.Expense && l.Account.AccountSubType == AccountSubType.CostOfGoodsSold)
+            .Sum(l => l.DebitAmount - l.CreditAmount);
+
+        var opex = journalLines
+            .Where(l => l.Account.AccountType == AccountType.Expense && l.Account.AccountSubType != AccountSubType.CostOfGoodsSold)
+            .Sum(l => l.DebitAmount - l.CreditAmount);
+
+        var grossProfit = revenue - cogs;
+        var operatingIncome = grossProfit - opex;
+        var netIncome = operatingIncome;
+
+        return (revenue, grossProfit, operatingIncome, netIncome);
+    }
+
+    private static string GetExpenseCategory(AccountSubType? subType)
+    {
+        return subType switch
+        {
+            AccountSubType.Salaries => "Payroll",
+            AccountSubType.Rent => "Facilities",
+            AccountSubType.Utilities => "Facilities",
+            AccountSubType.Insurance => "Insurance",
+            AccountSubType.Depreciation => "Depreciation",
+            AccountSubType.Marketing => "Marketing",
+            AccountSubType.TravelExpenses => "Travel",
+            AccountSubType.OfficeSupplies => "Office",
+            AccountSubType.ProfessionalFees => "Professional Services",
+            _ => "Other"
+        };
+    }
+
     public byte[] ExportToPdf<T>(T report, string reportTitle) where T : class
     {
         var document = Document.Create(container =>
@@ -426,6 +692,10 @@ public class FinancialReportService : IFinancialReportService
                     else if (report is CollectionEfficiencyReport collectionReport)
                     {
                         RenderCollectionReportPdf(column, collectionReport);
+                    }
+                    else if (report is ProfitAndLossReport pnlReport)
+                    {
+                        RenderProfitAndLossPdf(column, pnlReport);
                     }
                 });
 
@@ -701,6 +971,91 @@ public class FinancialReportService : IFinancialReportService
             table.Cell().Padding(8).Text("Late Payments:").Bold();
             table.Cell().Padding(8).Text(report.InvoicesPaidLate.ToString());
         });
+    }
+
+    private void RenderProfitAndLossPdf(ColumnDescriptor column, ProfitAndLossReport report)
+    {
+        column.Item().Text($"Period: {report.DateRange.StartDate:MMM dd, yyyy} - {report.DateRange.EndDate:MMM dd, yyyy}").FontSize(11);
+        column.Item().Height(15);
+
+        // Revenue Section
+        column.Item().Text("REVENUE").Bold().FontSize(12);
+        column.Item().Height(5);
+        foreach (var item in report.RevenueItems)
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text($"  {item.AccountName}");
+                row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+            });
+        }
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Total Revenue").Bold();
+            row.RelativeItem(1).AlignRight().Text(report.TotalRevenue.ToString("C2")).Bold();
+        });
+        column.Item().Height(10);
+
+        // COGS Section
+        column.Item().Text("COST OF GOODS SOLD").Bold().FontSize(12);
+        column.Item().Height(5);
+        foreach (var item in report.COGSItems)
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text($"  {item.AccountName}");
+                row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+            });
+        }
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Total COGS").Bold();
+            row.RelativeItem(1).AlignRight().Text(report.TotalCOGS.ToString("C2")).Bold();
+        });
+        column.Item().Height(10);
+
+        // Gross Profit
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("GROSS PROFIT").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.GrossProfit.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Text($"Gross Margin: {report.GrossProfitMargin:F1}%").FontSize(10);
+        column.Item().Height(10);
+
+        // Operating Expenses
+        column.Item().Text("OPERATING EXPENSES").Bold().FontSize(12);
+        column.Item().Height(5);
+        foreach (var item in report.OperatingExpenseItems)
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text($"  {item.AccountName}");
+                row.RelativeItem(1).AlignRight().Text(item.Amount.ToString("C2"));
+            });
+        }
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("Total Operating Expenses").Bold();
+            row.RelativeItem(1).AlignRight().Text(report.TotalOperatingExpenses.ToString("C2")).Bold();
+        });
+        column.Item().Height(10);
+
+        // Operating Income
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("OPERATING INCOME").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.OperatingIncome.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Height(10);
+
+        // Net Income
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("NET INCOME").Bold().FontSize(14);
+            row.RelativeItem(1).AlignRight().Text(report.NetIncome.ToString("C2")).Bold().FontSize(14);
+        });
+        column.Item().Text($"Net Profit Margin: {report.NetProfitMargin:F1}%").FontSize(10);
     }
 
     #endregion
