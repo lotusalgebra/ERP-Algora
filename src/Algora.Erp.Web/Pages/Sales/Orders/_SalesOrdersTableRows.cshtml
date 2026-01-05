@@ -1,0 +1,200 @@
+@model Algora.Erp.Web.Pages.Sales.Orders.SalesOrdersTableViewModel
+@using Algora.Erp.Domain.Entities.Sales
+
+@if (Model.SalesOrders.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-bag-x fs-1 d-block mb-3"></i>
+                <p class="mb-0">No sales orders found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var order in Model.SalesOrders)
+    {
+        var statusColor = order.Status switch
+        {
+            SalesOrderStatus.Draft => "secondary",
+            SalesOrderStatus.Confirmed => "primary",
+            SalesOrderStatus.PartiallyShipped => "info",
+            SalesOrderStatus.Shipped => "info",
+            SalesOrderStatus.Delivered => "success",
+            SalesOrderStatus.Paid => "success",
+            SalesOrderStatus.Cancelled => "danger",
+            _ => "secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <div class="fw-medium">@order.OrderNumber</div>
+                @if (!string.IsNullOrEmpty(order.Reference))
+                {
+                    <small class="text-muted">Ref: @order.Reference</small>
+                }
+            </td>
+            <td>
+                <div class="fw-medium">@order.Customer?.Name</div>
+                @if (!string.IsNullOrEmpty(order.Customer?.BillingCity))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-geo-alt me-1"></i>@order.Customer.BillingCity
+                    </small>
+                }
+            </td>
+            <td>
+                <div>@order.OrderDate.ToString("MMM dd, yyyy")</div>
+            </td>
+            <td>
+                @if (order.DueDate.HasValue)
+                {
+                    var isOverdue = order.DueDate.Value < DateTime.Today &&
+                                   order.Status != SalesOrderStatus.Paid &&
+                                   order.Status != SalesOrderStatus.Delivered &&
+                                   order.Status != SalesOrderStatus.Cancelled;
+                    <span class="@(isOverdue ? "text-danger fw-medium" : "")">
+                        @order.DueDate.Value.ToString("MMM dd, yyyy")
+                        @if (isOverdue)
+                        {
+                            <i class="bi bi-exclamation-circle ms-1"></i>
+                        }
+                    </span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td class="text-center">
+                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                    @order.Lines.Count
+                </span>
+            </td>
+            <td class="text-end">
+                <span class="fw-medium">@order.TotalAmount.ToString("C2")</span>
+                @if (order.AmountDue > 0 && order.Status != SalesOrderStatus.Draft && order.Status != SalesOrderStatus.Cancelled)
+                {
+                    <div class="small text-warning">Due: @order.AmountDue.ToString("C2")</div>
+                }
+            </td>
+            <td>
+                <span class="badge bg-@statusColor bg-opacity-10 text-@statusColor">
+                    @order.Status
+                </span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button"
+                            class="btn btn-outline-info"
+                            onclick="viewDetails('@order.Id')"
+                            title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+
+                    @if (order.Status == SalesOrderStatus.Draft)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                hx-get="?handler=EditForm&id=@order.Id"
+                                hx-target="#formModalBody"
+                                data-bs-toggle="modal"
+                                data-bs-target="#formModal"
+                                title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                onclick="updateStatus('@order.Id', 'Confirmed')"
+                                title="Confirm Order">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-danger"
+                                onclick="confirmDelete('@order.Id')"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                    else if (order.Status == SalesOrderStatus.Confirmed)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-info"
+                                onclick="updateStatus('@order.Id', 'Shipped')"
+                                title="Mark Shipped">
+                            <i class="bi bi-truck"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="updateStatus('@order.Id', 'Cancelled')"
+                                title="Cancel">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    }
+                    else if (order.Status == SalesOrderStatus.Shipped || order.Status == SalesOrderStatus.PartiallyShipped)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                onclick="updateStatus('@order.Id', 'Delivered')"
+                                title="Mark Delivered">
+                            <i class="bi bi-box-seam"></i>
+                        </button>
+                    }
+                    else if (order.Status == SalesOrderStatus.Delivered)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                onclick="updateStatus('@order.Id', 'Paid')"
+                                title="Mark Paid">
+                            <i class="bi bi-currency-dollar"></i>
+                        </button>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="8" class="py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#ordersTableBody"
+                               hx-include="#searchInput, #customerFilter, #statusFilter, #pageSizeSelect">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   hx-get="?handler=Table&page=@i"
+                                   hx-target="#ordersTableBody"
+                                   hx-include="#searchInput, #customerFilter, #statusFilter, #pageSizeSelect">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#ordersTableBody"
+                               hx-include="#searchInput, #customerFilter, #statusFilter, #pageSizeSelect">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

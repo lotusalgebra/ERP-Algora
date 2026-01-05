@@ -1,0 +1,149 @@
+@model Algora.Erp.Web.Pages.HR.Attendance.AttendanceTableViewModel
+@using Algora.Erp.Domain.Entities.HR
+
+@foreach (var att in Model.Attendances)
+{
+    <tr>
+        <td class="ps-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                     style="width: 40px; height: 40px; font-size: 14px;">
+                    @att.Employee.FirstName[0]@att.Employee.LastName[0]
+                </div>
+                <div>
+                    <h6 class="mb-0">@att.Employee.FirstName @att.Employee.LastName</h6>
+                    <small class="text-muted">@att.Employee.EmployeeCode · @(att.Employee.Department?.Name ?? "No Dept")</small>
+                </div>
+            </div>
+        </td>
+        <td>@att.Date.ToString("MMM dd, yyyy")</td>
+        <td>
+            @if (att.CheckInTime.HasValue)
+            {
+                <span>@att.CheckInTime.Value.ToString(@"hh\:mm")</span>
+                @if (att.IsLate)
+                {
+                    <span class="badge bg-warning ms-1">Late</span>
+                }
+            }
+            else
+            {
+                <span class="text-muted">-</span>
+            }
+        </td>
+        <td>
+            @if (att.CheckOutTime.HasValue)
+            {
+                <span>@att.CheckOutTime.Value.ToString(@"hh\:mm")</span>
+                @if (att.IsEarlyDeparture)
+                {
+                    <span class="badge bg-warning ms-1">Early</span>
+                }
+            }
+            else
+            {
+                <span class="text-muted">-</span>
+            }
+        </td>
+        <td>
+            @if (att.TotalWorkHours.HasValue)
+            {
+                <span>@att.TotalWorkHours.Value.ToString(@"hh\:mm")</span>
+                @if (att.OvertimeHours.HasValue && att.OvertimeHours.Value.TotalMinutes > 0)
+                {
+                    <span class="badge bg-info ms-1">+@att.OvertimeHours.Value.ToString(@"hh\:mm") OT</span>
+                }
+            }
+            else
+            {
+                <span class="text-muted">-</span>
+            }
+        </td>
+        <td>
+            @switch (att.Status)
+            {
+                case AttendanceStatus.Present:
+                    <span class="badge bg-success">Present</span>
+                    break;
+                case AttendanceStatus.Absent:
+                    <span class="badge bg-danger">Absent</span>
+                    break;
+                case AttendanceStatus.Late:
+                    <span class="badge bg-warning text-dark">Late</span>
+                    break;
+                case AttendanceStatus.HalfDay:
+                    <span class="badge bg-info">Half Day</span>
+                    break;
+                case AttendanceStatus.OnLeave:
+                    <span class="badge bg-secondary">On Leave</span>
+                    break;
+                case AttendanceStatus.Holiday:
+                    <span class="badge bg-primary">Holiday</span>
+                    break;
+                case AttendanceStatus.Weekend:
+                    <span class="badge bg-secondary">Weekend</span>
+                    break;
+                case AttendanceStatus.WorkFromHome:
+                    <span class="badge bg-info">WFH</span>
+                    break;
+            }
+        </td>
+        <td class="text-end pe-4">
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           hx-get="/HR/Attendance?handler=EditForm&id=@att.Id"
+                           hx-target="#formContainer"
+                           data-bs-toggle="modal"
+                           data-bs-target="#attendanceModal">
+                            <i class="bi bi-pencil me-2"></i> Edit
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="#"
+                           hx-delete="/HR/Attendance?handler=&id=@att.Id"
+                           hx-target="#tableContent"
+                           hx-confirm="Are you sure you want to delete this attendance record?">
+                            <i class="bi bi-trash me-2"></i> Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.Attendances.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-calendar-check fs-1 d-block mb-2"></i>
+                <p class="mb-0">No attendance records found for this date</p>
+            </div>
+        </td>
+    </tr>
+}
+
+<script>
+    document.getElementById('paginationInfo').textContent =
+        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
+
+    var paginationHtml = '';
+    @if (Model.TotalPages > 1)
+    {
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            var activeClass = i == Model.Page ? "active" : "";
+            <text>
+            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/HR/Attendance?handler=Table&page=@i&dateFilter=@Model.DateFilter" hx-target="#tableContent" hx-include="#searchInput,#statusFilter">@i</a></li>';
+            </text>
+        }
+    }
+    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+</script>

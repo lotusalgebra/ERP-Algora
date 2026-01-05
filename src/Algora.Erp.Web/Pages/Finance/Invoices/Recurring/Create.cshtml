@@ -1,0 +1,511 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Invoices.Recurring.CreateModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Create Recurring Invoice";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Create Recurring Invoice</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Invoices/Recurring">Recurring Invoices</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <form method="post" id="recurringForm">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Basic Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" asp-for="Input.Name" class="form-control" placeholder="e.g., Monthly Hosting Fee" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Customer <span class="text-danger">*</span></label>
+                                <select asp-for="Input.CustomerId" class="form-select" id="customerId" required>
+                                    <option value="">Select customer...</option>
+                                    @foreach (var customer in Model.Customers)
+                                    {
+                                        <option value="@customer.Id">@customer.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea asp-for="Input.Description" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Schedule</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Frequency <span class="text-danger">*</span></label>
+                                <select asp-for="Input.Frequency" class="form-select" id="frequency">
+                                    @foreach (RecurrenceFrequency freq in Enum.GetValues(typeof(RecurrenceFrequency)))
+                                    {
+                                        <option value="@((int)freq)">@freq</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Every</label>
+                                <div class="input-group">
+                                    <input type="number" asp-for="Input.FrequencyInterval" class="form-control" min="1" max="12" />
+                                    <span class="input-group-text" id="intervalSuffix">month(s)</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4" id="dayOfMonthContainer">
+                                <label class="form-label">Day of Month</label>
+                                <select asp-for="Input.DayOfMonth" class="form-select">
+                                    <option value="">Same as start date</option>
+                                    @for (int i = 1; i <= 31; i++)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-none" id="dayOfWeekContainer">
+                                <label class="form-label">Day of Week</label>
+                                <select asp-for="Input.DayOfWeek" class="form-select">
+                                    @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                                    {
+                                        <option value="@((int)day)">@day</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" asp-for="Input.StartDate" class="form-control" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">End Date</label>
+                                <input type="date" asp-for="Input.EndDate" class="form-control" />
+                                <small class="text-muted">Leave empty for indefinite</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Max Occurrences</label>
+                                <input type="number" asp-for="Input.MaxOccurrences" class="form-control" min="1" placeholder="Unlimited" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Line Items</h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="addLineBtn">
+                            <i class="bi bi-plus-lg me-1"></i>Add Line
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-borderless align-middle mb-0" id="linesTable">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th style="width: 30%;">Product/Description</th>
+                                        <th style="width: 10%;">Qty</th>
+                                        <th style="width: 15%;">Unit Price</th>
+                                        <th style="width: 10%;">Disc %</th>
+                                        <th style="width: 10%;">Tax %</th>
+                                        <th class="text-end" style="width: 15%;">Total</th>
+                                        <th style="width: 5%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="linesBody">
+                                    <!-- Lines will be added here -->
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <td colspan="5" class="text-end fw-medium">Subtotal:</td>
+                                        <td class="text-end fw-medium" id="subtotalDisplay">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="text-end">Discount:</td>
+                                        <td class="text-end" id="discountDisplay">-$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="text-end">Tax:</td>
+                                        <td class="text-end" id="taxDisplay">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="fw-bold">
+                                        <td colspan="5" class="text-end">Total:</td>
+                                        <td class="text-end" id="totalDisplay">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-sticky me-2"></i>Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Invoice Notes</label>
+                                <textarea asp-for="Input.Notes" class="form-control" rows="3" placeholder="Notes visible on invoice..."></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Internal Notes</label>
+                                <textarea asp-for="Input.InternalNotes" class="form-control" rows="3" placeholder="Internal notes only..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Invoice Settings -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Invoice Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Invoice Type</label>
+                            <select asp-for="Input.InvoiceType" class="form-select">
+                                @foreach (InvoiceType type in Enum.GetValues(typeof(InvoiceType)))
+                                {
+                                    <option value="@((int)type)">@type</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Terms</label>
+                            <select asp-for="Input.PaymentTermDays" class="form-select" id="paymentTermDays">
+                                <option value="0">Due on Receipt</option>
+                                <option value="7">Net 7</option>
+                                <option value="15">Net 15</option>
+                                <option value="30" selected>Net 30</option>
+                                <option value="45">Net 45</option>
+                                <option value="60">Net 60</option>
+                                <option value="90">Net 90</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Currency</label>
+                            <select asp-for="Input.Currency" class="form-select">
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                                <option value="AUD">AUD - Australian Dollar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Reference</label>
+                            <input type="text" asp-for="Input.Reference" class="form-control" placeholder="PO number, contract, etc." />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Address -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Billing Address</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" asp-for="Input.BillingName" class="form-control" id="billingName" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <input type="text" asp-for="Input.BillingAddress" class="form-control" id="billingAddress" />
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label">City</label>
+                                <input type="text" asp-for="Input.BillingCity" class="form-control" id="billingCity" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">State</label>
+                                <input type="text" asp-for="Input.BillingState" class="form-control" id="billingState" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Postal Code</label>
+                                <input type="text" asp-for="Input.BillingPostalCode" class="form-control" id="billingPostalCode" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Country</label>
+                                <input type="text" asp-for="Input.BillingCountry" class="form-control" id="billingCountry" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto-Send Options -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Auto-Send Options</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input type="checkbox" asp-for="Input.AutoSend" class="form-check-input" id="autoSend" />
+                            <label class="form-check-label" for="autoSend">
+                                Auto-mark as sent when generated
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" asp-for="Input.AutoSendEmail" class="form-check-input" id="autoSendEmail" />
+                            <label class="form-check-label" for="autoSendEmail">
+                                Email invoice automatically
+                            </label>
+                        </div>
+                        <div id="emailRecipientsDiv">
+                            <label class="form-label">Email Recipients</label>
+                            <input type="text" asp-for="Input.EmailRecipients" class="form-control" id="emailRecipients"
+                                   placeholder="email@example.com" />
+                            <small class="text-muted">Comma-separated for multiple</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-lg me-1"></i>Create Recurring Invoice
+                    </button>
+                    <a href="/Finance/Invoices/Recurring" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Line Template -->
+<template id="lineTemplate">
+    <tr class="line-row">
+        <td>
+            <select class="form-select form-select-sm product-select" onchange="productChanged(this)">
+                <option value="">Select product or type description...</option>
+                @foreach (var product in Model.Products)
+                {
+                    <option value="@product.Id" data-sku="@product.Sku" data-price="@product.SellingPrice" data-tax="@product.TaxRate">
+                        @product.Name
+                    </option>
+                }
+            </select>
+            <input type="hidden" class="line-product-id" name="" />
+            <input type="hidden" class="line-product-code" name="" />
+            <input type="text" class="form-control form-control-sm mt-1 line-description" placeholder="Description" name="" />
+        </td>
+        <td>
+            <input type="number" class="form-control form-control-sm line-qty" value="1" min="0.01" step="0.01" name="" onchange="calculateLine(this)" />
+        </td>
+        <td>
+            <input type="number" class="form-control form-control-sm line-price" value="0" min="0" step="0.01" name="" onchange="calculateLine(this)" />
+        </td>
+        <td>
+            <input type="number" class="form-control form-control-sm line-discount" value="0" min="0" max="100" step="0.01" name="" onchange="calculateLine(this)" />
+        </td>
+        <td>
+            <input type="number" class="form-control form-control-sm line-tax" value="0" min="0" max="100" step="0.01" name="" onchange="calculateLine(this)" />
+        </td>
+        <td class="text-end">
+            <span class="line-total fw-medium">$0.00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+@section Scripts {
+    <script>
+        let lineIndex = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add initial line
+            addLine();
+
+            // Frequency change handler
+            document.getElementById('frequency').addEventListener('change', function() {
+                updateFrequencyUI();
+            });
+
+            // Customer change handler
+            document.getElementById('customerId').addEventListener('change', async function() {
+                if (this.value) {
+                    const response = await fetch(`/Finance/Invoices/Recurring/Create?handler=CustomerDetails&customerId=${this.value}`);
+                    const data = await response.json();
+
+                    document.getElementById('billingName').value = data.billingName || '';
+                    document.getElementById('billingAddress').value = data.billingAddress || '';
+                    document.getElementById('billingCity').value = data.billingCity || '';
+                    document.getElementById('billingState').value = data.billingState || '';
+                    document.getElementById('billingPostalCode').value = data.billingPostalCode || '';
+                    document.getElementById('billingCountry').value = data.billingCountry || '';
+                    document.getElementById('emailRecipients').value = data.email || '';
+                }
+            });
+
+            // Auto-send email toggle
+            document.getElementById('autoSendEmail').addEventListener('change', function() {
+                document.getElementById('emailRecipientsDiv').style.display = this.checked ? 'block' : 'none';
+            });
+        });
+
+        function updateFrequencyUI() {
+            const freq = parseInt(document.getElementById('frequency').value);
+            const dayOfMonthContainer = document.getElementById('dayOfMonthContainer');
+            const dayOfWeekContainer = document.getElementById('dayOfWeekContainer');
+            const intervalSuffix = document.getElementById('intervalSuffix');
+
+            const suffixes = {
+                0: 'day(s)',
+                1: 'week(s)',
+                2: 'month(s)',
+                3: 'quarter(s)',
+                4: 'year(s)'
+            };
+
+            intervalSuffix.textContent = suffixes[freq] || 'period(s)';
+
+            if (freq === 1) { // Weekly
+                dayOfMonthContainer.classList.add('d-none');
+                dayOfWeekContainer.classList.remove('d-none');
+            } else if (freq === 2 || freq === 3) { // Monthly or Quarterly
+                dayOfMonthContainer.classList.remove('d-none');
+                dayOfWeekContainer.classList.add('d-none');
+            } else {
+                dayOfMonthContainer.classList.add('d-none');
+                dayOfWeekContainer.classList.add('d-none');
+            }
+        }
+
+        document.getElementById('addLineBtn').addEventListener('click', addLine);
+
+        function addLine() {
+            const template = document.getElementById('lineTemplate');
+            const clone = template.content.cloneNode(true);
+            const row = clone.querySelector('tr');
+
+            // Update names for form binding
+            row.querySelector('.line-product-id').name = `Input.Lines[${lineIndex}].ProductId`;
+            row.querySelector('.line-product-code').name = `Input.Lines[${lineIndex}].ProductCode`;
+            row.querySelector('.line-description').name = `Input.Lines[${lineIndex}].Description`;
+            row.querySelector('.line-qty').name = `Input.Lines[${lineIndex}].Quantity`;
+            row.querySelector('.line-price').name = `Input.Lines[${lineIndex}].UnitPrice`;
+            row.querySelector('.line-discount').name = `Input.Lines[${lineIndex}].DiscountPercent`;
+            row.querySelector('.line-tax').name = `Input.Lines[${lineIndex}].TaxPercent`;
+
+            document.getElementById('linesBody').appendChild(clone);
+            lineIndex++;
+        }
+
+        function productChanged(select) {
+            const row = select.closest('tr');
+            const option = select.options[select.selectedIndex];
+
+            if (option.value) {
+                row.querySelector('.line-product-id').value = option.value;
+                row.querySelector('.line-product-code').value = option.dataset.sku || '';
+                row.querySelector('.line-description').value = option.text;
+                row.querySelector('.line-price').value = parseFloat(option.dataset.price) || 0;
+                row.querySelector('.line-tax').value = parseFloat(option.dataset.tax) || 0;
+            } else {
+                row.querySelector('.line-product-id').value = '';
+                row.querySelector('.line-product-code').value = '';
+            }
+
+            calculateLine(select);
+        }
+
+        function calculateLine(element) {
+            const row = element.closest('tr');
+            const qty = parseFloat(row.querySelector('.line-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.line-price').value) || 0;
+            const discount = parseFloat(row.querySelector('.line-discount').value) || 0;
+            const tax = parseFloat(row.querySelector('.line-tax').value) || 0;
+
+            const subtotal = qty * price;
+            const discountAmt = subtotal * (discount / 100);
+            const afterDiscount = subtotal - discountAmt;
+            const taxAmt = afterDiscount * (tax / 100);
+            const total = afterDiscount + taxAmt;
+
+            row.querySelector('.line-total').textContent = formatCurrency(total);
+
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            let totalDiscount = 0;
+            let totalTax = 0;
+
+            document.querySelectorAll('#linesBody .line-row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.line-qty').value) || 0;
+                const price = parseFloat(row.querySelector('.line-price').value) || 0;
+                const discount = parseFloat(row.querySelector('.line-discount').value) || 0;
+                const tax = parseFloat(row.querySelector('.line-tax').value) || 0;
+
+                const lineSubtotal = qty * price;
+                const discountAmt = lineSubtotal * (discount / 100);
+                const afterDiscount = lineSubtotal - discountAmt;
+                const taxAmt = afterDiscount * (tax / 100);
+
+                subtotal += lineSubtotal;
+                totalDiscount += discountAmt;
+                totalTax += taxAmt;
+            });
+
+            document.getElementById('subtotalDisplay').textContent = formatCurrency(subtotal);
+            document.getElementById('discountDisplay').textContent = '-' + formatCurrency(totalDiscount);
+            document.getElementById('taxDisplay').textContent = formatCurrency(totalTax);
+            document.getElementById('totalDisplay').textContent = formatCurrency(subtotal - totalDiscount + totalTax);
+        }
+
+        function removeLine(button) {
+            const row = button.closest('tr');
+            row.remove();
+            calculateTotals();
+
+            // Ensure at least one line
+            if (document.querySelectorAll('#linesBody .line-row').length === 0) {
+                addLine();
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+        }
+    </script>
+}

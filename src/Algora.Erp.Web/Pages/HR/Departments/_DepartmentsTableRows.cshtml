@@ -1,0 +1,120 @@
+@model Algora.Erp.Web.Pages.HR.Departments.DepartmentsTableViewModel
+
+@foreach (var dept in Model.Departments)
+{
+    <tr>
+        <td class="ps-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3"
+                     style="width: 40px; height: 40px;">
+                    <i class="bi bi-building text-primary"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">@dept.Name</h6>
+                    @if (!string.IsNullOrEmpty(dept.Description))
+                    {
+                        <small class="text-muted">@(dept.Description.Length > 50 ? dept.Description.Substring(0, 50) + "..." : dept.Description)</small>
+                    }
+                </div>
+            </div>
+        </td>
+        <td>
+            <span class="badge bg-secondary">@dept.Code</span>
+        </td>
+        <td>
+            @if (dept.Manager != null)
+            {
+                <span>@dept.Manager.FirstName @dept.Manager.LastName</span>
+            }
+            else
+            {
+                <span class="text-muted">Not assigned</span>
+            }
+        </td>
+        <td>
+            @if (dept.ParentDepartment != null)
+            {
+                <span>@dept.ParentDepartment.Name</span>
+            }
+            else
+            {
+                <span class="text-muted">-</span>
+            }
+        </td>
+        <td>
+            <span class="badge bg-info">@dept.Employees.Count</span>
+        </td>
+        <td>
+            @if (dept.IsActive)
+            {
+                <span class="badge bg-success">Active</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Inactive</span>
+            }
+        </td>
+        <td class="text-end pe-4">
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           hx-get="/HR/Departments?handler=EditForm&id=@dept.Id"
+                           hx-target="#formContainer"
+                           data-bs-toggle="modal"
+                           data-bs-target="#departmentModal">
+                            <i class="bi bi-pencil me-2"></i> Edit
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/HR/Employees?departmentId=@dept.Id">
+                            <i class="bi bi-people me-2"></i> View Employees
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="#"
+                           hx-delete="/HR/Departments?handler=&id=@dept.Id"
+                           hx-target="#tableContent"
+                           hx-confirm="Are you sure you want to delete this department?">
+                            <i class="bi bi-trash me-2"></i> Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.Departments.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-building fs-1 d-block mb-2"></i>
+                <p class="mb-0">No departments found</p>
+            </div>
+        </td>
+    </tr>
+}
+
+<script>
+    document.getElementById('paginationInfo').textContent =
+        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
+
+    var paginationHtml = '';
+    @if (Model.TotalPages > 1)
+    {
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            var activeClass = i == Model.Page ? "active" : "";
+            <text>
+            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/HR/Departments?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter">@i</a></li>';
+            </text>
+        }
+    }
+    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+</script>

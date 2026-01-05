@@ -1,0 +1,200 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.JournalEntries.IndexModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Journal Entries";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Journal Entries</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item active">Journal Entries</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="/Finance/JournalEntries/Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> New Journal Entry
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Draft</h6>
+                            <h3 class="mb-0">@Model.DraftEntries</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-clock text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Pending</h6>
+                            <h3 class="mb-0">@Model.PendingEntries</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Posted</h6>
+                            <h3 class="mb-0">@Model.PostedEntries</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-currency-dollar text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">This Month</h6>
+                            <h3 class="mb-0">@Model.TotalThisMonth.ToString("C0")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Journal Entries Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0"
+                               placeholder="Search entries..."
+                               id="searchInput"
+                               hx-get="/Finance/JournalEntries?handler=Table"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#tableContent"
+                               hx-include="#statusFilter,#typeFilter,#dateFrom,#dateTo"
+                               name="search">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter" name="statusFilter"
+                            hx-get="/Finance/JournalEntries?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#tableContent"
+                            hx-include="#searchInput,#typeFilter,#dateFrom,#dateTo">
+                        <option value="">All Status</option>
+                        <option value="0">Draft</option>
+                        <option value="1">Pending</option>
+                        <option value="2">Posted</option>
+                        <option value="3">Reversed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="typeFilter" name="typeFilter"
+                            hx-get="/Finance/JournalEntries?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#tableContent"
+                            hx-include="#searchInput,#statusFilter,#dateFrom,#dateTo">
+                        <option value="">All Types</option>
+                        @foreach (JournalEntryType type in Enum.GetValues(typeof(JournalEntryType)))
+                        {
+                            <option value="@((int)type)">@type</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" id="dateFrom" name="dateFrom"
+                           hx-get="/Finance/JournalEntries?handler=Table"
+                           hx-trigger="change"
+                           hx-target="#tableContent"
+                           hx-include="#searchInput,#statusFilter,#typeFilter,#dateTo"
+                           placeholder="From">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" id="dateTo" name="dateTo"
+                           hx-get="/Finance/JournalEntries?handler=Table"
+                           hx-trigger="change"
+                           hx-target="#tableContent"
+                           hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom"
+                           placeholder="To">
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Entry #</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableContent" hx-get="/Finance/JournalEntries?handler=Table" hx-trigger="load">
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small" id="paginationInfo">
+                    Showing 0 entries
+                </div>
+                <nav id="paginationNav">
+                    <ul class="pagination pagination-sm mb-0">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

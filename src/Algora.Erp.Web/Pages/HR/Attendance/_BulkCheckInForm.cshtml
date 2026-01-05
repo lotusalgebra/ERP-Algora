@@ -1,0 +1,80 @@
+@model Algora.Erp.Web.Pages.HR.Attendance.BulkCheckInViewModel
+@using Algora.Erp.Domain.Entities.HR
+
+<form hx-post="/HR/Attendance?handler=BulkCheckIn" hx-target="#tableContent" hx-swap="innerHTML"
+      hx-on::after-request="if(event.detail.successful) bootstrap.Modal.getInstance(document.getElementById('attendanceModal')).hide()">
+
+    <input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+
+    <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        Select employees to mark attendance for <strong>@Model.Date.ToString("MMMM dd, yyyy")</strong>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Check-In Time <span class="text-danger">*</span></label>
+            <input type="time" class="form-control" name="CheckInTime" value="09:00" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Status <span class="text-danger">*</span></label>
+            <select class="form-select" name="Status" required>
+                <option value="0" selected>Present</option>
+                <option value="2">Late</option>
+                <option value="7">Work From Home</option>
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Select Employees</label>
+            <div class="mb-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll()">
+                    Select All
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">
+                    Deselect All
+                </button>
+            </div>
+
+            @if (Model.Employees.Any())
+            {
+                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                    @foreach (var emp in Model.Employees)
+                    {
+                        <div class="form-check mb-2">
+                            <input class="form-check-input employee-check" type="checkbox"
+                                   name="EmployeeIds" value="@emp.Id" id="emp_@emp.Id">
+                            <label class="form-check-label" for="emp_@emp.Id">
+                                @emp.FirstName @emp.LastName
+                                <small class="text-muted">(@emp.EmployeeCode)</small>
+                            </label>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    All employees already have attendance records for today.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary" @(Model.Employees.Any() ? "" : "disabled")>
+            <i class="bi bi-clock me-1"></i> Bulk Check-In
+        </button>
+    </div>
+</form>
+
+<script>
+    function selectAll() {
+        document.querySelectorAll('.employee-check').forEach(cb => cb.checked = true);
+    }
+
+    function deselectAll() {
+        document.querySelectorAll('.employee-check').forEach(cb => cb.checked = false);
+    }
+</script>

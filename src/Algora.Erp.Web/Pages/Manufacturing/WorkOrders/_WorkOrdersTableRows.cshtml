@@ -1,0 +1,242 @@
+@using Algora.Erp.Domain.Entities.Manufacturing
+@model Algora.Erp.Web.Pages.Manufacturing.WorkOrders.WorkOrderTableViewModel
+
+@if (!Model.WorkOrders.Any())
+{
+    <tr>
+        <td colspan="9" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-clipboard-check fs-1 d-block mb-3"></i>
+                <p class="mb-0">No work orders found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var wo in Model.WorkOrders)
+    {
+        var statusClass = wo.Status switch
+        {
+            WorkOrderStatus.Draft => "bg-secondary",
+            WorkOrderStatus.Released => "bg-info",
+            WorkOrderStatus.InProgress => "bg-primary",
+            WorkOrderStatus.OnHold => "bg-warning",
+            WorkOrderStatus.Completed => "bg-success",
+            WorkOrderStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+
+        var priorityClass = wo.Priority switch
+        {
+            WorkOrderPriority.Low => "text-muted",
+            WorkOrderPriority.Normal => "text-dark",
+            WorkOrderPriority.High => "text-warning",
+            WorkOrderPriority.Urgent => "text-danger",
+            _ => "text-dark"
+        };
+
+        var progressPercent = wo.PlannedQuantity > 0
+            ? Math.Min(100, (int)((wo.CompletedQuantity / wo.PlannedQuantity) * 100))
+            : 0;
+
+        var isOverdue = wo.Status != WorkOrderStatus.Completed &&
+                       wo.Status != WorkOrderStatus.Cancelled &&
+                       wo.PlannedEndDate < DateTime.UtcNow;
+
+        <tr class="@(isOverdue ? "table-danger" : "")">
+            <td class="ps-4">
+                <a href="#"
+                   class="text-decoration-none fw-semibold"
+                   hx-get="/Manufacturing/WorkOrders?handler=Details&id=@wo.Id"
+                   hx-target="#detailsModalContent"
+                   data-bs-toggle="modal"
+                   data-bs-target="#detailsModal">
+                    @wo.WorkOrderNumber
+                </a>
+                @if (isOverdue)
+                {
+                    <i class="bi bi-exclamation-triangle text-danger ms-1" title="Overdue"></i>
+                }
+            </td>
+            <td>
+                <div>@wo.Product?.Name</div>
+                @if (wo.BillOfMaterial != null)
+                {
+                    <small class="text-muted">BOM: @wo.BillOfMaterial.BomNumber</small>
+                }
+            </td>
+            <td>@wo.PlannedQuantity @wo.UnitOfMeasure</td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1" style="height: 8px; width: 80px;">
+                        <div class="progress-bar @(progressPercent >= 100 ? "bg-success" : "bg-primary")"
+                             style="width: @progressPercent%"></div>
+                    </div>
+                    <span class="ms-2 small">@wo.CompletedQuantity / @wo.PlannedQuantity</span>
+                </div>
+            </td>
+            <td>
+                <span class="@priorityClass">
+                    @if (wo.Priority == WorkOrderPriority.Urgent)
+                    {
+                        <i class="bi bi-exclamation-circle-fill me-1"></i>
+                    }
+                    @wo.Priority
+                </span>
+            </td>
+            <td>
+                <span class="badge @statusClass">@wo.Status</span>
+            </td>
+            <td>@wo.PlannedStartDate.ToString("MMM dd, yyyy")</td>
+            <td>@wo.PlannedEndDate.ToString("MMM dd, yyyy")</td>
+            <td class="text-end pe-4">
+                <div class="btn-group">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            hx-get="/Manufacturing/WorkOrders?handler=Details&id=@wo.Id"
+                            hx-target="#detailsModalContent"
+                            data-bs-toggle="modal"
+                            data-bs-target="#detailsModal"
+                            title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    @if (wo.Status == WorkOrderStatus.Draft || wo.Status == WorkOrderStatus.Released)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                hx-get="/Manufacturing/WorkOrders?handler=EditForm&id=@wo.Id"
+                                hx-target="#formModalContent"
+                                data-bs-toggle="modal"
+                                data-bs-target="#formModal"
+                                title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    }
+                    @if (wo.Status == WorkOrderStatus.Draft)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-info"
+                                hx-post="/Manufacturing/WorkOrders?handler=UpdateStatus&id=@wo.Id&status=Released"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Release this work order?"
+                                title="Release">
+                            <i class="bi bi-send"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                hx-delete="/Manufacturing/WorkOrders?id=@wo.Id"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Delete this work order?"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                    @if (wo.Status == WorkOrderStatus.Released)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                hx-post="/Manufacturing/WorkOrders?handler=UpdateStatus&id=@wo.Id&status=InProgress"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Start this work order?"
+                                title="Start">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                    }
+                    @if (wo.Status == WorkOrderStatus.InProgress)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                onclick="showOutputModal('@wo.Id')"
+                                title="Record Output">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-warning"
+                                hx-post="/Manufacturing/WorkOrders?handler=UpdateStatus&id=@wo.Id&status=OnHold"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Put this work order on hold?"
+                                title="Hold">
+                            <i class="bi bi-pause-fill"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                hx-post="/Manufacturing/WorkOrders?handler=UpdateStatus&id=@wo.Id&status=Completed"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Complete this work order?"
+                                title="Complete">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    }
+                    @if (wo.Status == WorkOrderStatus.OnHold)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                hx-post="/Manufacturing/WorkOrders?handler=UpdateStatus&id=@wo.Id&status=InProgress"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Resume this work order?"
+                                title="Resume">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                    }
+                    @if (wo.Status != WorkOrderStatus.Completed && wo.Status != WorkOrderStatus.Cancelled)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                hx-post="/Manufacturing/WorkOrders?handler=UpdateStatus&id=@wo.Id&status=Cancelled"
+                                hx-target="#workOrdersTableContainer"
+                                hx-confirm="Cancel this work order?"
+                                title="Cancel">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+<!-- Pagination -->
+@if (Model.TotalPages > 1)
+{
+    <tr>
+        <td colspan="9" class="border-0">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="/Manufacturing/WorkOrders?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#workOrdersTableContainer"
+                               hx-include="#searchInput, #statusFilter, #priorityFilter">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#"
+                                   hx-get="/Manufacturing/WorkOrders?handler=Table&page=@i"
+                                   hx-target="#workOrdersTableContainer"
+                                   hx-include="#searchInput, #statusFilter, #priorityFilter">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="/Manufacturing/WorkOrders?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#workOrdersTableContainer"
+                               hx-include="#searchInput, #statusFilter, #priorityFilter">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

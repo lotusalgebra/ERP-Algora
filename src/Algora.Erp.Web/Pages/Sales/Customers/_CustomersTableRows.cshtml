@@ -1,0 +1,153 @@
+@model Algora.Erp.Web.Pages.Sales.Customers.CustomersTableViewModel
+
+@if (Model.Customers.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-people fs-1 d-block mb-3"></i>
+                <p class="mb-0">No customers found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var customer in Model.Customers)
+    {
+        var orderCount = customer.SalesOrders?.Count ?? 0;
+
+        <tr>
+            <td class="ps-4">
+                <code class="bg-light px-2 py-1 rounded">@customer.Code</code>
+            </td>
+            <td>
+                <div class="fw-medium">@customer.Name</div>
+                @if (!string.IsNullOrEmpty(customer.BillingCity))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-geo-alt me-1"></i>@customer.BillingCity
+                    </small>
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(customer.ContactPerson))
+                {
+                    <div>@customer.ContactPerson</div>
+                }
+                @if (!string.IsNullOrEmpty(customer.Email))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-envelope me-1"></i>@customer.Email
+                    </small>
+                }
+                else if (!string.IsNullOrEmpty(customer.Phone))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-telephone me-1"></i>@customer.Phone
+                    </small>
+                }
+            </td>
+            <td>
+                <span class="badge bg-@(customer.CustomerType == Algora.Erp.Domain.Entities.Sales.CustomerType.Company ? "primary" : "info") bg-opacity-10 text-@(customer.CustomerType == Algora.Erp.Domain.Entities.Sales.CustomerType.Company ? "primary" : "info")">
+                    @customer.CustomerType
+                </span>
+            </td>
+            <td class="text-center">
+                <a href="/Sales/Orders?customerId=@customer.Id" class="btn btn-link p-0 text-decoration-none">
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary">@orderCount</span>
+                </a>
+            </td>
+            <td class="text-end">
+                @if (customer.CurrentBalance > 0)
+                {
+                    <span class="text-success fw-medium">@customer.CurrentBalance.ToString("C2")</span>
+                }
+                else if (customer.CurrentBalance < 0)
+                {
+                    <span class="text-danger fw-medium">@customer.CurrentBalance.ToString("C2")</span>
+                }
+                else
+                {
+                    <span class="text-muted">@customer.CurrentBalance.ToString("C2")</span>
+                }
+            </td>
+            <td>
+                @if (customer.IsActive)
+                {
+                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <a href="/Sales/Orders?customerId=@customer.Id"
+                       class="btn btn-outline-info"
+                       title="View Orders">
+                        <i class="bi bi-bag-check"></i>
+                    </a>
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            hx-get="?handler=EditForm&id=@customer.Id"
+                            hx-target="#formModalBody"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
+                            title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            onclick="confirmDelete('@customer.Id')"
+                            title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="8" class="py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#customersTableBody"
+                               hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   hx-get="?handler=Table&page=@i"
+                                   hx-target="#customersTableBody"
+                                   hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#customersTableBody"
+                               hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

@@ -1,0 +1,226 @@
+@page
+@model Algora.Erp.Web.Pages.HR.Attendance.IndexModel
+@using Algora.Erp.Domain.Entities.HR
+@{
+    ViewData["Title"] = "Attendance";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Attendance</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/HR">HR</a></li>
+                    <li class="breadcrumb-item active">Attendance</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary"
+                    hx-get="/HR/Attendance?handler=BulkCheckIn"
+                    hx-target="#formContainer"
+                    data-bs-toggle="modal"
+                    data-bs-target="#attendanceModal">
+                <i class="bi bi-clock me-1"></i> Bulk Check-In
+            </button>
+            <button type="button" class="btn btn-primary"
+                    hx-get="/HR/Attendance?handler=CreateForm"
+                    hx-target="#formContainer"
+                    data-bs-toggle="modal"
+                    data-bs-target="#attendanceModal">
+                <i class="bi bi-plus-lg me-1"></i> Add Attendance
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-person-check text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Present Today</h6>
+                            <h3 class="mb-0">@Model.PresentToday</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-person-x text-danger fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Absent Today</h6>
+                            <h3 class="mb-0">@Model.AbsentToday</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-clock-history text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Late Arrivals</h6>
+                            <h3 class="mb-0">@Model.LateToday</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-house text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Work From Home</h6>
+                            <h3 class="mb-0">@Model.WfhToday</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0"
+                               placeholder="Search employee..."
+                               id="searchInput"
+                               hx-get="/HR/Attendance?handler=Table"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#tableContent"
+                               hx-include="#statusFilter,#dateFilter"
+                               name="search">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control" id="dateFilter" name="dateFilter"
+                           value="@DateTime.UtcNow.ToString("yyyy-MM-dd")"
+                           hx-get="/HR/Attendance?handler=Table"
+                           hx-trigger="change"
+                           hx-target="#tableContent"
+                           hx-include="#searchInput,#statusFilter">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter" name="statusFilter"
+                            hx-get="/HR/Attendance?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#tableContent"
+                            hx-include="#searchInput,#dateFilter">
+                        <option value="">All Status</option>
+                        <option value="0">Present</option>
+                        <option value="1">Absent</option>
+                        <option value="2">Late</option>
+                        <option value="3">Half Day</option>
+                        <option value="4">On Leave</option>
+                        <option value="7">Work From Home</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button class="btn btn-outline-secondary btn-sm"
+                            hx-get="/HR/Attendance?handler=Export&dateFilter=@DateTime.UtcNow.ToString("yyyy-MM-dd")">
+                        <i class="bi bi-download me-1"></i> Export
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Employee</th>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Work Hours</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableContent" hx-get="/HR/Attendance?handler=Table" hx-trigger="load">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small" id="paginationInfo">
+                    Showing 0 entries
+                </div>
+                <nav id="paginationNav">
+                    <ul class="pagination pagination-sm mb-0">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Modal -->
+<div class="modal fade" id="attendanceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Attendance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="formContainer">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('attendanceModal').addEventListener('hidden.bs.modal', function () {
+            htmx.trigger('#tableContent', 'load');
+        });
+    </script>
+}

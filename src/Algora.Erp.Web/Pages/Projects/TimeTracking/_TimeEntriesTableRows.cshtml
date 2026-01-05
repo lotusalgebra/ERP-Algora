@@ -1,0 +1,200 @@
+@using Algora.Erp.Domain.Entities.Projects
+@model Algora.Erp.Web.Pages.Projects.TimeTracking.TimeEntryTableViewModel
+
+@if (!Model.TimeEntries.Any())
+{
+    <tr>
+        <td colspan="9" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-clock-history fs-1 d-block mb-3"></i>
+                <p class="mb-0">No time entries found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var entry in Model.TimeEntries)
+    {
+        var statusClass = entry.Status switch
+        {
+            TimeEntryStatus.Draft => "bg-secondary",
+            TimeEntryStatus.Submitted => "bg-warning",
+            TimeEntryStatus.Approved => "bg-success",
+            TimeEntryStatus.Rejected => "bg-danger",
+            _ => "bg-secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <div class="fw-semibold">@entry.Date.ToString("MMM dd, yyyy")</div>
+                @if (entry.StartTime.HasValue && entry.EndTime.HasValue)
+                {
+                    <small class="text-muted">
+                        @entry.StartTime.Value.ToString("HH:mm") - @entry.EndTime.Value.ToString("HH:mm")
+                    </small>
+                }
+            </td>
+            <td>
+                @if (entry.Employee != null)
+                {
+                    @($"{entry.Employee.FirstName} {entry.Employee.LastName}")
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                <div>@entry.Project?.Name</div>
+                <small class="text-muted">@entry.Project?.ProjectCode</small>
+            </td>
+            <td>
+                @if (entry.Task != null)
+                {
+                    <div>@entry.Task.Title</div>
+                    <small class="text-muted">@entry.Task.TaskNumber</small>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(entry.Description))
+                {
+                    @(entry.Description.Length > 50 ? entry.Description.Substring(0, 50) + "..." : entry.Description)
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td class="text-end">
+                <span class="fw-semibold">@entry.Hours.ToString("N2")</span>
+                <span class="text-muted">hrs</span>
+            </td>
+            <td>
+                @if (entry.IsBillable)
+                {
+                    <i class="bi bi-check-circle-fill text-success" title="Billable"></i>
+                }
+                else
+                {
+                    <i class="bi bi-x-circle text-muted" title="Non-billable"></i>
+                }
+            </td>
+            <td>
+                <span class="badge @statusClass">@entry.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group">
+                    @if (entry.Status == TimeEntryStatus.Draft)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                hx-get="/Projects/TimeTracking?handler=EditForm&id=@entry.Id"
+                                hx-target="#formModalContent"
+                                data-bs-toggle="modal"
+                                data-bs-target="#formModal"
+                                title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                hx-post="/Projects/TimeTracking?handler=UpdateStatus&id=@entry.Id&status=Submitted"
+                                hx-target="#timeEntriesTableContainer"
+                                hx-confirm="Submit this time entry for approval?"
+                                title="Submit">
+                            <i class="bi bi-send"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                hx-delete="/Projects/TimeTracking?id=@entry.Id"
+                                hx-target="#timeEntriesTableContainer"
+                                hx-confirm="Delete this time entry?"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                    @if (entry.Status == TimeEntryStatus.Submitted)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                hx-post="/Projects/TimeTracking?handler=UpdateStatus&id=@entry.Id&status=Approved"
+                                hx-target="#timeEntriesTableContainer"
+                                hx-confirm="Approve this time entry?"
+                                title="Approve">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                hx-post="/Projects/TimeTracking?handler=UpdateStatus&id=@entry.Id&status=Rejected"
+                                hx-target="#timeEntriesTableContainer"
+                                hx-confirm="Reject this time entry?"
+                                title="Reject">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    }
+                    @if (entry.Status == TimeEntryStatus.Rejected)
+                    {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                hx-get="/Projects/TimeTracking?handler=EditForm&id=@entry.Id"
+                                hx-target="#formModalContent"
+                                data-bs-toggle="modal"
+                                data-bs-target="#formModal"
+                                title="Edit and Resubmit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+<!-- Pagination -->
+@if (Model.TotalPages > 1)
+{
+    <tr>
+        <td colspan="9" class="border-0">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="/Projects/TimeTracking?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#timeEntriesTableContainer"
+                               hx-include="#searchInput, #projectFilter, #statusFilter">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#"
+                                   hx-get="/Projects/TimeTracking?handler=Table&page=@i"
+                                   hx-target="#timeEntriesTableContainer"
+                                   hx-include="#searchInput, #projectFilter, #statusFilter">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="/Projects/TimeTracking?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#timeEntriesTableContainer"
+                               hx-include="#searchInput, #projectFilter, #statusFilter">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

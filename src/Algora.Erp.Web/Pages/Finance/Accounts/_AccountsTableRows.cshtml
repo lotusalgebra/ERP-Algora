@@ -1,0 +1,131 @@
+@model Algora.Erp.Web.Pages.Finance.Accounts.AccountsTableViewModel
+@using Algora.Erp.Domain.Entities.Finance
+
+@foreach (var account in Model.Accounts)
+{
+    var typeColor = account.AccountType switch
+    {
+        AccountType.Asset => "primary",
+        AccountType.Liability => "danger",
+        AccountType.Equity => "success",
+        AccountType.Revenue => "info",
+        AccountType.Expense => "warning",
+        _ => "secondary"
+    };
+
+    var balanceColor = account.CurrentBalance >= 0 ? "text-success" : "text-danger";
+
+    <tr>
+        <td class="ps-4">
+            <span class="badge bg-@typeColor bg-opacity-10 text-@typeColor">@account.Code</span>
+        </td>
+        <td>
+            <div>
+                <h6 class="mb-0">@account.Name</h6>
+                @if (account.ParentAccount != null)
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-arrow-return-right me-1"></i>@account.ParentAccount.Name
+                    </small>
+                }
+            </div>
+        </td>
+        <td>
+            <span class="badge bg-@typeColor">@account.AccountType</span>
+        </td>
+        <td>
+            @if (account.AccountSubType.HasValue)
+            {
+                <span class="text-muted">@account.AccountSubType</span>
+            }
+            else
+            {
+                <span class="text-muted">-</span>
+            }
+        </td>
+        <td class="text-end">
+            <span class="@balanceColor fw-semibold">
+                @account.CurrentBalance.ToString("C2")
+            </span>
+        </td>
+        <td>
+            @if (account.IsActive)
+            {
+                <span class="badge bg-success">Active</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Inactive</span>
+            }
+            @if (account.IsSystemAccount)
+            {
+                <span class="badge bg-info ms-1">System</span>
+            }
+        </td>
+        <td class="text-end pe-4">
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           hx-get="/Finance/Accounts?handler=EditForm&id=@account.Id"
+                           hx-target="#formContainer"
+                           data-bs-toggle="modal"
+                           data-bs-target="#accountModal">
+                            <i class="bi bi-pencil me-2"></i> Edit
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/Finance/JournalEntries?accountId=@account.Id">
+                            <i class="bi bi-journal-text me-2"></i> View Transactions
+                        </a>
+                    </li>
+                    @if (!account.IsSystemAccount)
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#"
+                               hx-delete="/Finance/Accounts?handler=&id=@account.Id"
+                               hx-target="#tableContent"
+                               hx-confirm="Are you sure you want to delete this account?">
+                                <i class="bi bi-trash me-2"></i> Delete
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.Accounts.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-journal-bookmark fs-1 d-block mb-2"></i>
+                <p class="mb-0">No accounts found</p>
+            </div>
+        </td>
+    </tr>
+}
+
+<script>
+    document.getElementById('paginationInfo').textContent =
+        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
+
+    var paginationHtml = '';
+    @if (Model.TotalPages > 1)
+    {
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            var activeClass = i == Model.Page ? "active" : "";
+            <text>
+            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/Finance/Accounts?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#typeFilter,#statusFilter">@i</a></li>';
+            </text>
+        }
+    }
+    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+</script>

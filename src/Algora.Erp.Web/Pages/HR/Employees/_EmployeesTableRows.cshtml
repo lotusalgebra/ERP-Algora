@@ -1,0 +1,144 @@
+@model Algora.Erp.Web.Pages.HR.Employees.EmployeesTableViewModel
+
+@if (Model.Employees.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-people fs-1 d-block mb-2"></i>
+                <p class="mb-0">No employees found</p>
+                <small>Add your first employee to get started</small>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    foreach (var employee in Model.Employees)
+    {
+        var statusBadge = employee.EmploymentStatus switch
+        {
+            Algora.Erp.Domain.Enums.EmploymentStatus.Active => "bg-success",
+            Algora.Erp.Domain.Enums.EmploymentStatus.OnLeave => "bg-warning text-dark",
+            Algora.Erp.Domain.Enums.EmploymentStatus.Suspended => "bg-danger",
+            Algora.Erp.Domain.Enums.EmploymentStatus.Terminated => "bg-secondary",
+            Algora.Erp.Domain.Enums.EmploymentStatus.Retired => "bg-info",
+            _ => "bg-secondary"
+        };
+
+        var employmentTypeBadge = employee.EmploymentType switch
+        {
+            Algora.Erp.Domain.Enums.EmploymentType.FullTime => "text-bg-primary",
+            Algora.Erp.Domain.Enums.EmploymentType.PartTime => "text-bg-info",
+            Algora.Erp.Domain.Enums.EmploymentType.Contract => "text-bg-warning",
+            Algora.Erp.Domain.Enums.EmploymentType.Temporary => "text-bg-secondary",
+            Algora.Erp.Domain.Enums.EmploymentType.Intern => "text-bg-light text-dark",
+            Algora.Erp.Domain.Enums.EmploymentType.Freelance => "text-bg-dark",
+            _ => "text-bg-secondary"
+        };
+
+        <tr>
+            <td>
+                <input type="checkbox" class="form-check-input" value="@employee.Id">
+            </td>
+            <td>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
+                         style="width: 40px; height: 40px; font-weight: 600;">
+                        @employee.FirstName[0]@employee.LastName[0]
+                    </div>
+                    <div>
+                        <div class="fw-semibold">@employee.FullName</div>
+                        <div class="small text-muted">@employee.Email</div>
+                        <div class="small text-muted">@employee.EmployeeCode</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                @if (employee.Department != null)
+                {
+                    <span>@employee.Department.Name</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                @if (employee.Position != null)
+                {
+                    <span>@employee.Position.Title</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                <span class="badge @employmentTypeBadge">@employee.EmploymentType</span>
+            </td>
+            <td>
+                <span>@employee.HireDate.ToString("MMM dd, yyyy")</span>
+            </td>
+            <td>
+                <span class="badge @statusBadge">@employee.EmploymentStatus</span>
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-link btn-sm text-muted" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#employeeModal"
+                               hx-get="/HR/Employees?handler=EditForm&id=@employee.Id"
+                               hx-target="#employeeModalContent" hx-swap="innerHTML">
+                                <i class="bi bi-pencil me-2"></i>Edit
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/HR/Employees/@employee.Id">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#" onclick="confirmDelete('@employee.Id')">
+                                <i class="bi bi-trash me-2"></i>Delete
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+<script>
+    // Update pagination info
+    document.getElementById('showingFrom').textContent = '@((Model.Page - 1) * Model.PageSize + 1)';
+    document.getElementById('showingTo').textContent = '@Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)';
+    document.getElementById('totalRecords').textContent = '@Model.TotalRecords';
+
+    // Update pagination controls
+    var paginationHtml = '';
+    @if (Model.TotalPages > 1)
+    {
+        <text>
+        paginationHtml = '<ul class="pagination pagination-sm mb-0">';
+        paginationHtml += '<li class="page-item @(Model.Page == 1 ? "disabled" : "")"><a class="page-link" href="#" hx-get="/HR/Employees?handler=Table&page=@(Model.Page - 1)" hx-target="#employeesTableBody">Previous</a></li>';
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <text>
+            paginationHtml += '<li class="page-item @(i == Model.Page ? "active" : "")"><a class="page-link" href="#" hx-get="/HR/Employees?handler=Table&page=@i" hx-target="#employeesTableBody">@i</a></li>';
+            </text>
+        }
+
+        paginationHtml += '<li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")"><a class="page-link" href="#" hx-get="/HR/Employees?handler=Table&page=@(Model.Page + 1)" hx-target="#employeesTableBody">Next</a></li>';
+        paginationHtml += '</ul>';
+        </text>
+    }
+    document.getElementById('pagination').innerHTML = paginationHtml;
+    htmx.process(document.getElementById('pagination'));
+</script>

@@ -1,0 +1,146 @@
+@model Algora.Erp.Web.Pages.Inventory.Products.ProductsTableViewModel
+
+@if (Model.Products.Count == 0)
+{
+    <tr>
+        <td colspan="9" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+                <p class="mb-0">No products found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var product in Model.Products)
+    {
+        var stockLevel = Model.StockLevels.GetValueOrDefault(product.Id, 0);
+        var isLowStock = stockLevel <= product.ReorderLevel && product.ReorderLevel > 0;
+
+        <tr>
+            <td class="ps-4">
+                <code class="bg-light px-2 py-1 rounded">@product.Sku</code>
+            </td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="bg-light rounded-2 p-2 me-3">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <i class="bi bi-box text-muted fs-5"></i>
+                        }
+                    </div>
+                    <div>
+                        <div class="fw-medium">@product.Name</div>
+                        @if (!string.IsNullOrEmpty(product.Barcode))
+                        {
+                            <small class="text-muted"><i class="bi bi-upc me-1"></i>@product.Barcode</small>
+                        }
+                    </div>
+                </div>
+            </td>
+            <td>
+                @if (product.Category != null)
+                {
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary">@product.Category.Name</span>
+                }
+                else
+                {
+                    <span class="text-muted">—</span>
+                }
+            </td>
+            <td>
+                <span class="badge bg-info bg-opacity-10 text-info">@product.ProductType</span>
+            </td>
+            <td class="text-end">@product.CostPrice.ToString("C2")</td>
+            <td class="text-end">@product.SellingPrice.ToString("C2")</td>
+            <td class="text-end">
+                @if (isLowStock)
+                {
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-exclamation-triangle me-1"></i>@stockLevel.ToString("N0")
+                    </span>
+                }
+                else
+                {
+                    <span class="fw-medium">@stockLevel.ToString("N0")</span>
+                }
+            </td>
+            <td>
+                @if (product.IsActive)
+                {
+                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            hx-get="?handler=EditForm&id=@product.Id"
+                            hx-target="#formModalBody"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
+                            title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            onclick="confirmDelete('@product.Id')"
+                            title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="9" class="py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#productsTableBody"
+                               hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   hx-get="?handler=Table&page=@i"
+                                   hx-target="#productsTableBody"
+                                   hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#productsTableBody"
+                               hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

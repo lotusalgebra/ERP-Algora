@@ -1,0 +1,408 @@
+@using Algora.Erp.Domain.Entities.Manufacturing
+@model Algora.Erp.Web.Pages.Manufacturing.WorkOrders.WorkOrderFormViewModel
+
+@{
+    var title = Model.IsEdit ? "Edit Work Order" : "New Work Order";
+    var wo = Model.WorkOrder;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form hx-post="/Manufacturing/WorkOrders"
+      hx-target="#workOrdersTableContainer"
+      hx-swap="innerHTML">
+    <div class="modal-body">
+        @if (Model.IsEdit && wo != null)
+        {
+            <input type="hidden" name="Id" value="@wo.Id" />
+        }
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text"
+                       name="Name"
+                       class="form-control"
+                       value="@wo?.Name"
+                       required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Bill of Material</label>
+                <select name="BillOfMaterialId" id="bomSelect" class="form-select" onchange="loadBomMaterials()">
+                    <option value="">No BOM (Manual)</option>
+                    @foreach (var bom in Model.BillOfMaterials)
+                    {
+                        <option value="@bom.Id" data-product-id="@bom.ProductId" selected="@(wo?.BillOfMaterialId == bom.Id)">
+                            @bom.BomNumber - @bom.Name (@bom.Product?.Name)
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Product <span class="text-danger">*</span></label>
+                <select name="ProductId" id="productSelect" class="form-select" required>
+                    <option value="">Select Product...</option>
+                    @foreach (var product in Model.Products)
+                    {
+                        <option value="@product.Id" selected="@(wo?.ProductId == product.Id)">@product.Name (@product.Sku)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Warehouse</label>
+                <select name="WarehouseId" class="form-select">
+                    <option value="">Select Warehouse...</option>
+                    @foreach (var wh in Model.Warehouses)
+                    {
+                        <option value="@wh.Id" selected="@(wo?.WarehouseId == wh.Id)">@wh.Name (@wh.Code)</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Planned Quantity <span class="text-danger">*</span></label>
+                <input type="number"
+                       name="PlannedQuantity"
+                       class="form-control"
+                       value="@(wo?.PlannedQuantity ?? 1)"
+                       step="0.0001"
+                       min="0.0001"
+                       required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Unit of Measure</label>
+                <input type="text"
+                       name="UnitOfMeasure"
+                       class="form-control"
+                       value="@wo?.UnitOfMeasure"
+                       placeholder="e.g., EA, PCS" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="Status" class="form-select">
+                    @foreach (WorkOrderStatus status in Enum.GetValues(typeof(WorkOrderStatus)))
+                    {
+                        if (status == WorkOrderStatus.InProgress || status == WorkOrderStatus.Completed || status == WorkOrderStatus.Cancelled)
+                            continue; // These are set via workflow actions
+                        <option value="@status" selected="@(wo?.Status == status)">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Priority</label>
+                <select name="Priority" class="form-select">
+                    @foreach (WorkOrderPriority priority in Enum.GetValues(typeof(WorkOrderPriority)))
+                    {
+                        <option value="@priority" selected="@(wo?.Priority == priority)">@priority</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Planned Start Date <span class="text-danger">*</span></label>
+                <input type="date"
+                       name="PlannedStartDate"
+                       class="form-control"
+                       value="@(wo?.PlannedStartDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
+                       required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Planned End Date <span class="text-danger">*</span></label>
+                <input type="date"
+                       name="PlannedEndDate"
+                       class="form-control"
+                       value="@(wo?.PlannedEndDate.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(7).ToString("yyyy-MM-dd"))"
+                       required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Estimated Cost</label>
+                <input type="number"
+                       name="EstimatedCost"
+                       class="form-control"
+                       value="@wo?.EstimatedCost"
+                       step="0.01"
+                       min="0" />
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Notes</label>
+            <textarea name="Notes"
+                      class="form-control"
+                      rows="2">@wo?.Notes</textarea>
+        </div>
+
+        <!-- Operations Section -->
+        <div class="border rounded p-3 bg-light mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Operations</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addOperation()">
+                    <i class="bi bi-plus-lg me-1"></i> Add Operation
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0" id="operationsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 25%">Name</th>
+                            <th style="width: 20%">Workstation</th>
+                            <th style="width: 15%">Planned Hours</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="operationsBody">
+                        @if (wo?.Operations != null && wo.Operations.Any())
+                        {
+                            var opIndex = 0;
+                            @foreach (var op in wo.Operations.OrderBy(o => o.OperationNumber))
+                            {
+                                <tr class="operation-row">
+                                    <td class="text-center align-middle op-number">@(opIndex + 1)</td>
+                                    <td>
+                                        <input type="text" name="Operations[@opIndex].Name" class="form-control form-control-sm"
+                                               value="@op.Name" required />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Operations[@opIndex].Workstation" class="form-control form-control-sm"
+                                               value="@op.Workstation" />
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Operations[@opIndex].PlannedHours" class="form-control form-control-sm"
+                                               value="@op.PlannedHours" step="0.01" min="0" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Operations[@opIndex].Description" class="form-control form-control-sm"
+                                               value="@op.Description" />
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOperation(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                opIndex++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div id="noOperationsMessage" class="text-center text-muted py-3" style="@(wo?.Operations?.Any() == true ? "display:none;" : "")">
+                <i class="bi bi-gear fs-4 d-block mb-2"></i>
+                No operations defined. Click "Add Operation" to add production steps.
+            </div>
+        </div>
+
+        <!-- Materials Section -->
+        <div class="border rounded p-3 bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0"><i class="bi bi-box-seam me-2"></i>Materials Required</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMaterial()">
+                    <i class="bi bi-plus-lg me-1"></i> Add Material
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0" id="materialsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60%">Product</th>
+                            <th style="width: 30%">Required Quantity</th>
+                            <th style="width: 10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialsBody">
+                        @if (wo?.Materials != null && wo.Materials.Any())
+                        {
+                            var matIndex = 0;
+                            @foreach (var mat in wo.Materials.OrderBy(m => m.LineNumber))
+                            {
+                                <tr class="material-row">
+                                    <td>
+                                        <select name="Materials[@matIndex].ProductId" class="form-select form-select-sm" required>
+                                            <option value="">Select...</option>
+                                            @foreach (var product in Model.Products)
+                                            {
+                                                <option value="@product.Id" selected="@(mat.ProductId == product.Id)">@product.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Materials[@matIndex].RequiredQuantity" class="form-control form-control-sm"
+                                               value="@mat.RequiredQuantity" step="0.0001" min="0.0001" required />
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMaterial(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                matIndex++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div id="noMaterialsMessage" class="text-center text-muted py-3" style="@(wo?.Materials?.Any() == true ? "display:none;" : "")">
+                <i class="bi bi-box-seam fs-4 d-block mb-2"></i>
+                No materials added. Select a BOM or click "Add Material" to add materials.
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Create") Work Order
+        </button>
+    </div>
+</form>
+
+<script>
+    var operationIndex = @(wo?.Operations?.Count ?? 0);
+    var materialIndex = @(wo?.Materials?.Count ?? 0);
+    var productsJson = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products.Select(p => new { p.Id, p.Name })));
+
+    // When BOM is selected, load its materials and set product
+    function loadBomMaterials() {
+        var bomSelect = document.getElementById('bomSelect');
+        var bomId = bomSelect.value;
+        var productSelect = document.getElementById('productSelect');
+
+        if (bomId) {
+            // Set product from BOM
+            var selectedOption = bomSelect.options[bomSelect.selectedIndex];
+            var productId = selectedOption.getAttribute('data-product-id');
+            if (productId) {
+                productSelect.value = productId;
+            }
+
+            // Load materials from BOM
+            fetch('/Manufacturing/WorkOrders?handler=BomMaterials&bomId=' + bomId)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing materials
+                    var tbody = document.getElementById('materialsBody');
+                    tbody.innerHTML = '';
+                    materialIndex = 0;
+
+                    if (data.lines && data.lines.length > 0) {
+                        document.getElementById('noMaterialsMessage').style.display = 'none';
+                        data.lines.forEach(function(line) {
+                            addMaterialWithData(line.productId, line.quantity);
+                        });
+                    } else {
+                        document.getElementById('noMaterialsMessage').style.display = 'block';
+                    }
+                });
+        }
+    }
+
+    function addOperation() {
+        var tbody = document.getElementById('operationsBody');
+        var noMessage = document.getElementById('noOperationsMessage');
+        noMessage.style.display = 'none';
+
+        var rowCount = tbody.children.length + 1;
+        var row = document.createElement('tr');
+        row.className = 'operation-row';
+        row.innerHTML = `
+            <td class="text-center align-middle op-number">${rowCount}</td>
+            <td>
+                <input type="text" name="Operations[${operationIndex}].Name" class="form-control form-control-sm" required />
+            </td>
+            <td>
+                <input type="text" name="Operations[${operationIndex}].Workstation" class="form-control form-control-sm" />
+            </td>
+            <td>
+                <input type="number" name="Operations[${operationIndex}].PlannedHours" class="form-control form-control-sm"
+                       value="1" step="0.01" min="0" />
+            </td>
+            <td>
+                <input type="text" name="Operations[${operationIndex}].Description" class="form-control form-control-sm" />
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOperation(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        operationIndex++;
+    }
+
+    function removeOperation(button) {
+        var row = button.closest('tr');
+        row.remove();
+        renumberOperations();
+
+        var tbody = document.getElementById('operationsBody');
+        if (tbody.children.length === 0) {
+            document.getElementById('noOperationsMessage').style.display = 'block';
+        }
+    }
+
+    function renumberOperations() {
+        var rows = document.querySelectorAll('#operationsBody .operation-row');
+        rows.forEach(function(row, index) {
+            row.querySelector('.op-number').textContent = index + 1;
+        });
+    }
+
+    function addMaterial() {
+        addMaterialWithData('', 1);
+    }
+
+    function addMaterialWithData(productId, quantity) {
+        var tbody = document.getElementById('materialsBody');
+        var noMessage = document.getElementById('noMaterialsMessage');
+        noMessage.style.display = 'none';
+
+        var productOptions = '<option value="">Select...</option>';
+        productsJson.forEach(function(p) {
+            var selected = p.id === productId ? 'selected' : '';
+            productOptions += '<option value="' + p.id + '" ' + selected + '>' + p.name + '</option>';
+        });
+
+        var row = document.createElement('tr');
+        row.className = 'material-row';
+        row.innerHTML = `
+            <td>
+                <select name="Materials[${materialIndex}].ProductId" class="form-select form-select-sm" required>
+                    ${productOptions}
+                </select>
+            </td>
+            <td>
+                <input type="number" name="Materials[${materialIndex}].RequiredQuantity" class="form-control form-control-sm"
+                       value="${quantity}" step="0.0001" min="0.0001" required />
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMaterial(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        materialIndex++;
+    }
+
+    function removeMaterial(button) {
+        var row = button.closest('tr');
+        row.remove();
+
+        var tbody = document.getElementById('materialsBody');
+        if (tbody.children.length === 0) {
+            document.getElementById('noMaterialsMessage').style.display = 'block';
+        }
+    }
+</script>

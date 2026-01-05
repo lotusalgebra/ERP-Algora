@@ -1,0 +1,140 @@
+@using Algora.Erp.Domain.Entities.Projects
+@model Algora.Erp.Web.Pages.Projects.ProjectFormViewModel
+
+@{
+    var title = Model.IsEdit ? "Edit Project" : "New Project";
+    var project = Model.Project;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form hx-post="/Projects"
+      hx-target="#projectsTableContainer"
+      hx-swap="innerHTML">
+    <div class="modal-body">
+        @if (Model.IsEdit && project != null)
+        {
+            <input type="hidden" name="Id" value="@project.Id" />
+        }
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-12">
+                <label class="form-label">Project Name <span class="text-danger">*</span></label>
+                <input type="text"
+                       name="Name"
+                       class="form-control"
+                       value="@project?.Name"
+                       required />
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-12">
+                <label class="form-label">Description</label>
+                <textarea name="Description"
+                          class="form-control"
+                          rows="3">@project?.Description</textarea>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Customer</label>
+                <select name="CustomerId" class="form-select">
+                    <option value="">No Customer</option>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.Id" selected="@(project?.CustomerId == customer.Id)">@customer.Name (@customer.Code)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Project Manager</label>
+                <select name="ProjectManagerId" class="form-select">
+                    <option value="">No Manager Assigned</option>
+                    @foreach (var emp in Model.Employees)
+                    {
+                        <option value="@emp.Id" selected="@(project?.ProjectManagerId == emp.Id)">@emp.FirstName @emp.LastName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select name="Status" class="form-select">
+                    @foreach (ProjectStatus status in Enum.GetValues(typeof(ProjectStatus)))
+                    {
+                        <option value="@status" selected="@(project?.Status == status)">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Priority</label>
+                <select name="Priority" class="form-select">
+                    @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
+                    {
+                        <option value="@priority" selected="@(project?.Priority == priority)">@priority</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Budget Amount</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number"
+                           name="BudgetAmount"
+                           class="form-control"
+                           value="@project?.BudgetAmount"
+                           step="0.01"
+                           min="0" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                <input type="date"
+                       name="StartDate"
+                       class="form-control"
+                       value="@(project?.StartDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
+                       required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input type="date"
+                       name="EndDate"
+                       class="form-control"
+                       value="@project?.EndDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Active</label>
+                <div class="form-check form-switch mt-2">
+                    <input type="checkbox"
+                           name="IsActive"
+                           class="form-check-input"
+                           value="true"
+                           @(project?.IsActive != false ? "checked" : "") />
+                    <label class="form-check-label">Active</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea name="Notes"
+                      class="form-control"
+                      rows="2">@project?.Notes</textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Create") Project
+        </button>
+    </div>
+</form>

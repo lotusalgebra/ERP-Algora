@@ -1,0 +1,81 @@
+@model Algora.Erp.Web.Pages.Payroll.Runs.PayrollRunFormViewModel
+@using Algora.Erp.Domain.Entities.Payroll
+@using Algora.Erp.Domain.Enums
+
+<form hx-post=""
+      hx-target="#runsTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit && Model.PayrollRun != null)
+    {
+        <input type="hidden" name="Id" value="@Model.PayrollRun.Id" />
+    }
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label class="form-label">Payroll Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="Name"
+                   value="@(Model.PayrollRun?.Name ?? $"Payroll - {DateTime.Now:MMMM yyyy}")" required
+                   placeholder="e.g., Payroll - January 2024">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Period Start <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="PeriodStart"
+                   value="@(Model.PayrollRun?.PeriodStart.ToString("yyyy-MM-dd") ?? new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).ToString("yyyy-MM-dd"))" required>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Period End <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="PeriodEnd"
+                   value="@(Model.PayrollRun?.PeriodEnd.ToString("yyyy-MM-dd") ?? new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month)).ToString("yyyy-MM-dd"))" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Pay Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="PayDate"
+                   value="@(Model.PayrollRun?.PayDate.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(5).ToString("yyyy-MM-dd"))" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Pay Frequency</label>
+            <select class="form-select" name="PayFrequency">
+                @foreach (var freq in Enum.GetValues<PayFrequency>())
+                {
+                    <option value="@freq" selected="@(Model.PayrollRun?.PayFrequency == freq)">@freq</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Currency</label>
+            <select class="form-select" name="Currency">
+                <option value="USD" selected="@(Model.PayrollRun?.Currency == "USD")">USD</option>
+                <option value="EUR" selected="@(Model.PayrollRun?.Currency == "EUR")">EUR</option>
+                <option value="GBP" selected="@(Model.PayrollRun?.Currency == "GBP")">GBP</option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="Notes" rows="2">@Model.PayrollRun?.Notes</textarea>
+        </div>
+
+        @if (!Model.IsEdit)
+        {
+            <div class="col-12">
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    After creating the payroll run, click "Process" to generate payslips for all active employees.
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            @(Model.IsEdit ? "Update Payroll Run" : "Create Payroll Run")
+        </button>
+    </div>
+</form>

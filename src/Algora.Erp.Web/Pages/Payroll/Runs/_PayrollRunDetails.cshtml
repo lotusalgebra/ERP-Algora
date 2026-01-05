@@ -1,0 +1,199 @@
+@model Algora.Erp.Domain.Entities.Payroll.PayrollRun
+@using Algora.Erp.Domain.Entities.Payroll
+
+@{
+    var statusColor = Model.Status switch
+    {
+        PayrollRunStatus.Draft => "secondary",
+        PayrollRunStatus.Processing => "info",
+        PayrollRunStatus.Processed => "primary",
+        PayrollRunStatus.Approved => "warning",
+        PayrollRunStatus.Paid => "success",
+        PayrollRunStatus.Cancelled => "danger",
+        _ => "secondary"
+    };
+}
+
+<div class="row g-4">
+    <!-- Header -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h4 class="mb-1">@Model.Name</h4>
+                <p class="text-muted mb-0">@Model.RunNumber</p>
+            </div>
+            <span class="badge bg-@statusColor fs-6">@Model.Status</span>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="col-md-3">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center">
+                <h5 class="mb-1">@Model.EmployeeCount</h5>
+                <small class="text-muted">Employees</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center">
+                <h5 class="mb-1 text-success">@Model.TotalGrossPay.ToString("C0")</h5>
+                <small class="text-muted">Gross Pay</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center">
+                <h5 class="mb-1 text-danger">@Model.TotalDeductions.ToString("C0")</h5>
+                <small class="text-muted">Deductions</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center">
+                <h5 class="mb-1 text-primary">@Model.TotalNetPay.ToString("C0")</h5>
+                <small class="text-muted">Net Pay</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Period Info -->
+    <div class="col-md-6">
+        <div class="card border-0 bg-light h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small mb-3">Period Information</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Period Start</small>
+                        <span>@Model.PeriodStart.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Period End</small>
+                        <span>@Model.PeriodEnd.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Pay Date</small>
+                        <span>@Model.PayDate.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Frequency</small>
+                        <span>@Model.PayFrequency</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Info -->
+    <div class="col-md-6">
+        <div class="card border-0 bg-light h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small mb-3">Processing Information</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Processed At</small>
+                        <span>@(Model.ProcessedAt?.ToString("MMM dd, yyyy HH:mm") ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Approved At</small>
+                        <span>@(Model.ApprovedAt?.ToString("MMM dd, yyyy HH:mm") ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Currency</small>
+                        <span>@Model.Currency</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payslips -->
+    <div class="col-12">
+        <h6 class="text-muted text-uppercase small mb-3">Payslips (@Model.Payslips.Count)</h6>
+        @if (Model.Payslips.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Payslip #</th>
+                            <th>Employee</th>
+                            <th class="text-end">Basic</th>
+                            <th class="text-end">Gross</th>
+                            <th class="text-end">Deductions</th>
+                            <th class="text-end">Net Pay</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payslip in Model.Payslips.OrderBy(p => p.Employee?.FullName))
+                        {
+                            var slipStatusColor = payslip.Status switch
+                            {
+                                PayslipStatus.Draft => "secondary",
+                                PayslipStatus.Processed => "primary",
+                                PayslipStatus.Approved => "warning",
+                                PayslipStatus.Paid => "success",
+                                PayslipStatus.Cancelled => "danger",
+                                _ => "secondary"
+                            };
+                            <tr>
+                                <td><code class="small">@payslip.PayslipNumber</code></td>
+                                <td>
+                                    <div class="fw-medium">@payslip.Employee?.FullName</div>
+                                    <small class="text-muted">@payslip.Employee?.EmployeeCode</small>
+                                </td>
+                                <td class="text-end">@payslip.BasicSalary.ToString("C2")</td>
+                                <td class="text-end">@payslip.GrossPay.ToString("C2")</td>
+                                <td class="text-end text-danger">@payslip.TotalDeductions.ToString("C2")</td>
+                                <td class="text-end fw-medium">@payslip.NetPay.ToString("C2")</td>
+                                <td>
+                                    <span class="badge bg-@slipStatusColor bg-opacity-10 text-@slipStatusColor">
+                                        @payslip.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="bg-light fw-bold">
+                        <tr>
+                            <td colspan="2" class="text-end">Totals:</td>
+                            <td class="text-end">@Model.Payslips.Sum(p => p.BasicSalary).ToString("C2")</td>
+                            <td class="text-end">@Model.TotalGrossPay.ToString("C2")</td>
+                            <td class="text-end text-danger">@Model.TotalDeductions.ToString("C2")</td>
+                            <td class="text-end">@Model.TotalNetPay.ToString("C2")</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                No payslips generated yet. Process the payroll run to generate payslips.
+            </div>
+        }
+    </div>
+
+    <!-- Notes -->
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small mb-3">Notes</h6>
+                    <p class="mb-0" style="white-space: pre-line">@Model.Notes</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer px-0 pb-0 mt-4">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

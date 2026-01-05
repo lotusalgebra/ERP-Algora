@@ -1,0 +1,196 @@
+@model Algora.Erp.Web.Pages.Finance.Invoices.Recurring.RecurringTableData
+@using Algora.Erp.Domain.Entities.Finance
+
+@if (Model.Items.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No recurring invoices found
+        </td>
+    </tr>
+}
+else
+{
+    foreach (var item in Model.Items)
+    {
+        var statusBadge = item.Status switch
+        {
+            RecurringInvoiceStatus.Active => "bg-success",
+            RecurringInvoiceStatus.Paused => "bg-warning",
+            RecurringInvoiceStatus.Completed => "bg-secondary",
+            RecurringInvoiceStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <a href="/Finance/Invoices/Recurring/Details/@item.Id" class="text-decoration-none fw-medium">
+                    @item.Name
+                </a>
+            </td>
+            <td>@item.CustomerName</td>
+            <td>
+                <span class="text-muted">
+                    <i class="bi bi-arrow-repeat me-1"></i>@item.FrequencyText
+                </span>
+            </td>
+            <td class="text-end">@item.Amount.ToString("C2")</td>
+            <td>
+                @if (item.NextGenerationDate.HasValue)
+                {
+                    var daysUntil = (item.NextGenerationDate.Value.Date - DateTime.Today).Days;
+                    if (daysUntil < 0)
+                    {
+                        <span class="text-danger">
+                            <i class="bi bi-exclamation-circle me-1"></i>Overdue
+                        </span>
+                    }
+                    else if (daysUntil == 0)
+                    {
+                        <span class="text-warning">
+                            <i class="bi bi-clock me-1"></i>Today
+                        </span>
+                    }
+                    else
+                    {
+                        <span>@item.NextGenerationDate.Value.ToString("MMM dd, yyyy")</span>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                @if (item.MaxOccurrences.HasValue)
+                {
+                    var progress = (double)item.OccurrencesGenerated / item.MaxOccurrences.Value * 100;
+                    <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                            <div class="progress-bar" role="progressbar" style="width: @progress%"></div>
+                        </div>
+                        <small class="text-muted">@item.OccurrencesGenerated/@item.MaxOccurrences</small>
+                    </div>
+                }
+                else
+                {
+                    <span class="text-muted small">@item.OccurrencesGenerated generated</span>
+                }
+            </td>
+            <td>
+                <span class="badge @statusBadge">@item.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group">
+                    <a href="/Finance/Invoices/Recurring/Details/@item.Id" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    @if (item.Status == RecurringInvoiceStatus.Active)
+                    {
+                        <form method="post" asp-page-handler="Generate" asp-route-id="@item.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Generate Invoice Now">
+                                <i class="bi bi-file-earmark-plus"></i>
+                            </button>
+                        </form>
+                        <form method="post" asp-page-handler="Pause" asp-route-id="@item.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Pause">
+                                <i class="bi bi-pause"></i>
+                            </button>
+                        </form>
+                    }
+                    else if (item.Status == RecurringInvoiceStatus.Paused)
+                    {
+                        <form method="post" asp-page-handler="Resume" asp-route-id="@item.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Resume">
+                                <i class="bi bi-play"></i>
+                            </button>
+                        </form>
+                    }
+                    @if (item.Status != RecurringInvoiceStatus.Cancelled)
+                    {
+                        <a href="/Finance/Invoices/Recurring/Edit/@item.Id" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    }
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-id="@item.Id"
+                            data-name="@item.Name">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+}
+
+<script>
+    // Update pagination info
+    var info = document.getElementById('paginationInfo');
+    if (info) {
+        var start = (@Model.Page - 1) * @Model.PageSize + 1;
+        var end = Math.min(@Model.Page * @Model.PageSize, @Model.Total);
+        info.textContent = 'Showing ' + start + ' to ' + end + ' of ' + @Model.Total + ' entries';
+    }
+
+    // Update pagination nav
+    var nav = document.getElementById('paginationNav');
+    if (nav) {
+        var ul = nav.querySelector('ul');
+        ul.innerHTML = '';
+
+        var totalPages = @Model.TotalPages;
+        var currentPage = @Model.Page;
+
+        if (totalPages > 1) {
+            // Previous button
+            var prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
+            var prevA = document.createElement('a');
+            prevA.className = 'page-link';
+            prevA.href = '#';
+            prevA.innerHTML = '&laquo;';
+            if (currentPage > 1) {
+                prevA.setAttribute('hx-get', '/Finance/Invoices/Recurring?handler=Table&page=' + (currentPage - 1));
+                prevA.setAttribute('hx-target', '#tableContent');
+                prevA.setAttribute('hx-include', '#searchInput,#statusFilter');
+            }
+            prevLi.appendChild(prevA);
+            ul.appendChild(prevLi);
+
+            // Page numbers
+            for (var i = 1; i <= totalPages; i++) {
+                var li = document.createElement('li');
+                li.className = 'page-item' + (i === currentPage ? ' active' : '');
+                var a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = i;
+                a.setAttribute('hx-get', '/Finance/Invoices/Recurring?handler=Table&page=' + i);
+                a.setAttribute('hx-target', '#tableContent');
+                a.setAttribute('hx-include', '#searchInput,#statusFilter');
+                li.appendChild(a);
+                ul.appendChild(li);
+            }
+
+            // Next button
+            var nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
+            var nextA = document.createElement('a');
+            nextA.className = 'page-link';
+            nextA.href = '#';
+            nextA.innerHTML = '&raquo;';
+            if (currentPage < totalPages) {
+                nextA.setAttribute('hx-get', '/Finance/Invoices/Recurring?handler=Table&page=' + (currentPage + 1));
+                nextA.setAttribute('hx-target', '#tableContent');
+                nextA.setAttribute('hx-include', '#searchInput,#statusFilter');
+            }
+            nextLi.appendChild(nextA);
+            ul.appendChild(nextLi);
+
+            htmx.process(ul);
+        }
+    }
+</script>

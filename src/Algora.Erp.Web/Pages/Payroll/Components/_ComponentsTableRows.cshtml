@@ -1,0 +1,149 @@
+@model Algora.Erp.Web.Pages.Payroll.Components.ComponentsTableViewModel
+@using Algora.Erp.Domain.Entities.Payroll
+
+@if (Model.Components.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-list-ul fs-1 d-block mb-3"></i>
+                <p class="mb-0">No salary components found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var component in Model.Components)
+    {
+        var typeColor = component.ComponentType switch
+        {
+            SalaryComponentType.Earning => "success",
+            SalaryComponentType.Deduction => "danger",
+            SalaryComponentType.Reimbursement => "info",
+            SalaryComponentType.Tax => "warning",
+            _ => "secondary"
+        };
+
+        var calcDisplay = component.CalculationType switch
+        {
+            CalculationType.Fixed => "Fixed Amount",
+            CalculationType.PercentageOfBasic => "% of Basic",
+            CalculationType.PercentageOfGross => "% of Gross",
+            CalculationType.Formula => "Formula",
+            _ => "Fixed"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <code class="bg-light px-2 py-1 rounded">@component.Code</code>
+            </td>
+            <td>
+                <div class="fw-medium">@component.Name</div>
+                @if (!string.IsNullOrEmpty(component.Description))
+                {
+                    <small class="text-muted">@component.Description</small>
+                }
+            </td>
+            <td>
+                <span class="badge bg-@typeColor bg-opacity-10 text-@typeColor">
+                    @component.ComponentType
+                </span>
+            </td>
+            <td>
+                <span class="text-muted">@calcDisplay</span>
+            </td>
+            <td class="text-end">
+                @if (component.CalculationType == CalculationType.Fixed)
+                {
+                    <span>@component.DefaultValue.ToString("C2")</span>
+                }
+                else
+                {
+                    <span>@component.DefaultValue%</span>
+                }
+            </td>
+            <td class="text-center">
+                @if (component.IsTaxable)
+                {
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                }
+                else
+                {
+                    <i class="bi bi-x-circle text-muted"></i>
+                }
+            </td>
+            <td>
+                @if (component.IsActive)
+                {
+                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            hx-get="?handler=EditForm&id=@component.Id"
+                            hx-target="#formModalBody"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
+                            title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            onclick="confirmDelete('@component.Id')"
+                            title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="8" class="py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#componentsTableBody"
+                               hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   hx-get="?handler=Table&page=@i"
+                                   hx-target="#componentsTableBody"
+                                   hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#componentsTableBody"
+                               hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

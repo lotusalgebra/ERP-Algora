@@ -1,0 +1,215 @@
+@model Algora.Erp.Web.Pages.Sales.Customers.CustomerFormViewModel
+@using Algora.Erp.Domain.Entities.Sales
+
+<form hx-post=""
+      hx-target="#customersTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit && Model.Customer != null)
+    {
+        <input type="hidden" name="Id" value="@Model.Customer.Id" />
+    }
+
+    <div class="row g-3">
+        <!-- Basic Information -->
+        <div class="col-12">
+            <h6 class="text-muted text-uppercase small mb-3">Basic Information</h6>
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="Name"
+                   value="@Model.Customer?.Name" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Type</label>
+            <select class="form-select" name="CustomerType">
+                @foreach (var type in Enum.GetValues<CustomerType>())
+                {
+                    <option value="@type" selected="@(Model.Customer?.CustomerType == type)">@type</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Contact Person</label>
+            <input type="text" class="form-control" name="ContactPerson"
+                   value="@Model.Customer?.ContactPerson">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="Email"
+                   value="@Model.Customer?.Email">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-control" name="Phone"
+                   value="@Model.Customer?.Phone">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Mobile</label>
+            <input type="tel" class="form-control" name="Mobile"
+                   value="@Model.Customer?.Mobile">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Website</label>
+            <input type="url" class="form-control" name="Website"
+                   value="@Model.Customer?.Website" placeholder="https://">
+        </div>
+
+        <!-- Billing Address -->
+        <div class="col-12 mt-4">
+            <h6 class="text-muted text-uppercase small mb-3">Billing Address</h6>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Street Address</label>
+            <input type="text" class="form-control" name="BillingAddress"
+                   value="@Model.Customer?.BillingAddress">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" name="BillingCity"
+                   value="@Model.Customer?.BillingCity">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">State/Province</label>
+            <input type="text" class="form-control" name="BillingState"
+                   value="@Model.Customer?.BillingState">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control" name="BillingCountry"
+                   value="@Model.Customer?.BillingCountry">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Postal Code</label>
+            <input type="text" class="form-control" name="BillingPostalCode"
+                   value="@Model.Customer?.BillingPostalCode">
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="col-12 mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="text-muted text-uppercase small mb-0">Shipping Address</h6>
+                <button type="button" class="btn btn-sm btn-link" onclick="copyBillingToShipping()">
+                    <i class="bi bi-copy me-1"></i>Same as Billing
+                </button>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Street Address</label>
+            <input type="text" class="form-control" name="ShippingAddress" id="shippingAddress"
+                   value="@Model.Customer?.ShippingAddress">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" name="ShippingCity" id="shippingCity"
+                   value="@Model.Customer?.ShippingCity">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">State/Province</label>
+            <input type="text" class="form-control" name="ShippingState" id="shippingState"
+                   value="@Model.Customer?.ShippingState">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control" name="ShippingCountry" id="shippingCountry"
+                   value="@Model.Customer?.ShippingCountry">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Postal Code</label>
+            <input type="text" class="form-control" name="ShippingPostalCode" id="shippingPostalCode"
+                   value="@Model.Customer?.ShippingPostalCode">
+        </div>
+
+        <!-- Payment Terms -->
+        <div class="col-12 mt-4">
+            <h6 class="text-muted text-uppercase small mb-3">Payment Terms</h6>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Payment Terms (Days)</label>
+            <input type="number" class="form-control" name="PaymentTermsDays"
+                   value="@(Model.Customer?.PaymentTermsDays ?? 30)" min="0">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Credit Limit</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" name="CreditLimit"
+                       value="@(Model.Customer?.CreditLimit ?? 0)" step="0.01" min="0">
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Currency</label>
+            <select class="form-select" name="Currency">
+                <option value="USD" selected="@(Model.Customer?.Currency == "USD")">USD</option>
+                <option value="EUR" selected="@(Model.Customer?.Currency == "EUR")">EUR</option>
+                <option value="GBP" selected="@(Model.Customer?.Currency == "GBP")">GBP</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Tax ID</label>
+            <input type="text" class="form-control" name="TaxId"
+                   value="@Model.Customer?.TaxId">
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="IsTaxExempt" value="true" id="isTaxExempt"
+                       checked="@(Model.Customer?.IsTaxExempt ?? false)">
+                <label class="form-check-label" for="isTaxExempt">Tax Exempt</label>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="col-12 mt-4">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="Notes" rows="2">@Model.Customer?.Notes</textarea>
+        </div>
+
+        <!-- Options -->
+        <div class="col-12">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="IsActive" value="true" id="isActive"
+                       checked="@(Model.Customer?.IsActive ?? true)">
+                <label class="form-check-label" for="isActive">Active</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            @(Model.IsEdit ? "Update Customer" : "Create Customer")
+        </button>
+    </div>
+</form>
+
+<script>
+    function copyBillingToShipping() {
+        document.getElementById('shippingAddress').value = document.querySelector('input[name="BillingAddress"]').value;
+        document.getElementById('shippingCity').value = document.querySelector('input[name="BillingCity"]').value;
+        document.getElementById('shippingState').value = document.querySelector('input[name="BillingState"]').value;
+        document.getElementById('shippingCountry').value = document.querySelector('input[name="BillingCountry"]').value;
+        document.getElementById('shippingPostalCode').value = document.querySelector('input[name="BillingPostalCode"]').value;
+    }
+</script>

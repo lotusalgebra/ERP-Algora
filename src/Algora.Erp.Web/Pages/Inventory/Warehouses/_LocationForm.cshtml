@@ -1,0 +1,81 @@
+@model Algora.Erp.Web.Pages.Inventory.Warehouses.LocationFormViewModel
+
+<form hx-post="?handler=Location"
+      hx-target="#locationsModalBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('locationFormSuccess'))">
+
+    @if (Model.IsEdit && Model.Location != null)
+    {
+        <input type="hidden" name="Id" value="@Model.Location.Id" />
+    }
+    <input type="hidden" name="WarehouseId" value="@Model.WarehouseId" />
+
+    <div class="alert alert-info small">
+        <i class="bi bi-info-circle me-2"></i>
+        Adding location to: <strong>@Model.WarehouseName</strong>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label class="form-label">Location Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="Name"
+                   value="@Model.Location?.Name" required
+                   placeholder="e.g., Zone A - Row 1 - Shelf 2">
+        </div>
+
+        <div class="col-12">
+            <hr class="my-2">
+            <small class="text-muted">Location Path (optional)</small>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Zone</label>
+            <input type="text" class="form-control" name="Zone"
+                   value="@Model.Location?.Zone"
+                   placeholder="e.g., A, B, Cold Storage">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Aisle</label>
+            <input type="text" class="form-control" name="Aisle"
+                   value="@Model.Location?.Aisle"
+                   placeholder="e.g., 1, 2, 3">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Rack</label>
+            <input type="text" class="form-control" name="Rack"
+                   value="@Model.Location?.Rack"
+                   placeholder="e.g., R1, R2">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Shelf</label>
+            <input type="text" class="form-control" name="Shelf"
+                   value="@Model.Location?.Shelf"
+                   placeholder="e.g., S1, S2">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Bin</label>
+            <input type="text" class="form-control" name="Bin"
+                   value="@Model.Location?.Bin"
+                   placeholder="e.g., B1, B2">
+        </div>
+
+        <div class="col-12">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="IsActive" value="true" id="locIsActive"
+                       checked="@(Model.Location?.IsActive ?? true)">
+                <label class="form-check-label" for="locIsActive">Active</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            @(Model.IsEdit ? "Update Location" : "Create Location")
+        </button>
+    </div>
+</form>

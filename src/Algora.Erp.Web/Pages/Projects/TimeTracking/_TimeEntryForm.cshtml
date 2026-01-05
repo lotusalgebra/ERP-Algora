@@ -1,0 +1,185 @@
+@using Algora.Erp.Domain.Entities.Projects
+@model Algora.Erp.Web.Pages.Projects.TimeTracking.TimeEntryFormViewModel
+
+@{
+    var title = Model.IsEdit ? "Edit Time Entry" : "Log Time";
+    var entry = Model.TimeEntry;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<form hx-post="/Projects/TimeTracking"
+      hx-target="#timeEntriesTableContainer"
+      hx-swap="innerHTML">
+    <div class="modal-body">
+        @if (Model.IsEdit && entry != null)
+        {
+            <input type="hidden" name="Id" value="@entry.Id" />
+        }
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Project <span class="text-danger">*</span></label>
+                <select name="ProjectId" id="projectSelect" class="form-select" required onchange="loadProjectTasks()">
+                    <option value="">Select Project...</option>
+                    @foreach (var project in Model.Projects)
+                    {
+                        <option value="@project.Id" selected="@(entry?.ProjectId == project.Id)">@project.Name (@project.ProjectCode)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Task</label>
+                <select name="TaskId" id="taskSelect" class="form-select">
+                    <option value="">No Task</option>
+                    @if (Model.Tasks.Any())
+                    {
+                        @foreach (var task in Model.Tasks)
+                        {
+                            <option value="@task.Id" selected="@(entry?.TaskId == task.Id)">@task.TaskNumber - @task.Title</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Employee <span class="text-danger">*</span></label>
+                <select name="EmployeeId" class="form-select" required>
+                    <option value="">Select Employee...</option>
+                    @foreach (var emp in Model.Employees)
+                    {
+                        <option value="@emp.Id" selected="@(entry?.EmployeeId == emp.Id)">@emp.FirstName @emp.LastName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Date <span class="text-danger">*</span></label>
+                <input type="date"
+                       name="Date"
+                       class="form-control"
+                       value="@(entry?.Date.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
+                       required />
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Start Time</label>
+                <input type="time"
+                       name="StartTime"
+                       id="startTime"
+                       class="form-control"
+                       value="@entry?.StartTime?.ToString("HH:mm")"
+                       onchange="calculateHours()" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">End Time</label>
+                <input type="time"
+                       name="EndTime"
+                       id="endTime"
+                       class="form-control"
+                       value="@entry?.EndTime?.ToString("HH:mm")"
+                       onchange="calculateHours()" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Hours <span class="text-danger">*</span></label>
+                <input type="number"
+                       name="Hours"
+                       id="hoursInput"
+                       class="form-control"
+                       value="@(entry?.Hours ?? 0)"
+                       step="0.25"
+                       min="0.25"
+                       max="24"
+                       required />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="Description"
+                      class="form-control"
+                      rows="3"
+                      placeholder="What did you work on?">@entry?.Description</textarea>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <select name="Status" class="form-select">
+                    @foreach (TimeEntryStatus status in Enum.GetValues(typeof(TimeEntryStatus)))
+                    {
+                        if (status == TimeEntryStatus.Approved && !Model.IsEdit) continue;
+                        <option value="@status" selected="@(entry?.Status == status)">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Billable</label>
+                <div class="form-check form-switch mt-2">
+                    <input type="checkbox"
+                           name="IsBillable"
+                           class="form-check-input"
+                           value="true"
+                           @(entry?.IsBillable != false ? "checked" : "") />
+                    <label class="form-check-label">Billable Hours</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea name="Notes"
+                      class="form-control"
+                      rows="2">@entry?.Notes</textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Log") Time
+        </button>
+    </div>
+</form>
+
+<script>
+    function loadProjectTasks() {
+        var projectId = document.getElementById('projectSelect').value;
+        var taskSelect = document.getElementById('taskSelect');
+
+        if (!projectId) {
+            taskSelect.innerHTML = '<option value="">No Task</option>';
+            return;
+        }
+
+        fetch('/Projects/TimeTracking?handler=ProjectTasks&projectId=' + projectId)
+            .then(response => response.json())
+            .then(tasks => {
+                var options = '<option value="">No Task</option>';
+                tasks.forEach(function(task) {
+                    options += '<option value="' + task.id + '">' + task.taskNumber + ' - ' + task.title + '</option>';
+                });
+                taskSelect.innerHTML = options;
+            });
+    }
+
+    function calculateHours() {
+        var startTime = document.getElementById('startTime').value;
+        var endTime = document.getElementById('endTime').value;
+        var hoursInput = document.getElementById('hoursInput');
+
+        if (startTime && endTime) {
+            var start = new Date('2000-01-01 ' + startTime);
+            var end = new Date('2000-01-01 ' + endTime);
+            var diffMs = end - start;
+            if (diffMs > 0) {
+                var diffHours = diffMs / (1000 * 60 * 60);
+                hoursInput.value = Math.round(diffHours * 4) / 4; // Round to nearest 0.25
+            }
+        }
+    }
+</script>

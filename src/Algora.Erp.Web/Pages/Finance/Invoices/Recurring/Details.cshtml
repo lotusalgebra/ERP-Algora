@@ -1,0 +1,446 @@
+@page "{id:guid}"
+@model Algora.Erp.Web.Pages.Finance.Invoices.Recurring.DetailsModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = $"Recurring Invoice - {Model.RecurringInvoice.Name}";
+
+    var statusBadge = Model.RecurringInvoice.Status switch
+    {
+        RecurringInvoiceStatus.Active => "bg-success",
+        RecurringInvoiceStatus.Paused => "bg-warning",
+        RecurringInvoiceStatus.Completed => "bg-secondary",
+        RecurringInvoiceStatus.Cancelled => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    var frequencyText = Model.RecurringInvoice.FrequencyInterval == 1
+        ? Model.RecurringInvoice.Frequency.ToString()
+        : $"Every {Model.RecurringInvoice.FrequencyInterval} {Model.RecurringInvoice.Frequency}s";
+
+    var lineTotal = Model.RecurringInvoice.Lines.Sum(l =>
+        l.Quantity * l.UnitPrice * (1 - l.DiscountPercent / 100) * (1 + l.TaxPercent / 100));
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                @Model.RecurringInvoice.Name
+                <span class="badge @statusBadge ms-2">@Model.RecurringInvoice.Status</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Invoices/Recurring">Recurring Invoices</a></li>
+                    <li class="breadcrumb-item active">Details</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="btn-group">
+            @if (Model.RecurringInvoice.Status == RecurringInvoiceStatus.Active)
+            {
+                <form method="post" asp-page-handler="Generate" asp-route-id="@Model.RecurringInvoice.Id" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-file-earmark-plus me-1"></i>Generate Invoice Now
+                    </button>
+                </form>
+                <form method="post" asp-page-handler="Pause" asp-route-id="@Model.RecurringInvoice.Id" class="d-inline">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-pause me-1"></i>Pause
+                    </button>
+                </form>
+            }
+            else if (Model.RecurringInvoice.Status == RecurringInvoiceStatus.Paused)
+            {
+                <form method="post" asp-page-handler="Resume" asp-route-id="@Model.RecurringInvoice.Id" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-play me-1"></i>Resume
+                    </button>
+                </form>
+            }
+            @if (Model.RecurringInvoice.Status != RecurringInvoiceStatus.Cancelled)
+            {
+                <a href="/Finance/Invoices/Recurring/Edit/@Model.RecurringInvoice.Id" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil me-1"></i>Edit
+                </a>
+                <form method="post" asp-page-handler="Cancel" asp-route-id="@Model.RecurringInvoice.Id" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this recurring invoice?');">
+                        <i class="bi bi-x-circle me-1"></i>Cancel
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-1">Invoice Amount</h6>
+                            <h3 class="mb-0">@lineTotal.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-1">Est. Monthly</h6>
+                            <h3 class="mb-0">@Model.EstimatedMonthlyAmount.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-1">Total Generated</h6>
+                            <h3 class="mb-0">@Model.TotalGenerated.ToString("C2")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Line Items -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Invoice Template</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Description</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Disc %</th>
+                                    <th class="text-center">Tax %</th>
+                                    <th class="text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var line in Model.RecurringInvoice.Lines.OrderBy(l => l.LineNumber))
+                                {
+                                    var lineSubtotal = line.Quantity * line.UnitPrice;
+                                    var discountAmt = lineSubtotal * (line.DiscountPercent / 100);
+                                    var afterDiscount = lineSubtotal - discountAmt;
+                                    var taxAmt = afterDiscount * (line.TaxPercent / 100);
+                                    var total = afterDiscount + taxAmt;
+
+                                    <tr>
+                                        <td class="ps-4">
+                                            @if (!string.IsNullOrEmpty(line.ProductCode))
+                                            {
+                                                <span class="badge bg-secondary me-2">@line.ProductCode</span>
+                                            }
+                                            @line.Description
+                                        </td>
+                                        <td class="text-center">@line.Quantity.ToString("N2")</td>
+                                        <td class="text-end">@line.UnitPrice.ToString("C2")</td>
+                                        <td class="text-center">@(line.DiscountPercent > 0 ? line.DiscountPercent.ToString("N2") + "%" : "-")</td>
+                                        <td class="text-center">@(line.TaxPercent > 0 ? line.TaxPercent.ToString("N2") + "%" : "-")</td>
+                                        <td class="text-end pe-4 fw-medium">@total.ToString("C2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr class="fw-bold">
+                                    <td colspan="5" class="text-end">Total per Invoice:</td>
+                                    <td class="text-end pe-4">@lineTotal.ToString("C2")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Invoices History -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Generated Invoices</h5>
+                    <span class="badge bg-primary">@Model.RecurringInvoice.OccurrencesGenerated generated</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.GeneratedInvoices.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">Invoice #</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var invoice in Model.GeneratedInvoices)
+                                    {
+                                        var invStatusBadge = invoice.Status switch
+                                        {
+                                            InvoiceStatus.Draft => "bg-secondary",
+                                            InvoiceStatus.Pending => "bg-warning",
+                                            InvoiceStatus.Sent => "bg-info",
+                                            InvoiceStatus.PartiallyPaid => "bg-primary",
+                                            InvoiceStatus.Paid => "bg-success",
+                                            InvoiceStatus.Overdue => "bg-danger",
+                                            InvoiceStatus.Void => "bg-dark",
+                                            _ => "bg-secondary"
+                                        };
+
+                                        <tr>
+                                            <td class="ps-4">
+                                                <a href="/Finance/Invoices/Details/@invoice.Id" class="text-decoration-none">
+                                                    @invoice.InvoiceNumber
+                                                </a>
+                                            </td>
+                                            <td>@invoice.InvoiceDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-end">@invoice.TotalAmount.ToString("C2")</td>
+                                            <td><span class="badge @invStatusBadge">@invoice.Status</span></td>
+                                            <td class="text-end pe-4">
+                                                <a href="/Finance/Invoices/Details/@invoice.Id" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No invoices generated yet
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Schedule Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Frequency</label>
+                        <div class="fw-medium">
+                            <i class="bi bi-arrow-repeat me-1 text-primary"></i>@frequencyText
+                        </div>
+                    </div>
+                    @if (Model.RecurringInvoice.DayOfMonth.HasValue)
+                    {
+                        <div class="mb-3">
+                            <label class="text-muted small">Day of Month</label>
+                            <div class="fw-medium">@Model.RecurringInvoice.DayOfMonth</div>
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label class="text-muted small">Start Date</label>
+                        <div class="fw-medium">@Model.RecurringInvoice.StartDate.ToString("MMMM dd, yyyy")</div>
+                    </div>
+                    @if (Model.RecurringInvoice.EndDate.HasValue)
+                    {
+                        <div class="mb-3">
+                            <label class="text-muted small">End Date</label>
+                            <div class="fw-medium">@Model.RecurringInvoice.EndDate.Value.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    }
+                    @if (Model.RecurringInvoice.MaxOccurrences.HasValue)
+                    {
+                        <div class="mb-3">
+                            <label class="text-muted small">Progress</label>
+                            <div class="d-flex align-items-center">
+                                @{
+                                    var progress = (double)Model.RecurringInvoice.OccurrencesGenerated / Model.RecurringInvoice.MaxOccurrences.Value * 100;
+                                }
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width: @progress%"></div>
+                                </div>
+                                <span class="small">@Model.RecurringInvoice.OccurrencesGenerated / @Model.RecurringInvoice.MaxOccurrences</span>
+                            </div>
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label class="text-muted small">Next Invoice</label>
+                        <div class="fw-medium">
+                            @if (Model.RecurringInvoice.NextGenerationDate.HasValue)
+                            {
+                                var daysUntil = (Model.RecurringInvoice.NextGenerationDate.Value.Date - DateTime.Today).Days;
+                                @Model.RecurringInvoice.NextGenerationDate.Value.ToString("MMMM dd, yyyy")
+                                @if (daysUntil < 0)
+                                {
+                                    <span class="badge bg-danger ms-1">Overdue</span>
+                                }
+                                else if (daysUntil == 0)
+                                {
+                                    <span class="badge bg-warning ms-1">Today</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted ms-1">(in @daysUntil days)</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </div>
+                    </div>
+                    @if (Model.RecurringInvoice.LastGeneratedDate.HasValue)
+                    {
+                        <div>
+                            <label class="text-muted small">Last Generated</label>
+                            <div class="fw-medium">@Model.RecurringInvoice.LastGeneratedDate.Value.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Customer Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-person me-2"></i>Customer</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-2">@Model.RecurringInvoice.Customer?.Name</h6>
+                    @if (!string.IsNullOrEmpty(Model.RecurringInvoice.Customer?.Email))
+                    {
+                        <p class="mb-1">
+                            <i class="bi bi-envelope me-1 text-muted"></i>
+                            <a href="mailto:@Model.RecurringInvoice.Customer.Email">@Model.RecurringInvoice.Customer.Email</a>
+                        </p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.RecurringInvoice.BillingAddress))
+                    {
+                        <div class="mt-3">
+                            <label class="text-muted small">Billing Address</label>
+                            <address class="mb-0">
+                                @Model.RecurringInvoice.BillingName<br />
+                                @Model.RecurringInvoice.BillingAddress<br />
+                                @Model.RecurringInvoice.BillingCity, @Model.RecurringInvoice.BillingState @Model.RecurringInvoice.BillingPostalCode<br />
+                                @Model.RecurringInvoice.BillingCountry
+                            </address>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Invoice Settings -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Invoice Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="text-muted small">Invoice Type</label>
+                            <div class="fw-medium">@Model.RecurringInvoice.InvoiceType</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="text-muted small">Currency</label>
+                            <div class="fw-medium">@Model.RecurringInvoice.Currency</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="text-muted small">Payment Terms</label>
+                            <div class="fw-medium">@(Model.RecurringInvoice.PaymentTerms ?? $"Net {Model.RecurringInvoice.PaymentTermDays}")</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.RecurringInvoice.Reference))
+                        {
+                            <div class="col-6">
+                                <label class="text-muted small">Reference</label>
+                                <div class="fw-medium">@Model.RecurringInvoice.Reference</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto-Send Settings -->
+            @if (Model.RecurringInvoice.AutoSend || Model.RecurringInvoice.AutoSendEmail)
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-envelope-check me-2"></i>Auto-Send</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.RecurringInvoice.AutoSend)
+                        {
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle text-success me-1"></i>
+                                Auto-mark as sent
+                            </div>
+                        }
+                        @if (Model.RecurringInvoice.AutoSendEmail)
+                        {
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle text-success me-1"></i>
+                                Email automatically
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.RecurringInvoice.EmailRecipients))
+                            {
+                                <div class="mt-2">
+                                    <label class="text-muted small">Recipients</label>
+                                    <div class="fw-medium">@Model.RecurringInvoice.EmailRecipients</div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Notes -->
+            @if (!string.IsNullOrEmpty(Model.RecurringInvoice.Notes) || !string.IsNullOrEmpty(Model.RecurringInvoice.InternalNotes))
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-sticky me-2"></i>Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(Model.RecurringInvoice.Notes))
+                        {
+                            <div class="mb-3">
+                                <label class="text-muted small">Invoice Notes</label>
+                                <div>@Model.RecurringInvoice.Notes</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.RecurringInvoice.InternalNotes))
+                        {
+                            <div>
+                                <label class="text-muted small">Internal Notes</label>
+                                <div>@Model.RecurringInvoice.InternalNotes</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

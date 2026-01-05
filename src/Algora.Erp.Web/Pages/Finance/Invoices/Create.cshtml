@@ -1,0 +1,514 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Invoices.CreateModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Create Invoice";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Create Invoice</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/Invoices">Invoices</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Invoice Details Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Invoice Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer <span class="text-danger">*</span></label>
+                                <select class="form-select" name="Input.CustomerId" id="customerSelect" required>
+                                    <option value="">Select Customer</option>
+                                    @foreach (var customer in Model.Customers)
+                                    {
+                                        <option value="@customer.Id"
+                                                selected="@(Model.Input.CustomerId == customer.Id)"
+                                                data-name="@customer.Name"
+                                                data-address="@customer.BillingAddress"
+                                                data-city="@customer.BillingCity"
+                                                data-state="@customer.BillingState"
+                                                data-postal="@customer.BillingPostalCode"
+                                                data-country="@customer.BillingCountry">
+                                            @customer.Name (@customer.Code)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">From Sales Order</label>
+                                <select class="form-select" name="Input.SalesOrderId" id="salesOrderSelect">
+                                    <option value="">None</option>
+                                    @foreach (var order in Model.SalesOrders)
+                                    {
+                                        <option value="@order.Id" selected="@(Model.Input.SalesOrderId == order.Id)">
+                                            @order.OrderNumber - @order.Customer?.Name (@order.TotalAmount.ToString("C2"))
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Invoice Type</label>
+                                <select class="form-select" name="Input.Type">
+                                    @foreach (var type in Enum.GetValues<InvoiceType>())
+                                    {
+                                        <option value="@type" selected="@(Model.Input.Type == type)">@type</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Invoice Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="Input.InvoiceDate"
+                                       value="@Model.Input.InvoiceDate.ToString("yyyy-MM-dd")" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Due Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="Input.DueDate" id="dueDate"
+                                       value="@Model.Input.DueDate.ToString("yyyy-MM-dd")" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Payment Terms</label>
+                                <select class="form-select" name="Input.PaymentTerms" id="paymentTerms" onchange="updateDueDate()">
+                                    <option value="Due on Receipt" data-days="0">Due on Receipt</option>
+                                    <option value="Net 15" data-days="15" selected="@(Model.Input.PaymentTerms == "Net 15")">Net 15</option>
+                                    <option value="Net 30" data-days="30" selected="@(Model.Input.PaymentTerms == "Net 30" || Model.Input.PaymentTerms == null)">Net 30</option>
+                                    <option value="Net 45" data-days="45" selected="@(Model.Input.PaymentTerms == "Net 45")">Net 45</option>
+                                    <option value="Net 60" data-days="60" selected="@(Model.Input.PaymentTerms == "Net 60")">Net 60</option>
+                                    <option value="Custom" data-days="0">Custom</option>
+                                </select>
+                                <input type="hidden" name="Input.PaymentTermDays" id="paymentTermDays" value="@Model.Input.PaymentTermDays">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Currency</label>
+                                <select class="form-select" name="Input.Currency">
+                                    <option value="USD" selected="@(Model.Input.Currency == "USD")">USD - US Dollar</option>
+                                    <option value="EUR" selected="@(Model.Input.Currency == "EUR")">EUR - Euro</option>
+                                    <option value="GBP" selected="@(Model.Input.Currency == "GBP")">GBP - British Pound</option>
+                                    <option value="CAD" selected="@(Model.Input.Currency == "CAD")">CAD - Canadian Dollar</option>
+                                    <option value="AUD" selected="@(Model.Input.Currency == "AUD")">AUD - Australian Dollar</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Reference</label>
+                                <input type="text" class="form-control" name="Input.Reference"
+                                       value="@Model.Input.Reference" placeholder="PO#, Quote#, etc.">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Items Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Line Items</h5>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addLine()">
+                                <i class="bi bi-plus-lg me-1"></i>Add Line
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="linesTable">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th style="width: 25%">Product</th>
+                                        <th style="width: 20%">Description</th>
+                                        <th style="width: 8%" class="text-center">Qty</th>
+                                        <th style="width: 12%" class="text-end">Unit Price</th>
+                                        <th style="width: 8%" class="text-center">Disc %</th>
+                                        <th style="width: 8%" class="text-center">Tax %</th>
+                                        <th style="width: 12%" class="text-end">Total</th>
+                                        <th style="width: 7%" class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="linesBody">
+                                    @if (Model.Input.Lines.Any())
+                                    {
+                                        var index = 0;
+                                        foreach (var line in Model.Input.Lines)
+                                        {
+                                            <tr data-index="@index">
+                                                <td>
+                                                    <select class="form-select form-select-sm product-select" name="Input.Lines[@index].ProductId" onchange="updateLineFromProduct(this)">
+                                                        <option value="">Select Product</option>
+                                                        @foreach (var product in Model.Products)
+                                                        {
+                                                            <option value="@product.Id"
+                                                                    data-sku="@product.Sku"
+                                                                    data-name="@product.Name"
+                                                                    data-price="@product.SellingPrice"
+                                                                    data-tax="@(product.TaxRate ?? 0)"
+                                                                    selected="@(line.ProductId == product.Id)">
+                                                                @product.Name
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                    <input type="hidden" name="Input.Lines[@index].ProductCode" class="product-code" value="@line.ProductCode">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm description-input"
+                                                           name="Input.Lines[@index].Description" value="@line.Description" placeholder="Description">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-center qty-input"
+                                                           name="Input.Lines[@index].Quantity" value="@line.Quantity" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-end price-input"
+                                                           name="Input.Lines[@index].UnitPrice" value="@line.UnitPrice" min="0" step="0.01" onchange="calculateLineTotal(this)">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-center discount-input"
+                                                           name="Input.Lines[@index].DiscountPercent" value="@line.DiscountPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm text-center tax-input"
+                                                           name="Input.Lines[@index].TaxPercent" value="@line.TaxPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+                                                </td>
+                                                <td class="text-end align-middle">
+                                                    <span class="line-total fw-medium">$0.00</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <td colspan="6" class="text-end fw-medium">Subtotal:</td>
+                                        <td class="text-end fw-medium" id="subtotalDisplay">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6" class="text-end text-danger">Discount:</td>
+                                        <td class="text-end text-danger" id="discountDisplay">-$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6" class="text-end">Tax:</td>
+                                        <td class="text-end" id="taxDisplay">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="fw-bold fs-5">
+                                        <td colspan="6" class="text-end">Total:</td>
+                                        <td class="text-end text-primary" id="totalDisplay">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Notes (visible to customer)</label>
+                                <textarea class="form-control" name="Input.Notes" rows="2" placeholder="Thank you for your business...">@Model.Input.Notes</textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Internal Notes (not visible to customer)</label>
+                                <textarea class="form-control" name="Input.InternalNotes" rows="2" placeholder="Internal notes...">@Model.Input.InternalNotes</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Billing Address Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Billing Address</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="Input.BillingName" id="billingName"
+                                       value="@Model.Input.BillingName" placeholder="Company/Customer Name">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="Input.BillingAddress" id="billingAddress"
+                                          rows="2" placeholder="Street address">@Model.Input.BillingAddress</textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-control" name="Input.BillingCity" id="billingCity"
+                                       value="@Model.Input.BillingCity">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">State</label>
+                                <input type="text" class="form-control" name="Input.BillingState" id="billingState"
+                                       value="@Model.Input.BillingState">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Postal Code</label>
+                                <input type="text" class="form-control" name="Input.BillingPostalCode" id="billingPostalCode"
+                                       value="@Model.Input.BillingPostalCode">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Country</label>
+                                <input type="text" class="form-control" name="Input.BillingCountry" id="billingCountry"
+                                       value="@Model.Input.BillingCountry">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Card -->
+                <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 1rem;">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Subtotal</span>
+                            <span id="summarySubtotal">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Discount</span>
+                            <span class="text-danger" id="summaryDiscount">-$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tax</span>
+                            <span id="summaryTax">$0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold fs-5">Total</span>
+                            <span class="fw-bold fs-5 text-primary" id="summaryTotal">$0.00</span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg me-2"></i>Create Invoice
+                            </button>
+                            <a href="/Finance/Invoices" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    let lineIndex = @(Model.Input.Lines.Count);
+
+    const products = [
+        @foreach (var product in Model.Products)
+        {
+            <text>{ id: '@product.Id', sku: '@product.Sku', name: '@product.Name.Replace("'", "\\'")', price: @product.SellingPrice, tax: @(product.TaxRate ?? 0) },</text>
+        }
+    ];
+
+    function addLine() {
+        const tbody = document.getElementById('linesBody');
+        const row = document.createElement('tr');
+        row.setAttribute('data-index', lineIndex);
+        row.innerHTML = `
+            <td>
+                <select class="form-select form-select-sm product-select" name="Input.Lines[${lineIndex}].ProductId" onchange="updateLineFromProduct(this)">
+                    <option value="">Select Product</option>
+                    ${products.map(p => `<option value="${p.id}" data-sku="${p.sku}" data-name="${p.name}" data-price="${p.price}" data-tax="${p.tax}">${p.name}</option>`).join('')}
+                </select>
+                <input type="hidden" name="Input.Lines[${lineIndex}].ProductCode" class="product-code" value="">
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm description-input"
+                       name="Input.Lines[${lineIndex}].Description" value="" placeholder="Description">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-center qty-input"
+                       name="Input.Lines[${lineIndex}].Quantity" value="1" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-end price-input"
+                       name="Input.Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-center discount-input"
+                       name="Input.Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-center tax-input"
+                       name="Input.Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td class="text-end align-middle">
+                <span class="line-total fw-medium">$0.00</span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        lineIndex++;
+    }
+
+    function removeLine(btn) {
+        btn.closest('tr').remove();
+        reindexLines();
+        calculateTotals();
+    }
+
+    function reindexLines() {
+        const rows = document.querySelectorAll('#linesBody tr');
+        rows.forEach((row, index) => {
+            row.setAttribute('data-index', index);
+            row.querySelectorAll('[name]').forEach(input => {
+                input.name = input.name.replace(/\[\d+\]/, `[${index}]`);
+            });
+        });
+        lineIndex = rows.length;
+    }
+
+    function updateLineFromProduct(select) {
+        const row = select.closest('tr');
+        const option = select.options[select.selectedIndex];
+        const descInput = row.querySelector('.description-input');
+        const priceInput = row.querySelector('.price-input');
+        const taxInput = row.querySelector('.tax-input');
+        const codeInput = row.querySelector('.product-code');
+
+        if (option.value) {
+            descInput.value = option.dataset.name || '';
+            priceInput.value = option.dataset.price || 0;
+            taxInput.value = option.dataset.tax || 0;
+            codeInput.value = option.dataset.sku || '';
+        }
+        calculateLineTotal(select);
+    }
+
+    function calculateLineTotal(input) {
+        const row = input.closest('tr');
+        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+        const price = parseFloat(row.querySelector('.price-input').value) || 0;
+        const discount = parseFloat(row.querySelector('.discount-input').value) || 0;
+        const tax = parseFloat(row.querySelector('.tax-input').value) || 0;
+
+        const subtotal = qty * price;
+        const discountAmt = subtotal * discount / 100;
+        const afterDiscount = subtotal - discountAmt;
+        const taxAmount = afterDiscount * tax / 100;
+        const total = afterDiscount + taxAmount;
+
+        row.querySelector('.line-total').textContent = '$' + total.toFixed(2);
+        calculateTotals();
+    }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        let discountTotal = 0;
+        let taxTotal = 0;
+
+        document.querySelectorAll('#linesBody tr').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+            const discount = parseFloat(row.querySelector('.discount-input')?.value) || 0;
+            const tax = parseFloat(row.querySelector('.tax-input')?.value) || 0;
+
+            const lineSubtotal = qty * price;
+            const lineDiscount = lineSubtotal * discount / 100;
+            const lineAfterDiscount = lineSubtotal - lineDiscount;
+            const lineTax = lineAfterDiscount * tax / 100;
+
+            subtotal += lineSubtotal;
+            discountTotal += lineDiscount;
+            taxTotal += lineTax;
+        });
+
+        const total = subtotal - discountTotal + taxTotal;
+
+        // Update table footer
+        document.getElementById('subtotalDisplay').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('discountDisplay').textContent = '-$' + discountTotal.toFixed(2);
+        document.getElementById('taxDisplay').textContent = '$' + taxTotal.toFixed(2);
+        document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+
+        // Update sidebar summary
+        document.getElementById('summarySubtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('summaryDiscount').textContent = '-$' + discountTotal.toFixed(2);
+        document.getElementById('summaryTax').textContent = '$' + taxTotal.toFixed(2);
+        document.getElementById('summaryTotal').textContent = '$' + total.toFixed(2);
+    }
+
+    function updateDueDate() {
+        const select = document.getElementById('paymentTerms');
+        const option = select.options[select.selectedIndex];
+        const days = parseInt(option.dataset.days) || 0;
+
+        if (days > 0) {
+            const invoiceDate = new Date(document.querySelector('[name="Input.InvoiceDate"]').value);
+            const dueDate = new Date(invoiceDate);
+            dueDate.setDate(dueDate.getDate() + days);
+            document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+            document.getElementById('paymentTermDays').value = days;
+        }
+    }
+
+    // Auto-fill billing address when customer selected
+    document.getElementById('customerSelect')?.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        if (option.value) {
+            document.getElementById('billingName').value = option.dataset.name || '';
+            document.getElementById('billingAddress').value = option.dataset.address || '';
+            document.getElementById('billingCity').value = option.dataset.city || '';
+            document.getElementById('billingState').value = option.dataset.state || '';
+            document.getElementById('billingPostalCode').value = option.dataset.postal || '';
+            document.getElementById('billingCountry').value = option.dataset.country || '';
+        }
+    });
+
+    // Initialize calculations on page load
+    document.querySelectorAll('#linesBody tr').forEach(row => {
+        const input = row.querySelector('.qty-input');
+        if (input) calculateLineTotal(input);
+    });
+    calculateTotals();
+
+    // Add first line if empty
+    if (document.querySelectorAll('#linesBody tr').length === 0) {
+        addLine();
+    }
+</script>

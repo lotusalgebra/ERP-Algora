@@ -1,0 +1,166 @@
+@model Algora.Erp.Web.Pages.Procurement.Suppliers.SuppliersTableViewModel
+
+@if (Model.Suppliers.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-people fs-1 d-block mb-3"></i>
+                <p class="mb-0">No suppliers found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var supplier in Model.Suppliers)
+    {
+        var poCount = supplier.PurchaseOrders?.Count ?? 0;
+
+        <tr>
+            <td class="ps-4">
+                <code class="bg-light px-2 py-1 rounded">@supplier.Code</code>
+            </td>
+            <td>
+                <div class="fw-medium">@supplier.Name</div>
+                @if (!string.IsNullOrEmpty(supplier.Website))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-globe me-1"></i>@supplier.Website
+                    </small>
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(supplier.ContactPerson))
+                {
+                    <div>@supplier.ContactPerson</div>
+                }
+                @if (!string.IsNullOrEmpty(supplier.Email))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-envelope me-1"></i>@supplier.Email
+                    </small>
+                }
+                else if (!string.IsNullOrEmpty(supplier.Phone))
+                {
+                    <small class="text-muted">
+                        <i class="bi bi-telephone me-1"></i>@supplier.Phone
+                    </small>
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(supplier.City))
+                {
+                    <div>
+                        <i class="bi bi-geo-alt me-1 text-muted"></i>
+                        @supplier.City@(string.IsNullOrEmpty(supplier.State) ? "" : $", {supplier.State}")
+                    </div>
+                    @if (!string.IsNullOrEmpty(supplier.Country))
+                    {
+                        <small class="text-muted">@supplier.Country</small>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted">—</span>
+                }
+            </td>
+            <td class="text-center">
+                @if (supplier.LeadTimeDays > 0)
+                {
+                    <span class="badge bg-info bg-opacity-10 text-info">@supplier.LeadTimeDays days</span>
+                }
+                else
+                {
+                    <span class="text-muted">—</span>
+                }
+            </td>
+            <td class="text-end">
+                @if (supplier.CurrentBalance > 0)
+                {
+                    <span class="text-danger fw-medium">@supplier.CurrentBalance.ToString("C2")</span>
+                }
+                else
+                {
+                    <span class="text-success">@supplier.CurrentBalance.ToString("C2")</span>
+                }
+            </td>
+            <td>
+                @if (supplier.IsActive)
+                {
+                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <a href="/Procurement/PurchaseOrders?supplierId=@supplier.Id"
+                       class="btn btn-outline-info"
+                       title="View POs (@poCount)">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </a>
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            hx-get="?handler=EditForm&id=@supplier.Id"
+                            hx-target="#formModalBody"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal"
+                            title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            onclick="confirmDelete('@supplier.Id')"
+                            title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="8" class="py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#suppliersTableBody"
+                               hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                                Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   hx-get="?handler=Table&page=@i"
+                                   hx-target="#suppliersTableBody"
+                                   hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#suppliersTableBody"
+                               hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

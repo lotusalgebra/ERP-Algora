@@ -1,0 +1,193 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.Accounts.IndexModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "Chart of Accounts";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Chart of Accounts</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item active">Chart of Accounts</li>
+                </ol>
+            </nav>
+        </div>
+        <button type="button" class="btn btn-primary"
+                hx-get="/Finance/Accounts?handler=CreateForm"
+                hx-target="#formContainer"
+                data-bs-toggle="modal"
+                data-bs-target="#accountModal">
+            <i class="bi bi-plus-lg me-1"></i> Add Account
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Assets</h6>
+                    <h3 class="mb-0 text-primary">@Model.TotalAssets.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm border-start border-danger border-4">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Liabilities</h6>
+                    <h3 class="mb-0 text-danger">@Model.TotalLiabilities.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Equity</h6>
+                    <h3 class="mb-0 text-success">@Model.TotalEquity.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm border-start border-info border-4">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Net Income</h6>
+                    <h3 class="mb-0 text-info">@Model.NetIncome.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accounts Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0"
+                               placeholder="Search accounts..."
+                               id="searchInput"
+                               hx-get="/Finance/Accounts?handler=Table"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#tableContent"
+                               hx-include="#typeFilter,#statusFilter"
+                               name="search">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="typeFilter" name="typeFilter"
+                            hx-get="/Finance/Accounts?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#tableContent"
+                            hx-include="#searchInput,#statusFilter">
+                        <option value="">All Types</option>
+                        @foreach (AccountType type in Enum.GetValues(typeof(AccountType)))
+                        {
+                            <option value="@((int)type)">@type</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter" name="statusFilter"
+                            hx-get="/Finance/Accounts?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#tableContent"
+                            hx-include="#searchInput,#typeFilter">
+                        <option value="">All Status</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm" id="viewList" onclick="setView('list')">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="viewTree" onclick="setView('tree')">
+                            <i class="bi bi-diagram-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4" style="width: 120px;">Code</th>
+                            <th>Account Name</th>
+                            <th>Type</th>
+                            <th>Sub-Type</th>
+                            <th class="text-end">Balance</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableContent" hx-get="/Finance/Accounts?handler=Table" hx-trigger="load">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small" id="paginationInfo">
+                    Showing 0 entries
+                </div>
+                <nav id="paginationNav">
+                    <ul class="pagination pagination-sm mb-0">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="formContainer">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('accountModal').addEventListener('hidden.bs.modal', function () {
+            htmx.trigger('#tableContent', 'load');
+        });
+
+        function setView(view) {
+            // Toggle button states
+            document.getElementById('viewList').classList.toggle('active', view === 'list');
+            document.getElementById('viewTree').classList.toggle('active', view === 'tree');
+            // TODO: Implement tree view
+        }
+    </script>
+}

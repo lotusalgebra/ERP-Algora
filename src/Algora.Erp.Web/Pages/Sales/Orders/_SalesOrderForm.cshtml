@@ -1,0 +1,371 @@
+@model Algora.Erp.Web.Pages.Sales.Orders.SalesOrderFormViewModel
+@using Algora.Erp.Domain.Entities.Sales
+
+<form hx-post=""
+      hx-target="#ordersTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit && Model.SalesOrder != null)
+    {
+        <input type="hidden" name="Id" value="@Model.SalesOrder.Id" />
+    }
+
+    <div class="row g-3">
+        <!-- Order Information -->
+        <div class="col-12">
+            <h6 class="text-muted text-uppercase small mb-3">Order Information</h6>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Customer <span class="text-danger">*</span></label>
+            <select class="form-select" name="CustomerId" id="customerSelect" required>
+                <option value="">Select Customer</option>
+                @foreach (var customer in Model.Customers)
+                {
+                    <option value="@customer.Id"
+                            selected="@(Model.SalesOrder?.CustomerId == customer.Id)"
+                            data-address="@customer.ShippingAddress, @customer.ShippingCity, @customer.ShippingState @customer.ShippingPostalCode">
+                        @customer.Name (@customer.Code)
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Order Type</label>
+            <select class="form-select" name="OrderType">
+                @foreach (var type in Enum.GetValues<SalesOrderType>())
+                {
+                    <option value="@type" selected="@(Model.SalesOrder?.OrderType == type)">@type</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="Status">
+                @foreach (var status in Enum.GetValues<SalesOrderStatus>())
+                {
+                    <option value="@status" selected="@(Model.SalesOrder?.Status == status)">@status</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Order Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="OrderDate"
+                   value="@(Model.SalesOrder?.OrderDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="form-control" name="DueDate"
+                   value="@Model.SalesOrder?.DueDate?.ToString("yyyy-MM-dd")">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Expected Delivery</label>
+            <input type="date" class="form-control" name="ExpectedDeliveryDate"
+                   value="@Model.SalesOrder?.ExpectedDeliveryDate?.ToString("yyyy-MM-dd")">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Reference</label>
+            <input type="text" class="form-control" name="Reference"
+                   value="@Model.SalesOrder?.Reference" placeholder="PO#, Quote#, etc.">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Currency</label>
+            <select class="form-select" name="Currency">
+                <option value="USD" selected="@(Model.SalesOrder?.Currency == "USD")">USD</option>
+                <option value="EUR" selected="@(Model.SalesOrder?.Currency == "EUR")">EUR</option>
+                <option value="GBP" selected="@(Model.SalesOrder?.Currency == "GBP")">GBP</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Shipping Method</label>
+            <select class="form-select" name="ShippingMethod">
+                <option value="">Select...</option>
+                <option value="Ground" selected="@(Model.SalesOrder?.ShippingMethod == "Ground")">Ground</option>
+                <option value="Express" selected="@(Model.SalesOrder?.ShippingMethod == "Express")">Express</option>
+                <option value="Overnight" selected="@(Model.SalesOrder?.ShippingMethod == "Overnight")">Overnight</option>
+                <option value="Pickup" selected="@(Model.SalesOrder?.ShippingMethod == "Pickup")">Customer Pickup</option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Shipping Address</label>
+            <textarea class="form-control" name="ShippingAddress" rows="2" id="shippingAddress"
+                      placeholder="Enter shipping address or select customer to auto-fill">@Model.SalesOrder?.ShippingAddress</textarea>
+        </div>
+
+        <!-- Order Lines -->
+        <div class="col-12 mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-muted text-uppercase small mb-0">Order Lines</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLine()">
+                    <i class="bi bi-plus-lg me-1"></i>Add Line
+                </button>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered" id="linesTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width: 30%">Product</th>
+                            <th style="width: 10%" class="text-center">Qty</th>
+                            <th style="width: 15%" class="text-end">Unit Price</th>
+                            <th style="width: 10%" class="text-center">Disc %</th>
+                            <th style="width: 10%" class="text-center">Tax %</th>
+                            <th style="width: 15%" class="text-end">Total</th>
+                            <th style="width: 10%" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linesBody">
+                        @if (Model.SalesOrder?.Lines != null && Model.SalesOrder.Lines.Any())
+                        {
+                            var index = 0;
+                            foreach (var line in Model.SalesOrder.Lines.OrderBy(l => l.LineNumber))
+                            {
+                                <tr data-index="@index">
+                                    <td>
+                                        <select class="form-select form-select-sm product-select" name="Lines[@index].ProductId" onchange="updateLinePrice(this)">
+                                            <option value="">Select Product</option>
+                                            @foreach (var product in Model.Products)
+                                            {
+                                                <option value="@product.Id"
+                                                        data-price="@product.SellingPrice"
+                                                        data-tax="@(product.TaxRate ?? 0)"
+                                                        selected="@(line.ProductId == product.Id)">
+                                                    @product.Name (@product.Sku)
+                                                </option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-center qty-input"
+                                               name="Lines[@index].Quantity" value="@line.Quantity" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end price-input"
+                                               name="Lines[@index].UnitPrice" value="@line.UnitPrice" min="0" step="0.01" onchange="calculateLineTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-center discount-input"
+                                               name="Lines[@index].DiscountPercent" value="@line.DiscountPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-center tax-input"
+                                               name="Lines[@index].TaxPercent" value="@line.TaxPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+                                    </td>
+                                    <td class="text-end align-middle">
+                                        <span class="line-total fw-medium">$0.00</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        }
+                    </tbody>
+                    <tfoot class="bg-light">
+                        <tr>
+                            <td colspan="5" class="text-end fw-medium">Subtotal:</td>
+                            <td class="text-end" id="subtotalDisplay">$0.00</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="text-end">Tax:</td>
+                            <td class="text-end" id="taxDisplay">$0.00</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end">Shipping:</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-end"
+                                       name="ShippingAmount" id="shippingAmount" value="@(Model.SalesOrder?.ShippingAmount ?? 0)"
+                                       min="0" step="0.01" onchange="calculateTotals()">
+                            </td>
+                            <td class="text-end" id="shippingDisplay">$0.00</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end">Discount:</td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-end"
+                                       name="DiscountAmount" id="discountAmount" value="@(Model.SalesOrder?.DiscountAmount ?? 0)"
+                                       min="0" step="0.01" onchange="calculateTotals()">
+                            </td>
+                            <td class="text-end text-danger" id="discountDisplay">-$0.00</td>
+                            <td></td>
+                        </tr>
+                        <tr class="fw-bold">
+                            <td colspan="5" class="text-end">Total:</td>
+                            <td class="text-end" id="totalDisplay">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="col-12 mt-3">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="Notes" rows="2">@Model.SalesOrder?.Notes</textarea>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            @(Model.IsEdit ? "Update Order" : "Create Order")
+        </button>
+    </div>
+</form>
+
+<script>
+    let lineIndex = @(Model.SalesOrder?.Lines?.Count ?? 0);
+
+    const products = [
+        @foreach (var product in Model.Products)
+        {
+            <text>{ id: '@product.Id', name: '@product.Name.Replace("'", "\\'")', sku: '@product.Sku', price: @product.SellingPrice, tax: @(product.TaxRate ?? 0) },</text>
+        }
+    ];
+
+    function addLine() {
+        const tbody = document.getElementById('linesBody');
+        const row = document.createElement('tr');
+        row.setAttribute('data-index', lineIndex);
+        row.innerHTML = `
+            <td>
+                <select class="form-select form-select-sm product-select" name="Lines[${lineIndex}].ProductId" onchange="updateLinePrice(this)">
+                    <option value="">Select Product</option>
+                    ${products.map(p => `<option value="${p.id}" data-price="${p.price}" data-tax="${p.tax}">${p.name} (${p.sku})</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-center qty-input"
+                       name="Lines[${lineIndex}].Quantity" value="1" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-end price-input"
+                       name="Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-center discount-input"
+                       name="Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-center tax-input"
+                       name="Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+            </td>
+            <td class="text-end align-middle">
+                <span class="line-total fw-medium">$0.00</span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        lineIndex++;
+    }
+
+    function removeLine(btn) {
+        btn.closest('tr').remove();
+        reindexLines();
+        calculateTotals();
+    }
+
+    function reindexLines() {
+        const rows = document.querySelectorAll('#linesBody tr');
+        rows.forEach((row, index) => {
+            row.setAttribute('data-index', index);
+            row.querySelectorAll('[name]').forEach(input => {
+                input.name = input.name.replace(/\[\d+\]/, `[${index}]`);
+            });
+        });
+        lineIndex = rows.length;
+    }
+
+    function updateLinePrice(select) {
+        const row = select.closest('tr');
+        const option = select.options[select.selectedIndex];
+        const priceInput = row.querySelector('.price-input');
+        const taxInput = row.querySelector('.tax-input');
+
+        if (option.value) {
+            priceInput.value = option.dataset.price || 0;
+            taxInput.value = option.dataset.tax || 0;
+        }
+        calculateLineTotal(select);
+    }
+
+    function calculateLineTotal(input) {
+        const row = input.closest('tr');
+        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+        const price = parseFloat(row.querySelector('.price-input').value) || 0;
+        const discount = parseFloat(row.querySelector('.discount-input').value) || 0;
+        const tax = parseFloat(row.querySelector('.tax-input').value) || 0;
+
+        const subtotal = qty * price * (1 - discount / 100);
+        const taxAmount = subtotal * tax / 100;
+        const total = subtotal + taxAmount;
+
+        row.querySelector('.line-total').textContent = '$' + total.toFixed(2);
+        calculateTotals();
+    }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        let taxTotal = 0;
+
+        document.querySelectorAll('#linesBody tr').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+            const discount = parseFloat(row.querySelector('.discount-input')?.value) || 0;
+            const tax = parseFloat(row.querySelector('.tax-input')?.value) || 0;
+
+            const lineSubtotal = qty * price * (1 - discount / 100);
+            const lineTax = lineSubtotal * tax / 100;
+
+            subtotal += lineSubtotal;
+            taxTotal += lineTax;
+        });
+
+        const shipping = parseFloat(document.getElementById('shippingAmount').value) || 0;
+        const discountAmt = parseFloat(document.getElementById('discountAmount').value) || 0;
+        const total = subtotal + taxTotal + shipping - discountAmt;
+
+        document.getElementById('subtotalDisplay').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('taxDisplay').textContent = '$' + taxTotal.toFixed(2);
+        document.getElementById('shippingDisplay').textContent = '$' + shipping.toFixed(2);
+        document.getElementById('discountDisplay').textContent = '-$' + discountAmt.toFixed(2);
+        document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+    }
+
+    // Auto-fill shipping address when customer selected
+    document.getElementById('customerSelect')?.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        if (option.value && option.dataset.address) {
+            document.getElementById('shippingAddress').value = option.dataset.address;
+        }
+    });
+
+    // Initialize calculations
+    document.querySelectorAll('#linesBody tr').forEach(row => {
+        const input = row.querySelector('.qty-input');
+        if (input) calculateLineTotal(input);
+    });
+    calculateTotals();
+</script>

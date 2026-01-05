@@ -1,0 +1,171 @@
+@model Algora.Erp.Web.Pages.HR.Leave.LeaveTableViewModel
+@using Algora.Erp.Domain.Entities.HR
+
+@foreach (var leave in Model.LeaveRequests)
+{
+    <tr>
+        <td class="ps-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                     style="width: 40px; height: 40px; font-size: 14px;">
+                    @leave.Employee.FirstName[0]@leave.Employee.LastName[0]
+                </div>
+                <div>
+                    <h6 class="mb-0">@leave.Employee.FirstName @leave.Employee.LastName</h6>
+                    <small class="text-muted">@leave.Employee.EmployeeCode · @(leave.Employee.Department?.Name ?? "No Dept")</small>
+                </div>
+            </div>
+        </td>
+        <td>
+            @switch (leave.LeaveType)
+            {
+                case LeaveType.Annual:
+                    <span class="badge bg-success">Annual</span>
+                    break;
+                case LeaveType.Sick:
+                    <span class="badge bg-danger">Sick</span>
+                    break;
+                case LeaveType.Personal:
+                    <span class="badge bg-info">Personal</span>
+                    break;
+                case LeaveType.Maternity:
+                    <span class="badge bg-pink">Maternity</span>
+                    break;
+                case LeaveType.Paternity:
+                    <span class="badge bg-primary">Paternity</span>
+                    break;
+                case LeaveType.Bereavement:
+                    <span class="badge bg-secondary">Bereavement</span>
+                    break;
+                case LeaveType.Unpaid:
+                    <span class="badge bg-dark">Unpaid</span>
+                    break;
+                case LeaveType.Compensatory:
+                    <span class="badge bg-warning text-dark">Compensatory</span>
+                    break;
+                default:
+                    <span class="badge bg-secondary">@leave.LeaveType</span>
+                    break;
+            }
+        </td>
+        <td>
+            @leave.StartDate.ToString("MMM dd") - @leave.EndDate.ToString("MMM dd, yyyy")
+            @if (leave.IsHalfDay)
+            {
+                <br><small class="text-muted">(@leave.HalfDayType Half)</small>
+            }
+        </td>
+        <td>
+            <span class="fw-semibold">@leave.TotalDays</span> day(s)
+        </td>
+        <td>
+            @switch (leave.Status)
+            {
+                case LeaveStatus.Pending:
+                    <span class="badge bg-warning text-dark">Pending</span>
+                    break;
+                case LeaveStatus.Approved:
+                    <span class="badge bg-success">Approved</span>
+                    @if (leave.ApprovedAt.HasValue)
+                    {
+                        <br><small class="text-muted">@leave.ApprovedAt.Value.ToString("MMM dd")</small>
+                    }
+                    break;
+                case LeaveStatus.Rejected:
+                    <span class="badge bg-danger">Rejected</span>
+                    break;
+                case LeaveStatus.Cancelled:
+                    <span class="badge bg-secondary">Cancelled</span>
+                    break;
+            }
+        </td>
+        <td>
+            <span title="@leave.Reason">
+                @(leave.Reason.Length > 30 ? leave.Reason.Substring(0, 30) + "..." : leave.Reason)
+            </span>
+        </td>
+        <td class="text-end pe-4">
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    @if (leave.Status == LeaveStatus.Pending)
+                    {
+                        <li>
+                            <a class="dropdown-item text-success" href="#"
+                               hx-post="/HR/Leave?handler=Approve&id=@leave.Id"
+                               hx-target="#tableContent"
+                               hx-confirm="Approve this leave request?">
+                                <i class="bi bi-check-circle me-2"></i> Approve
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#"
+                               hx-post="/HR/Leave?handler=Reject&id=@leave.Id"
+                               hx-target="#tableContent"
+                               hx-confirm="Reject this leave request?">
+                                <i class="bi bi-x-circle me-2"></i> Reject
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#"
+                               hx-get="/HR/Leave?handler=EditForm&id=@leave.Id"
+                               hx-target="#formContainer"
+                               data-bs-toggle="modal"
+                               data-bs-target="#leaveModal">
+                                <i class="bi bi-pencil me-2"></i> Edit
+                            </a>
+                        </li>
+                    }
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           onclick="alert('Reason: @leave.Reason\n\nEmergency Contact: @(leave.EmergencyContact ?? "N/A")\n\nHandover Notes: @(leave.HandoverNotes ?? "N/A")')">
+                            <i class="bi bi-eye me-2"></i> View Details
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="#"
+                           hx-delete="/HR/Leave?handler=&id=@leave.Id"
+                           hx-target="#tableContent"
+                           hx-confirm="Are you sure you want to delete this leave request?">
+                            <i class="bi bi-trash me-2"></i> Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.LeaveRequests.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                <p class="mb-0">No leave requests found</p>
+            </div>
+        </td>
+    </tr>
+}
+
+<script>
+    document.getElementById('paginationInfo').textContent =
+        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
+
+    var paginationHtml = '';
+    @if (Model.TotalPages > 1)
+    {
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            var activeClass = i == Model.Page ? "active" : "";
+            <text>
+            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/HR/Leave?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter">@i</a></li>';
+            </text>
+        }
+    }
+    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+</script>

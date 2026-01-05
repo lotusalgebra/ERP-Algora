@@ -1,0 +1,124 @@
+@model Algora.Erp.Web.Pages.HR.Leave.LeaveFormViewModel
+@using Algora.Erp.Domain.Entities.HR
+
+<form hx-post="/HR/Leave" hx-target="#tableContent" hx-swap="innerHTML"
+      hx-on::after-request="if(event.detail.successful) bootstrap.Modal.getInstance(document.getElementById('leaveModal')).hide()">
+
+    @if (Model.IsEdit && Model.LeaveRequest != null)
+    {
+        <input type="hidden" name="Id" value="@Model.LeaveRequest.Id" />
+    }
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Employee <span class="text-danger">*</span></label>
+            <select class="form-select" name="EmployeeId" required @(Model.IsEdit ? "disabled" : "")>
+                <option value="">Select Employee</option>
+                @foreach (var emp in Model.Employees)
+                {
+                    if (Model.LeaveRequest?.EmployeeId == emp.Id)
+                    {
+                        <option value="@emp.Id" selected>@emp.FirstName @emp.LastName (@emp.EmployeeCode)</option>
+                    }
+                    else
+                    {
+                        <option value="@emp.Id">@emp.FirstName @emp.LastName (@emp.EmployeeCode)</option>
+                    }
+                }
+            </select>
+            @if (Model.IsEdit && Model.LeaveRequest != null)
+            {
+                <input type="hidden" name="EmployeeId" value="@Model.LeaveRequest.EmployeeId" />
+            }
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Leave Type <span class="text-danger">*</span></label>
+            <select class="form-select" name="LeaveType" required>
+                @foreach (LeaveType type in Enum.GetValues(typeof(LeaveType)))
+                {
+                    if (Model.LeaveRequest?.LeaveType == type)
+                    {
+                        <option value="@((int)type)" selected>@type</option>
+                    }
+                    else
+                    {
+                        <option value="@((int)type)">@type</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Start Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="StartDate" required
+                   value="@(Model.LeaveRequest?.StartDate.ToString("yyyy-MM-dd") ?? DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd"))">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">End Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="EndDate" required
+                   value="@(Model.LeaveRequest?.EndDate.ToString("yyyy-MM-dd") ?? DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd"))">
+        </div>
+        <div class="col-md-6">
+            <div class="form-check mt-4">
+                @if (Model.LeaveRequest?.IsHalfDay ?? false)
+                {
+                    <input class="form-check-input" type="checkbox" name="IsHalfDay" value="true" id="isHalfDay" checked
+                           onchange="toggleHalfDayType()">
+                }
+                else
+                {
+                    <input class="form-check-input" type="checkbox" name="IsHalfDay" value="true" id="isHalfDay"
+                           onchange="toggleHalfDayType()">
+                }
+                <label class="form-check-label" for="isHalfDay">Half Day Leave</label>
+            </div>
+        </div>
+        <div class="col-md-6" id="halfDayTypeContainer" style="@(Model.LeaveRequest?.IsHalfDay == true ? "" : "display: none;")">
+            <label class="form-label">Half Day Type</label>
+            <select class="form-select" name="HalfDayType">
+                @foreach (HalfDayType type in Enum.GetValues(typeof(HalfDayType)))
+                {
+                    if (Model.LeaveRequest?.HalfDayType == type)
+                    {
+                        <option value="@((int)type)" selected>@type</option>
+                    }
+                    else
+                    {
+                        <option value="@((int)type)">@type</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Reason <span class="text-danger">*</span></label>
+            <textarea class="form-control" name="Reason" rows="3" required
+                      placeholder="Please provide the reason for leave">@Model.LeaveRequest?.Reason</textarea>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Emergency Contact</label>
+            <input type="text" class="form-control" name="EmergencyContact"
+                   value="@Model.LeaveRequest?.EmergencyContact"
+                   placeholder="Phone number during leave">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Handover Notes</label>
+            <input type="text" class="form-control" name="HandoverNotes"
+                   value="@Model.LeaveRequest?.HandoverNotes"
+                   placeholder="Who will cover your work?">
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            @(Model.IsEdit ? "Update Request" : "Submit Request")
+        </button>
+    </div>
+</form>
+
+<script>
+    function toggleHalfDayType() {
+        var container = document.getElementById('halfDayTypeContainer');
+        var checkbox = document.getElementById('isHalfDay');
+        container.style.display = checkbox.checked ? '' : 'none';
+    }
+</script>

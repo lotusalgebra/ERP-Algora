@@ -1,0 +1,128 @@
+@model Algora.Erp.Web.Pages.HR.Positions.PositionsTableViewModel
+
+@foreach (var pos in Model.Positions)
+{
+    <tr>
+        <td class="ps-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3"
+                     style="width: 40px; height: 40px;">
+                    <i class="bi bi-person-badge text-info"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">@pos.Title</h6>
+                    @if (!string.IsNullOrEmpty(pos.Description))
+                    {
+                        <small class="text-muted">@(pos.Description.Length > 50 ? pos.Description.Substring(0, 50) + "..." : pos.Description)</small>
+                    }
+                </div>
+            </div>
+        </td>
+        <td>
+            <span class="badge bg-secondary">@pos.Code</span>
+        </td>
+        <td>
+            @if (pos.Department != null)
+            {
+                <span>@pos.Department.Name</span>
+            }
+            else
+            {
+                <span class="text-muted">Not assigned</span>
+            }
+        </td>
+        <td>
+            @if (pos.MinSalary.HasValue && pos.MaxSalary.HasValue)
+            {
+                <span>@pos.MinSalary.Value.ToString("C0") - @pos.MaxSalary.Value.ToString("C0")</span>
+            }
+            else if (pos.MinSalary.HasValue)
+            {
+                <span>From @pos.MinSalary.Value.ToString("C0")</span>
+            }
+            else if (pos.MaxSalary.HasValue)
+            {
+                <span>Up to @pos.MaxSalary.Value.ToString("C0")</span>
+            }
+            else
+            {
+                <span class="text-muted">Not specified</span>
+            }
+        </td>
+        <td>
+            <span class="badge bg-info">@pos.Employees.Count</span>
+        </td>
+        <td>
+            @if (pos.IsActive)
+            {
+                <span class="badge bg-success">Active</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Inactive</span>
+            }
+        </td>
+        <td class="text-end pe-4">
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           hx-get="/HR/Positions?handler=EditForm&id=@pos.Id"
+                           hx-target="#formContainer"
+                           data-bs-toggle="modal"
+                           data-bs-target="#positionModal">
+                            <i class="bi bi-pencil me-2"></i> Edit
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/HR/Employees?positionId=@pos.Id">
+                            <i class="bi bi-people me-2"></i> View Employees
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="#"
+                           hx-delete="/HR/Positions?handler=&id=@pos.Id"
+                           hx-target="#tableContent"
+                           hx-confirm="Are you sure you want to delete this position?">
+                            <i class="bi bi-trash me-2"></i> Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+}
+
+@if (!Model.Positions.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-person-badge fs-1 d-block mb-2"></i>
+                <p class="mb-0">No positions found</p>
+            </div>
+        </td>
+    </tr>
+}
+
+<script>
+    document.getElementById('paginationInfo').textContent =
+        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
+
+    var paginationHtml = '';
+    @if (Model.TotalPages > 1)
+    {
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            var activeClass = i == Model.Page ? "active" : "";
+            <text>
+            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/HR/Positions?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#departmentFilter">@i</a></li>';
+            </text>
+        }
+    }
+    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+</script>

@@ -1,0 +1,137 @@
+@model Algora.Erp.Web.Pages.Payroll.Components.ComponentFormViewModel
+@using Algora.Erp.Domain.Entities.Payroll
+
+<form hx-post=""
+      hx-target="#componentsTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit && Model.Component != null)
+    {
+        <input type="hidden" name="Id" value="@Model.Component.Id" />
+    }
+
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="Name"
+                   value="@Model.Component?.Name" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Sort Order</label>
+            <input type="number" class="form-control" name="SortOrder"
+                   value="@(Model.Component?.SortOrder ?? 0)" min="0">
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="Description" rows="2">@Model.Component?.Description</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Component Type</label>
+            <select class="form-select" name="ComponentType" id="componentType">
+                @foreach (var type in Enum.GetValues<SalaryComponentType>())
+                {
+                    <option value="@type" selected="@(Model.Component?.ComponentType == type)">@type</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Calculation Type</label>
+            <select class="form-select" name="CalculationType" id="calculationType" onchange="updateValueLabel()">
+                @foreach (var type in Enum.GetValues<CalculationType>())
+                {
+                    var label = type switch
+                    {
+                        CalculationType.Fixed => "Fixed Amount",
+                        CalculationType.PercentageOfBasic => "Percentage of Basic",
+                        CalculationType.PercentageOfGross => "Percentage of Gross",
+                        CalculationType.Formula => "Custom Formula",
+                        _ => type.ToString()
+                    };
+                    <option value="@type" selected="@(Model.Component?.CalculationType == type)">@label</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label" id="valueLabel">Default Value</label>
+            <div class="input-group">
+                <span class="input-group-text" id="valuePrefix">$</span>
+                <input type="number" class="form-control" name="DefaultValue"
+                       value="@(Model.Component?.DefaultValue ?? 0)" step="0.01" min="0">
+                <span class="input-group-text d-none" id="valueSuffix">%</span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Min Value</label>
+            <input type="number" class="form-control" name="MinValue"
+                   value="@Model.Component?.MinValue" step="0.01" min="0">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Max Value</label>
+            <input type="number" class="form-control" name="MaxValue"
+                   value="@Model.Component?.MaxValue" step="0.01" min="0">
+        </div>
+
+        <div class="col-12">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="IsTaxable" value="true" id="isTaxable"
+                               checked="@(Model.Component?.IsTaxable ?? true)">
+                        <label class="form-check-label" for="isTaxable">Taxable</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="IsRecurring" value="true" id="isRecurring"
+                               checked="@(Model.Component?.IsRecurring ?? true)">
+                        <label class="form-check-label" for="isRecurring">Recurring</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="IsActive" value="true" id="isActive"
+                               checked="@(Model.Component?.IsActive ?? true)">
+                        <label class="form-check-label" for="isActive">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            @(Model.IsEdit ? "Update Component" : "Create Component")
+        </button>
+    </div>
+</form>
+
+<script>
+    function updateValueLabel() {
+        const calcType = document.getElementById('calculationType').value;
+        const prefix = document.getElementById('valuePrefix');
+        const suffix = document.getElementById('valueSuffix');
+
+        if (calcType === 'Fixed') {
+            prefix.textContent = '$';
+            prefix.classList.remove('d-none');
+            suffix.classList.add('d-none');
+        } else if (calcType === 'PercentageOfBasic' || calcType === 'PercentageOfGross') {
+            prefix.classList.add('d-none');
+            suffix.classList.remove('d-none');
+        } else {
+            prefix.classList.add('d-none');
+            suffix.classList.add('d-none');
+        }
+    }
+
+    // Initialize on load
+    updateValueLabel();
+</script>
