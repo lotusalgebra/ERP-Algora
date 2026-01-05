@@ -48,6 +48,11 @@ public interface IFinancialReportService
     Task<ProfitAndLossReport> GetProfitAndLossAsync(ReportDateRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets balance sheet as of a specific date
+    /// </summary>
+    Task<BalanceSheetReport> GetBalanceSheetAsync(DateTime asOfDate, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Exports report to PDF
     /// </summary>
     byte[] ExportToPdf<T>(T report, string reportTitle) where T : class;
@@ -366,6 +371,70 @@ public class MonthlyPnL
     public decimal GrossProfit { get; set; }
     public decimal OperatingExpenses { get; set; }
     public decimal NetIncome { get; set; }
+}
+
+public class BalanceSheetReport
+{
+    public DateTime AsOfDate { get; set; } = DateTime.Today;
+
+    // Assets
+    public decimal TotalAssets { get; set; }
+    public decimal TotalCurrentAssets { get; set; }
+    public decimal TotalNonCurrentAssets { get; set; }
+    public List<BalanceSheetSection> AssetSections { get; set; } = new();
+
+    // Liabilities
+    public decimal TotalLiabilities { get; set; }
+    public decimal TotalCurrentLiabilities { get; set; }
+    public decimal TotalNonCurrentLiabilities { get; set; }
+    public List<BalanceSheetSection> LiabilitySections { get; set; } = new();
+
+    // Equity
+    public decimal TotalEquity { get; set; }
+    public List<BalanceSheetLineItem> EquityItems { get; set; } = new();
+
+    // Validation (Assets = Liabilities + Equity)
+    public decimal TotalLiabilitiesAndEquity { get; set; }
+    public bool IsBalanced => Math.Abs(TotalAssets - TotalLiabilitiesAndEquity) < 0.01m;
+
+    // Comparative Data
+    public BalanceSheetComparison? PreviousPeriod { get; set; }
+
+    // Key Ratios
+    public decimal CurrentRatio { get; set; }
+    public decimal QuickRatio { get; set; }
+    public decimal DebtToEquityRatio { get; set; }
+    public decimal WorkingCapital { get; set; }
+}
+
+public class BalanceSheetSection
+{
+    public string SectionName { get; set; } = string.Empty;
+    public decimal Total { get; set; }
+    public List<BalanceSheetLineItem> Items { get; set; } = new();
+}
+
+public class BalanceSheetLineItem
+{
+    public string AccountCode { get; set; } = string.Empty;
+    public string AccountName { get; set; } = string.Empty;
+    public AccountSubType? SubType { get; set; }
+    public decimal Balance { get; set; }
+    public decimal? PreviousBalance { get; set; }
+    public decimal? ChangeAmount { get; set; }
+    public decimal? ChangePercent { get; set; }
+}
+
+public class BalanceSheetComparison
+{
+    public DateTime AsOfDate { get; set; }
+    public decimal TotalAssets { get; set; }
+    public decimal TotalLiabilities { get; set; }
+    public decimal TotalEquity { get; set; }
+
+    public decimal AssetsChange { get; set; }
+    public decimal LiabilitiesChange { get; set; }
+    public decimal EquityChange { get; set; }
 }
 
 #endregion

@@ -557,6 +557,302 @@ public class FinancialReportService : IFinancialReportService
         return report;
     }
 
+    public async Task<BalanceSheetReport> GetBalanceSheetAsync(DateTime asOfDate, CancellationToken cancellationToken = default)
+    {
+        // Get all accounts with their current balances from posted journal entries up to the as-of date
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= asOfDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        // Get all accounts
+        var accounts = await _context.Accounts
+            .Where(a => a.IsActive)
+            .ToListAsync(cancellationToken);
+
+        var report = new BalanceSheetReport
+        {
+            AsOfDate = asOfDate
+        };
+
+        // Calculate account balances
+        var accountBalances = accounts.Select(account =>
+        {
+            var lines = journalLines.Where(l => l.AccountId == account.Id).ToList();
+            var balance = account.AccountType switch
+            {
+                // Assets and Expenses increase with debits
+                AccountType.Asset or AccountType.Expense =>
+                    account.OpeningBalance + lines.Sum(l => l.DebitAmount - l.CreditAmount),
+                // Liabilities, Equity, and Revenue increase with credits
+                _ => account.OpeningBalance + lines.Sum(l => l.CreditAmount - l.DebitAmount)
+            };
+
+            return new
+            {
+                Account = account,
+                Balance = balance
+            };
+        }).Where(a => a.Balance != 0).ToList();
+
+        // ===== ASSETS =====
+        var assetAccounts = accountBalances
+            .Where(a => a.Account.AccountType == AccountType.Asset)
+            .ToList();
+
+        // Current Assets
+        var currentAssetSubTypes = new[]
+        {
+            AccountSubType.Cash,
+            AccountSubType.Bank,
+            AccountSubType.AccountsReceivable,
+            AccountSubType.Inventory,
+            AccountSubType.PrepaidExpenses,
+            AccountSubType.OtherCurrentAssets
+        };
+
+        var currentAssets = assetAccounts
+            .Where(a => currentAssetSubTypes.Contains(a.Account.AccountSubType ?? AccountSubType.OtherCurrentAssets))
+            .Select(a => new BalanceSheetLineItem
+            {
+                AccountCode = a.Account.Code,
+                AccountName = a.Account.Name,
+                SubType = a.Account.AccountSubType,
+                Balance = a.Balance
+            })
+            .OrderBy(a => a.AccountCode)
+            .ToList();
+
+        var currentAssetsSection = new BalanceSheetSection
+        {
+            SectionName = "Current Assets",
+            Items = currentAssets,
+            Total = currentAssets.Sum(a => a.Balance)
+        };
+
+        // Non-Current Assets
+        var nonCurrentAssets = assetAccounts
+            .Where(a => !currentAssetSubTypes.Contains(a.Account.AccountSubType ?? AccountSubType.OtherCurrentAssets))
+            .Select(a => new BalanceSheetLineItem
+            {
+                AccountCode = a.Account.Code,
+                AccountName = a.Account.Name,
+                SubType = a.Account.AccountSubType,
+                Balance = a.Balance
+            })
+            .OrderBy(a => a.AccountCode)
+            .ToList();
+
+        var nonCurrentAssetsSection = new BalanceSheetSection
+        {
+            SectionName = "Non-Current Assets",
+            Items = nonCurrentAssets,
+            Total = nonCurrentAssets.Sum(a => a.Balance)
+        };
+
+        report.AssetSections = new List<BalanceSheetSection> { currentAssetsSection, nonCurrentAssetsSection };
+        report.TotalCurrentAssets = currentAssetsSection.Total;
+        report.TotalNonCurrentAssets = nonCurrentAssetsSection.Total;
+        report.TotalAssets = report.TotalCurrentAssets + report.TotalNonCurrentAssets;
+
+        // ===== LIABILITIES =====
+        var liabilityAccounts = accountBalances
+            .Where(a => a.Account.AccountType == AccountType.Liability)
+            .ToList();
+
+        // Current Liabilities
+        var currentLiabilitySubTypes = new[]
+        {
+            AccountSubType.AccountsPayable,
+            AccountSubType.CreditCard,
+            AccountSubType.AccruedLiabilities,
+            AccountSubType.SalesTaxPayable,
+            AccountSubType.PayrollLiabilities,
+            AccountSubType.ShortTermDebt,
+            AccountSubType.OtherCurrentLiabilities
+        };
+
+        var currentLiabilities = liabilityAccounts
+            .Where(a => currentLiabilitySubTypes.Contains(a.Account.AccountSubType ?? AccountSubType.OtherCurrentLiabilities))
+            .Select(a => new BalanceSheetLineItem
+            {
+                AccountCode = a.Account.Code,
+                AccountName = a.Account.Name,
+                SubType = a.Account.AccountSubType,
+                Balance = a.Balance
+            })
+            .OrderBy(a => a.AccountCode)
+            .ToList();
+
+        var currentLiabilitiesSection = new BalanceSheetSection
+        {
+            SectionName = "Current Liabilities",
+            Items = currentLiabilities,
+            Total = currentLiabilities.Sum(a => a.Balance)
+        };
+
+        // Non-Current Liabilities
+        var nonCurrentLiabilities = liabilityAccounts
+            .Where(a => !currentLiabilitySubTypes.Contains(a.Account.AccountSubType ?? AccountSubType.OtherCurrentLiabilities))
+            .Select(a => new BalanceSheetLineItem
+            {
+                AccountCode = a.Account.Code,
+                AccountName = a.Account.Name,
+                SubType = a.Account.AccountSubType,
+                Balance = a.Balance
+            })
+            .OrderBy(a => a.AccountCode)
+            .ToList();
+
+        var nonCurrentLiabilitiesSection = new BalanceSheetSection
+        {
+            SectionName = "Non-Current Liabilities",
+            Items = nonCurrentLiabilities,
+            Total = nonCurrentLiabilities.Sum(a => a.Balance)
+        };
+
+        report.LiabilitySections = new List<BalanceSheetSection> { currentLiabilitiesSection, nonCurrentLiabilitiesSection };
+        report.TotalCurrentLiabilities = currentLiabilitiesSection.Total;
+        report.TotalNonCurrentLiabilities = nonCurrentLiabilitiesSection.Total;
+        report.TotalLiabilities = report.TotalCurrentLiabilities + report.TotalNonCurrentLiabilities;
+
+        // ===== EQUITY =====
+        var equityAccounts = accountBalances
+            .Where(a => a.Account.AccountType == AccountType.Equity)
+            .ToList();
+
+        report.EquityItems = equityAccounts
+            .Select(a => new BalanceSheetLineItem
+            {
+                AccountCode = a.Account.Code,
+                AccountName = a.Account.Name,
+                SubType = a.Account.AccountSubType,
+                Balance = a.Balance
+            })
+            .OrderBy(a => a.AccountCode)
+            .ToList();
+
+        // Calculate retained earnings from revenue and expenses
+        var revenueTotal = accountBalances
+            .Where(a => a.Account.AccountType == AccountType.Revenue)
+            .Sum(a => a.Balance);
+
+        var expenseTotal = accountBalances
+            .Where(a => a.Account.AccountType == AccountType.Expense)
+            .Sum(a => a.Balance);
+
+        var netIncome = revenueTotal - expenseTotal;
+
+        // Add net income to retained earnings
+        var retainedEarningsItem = report.EquityItems.FirstOrDefault(e => e.SubType == AccountSubType.RetainedEarnings);
+        if (retainedEarningsItem != null)
+        {
+            retainedEarningsItem.Balance += netIncome;
+        }
+        else if (netIncome != 0)
+        {
+            report.EquityItems.Add(new BalanceSheetLineItem
+            {
+                AccountCode = "3900",
+                AccountName = "Retained Earnings (Current Period)",
+                SubType = AccountSubType.RetainedEarnings,
+                Balance = netIncome
+            });
+        }
+
+        report.TotalEquity = report.EquityItems.Sum(e => e.Balance);
+        report.TotalLiabilitiesAndEquity = report.TotalLiabilities + report.TotalEquity;
+
+        // ===== KEY RATIOS =====
+        // Current Ratio = Current Assets / Current Liabilities
+        report.CurrentRatio = report.TotalCurrentLiabilities != 0
+            ? report.TotalCurrentAssets / report.TotalCurrentLiabilities
+            : 0;
+
+        // Quick Ratio = (Current Assets - Inventory) / Current Liabilities
+        var inventoryBalance = currentAssets.Where(a => a.SubType == AccountSubType.Inventory).Sum(a => a.Balance);
+        report.QuickRatio = report.TotalCurrentLiabilities != 0
+            ? (report.TotalCurrentAssets - inventoryBalance) / report.TotalCurrentLiabilities
+            : 0;
+
+        // Debt to Equity = Total Liabilities / Total Equity
+        report.DebtToEquityRatio = report.TotalEquity != 0
+            ? report.TotalLiabilities / report.TotalEquity
+            : 0;
+
+        // Working Capital = Current Assets - Current Liabilities
+        report.WorkingCapital = report.TotalCurrentAssets - report.TotalCurrentLiabilities;
+
+        // ===== PREVIOUS PERIOD COMPARISON =====
+        var previousDate = asOfDate.AddYears(-1);
+        var previousBalances = await GetPreviousBalanceSheetDataAsync(previousDate, cancellationToken);
+        if (previousBalances.HasValue)
+        {
+            var prev = previousBalances.Value;
+            report.PreviousPeriod = new BalanceSheetComparison
+            {
+                AsOfDate = previousDate,
+                TotalAssets = prev.TotalAssets,
+                TotalLiabilities = prev.TotalLiabilities,
+                TotalEquity = prev.TotalEquity,
+                AssetsChange = prev.TotalAssets != 0
+                    ? ((report.TotalAssets - prev.TotalAssets) / prev.TotalAssets) * 100
+                    : 0,
+                LiabilitiesChange = prev.TotalLiabilities != 0
+                    ? ((report.TotalLiabilities - prev.TotalLiabilities) / prev.TotalLiabilities) * 100
+                    : 0,
+                EquityChange = prev.TotalEquity != 0
+                    ? ((report.TotalEquity - prev.TotalEquity) / Math.Abs(prev.TotalEquity)) * 100
+                    : 0
+            };
+        }
+
+        return report;
+    }
+
+    private async Task<(decimal TotalAssets, decimal TotalLiabilities, decimal TotalEquity)?> GetPreviousBalanceSheetDataAsync(
+        DateTime asOfDate, CancellationToken cancellationToken)
+    {
+        var journalLines = await _context.JournalEntries
+            .Include(j => j.Lines)
+                .ThenInclude(l => l.Account)
+            .Where(j => j.EntryDate <= asOfDate && j.Status == JournalEntryStatus.Posted)
+            .SelectMany(j => j.Lines)
+            .ToListAsync(cancellationToken);
+
+        var accounts = await _context.Accounts
+            .Where(a => a.IsActive)
+            .ToListAsync(cancellationToken);
+
+        if (!accounts.Any())
+            return null;
+
+        var accountBalances = accounts.Select(account =>
+        {
+            var lines = journalLines.Where(l => l.AccountId == account.Id).ToList();
+            var balance = account.AccountType switch
+            {
+                AccountType.Asset or AccountType.Expense =>
+                    account.OpeningBalance + lines.Sum(l => l.DebitAmount - l.CreditAmount),
+                _ => account.OpeningBalance + lines.Sum(l => l.CreditAmount - l.DebitAmount)
+            };
+
+            return new { Account = account, Balance = balance };
+        }).ToList();
+
+        var totalAssets = accountBalances.Where(a => a.Account.AccountType == AccountType.Asset).Sum(a => a.Balance);
+        var totalLiabilities = accountBalances.Where(a => a.Account.AccountType == AccountType.Liability).Sum(a => a.Balance);
+
+        var equityBalance = accountBalances.Where(a => a.Account.AccountType == AccountType.Equity).Sum(a => a.Balance);
+        var revenueTotal = accountBalances.Where(a => a.Account.AccountType == AccountType.Revenue).Sum(a => a.Balance);
+        var expenseTotal = accountBalances.Where(a => a.Account.AccountType == AccountType.Expense).Sum(a => a.Balance);
+        var totalEquity = equityBalance + (revenueTotal - expenseTotal);
+
+        return (totalAssets, totalLiabilities, totalEquity);
+    }
+
     private async Task<List<MonthlyPnL>> GetMonthlyPnLTrendAsync(ReportDateRange range, CancellationToken cancellationToken)
     {
         var result = new List<MonthlyPnL>();
@@ -696,6 +992,10 @@ public class FinancialReportService : IFinancialReportService
                     else if (report is ProfitAndLossReport pnlReport)
                     {
                         RenderProfitAndLossPdf(column, pnlReport);
+                    }
+                    else if (report is BalanceSheetReport balanceSheetReport)
+                    {
+                        RenderBalanceSheetPdf(column, balanceSheetReport);
                     }
                 });
 
@@ -1056,6 +1356,140 @@ public class FinancialReportService : IFinancialReportService
             row.RelativeItem(1).AlignRight().Text(report.NetIncome.ToString("C2")).Bold().FontSize(14);
         });
         column.Item().Text($"Net Profit Margin: {report.NetProfitMargin:F1}%").FontSize(10);
+    }
+
+    private void RenderBalanceSheetPdf(ColumnDescriptor column, BalanceSheetReport report)
+    {
+        column.Item().Text($"As of: {report.AsOfDate:MMMM dd, yyyy}").FontSize(11);
+        column.Item().Height(15);
+
+        // ===== ASSETS =====
+        column.Item().Text("ASSETS").Bold().FontSize(14);
+        column.Item().Height(10);
+
+        foreach (var section in report.AssetSections)
+        {
+            if (section.Items.Any())
+            {
+                column.Item().Text(section.SectionName).Bold().FontSize(11);
+                column.Item().Height(5);
+
+                foreach (var item in section.Items)
+                {
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem(3).Text($"  {item.AccountName}");
+                        row.RelativeItem(1).AlignRight().Text(item.Balance.ToString("C2"));
+                    });
+                }
+
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem(3).Text($"Total {section.SectionName}").Bold();
+                    row.RelativeItem(1).AlignRight().Text(section.Total.ToString("C2")).Bold();
+                });
+                column.Item().Height(8);
+            }
+        }
+
+        column.Item().LineHorizontal(1).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("TOTAL ASSETS").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.TotalAssets.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Height(20);
+
+        // ===== LIABILITIES =====
+        column.Item().Text("LIABILITIES").Bold().FontSize(14);
+        column.Item().Height(10);
+
+        foreach (var section in report.LiabilitySections)
+        {
+            if (section.Items.Any())
+            {
+                column.Item().Text(section.SectionName).Bold().FontSize(11);
+                column.Item().Height(5);
+
+                foreach (var item in section.Items)
+                {
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem(3).Text($"  {item.AccountName}");
+                        row.RelativeItem(1).AlignRight().Text(item.Balance.ToString("C2"));
+                    });
+                }
+
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem(3).Text($"Total {section.SectionName}").Bold();
+                    row.RelativeItem(1).AlignRight().Text(section.Total.ToString("C2")).Bold();
+                });
+                column.Item().Height(8);
+            }
+        }
+
+        column.Item().LineHorizontal(1).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("TOTAL LIABILITIES").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.TotalLiabilities.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Height(20);
+
+        // ===== EQUITY =====
+        column.Item().Text("EQUITY").Bold().FontSize(14);
+        column.Item().Height(10);
+
+        foreach (var item in report.EquityItems)
+        {
+            column.Item().Row(row =>
+            {
+                row.RelativeItem(3).Text($"  {item.AccountName}");
+                row.RelativeItem(1).AlignRight().Text(item.Balance.ToString("C2"));
+            });
+        }
+
+        column.Item().LineHorizontal(1).LineColor(Colors.Grey.Medium);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("TOTAL EQUITY").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.TotalEquity.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Height(15);
+
+        // ===== TOTAL LIABILITIES & EQUITY =====
+        column.Item().LineHorizontal(2).LineColor(Colors.Black);
+        column.Item().Row(row =>
+        {
+            row.RelativeItem(3).Text("TOTAL LIABILITIES & EQUITY").Bold().FontSize(12);
+            row.RelativeItem(1).AlignRight().Text(report.TotalLiabilitiesAndEquity.ToString("C2")).Bold().FontSize(12);
+        });
+        column.Item().Height(20);
+
+        // ===== KEY RATIOS =====
+        column.Item().Text("KEY RATIOS").Bold().FontSize(12);
+        column.Item().Height(10);
+        column.Item().Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+                columns.RelativeColumn();
+            });
+
+            table.Cell().Padding(5).Text("Current Ratio").Bold();
+            table.Cell().Padding(5).Text("Quick Ratio").Bold();
+            table.Cell().Padding(5).Text("Debt/Equity").Bold();
+            table.Cell().Padding(5).Text("Working Capital").Bold();
+
+            table.Cell().Padding(5).Text($"{report.CurrentRatio:F2}");
+            table.Cell().Padding(5).Text($"{report.QuickRatio:F2}");
+            table.Cell().Padding(5).Text($"{report.DebtToEquityRatio:F2}");
+            table.Cell().Padding(5).Text(report.WorkingCapital.ToString("C2"));
+        });
     }
 
     #endregion
