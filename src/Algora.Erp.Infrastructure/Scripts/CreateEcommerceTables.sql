@@ -128,8 +128,8 @@ BEGIN
         IsDeleted BIT DEFAULT 0,
         DeletedAt DATETIME2,
         DeletedBy UNIQUEIDENTIFIER,
-        CONSTRAINT FK_EcommerceProducts_Category FOREIGN KEY (CategoryId) REFERENCES WebCategories(Id),
-        CONSTRAINT FK_EcommerceProducts_InventoryProduct FOREIGN KEY (InventoryProductId) REFERENCES Products(Id)
+        CONSTRAINT FK_EcommerceProducts_Category FOREIGN KEY (CategoryId) REFERENCES WebCategories(Id)
+        -- Note: FK to Inventory Products table removed - optional integration
     );
     CREATE UNIQUE INDEX IX_EcommerceProducts_Slug ON EcommerceProducts(Slug) WHERE IsDeleted = 0;
     CREATE INDEX IX_EcommerceProducts_Sku ON EcommerceProducts(Sku);

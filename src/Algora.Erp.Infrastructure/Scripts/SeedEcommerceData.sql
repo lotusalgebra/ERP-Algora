@@ -1,6 +1,9 @@
 -- Seed eCommerce Sample Data for Algora.Erp
 -- Run this script after CreateEcommerceTables.sql
 
+SET QUOTED_IDENTIFIER ON;
+GO
+
 -- =============================================
 -- Insert Product Categories
 -- =============================================
@@ -10,7 +13,7 @@ DECLARE @HomeId UNIQUEIDENTIFIER = NEWID();
 DECLARE @BooksId UNIQUEIDENTIFIER = NEWID();
 DECLARE @SportsId UNIQUEIDENTIFIER = NEWID();
 
-INSERT INTO EcommerceCategories (Id, Name, Slug, Description, ImageUrl, ParentCategoryId, SortOrder, IsActive, CreatedAt)
+INSERT INTO WebCategories (Id, Name, Slug, Description, ImageUrl, ParentId, SortOrder, IsActive, CreatedAt)
 VALUES
     (@ElectronicsId, 'Electronics', 'electronics', 'Laptops, phones, tablets and more', 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400', NULL, 1, 1, GETUTCDATE()),
     (@ClothingId, 'Clothing', 'clothing', 'Fashion and apparel for everyone', 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400', NULL, 2, 1, GETUTCDATE()),
@@ -19,14 +22,14 @@ VALUES
     (@SportsId, 'Sports & Outdoors', 'sports-outdoors', 'Fitness equipment and outdoor gear', 'https://images.unsplash.com/photo-1461896836934- voices-of-the-next-generation-11?w=400', NULL, 5, 1, GETUTCDATE());
 
 -- Sub-categories for Electronics
-INSERT INTO EcommerceCategories (Id, Name, Slug, Description, ImageUrl, ParentCategoryId, SortOrder, IsActive, CreatedAt)
+INSERT INTO WebCategories (Id, Name, Slug, Description, ImageUrl, ParentId, SortOrder, IsActive, CreatedAt)
 VALUES
     (NEWID(), 'Laptops', 'laptops', 'Notebooks and ultrabooks', NULL, @ElectronicsId, 1, 1, GETUTCDATE()),
     (NEWID(), 'Smartphones', 'smartphones', 'Mobile phones and accessories', NULL, @ElectronicsId, 2, 1, GETUTCDATE()),
     (NEWID(), 'Audio', 'audio', 'Headphones, speakers and more', NULL, @ElectronicsId, 3, 1, GETUTCDATE());
 
 -- Sub-categories for Clothing
-INSERT INTO EcommerceCategories (Id, Name, Slug, Description, ImageUrl, ParentCategoryId, SortOrder, IsActive, CreatedAt)
+INSERT INTO WebCategories (Id, Name, Slug, Description, ImageUrl, ParentId, SortOrder, IsActive, CreatedAt)
 VALUES
     (NEWID(), 'Men''s Clothing', 'mens-clothing', 'Shirts, pants, jackets for men', NULL, @ClothingId, 1, 1, GETUTCDATE()),
     (NEWID(), 'Women''s Clothing', 'womens-clothing', 'Dresses, tops, bottoms for women', NULL, @ClothingId, 2, 1, GETUTCDATE()),
@@ -48,7 +51,7 @@ DECLARE @Product10Id UNIQUEIDENTIFIER = NEWID();
 DECLARE @Product11Id UNIQUEIDENTIFIER = NEWID();
 DECLARE @Product12Id UNIQUEIDENTIFIER = NEWID();
 
-INSERT INTO EcommerceProducts (Id, Name, Slug, Sku, Description, ShortDescription, Price, CompareAtPrice, CostPrice, StockQuantity, LowStockThreshold, Weight, CategoryId, Status, IsFeatured, SeoTitle, SeoDescription, CreatedAt)
+INSERT INTO EcommerceProducts (Id, Name, Slug, Sku, Description, ShortDescription, Price, CompareAtPrice, CostPrice, StockQuantity, LowStockThreshold, Weight, CategoryId, Status, IsFeatured, MetaTitle, MetaDescription, CreatedAt)
 VALUES
     -- Electronics
     (@Product1Id, 'MacBook Pro 14"', 'macbook-pro-14', 'ELEC-001', 'The most powerful MacBook Pro ever is here. With the M3 Pro or M3 Max chip, incredible battery life, and a stunning Liquid Retina XDR display.', 'Powerful laptop with M3 chip', 1999.99, 2199.99, 1500.00, 25, 5, 1.6, @ElectronicsId, 1, 1, 'MacBook Pro 14 inch - M3 Chip', 'Buy the new MacBook Pro 14 with M3 chip', GETUTCDATE()),
@@ -75,46 +78,46 @@ VALUES
 -- =============================================
 -- Insert Product Images
 -- =============================================
-INSERT INTO ProductImages (Id, ProductId, Url, AltText, IsPrimary, SortOrder, CreatedAt)
+INSERT INTO ProductImages (Id, ProductId, Url, AltText, IsPrimary, SortOrder)
 VALUES
     -- MacBook Pro images
-    (NEWID(), @Product1Id, 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800', 'MacBook Pro 14 inch front view', 1, 1, GETUTCDATE()),
-    (NEWID(), @Product1Id, 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800', 'MacBook Pro keyboard close-up', 0, 2, GETUTCDATE()),
+    (NEWID(), @Product1Id, 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800', 'MacBook Pro 14 inch front view', 1, 1),
+    (NEWID(), @Product1Id, 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800', 'MacBook Pro keyboard close-up', 0, 2),
 
     -- iPhone images
-    (NEWID(), @Product2Id, 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800', 'iPhone 15 Pro titanium', 1, 1, GETUTCDATE()),
-    (NEWID(), @Product2Id, 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800', 'iPhone camera system', 0, 2, GETUTCDATE()),
+    (NEWID(), @Product2Id, 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800', 'iPhone 15 Pro titanium', 1, 1),
+    (NEWID(), @Product2Id, 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800', 'iPhone camera system', 0, 2),
 
     -- Sony headphones
-    (NEWID(), @Product3Id, 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=800', 'Sony WH-1000XM5 headphones', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product3Id, 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=800', 'Sony WH-1000XM5 headphones', 1, 1),
 
     -- Samsung TV
-    (NEWID(), @Product4Id, 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800', 'Samsung OLED TV in living room', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product4Id, 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800', 'Samsung OLED TV in living room', 1, 1),
 
     -- T-Shirt
-    (NEWID(), @Product5Id, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800', 'Classic white cotton t-shirt', 1, 1, GETUTCDATE()),
-    (NEWID(), @Product5Id, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800', 'T-shirt fabric detail', 0, 2, GETUTCDATE()),
+    (NEWID(), @Product5Id, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800', 'Classic white cotton t-shirt', 1, 1),
+    (NEWID(), @Product5Id, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800', 'T-shirt fabric detail', 0, 2),
 
     -- Chinos
-    (NEWID(), @Product6Id, 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800', 'Slim fit chinos', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product6Id, 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800', 'Slim fit chinos', 1, 1),
 
     -- Crossbody bag
-    (NEWID(), @Product7Id, 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800', 'Leather crossbody bag', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product7Id, 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800', 'Leather crossbody bag', 1, 1),
 
     -- Coffee table
-    (NEWID(), @Product8Id, 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=800', 'Modern coffee table in living room', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product8Id, 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=800', 'Modern coffee table in living room', 1, 1),
 
     -- Plant set
-    (NEWID(), @Product9Id, 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800', 'Indoor plant set', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product9Id, 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800', 'Indoor plant set', 1, 1),
 
     -- Book
-    (NEWID(), @Product10Id, 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800', 'Programming book', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product10Id, 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800', 'Programming book', 1, 1),
 
     -- Yoga mat
-    (NEWID(), @Product11Id, 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=800', 'Premium yoga mat', 1, 1, GETUTCDATE()),
+    (NEWID(), @Product11Id, 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=800', 'Premium yoga mat', 1, 1),
 
     -- Dumbbells
-    (NEWID(), @Product12Id, 'https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?w=800', 'Adjustable dumbbells set', 1, 1, GETUTCDATE());
+    (NEWID(), @Product12Id, 'https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?w=800', 'Adjustable dumbbells set', 1, 1);
 
 -- =============================================
 -- Insert Sample Customers
@@ -130,7 +133,7 @@ VALUES
 -- =============================================
 -- Insert Coupons
 -- =============================================
-INSERT INTO Coupons (Id, Code, Description, DiscountType, DiscountValue, MinimumOrderAmount, MaximumDiscount, UsageLimit, UsedCount, StartDate, EndDate, IsActive, CreatedAt)
+INSERT INTO Coupons (Id, Code, Description, DiscountType, DiscountValue, MinOrderAmount, MaxDiscountAmount, UsageLimit, TimesUsed, StartsAt, ExpiresAt, IsActive, CreatedAt)
 VALUES
     (NEWID(), 'WELCOME10', 'Welcome discount - 10% off first order', 1, 10.00, 50.00, 100.00, 1000, 0, GETUTCDATE(), DATEADD(MONTH, 3, GETUTCDATE()), 1, GETUTCDATE()),
     (NEWID(), 'SAVE20', 'Save $20 on orders over $100', 0, 20.00, 100.00, NULL, 500, 0, GETUTCDATE(), DATEADD(MONTH, 1, GETUTCDATE()), 1, GETUTCDATE()),
@@ -138,46 +141,7 @@ VALUES
     (NEWID(), 'FREESHIP', 'Free shipping on orders over $50', 0, 0.00, 50.00, NULL, NULL, 0, GETUTCDATE(), DATEADD(YEAR, 1, GETUTCDATE()), 1, GETUTCDATE()),
     (NEWID(), 'VIP50', 'VIP exclusive - $50 off $200+', 0, 50.00, 200.00, NULL, 50, 0, GETUTCDATE(), DATEADD(MONTH, 6, GETUTCDATE()), 1, GETUTCDATE());
 
--- =============================================
--- Insert Shipping Methods
--- =============================================
-INSERT INTO ShippingMethods (Id, Name, Description, Rate, EstimatedDays, IsActive, SortOrder, CreatedAt)
-VALUES
-    (NEWID(), 'Standard Shipping', 'Delivery in 5-7 business days', 5.99, '5-7 business days', 1, 1, GETUTCDATE()),
-    (NEWID(), 'Express Shipping', 'Delivery in 2-3 business days', 12.99, '2-3 business days', 1, 2, GETUTCDATE()),
-    (NEWID(), 'Next Day Delivery', 'Delivery by next business day', 24.99, '1 business day', 1, 3, GETUTCDATE()),
-    (NEWID(), 'Free Shipping', 'Free standard shipping on orders over $50', 0.00, '5-7 business days', 1, 0, GETUTCDATE());
-
--- =============================================
--- Insert Payment Methods
--- =============================================
-INSERT INTO WebPaymentMethods (Id, Name, Description, ProcessorType, IsActive, SortOrder, CreatedAt)
-VALUES
-    (NEWID(), 'Credit Card', 'Pay with Visa, Mastercard, or American Express', 'Stripe', 1, 1, GETUTCDATE()),
-    (NEWID(), 'PayPal', 'Pay securely with your PayPal account', 'PayPal', 1, 2, GETUTCDATE()),
-    (NEWID(), 'Bank Transfer', 'Direct bank transfer payment', 'Manual', 1, 3, GETUTCDATE()),
-    (NEWID(), 'Cash on Delivery', 'Pay when your order arrives', 'COD', 1, 4, GETUTCDATE());
-
--- =============================================
--- Insert eCommerce Settings
--- =============================================
-INSERT INTO EcommerceSettings (Id, SettingKey, SettingValue, Description, CreatedAt)
-VALUES
-    (NEWID(), 'StoreName', 'Algora Shop', 'The name of the online store', GETUTCDATE()),
-    (NEWID(), 'StoreLogo', '/images/logo.png', 'Store logo URL', GETUTCDATE()),
-    (NEWID(), 'StoreEmail', 'support@algorashop.com', 'Store contact email', GETUTCDATE()),
-    (NEWID(), 'StorePhone', '+1-800-ALGORA', 'Store contact phone', GETUTCDATE()),
-    (NEWID(), 'StoreAddress', '123 Business Ave, Suite 100, San Francisco, CA 94102', 'Store physical address', GETUTCDATE()),
-    (NEWID(), 'Currency', 'USD', 'Default store currency', GETUTCDATE()),
-    (NEWID(), 'CurrencySymbol', '$', 'Currency symbol', GETUTCDATE()),
-    (NEWID(), 'TaxRate', '8.5', 'Default tax rate percentage', GETUTCDATE()),
-    (NEWID(), 'EnableTax', 'true', 'Enable tax calculation', GETUTCDATE()),
-    (NEWID(), 'FreeShippingThreshold', '50', 'Minimum order amount for free shipping', GETUTCDATE()),
-    (NEWID(), 'EnableReviews', 'true', 'Enable product reviews', GETUTCDATE()),
-    (NEWID(), 'EnableWishlist', 'true', 'Enable wishlist feature', GETUTCDATE()),
-    (NEWID(), 'LowStockThreshold', '10', 'Default low stock alert threshold', GETUTCDATE()),
-    (NEWID(), 'OrderPrefix', 'ORD', 'Prefix for order numbers', GETUTCDATE()),
-    (NEWID(), 'MaxCartQuantity', '99', 'Maximum quantity per item in cart', GETUTCDATE());
+-- Note: Shipping methods and Payment methods are seeded in CreateEcommerceTables.sql
 
 PRINT 'eCommerce sample data inserted successfully!';
 GO
