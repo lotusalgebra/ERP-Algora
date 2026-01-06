@@ -9,7 +9,7 @@ public class ShippingMethod : AuditableEntity
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public string Carrier { get; set; } = string.Empty;  // FedEx, UPS, USPS, etc.
+    public string? Carrier { get; set; }  // FedEx, UPS, USPS, etc.
 
     public ShippingRateType RateType { get; set; } = ShippingRateType.FlatRate;
     public decimal Rate { get; set; }
