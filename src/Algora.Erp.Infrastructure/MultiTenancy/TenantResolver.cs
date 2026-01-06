@@ -27,7 +27,7 @@ public class TenantResolver : ITenantResolver
 
     public async Task<Tenant?> ResolveAsync(string? subdomain, string? tenantHeader, Guid? tenantIdFromClaim)
     {
-        // Priority: 1. Claim, 2. Header, 3. Subdomain
+        // Priority: 1. Claim, 2. Header, 3. Subdomain, 4. Default (first active tenant for localhost)
         if (tenantIdFromClaim.HasValue)
         {
             return await GetTenantByIdAsync(tenantIdFromClaim.Value);
@@ -43,7 +43,27 @@ public class TenantResolver : ITenantResolver
             return await GetTenantBySubdomainAsync(subdomain);
         }
 
-        return null;
+        // Return default tenant for localhost (development)
+        return await GetDefaultTenantAsync();
+    }
+
+    private async Task<Tenant?> GetDefaultTenantAsync()
+    {
+        var cacheKey = "tenant_default";
+
+        if (!_cache.TryGetValue(cacheKey, out Tenant? tenant))
+        {
+            tenant = await _masterDbContext.Tenants
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.IsActive);
+
+            if (tenant != null)
+            {
+                _cache.Set(cacheKey, tenant, _cacheExpiration);
+            }
+        }
+
+        return tenant;
     }
 
     private async Task<Tenant?> GetTenantByIdAsync(Guid tenantId)
