@@ -1,0 +1,204 @@
+@model Algora.Erp.Web.Pages.Sales.Quotations.QuotationsTableViewModel
+@using Algora.Erp.Domain.Entities.Sales
+
+@if (Model.Quotations.Count == 0)
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-file-earmark-x fs-1 d-block mb-3"></i>
+                <p class="mb-0">No quotations found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var quote in Model.Quotations)
+    {
+        var status = quote.Status switch
+        {
+            SalesOrderStatus.Draft => "Draft",
+            SalesOrderStatus.Confirmed => "Sent",
+            SalesOrderStatus.Paid => "Accepted",
+            SalesOrderStatus.Cancelled => "Rejected",
+            SalesOrderStatus.OnHold => "Expired",
+            _ => quote.Status.ToString()
+        };
+
+        var statusColor = quote.Status switch
+        {
+            SalesOrderStatus.Draft => "secondary",
+            SalesOrderStatus.Confirmed => "primary",
+            SalesOrderStatus.Paid => "success",
+            SalesOrderStatus.Cancelled => "danger",
+            SalesOrderStatus.OnHold => "warning",
+            _ => "secondary"
+        };
+
+        var isExpired = quote.DueDate.HasValue && quote.DueDate.Value < DateTime.Today &&
+                       quote.Status != SalesOrderStatus.Paid &&
+                       quote.Status != SalesOrderStatus.Cancelled &&
+                       quote.Status != SalesOrderStatus.OnHold;
+
+        <tr>
+            <td class="ps-4">
+                <div class="fw-medium">@quote.OrderNumber</div>
+                @if (!string.IsNullOrEmpty(quote.Reference))
+                {
+                    <small class="text-muted">Ref: @quote.Reference</small>
+                }
+            </td>
+            <td>
+                <div class="fw-medium">@quote.Customer?.Name</div>
+                @if (!string.IsNullOrEmpty(quote.Customer?.Email))
+                {
+                    <small class="text-muted">@quote.Customer.Email</small>
+                }
+            </td>
+            <td>
+                <div>@quote.OrderDate.ToString("MMM dd, yyyy")</div>
+            </td>
+            <td>
+                @if (quote.DueDate.HasValue)
+                {
+                    <span class="@(isExpired ? "text-danger fw-medium" : "")">
+                        @quote.DueDate.Value.ToString("MMM dd, yyyy")
+                        @if (isExpired)
+                        {
+                            <i class="bi bi-exclamation-circle ms-1" title="Expired"></i>
+                        }
+                    </span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td class="text-center">
+                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                    @quote.Lines.Count
+                </span>
+            </td>
+            <td class="text-end">
+                <span class="fw-medium">@quote.TotalAmount.ToString("C2")</span>
+            </td>
+            <td>
+                <span class="badge bg-@statusColor bg-opacity-10 text-@statusColor">
+                    @status
+                </span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button type="button"
+                            class="btn btn-outline-info"
+                            onclick="viewDetails('@quote.Id')"
+                            title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </button>
+
+                    @if (quote.Status == SalesOrderStatus.Draft)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                hx-get="?handler=EditForm&id=@quote.Id"
+                                hx-target="#formModalBody"
+                                data-bs-toggle="modal"
+                                data-bs-target="#formModal"
+                                title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                onclick="updateStatus('@quote.Id', 'Sent')"
+                                title="Mark as Sent">
+                            <i class="bi bi-send"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-danger"
+                                onclick="deleteQuotation('@quote.Id')"
+                                title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                    else if (quote.Status == SalesOrderStatus.Confirmed)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                onclick="convertToOrder('@quote.Id')"
+                                title="Convert to Order">
+                            <i class="bi bi-bag-plus"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-warning"
+                                onclick="updateStatus('@quote.Id', 'Rejected')"
+                                title="Mark Rejected">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="8" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            @if (Model.Page > 1)
+                            {
+                                <li class="page-item">
+                                    <button type="button" class="page-link"
+                                            hx-get="?handler=Table&pageNumber=@(Model.Page - 1)&pageSize=@Model.PageSize"
+                                            hx-target="#quotationsTableBody"
+                                            hx-include="#searchInput, #customerFilter, #statusFilter">
+                                        Previous
+                                    </button>
+                                </li>
+                            }
+                            @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <button type="button" class="page-link"
+                                            hx-get="?handler=Table&pageNumber=@i&pageSize=@Model.PageSize"
+                                            hx-target="#quotationsTableBody"
+                                            hx-include="#searchInput, #customerFilter, #statusFilter">
+                                        @i
+                                    </button>
+                                </li>
+                            }
+                            @if (Model.Page < Model.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <button type="button" class="page-link"
+                                            hx-get="?handler=Table&pageNumber=@(Model.Page + 1)&pageSize=@Model.PageSize"
+                                            hx-target="#quotationsTableBody"
+                                            hx-include="#searchInput, #customerFilter, #statusFilter">
+                                        Next
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+    else if (Model.TotalRecords > 0)
+    {
+        <tr>
+            <td colspan="8" class="py-3">
+                <div class="text-muted small">
+                    Showing @Model.TotalRecords entries
+                </div>
+            </td>
+        </tr>
+    }
+}

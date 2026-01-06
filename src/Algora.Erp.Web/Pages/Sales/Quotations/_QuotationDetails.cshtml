@@ -1,0 +1,239 @@
+@model Algora.Erp.Domain.Entities.Sales.SalesOrder
+@using Algora.Erp.Domain.Entities.Sales
+
+@{
+    var status = Model.Status switch
+    {
+        SalesOrderStatus.Draft => "Draft",
+        SalesOrderStatus.Confirmed => "Sent",
+        SalesOrderStatus.Paid => "Accepted",
+        SalesOrderStatus.Cancelled => "Rejected",
+        SalesOrderStatus.OnHold => "Expired",
+        _ => Model.Status.ToString()
+    };
+
+    var statusColor = Model.Status switch
+    {
+        SalesOrderStatus.Draft => "secondary",
+        SalesOrderStatus.Confirmed => "primary",
+        SalesOrderStatus.Paid => "success",
+        SalesOrderStatus.Cancelled => "danger",
+        SalesOrderStatus.OnHold => "warning",
+        _ => "secondary"
+    };
+
+    var isExpired = Model.DueDate.HasValue && Model.DueDate.Value < DateTime.Today &&
+                   Model.Status != SalesOrderStatus.Paid &&
+                   Model.Status != SalesOrderStatus.Cancelled;
+}
+
+<div class="p-2">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h5 class="mb-1">@Model.OrderNumber</h5>
+            <span class="badge bg-@statusColor bg-opacity-10 text-@statusColor">@status</span>
+            @if (isExpired)
+            {
+                <span class="badge bg-warning bg-opacity-10 text-warning ms-1">
+                    <i class="bi bi-exclamation-triangle me-1"></i>Expired
+                </span>
+            }
+        </div>
+        <div class="text-end">
+            <div class="text-muted small">Quote Date</div>
+            <div class="fw-medium">@Model.OrderDate.ToString("MMMM dd, yyyy")</div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Customer Info -->
+        <div class="col-md-6">
+            <div class="card bg-light border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">
+                        <i class="bi bi-person me-2"></i>Customer
+                    </h6>
+                    <div class="fw-medium">@Model.Customer?.Name</div>
+                    @if (!string.IsNullOrEmpty(Model.Customer?.ContactPerson))
+                    {
+                        <div class="text-muted small">Attn: @Model.Customer.ContactPerson</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Customer?.Email))
+                    {
+                        <div class="text-muted small">
+                            <i class="bi bi-envelope me-1"></i>@Model.Customer.Email
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Customer?.Phone))
+                    {
+                        <div class="text-muted small">
+                            <i class="bi bi-telephone me-1"></i>@Model.Customer.Phone
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Customer?.BillingAddress))
+                    {
+                        <div class="text-muted small mt-2">
+                            @Model.Customer.BillingAddress<br />
+                            @Model.Customer.BillingCity, @Model.Customer.BillingState @Model.Customer.BillingPostalCode<br />
+                            @Model.Customer.BillingCountry
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quote Info -->
+        <div class="col-md-6">
+            <div class="card bg-light border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Quote Details
+                    </h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="text-muted small">Valid Until</div>
+                            <div class="fw-medium @(isExpired ? "text-danger" : "")">
+                                @(Model.DueDate?.ToString("MMM dd, yyyy") ?? "-")
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">Currency</div>
+                            <div class="fw-medium">@Model.Currency</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">Reference</div>
+                            <div class="fw-medium">@(Model.Reference ?? "-")</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">Items</div>
+                            <div class="fw-medium">@Model.Lines.Count</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="mt-4">
+        <h6 class="text-muted mb-3">
+            <i class="bi bi-list-ul me-2"></i>Line Items
+        </h6>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead class="bg-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Discount</th>
+                        <th class="text-end">Tax</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in Model.Lines.OrderBy(l => l.LineNumber))
+                    {
+                        <tr>
+                            <td class="text-muted">@line.LineNumber</td>
+                            <td>
+                                <div class="fw-medium">@line.ProductName</div>
+                                <small class="text-muted">@line.ProductSku</small>
+                            </td>
+                            <td class="text-center">@line.Quantity @line.UnitOfMeasure</td>
+                            <td class="text-end">@line.UnitPrice.ToString("C2")</td>
+                            <td class="text-end">
+                                @if (line.DiscountPercent > 0)
+                                {
+                                    <span class="text-danger">-@line.DiscountPercent%</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (line.TaxPercent > 0)
+                                {
+                                    <span>@line.TaxPercent%</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="text-end fw-medium">@line.LineTotal.ToString("C2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="row mt-3">
+        <div class="col-md-6">
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="card bg-light border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Notes</h6>
+                        <p class="mb-0 small">@Model.Notes</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal:</span>
+                        <span>@Model.SubTotal.ToString("C2")</span>
+                    </div>
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 text-danger">
+                            <span>Discount:</span>
+                            <span>-@Model.DiscountAmount.ToString("C2")</span>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tax:</span>
+                        <span>@Model.TaxAmount.ToString("C2")</span>
+                    </div>
+                    <hr class="my-2" />
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Total:</span>
+                        <span class="fw-bold fs-5">@Model.TotalAmount.ToString("C2")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-4 d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Close
+        </button>
+        <div class="btn-group">
+            @if (Model.Status == SalesOrderStatus.Draft)
+            {
+                <button type="button" class="btn btn-primary" onclick="updateStatus('@Model.Id', 'Sent'); bootstrap.Modal.getInstance(document.getElementById('detailsModal')).hide();">
+                    <i class="bi bi-send me-1"></i>Send to Customer
+                </button>
+            }
+            else if (Model.Status == SalesOrderStatus.Confirmed)
+            {
+                <button type="button" class="btn btn-success" onclick="convertToOrder('@Model.Id'); bootstrap.Modal.getInstance(document.getElementById('detailsModal')).hide();">
+                    <i class="bi bi-bag-plus me-1"></i>Convert to Order
+                </button>
+            }
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i>Print
+            </button>
+        </div>
+    </div>
+</div>

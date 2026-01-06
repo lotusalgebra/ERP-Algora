@@ -1,0 +1,265 @@
+@page
+@model Algora.Erp.Web.Pages.Sales.Quotations.IndexModel
+@{
+    ViewData["Title"] = "Quotations";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Quotations</h4>
+            <p class="text-muted mb-0">Create and manage customer quotations</p>
+        </div>
+        <button class="btn btn-primary"
+                hx-get="?handler=CreateForm"
+                hx-target="#formModalBody"
+                data-bs-toggle="modal"
+                data-bs-target="#formModal">
+            <i class="bi bi-plus-lg me-2"></i>New Quotation
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Quotations</p>
+                            <h4 class="mb-0">@Model.TotalQuotations</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Pending</p>
+                            <h4 class="mb-0">@Model.PendingQuotations</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Accepted</p>
+                            <h4 class="mb-0">@Model.AcceptedQuotations</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-currency-dollar text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Value</p>
+                            <h4 class="mb-0">@Model.TotalValue.ToString("C0")</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quotations Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text"
+                               class="form-control border-start-0"
+                               placeholder="Search quotations..."
+                               id="searchInput"
+                               hx-get="?handler=Table"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#quotationsTableBody"
+                               hx-include="#customerFilter, #statusFilter"
+                               name="search">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select"
+                            id="customerFilter"
+                            name="customerFilter"
+                            hx-get="?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#quotationsTableBody"
+                            hx-include="#searchInput, #statusFilter">
+                        <option value="">All Customers</option>
+                        @foreach (var customer in Model.Customers)
+                        {
+                            <option value="@customer.Id">@customer.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select"
+                            id="statusFilter"
+                            name="statusFilter"
+                            hx-get="?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#quotationsTableBody"
+                            hx-include="#searchInput, #customerFilter">
+                        <option value="">All Status</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button class="btn btn-outline-secondary"
+                            hx-get="?handler=Export"
+                            hx-include="#searchInput, #customerFilter, #statusFilter">
+                        <i class="bi bi-download me-1"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Quote #</th>
+                            <th>Customer</th>
+                            <th>Created</th>
+                            <th>Valid Until</th>
+                            <th class="text-center">Items</th>
+                            <th class="text-end">Amount</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quotationsTableBody"
+                           hx-get="?handler=Table"
+                           hx-trigger="load"
+                           hx-include="#searchInput, #customerFilter, #statusFilter">
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Modal -->
+<div class="modal fade" id="formModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Quotation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="formModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Quotation Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function viewDetails(id) {
+            htmx.ajax('GET', `?handler=Details&id=${id}`, {
+                target: '#detailsModalBody',
+                swap: 'innerHTML'
+            });
+            new bootstrap.Modal(document.getElementById('detailsModal')).show();
+        }
+
+        function updateStatus(id, status) {
+            htmx.ajax('POST', `?handler=UpdateStatus&id=${id}&status=${status}`, {
+                target: '#quotationsTableBody',
+                swap: 'innerHTML'
+            });
+        }
+
+        function convertToOrder(id) {
+            if (confirm('Convert this quotation to a sales order?')) {
+                htmx.ajax('POST', `?handler=ConvertToOrder&id=${id}`, {
+                    target: '#quotationsTableBody',
+                    swap: 'innerHTML'
+                });
+            }
+        }
+
+        function deleteQuotation(id) {
+            if (confirm('Are you sure you want to delete this quotation?')) {
+                htmx.ajax('DELETE', `?handler=&id=${id}`, {
+                    target: '#quotationsTableBody',
+                    swap: 'innerHTML'
+                });
+            }
+        }
+
+        document.body.addEventListener('formSubmitSuccess', function() {
+            bootstrap.Modal.getInstance(document.getElementById('formModal'))?.hide();
+        });
+    </script>
+}

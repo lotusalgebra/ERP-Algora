@@ -1,0 +1,325 @@
+@model Algora.Erp.Web.Pages.Sales.Quotations.QuotationFormViewModel
+
+<form hx-post="?handler=" hx-target="#quotationsTableBody" hx-swap="innerHTML">
+    @if (Model.IsEdit)
+    {
+        <input type="hidden" name="Id" value="@Model.Quotation?.Id" />
+    }
+
+    <div class="row g-3">
+        <!-- Customer Selection -->
+        <div class="col-md-6">
+            <label class="form-label fw-medium">Customer <span class="text-danger">*</span></label>
+            <select class="form-select" name="CustomerId" required>
+                <option value="">Select Customer</option>
+                @foreach (var customer in Model.Customers)
+                {
+                    if (Model.Quotation?.CustomerId == customer.Id)
+                    {
+                        <option value="@customer.Id" selected>@customer.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@customer.Id">@customer.Name</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-medium">Quote Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="QuoteDate"
+                   value="@(Model.Quotation?.OrderDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-medium">Valid Until</label>
+            <input type="date" class="form-control" name="ValidUntil"
+                   value="@Model.Quotation?.DueDate?.ToString("yyyy-MM-dd")" />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-medium">Reference</label>
+            <input type="text" class="form-control" name="Reference"
+                   value="@Model.Quotation?.Reference" placeholder="e.g., RFQ-2024-001" />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-medium">Currency</label>
+            @{
+                var currency = Model.Quotation?.Currency ?? "USD";
+            }
+            <select class="form-select" name="Currency">
+                @if (currency == "USD") { <option value="USD" selected>USD - US Dollar</option> }
+                else { <option value="USD">USD - US Dollar</option> }
+                @if (currency == "EUR") { <option value="EUR" selected>EUR - Euro</option> }
+                else { <option value="EUR">EUR - Euro</option> }
+                @if (currency == "GBP") { <option value="GBP" selected>GBP - British Pound</option> }
+                else { <option value="GBP">GBP - British Pound</option> }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fw-medium">Status</label>
+            @{
+                var isDraft = Model.Quotation?.Status == Algora.Erp.Domain.Entities.Sales.SalesOrderStatus.Draft || Model.Quotation == null;
+                var isSent = Model.Quotation?.Status == Algora.Erp.Domain.Entities.Sales.SalesOrderStatus.Confirmed;
+            }
+            <select class="form-select" name="Status">
+                @if (isDraft) { <option value="Draft" selected>Draft</option> }
+                else { <option value="Draft">Draft</option> }
+                @if (Model.IsEdit)
+                {
+                    @if (isSent) { <option value="Confirmed" selected>Sent</option> }
+                    else { <option value="Confirmed">Sent</option> }
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="mt-4">
+        <h6 class="fw-medium mb-3">
+            <i class="bi bi-list-ul me-2"></i>Line Items
+        </h6>
+        <div class="table-responsive">
+            <table class="table table-sm" id="quotationLinesTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 35%">Product</th>
+                        <th style="width: 10%">Qty</th>
+                        <th style="width: 15%">Unit Price</th>
+                        <th style="width: 10%">Disc %</th>
+                        <th style="width: 10%">Tax %</th>
+                        <th style="width: 15%" class="text-end">Line Total</th>
+                        <th style="width: 5%"></th>
+                    </tr>
+                </thead>
+                <tbody id="quotationLinesBody">
+                    @if (Model.Quotation?.Lines?.Any() == true)
+                    {
+                        var index = 0;
+                        @foreach (var line in Model.Quotation.Lines.OrderBy(l => l.LineNumber))
+                        {
+                            <tr class="quote-line-row">
+                                <td>
+                                    <select class="form-select form-select-sm product-select" name="Lines[@index].ProductId" onchange="updateLinePrice(this)">
+                                        <option value="">Select Product</option>
+                                        @foreach (var product in Model.Products)
+                                        {
+                                            if (line.ProductId == product.Id)
+                                            {
+                                                <option value="@product.Id" data-price="@product.SellingPrice" selected>@product.Name (@product.Sku)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@product.Id" data-price="@product.SellingPrice">@product.Name (@product.Sku)</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm qty-input" name="Lines[@index].Quantity"
+                                           value="@line.Quantity" min="1" step="1" onchange="calculateLineTotal(this)" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm price-input" name="Lines[@index].UnitPrice"
+                                           value="@line.UnitPrice" min="0" step="0.01" onchange="calculateLineTotal(this)" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm disc-input" name="Lines[@index].DiscountPercent"
+                                           value="@line.DiscountPercent" min="0" max="100" step="0.1" onchange="calculateLineTotal(this)" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm tax-input" name="Lines[@index].TaxPercent"
+                                           value="@line.TaxPercent" min="0" max="100" step="0.1" onchange="calculateLineTotal(this)" />
+                                </td>
+                                <td class="text-end line-total fw-medium">@line.LineTotal.ToString("C2")</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr class="quote-line-row">
+                            <td>
+                                <select class="form-select form-select-sm product-select" name="Lines[0].ProductId" onchange="updateLinePrice(this)">
+                                    <option value="">Select Product</option>
+                                    @foreach (var product in Model.Products)
+                                    {
+                                        <option value="@product.Id" data-price="@product.SellingPrice">@product.Name (@product.Sku)</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm qty-input" name="Lines[0].Quantity" value="1" min="1" step="1" onchange="calculateLineTotal(this)" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm price-input" name="Lines[0].UnitPrice" value="0" min="0" step="0.01" onchange="calculateLineTotal(this)" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm disc-input" name="Lines[0].DiscountPercent" value="0" min="0" max="100" step="0.1" onchange="calculateLineTotal(this)" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm tax-input" name="Lines[0].TaxPercent" value="0" min="0" max="100" step="0.1" onchange="calculateLineTotal(this)" />
+                            </td>
+                            <td class="text-end line-total fw-medium">$0.00</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLine()">
+            <i class="bi bi-plus-lg me-1"></i>Add Line
+        </button>
+    </div>
+
+    <!-- Totals -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <label class="form-label fw-medium">Notes</label>
+            <textarea class="form-control" name="Notes" rows="3" placeholder="Additional notes or terms...">@Model.Quotation?.Notes</textarea>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span class="fw-medium" id="subtotalDisplay">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span class="fw-medium" id="taxDisplay">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <label class="form-label mb-0">Discount:</label>
+                        </div>
+                        <div style="width: 120px">
+                            <input type="number" class="form-control form-control-sm text-end" name="DiscountAmount"
+                                   value="@(Model.Quotation?.DiscountAmount ?? 0)" min="0" step="0.01" onchange="calculateTotals()" id="discountInput" />
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Total:</span>
+                        <span class="fw-bold fs-5" id="totalDisplay">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>@(Model.IsEdit ? "Update" : "Create") Quotation
+        </button>
+    </div>
+</form>
+
+<script>
+    let lineIndex = @(Model.Quotation?.Lines?.Count ?? 1);
+    const productsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products.Select(p => new { p.Id, p.Name, p.Sku, p.SellingPrice })));
+
+    function addLine() {
+        const tbody = document.getElementById('quotationLinesBody');
+        const row = document.createElement('tr');
+        row.className = 'quote-line-row';
+        row.innerHTML = `
+            <td>
+                <select class="form-select form-select-sm product-select" name="Lines[${lineIndex}].ProductId" onchange="updateLinePrice(this)">
+                    <option value="">Select Product</option>
+                    ${productsData.map(p => `<option value="${p.Id}" data-price="${p.SellingPrice}">${p.Name} (${p.Sku})</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm qty-input" name="Lines[${lineIndex}].Quantity" value="1" min="1" step="1" onchange="calculateLineTotal(this)" />
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm price-input" name="Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="calculateLineTotal(this)" />
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm disc-input" name="Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.1" onchange="calculateLineTotal(this)" />
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm tax-input" name="Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.1" onchange="calculateLineTotal(this)" />
+            </td>
+            <td class="text-end line-total fw-medium">$0.00</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                    <i class="bi bi-x"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        lineIndex++;
+    }
+
+    function removeLine(btn) {
+        const row = btn.closest('tr');
+        row.remove();
+        calculateTotals();
+    }
+
+    function updateLinePrice(select) {
+        const row = select.closest('tr');
+        const option = select.options[select.selectedIndex];
+        const price = option.dataset.price || 0;
+        row.querySelector('.price-input').value = parseFloat(price).toFixed(2);
+        calculateLineTotal(select);
+    }
+
+    function calculateLineTotal(input) {
+        const row = input.closest('tr');
+        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+        const price = parseFloat(row.querySelector('.price-input').value) || 0;
+        const disc = parseFloat(row.querySelector('.disc-input').value) || 0;
+        const tax = parseFloat(row.querySelector('.tax-input').value) || 0;
+
+        const subtotal = qty * price * (1 - disc / 100);
+        const taxAmount = subtotal * tax / 100;
+        const total = subtotal + taxAmount;
+
+        row.querySelector('.line-total').textContent = '$' + total.toFixed(2);
+        calculateTotals();
+    }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        let taxTotal = 0;
+
+        document.querySelectorAll('.quote-line-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+            const price = parseFloat(row.querySelector('.price-input').value) || 0;
+            const disc = parseFloat(row.querySelector('.disc-input').value) || 0;
+            const tax = parseFloat(row.querySelector('.tax-input').value) || 0;
+
+            const lineSubtotal = qty * price * (1 - disc / 100);
+            const lineTax = lineSubtotal * tax / 100;
+
+            subtotal += lineSubtotal;
+            taxTotal += lineTax;
+        });
+
+        const discount = parseFloat(document.getElementById('discountInput').value) || 0;
+        const total = subtotal + taxTotal - discount;
+
+        document.getElementById('subtotalDisplay').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('taxDisplay').textContent = '$' + taxTotal.toFixed(2);
+        document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+    }
+
+    // Calculate on load
+    calculateTotals();
+</script>
