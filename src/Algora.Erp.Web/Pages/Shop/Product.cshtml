@@ -1,0 +1,273 @@
+@page "{slug}"
+@model Algora.Erp.Web.Pages.Shop.ProductModel
+@{
+    ViewData["Title"] = Model.Product?.Name ?? "Product";
+    Layout = "_LayoutShop";
+}
+
+@if (Model.Product == null)
+{
+    <div class="container py-5 text-center">
+        <i class="bi bi-box-seam fs-1 text-muted d-block mb-3"></i>
+        <h2>Product Not Found</h2>
+        <p class="text-muted">The product you're looking for doesn't exist or has been removed.</p>
+        <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+    </div>
+}
+else
+{
+    var primaryImage = Model.Product.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? Model.Product.Images.FirstOrDefault()?.Url;
+
+    <!-- Breadcrumb -->
+    <nav class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/Shop">Shop</a></li>
+                @if (Model.Product.Category != null)
+                {
+                    <li class="breadcrumb-item"><a href="/Shop?category=@Model.Product.Category.Slug">@Model.Product.Category.Name</a></li>
+                }
+                <li class="breadcrumb-item active">@Model.Product.Name</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row">
+            <!-- Product Images -->
+            <div class="col-lg-6 mb-4">
+                <div class="position-relative">
+                    @if (Model.Product.CompareAtPrice.HasValue && Model.Product.CompareAtPrice > Model.Product.Price)
+                    {
+                        var discount = (int)Math.Round((1 - Model.Product.Price / Model.Product.CompareAtPrice.Value) * 100);
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3 fs-6">-@discount% OFF</span>
+                    }
+                    @if (!string.IsNullOrEmpty(primaryImage))
+                    {
+                        <img src="@primaryImage" alt="@Model.Product.Name" class="img-fluid rounded product-main-image" style="width: 100%;">
+                    }
+                    else
+                    {
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+                            <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                    }
+                </div>
+
+                <!-- Additional Images -->
+                @if (Model.Product.Images.Count > 1)
+                {
+                    <div class="row g-2 mt-3">
+                        @foreach (var image in Model.Product.Images.Take(4))
+                        {
+                            <div class="col-3">
+                                <img src="@image.Url" alt="@image.AltText" class="img-fluid rounded cursor-pointer"
+                                     onclick="document.querySelector('.product-main-image')?.setAttribute('src', '@image.Url')">
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Product Details -->
+            <div class="col-lg-6">
+                @if (Model.Product.Category != null)
+                {
+                    <span class="badge bg-light text-dark mb-2">@Model.Product.Category.Name</span>
+                }
+
+                <h1 class="h2 mb-3">@Model.Product.Name</h1>
+
+                @if (!string.IsNullOrEmpty(Model.Product.ShortDescription))
+                {
+                    <p class="text-muted mb-4">@Model.Product.ShortDescription</p>
+                }
+
+                <div class="mb-4">
+                    <span class="h2 text-primary fw-bold">@Model.Product.Price.ToString("C")</span>
+                    @if (Model.Product.CompareAtPrice.HasValue && Model.Product.CompareAtPrice > Model.Product.Price)
+                    {
+                        <span class="text-muted text-decoration-line-through ms-2 h5">@Model.Product.CompareAtPrice.Value.ToString("C")</span>
+                        <span class="badge bg-success ms-2">Save @((Model.Product.CompareAtPrice.Value - Model.Product.Price).ToString("C"))</span>
+                    }
+                </div>
+
+                <!-- Stock Status -->
+                <div class="mb-4">
+                    @if (Model.Product.StockQuantity > 10)
+                    {
+                        <span class="text-success"><i class="bi bi-check-circle me-1"></i>In Stock</span>
+                    }
+                    else if (Model.Product.StockQuantity > 0)
+                    {
+                        <span class="text-warning"><i class="bi bi-exclamation-circle me-1"></i>Low Stock - Only @Model.Product.StockQuantity left!</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                    }
+                </div>
+
+                <!-- Quantity Selector -->
+                @if (Model.Product.StockQuantity > 0)
+                {
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Quantity</label>
+                        <div class="input-group" style="width: 140px;">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
+                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="@Model.Product.StockQuantity">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mb-4">
+                        <button class="btn btn-primary btn-lg flex-grow-1"
+                                onclick="addToCartWithQty('@Model.Product.Id', '@Model.Product.Name.Replace("'", "\\'")', @Model.Product.Price, '@primaryImage')">
+                            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                        </button>
+                        <button class="btn btn-outline-secondary btn-lg" title="Add to Wishlist">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <button class="btn btn-secondary btn-lg w-100 mb-4" disabled>
+                        <i class="bi bi-x-circle me-2"></i>Out of Stock
+                    </button>
+                }
+
+                <!-- Product Info -->
+                <div class="border-top pt-4">
+                    <div class="row g-3 text-muted small">
+                        <div class="col-6">
+                            <i class="bi bi-upc me-2"></i>SKU: @(Model.Product.Sku ?? "N/A")
+                        </div>
+                        @if (Model.Product.Category != null)
+                        {
+                            <div class="col-6">
+                                <i class="bi bi-tag me-2"></i>Category: @Model.Product.Category.Name
+                            </div>
+                        }
+                        @if (Model.Product.Weight.HasValue)
+                        {
+                            <div class="col-6">
+                                <i class="bi bi-box me-2"></i>Weight: @Model.Product.Weight.Value kg
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="border-top mt-4 pt-4">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-truck fs-4 text-primary me-3"></i>
+                                <div>
+                                    <div class="fw-semibold">Free Shipping</div>
+                                    <small class="text-muted">On orders over $50</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-arrow-repeat fs-4 text-primary me-3"></i>
+                                <div>
+                                    <div class="fw-semibold">Easy Returns</div>
+                                    <small class="text-muted">30-day return policy</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mt-5">
+            <div class="card border">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Description</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Product.Description))
+                    {
+                        <div>@Html.Raw(Model.Product.Description.Replace("\n", "<br>"))</div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No description available.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        @if (Model.RelatedProducts.Any())
+        {
+            <div class="mt-5">
+                <h3 class="h4 mb-4">Related Products</h3>
+                <div class="row g-4">
+                    @foreach (var related in Model.RelatedProducts)
+                    {
+                        var relatedImage = related.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? related.Images.FirstOrDefault()?.Url;
+                        <div class="col-6 col-md-3">
+                            <div class="product-card">
+                                <a href="/Shop/Product/@related.Slug">
+                                    @if (!string.IsNullOrEmpty(relatedImage))
+                                    {
+                                        <img src="@relatedImage" alt="@related.Name" class="card-img-top">
+                                    }
+                                    else
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    }
+                                </a>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-2">
+                                        <a href="/Shop/Product/@related.Slug" class="text-decoration-none text-dark">@related.Name</a>
+                                    </h6>
+                                    <div class="product-price">@related.Price.ToString("C")</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function updateQuantity(delta) {
+            const input = document.getElementById('quantity');
+            let value = parseInt(input.value) + delta;
+            const max = parseInt(input.max);
+            if (value < 1) value = 1;
+            if (value > max) value = max;
+            input.value = value;
+        }
+
+        function addToCartWithQty(productId, name, price, image) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existing = cart.find(item => item.productId === productId);
+
+            if (existing) {
+                existing.quantity += quantity;
+            } else {
+                cart.push({ productId, name, price, image, quantity });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+
+            const toast = new bootstrap.Toast(document.getElementById('cartToast'));
+            toast.show();
+        }
+    </script>
+}

@@ -1,6 +1,7 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Administration;
 using Algora.Erp.Domain.Entities.Common;
+using Algora.Erp.Domain.Entities.Ecommerce;
 using Algora.Erp.Domain.Entities.Finance;
 using Algora.Erp.Domain.Entities.HR;
 using Algora.Erp.Domain.Entities.Inventory;
@@ -97,6 +98,25 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
     public DbSet<TimeEntry> TimeEntries => Set<TimeEntry>();
     public DbSet<ProjectMilestone> ProjectMilestones => Set<ProjectMilestone>();
+
+    // Ecommerce
+    public DbSet<Store> Stores => Set<Store>();
+    public DbSet<WebCategory> WebCategories => Set<WebCategory>();
+    public DbSet<EcommerceProduct> EcommerceProducts => Set<EcommerceProduct>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+    public DbSet<WebCustomer> WebCustomers => Set<WebCustomer>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
+    public DbSet<ShoppingCart> ShoppingCarts => Set<ShoppingCart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
+    public DbSet<WebOrder> WebOrders => Set<WebOrder>();
+    public DbSet<WebOrderItem> WebOrderItems => Set<WebOrderItem>();
+    public DbSet<Coupon> Coupons => Set<Coupon>();
+    public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
+    public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
+    public DbSet<ShippingMethod> ShippingMethods => Set<ShippingMethod>();
+    public DbSet<WebPaymentMethod> WebPaymentMethods => Set<WebPaymentMethod>();
+    public DbSet<Banner> Banners => Set<Banner>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -1320,6 +1340,441 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 .WithMany(p => p.Milestones)
                 .HasForeignKey(e => e.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // =============================================
+        // ECOMMERCE ENTITIES
+        // =============================================
+
+        // Store configuration
+        modelBuilder.Entity<Store>(entity =>
+        {
+            entity.ToTable("Stores");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Tagline).HasMaxLength(500);
+            entity.Property(e => e.LogoUrl).HasMaxLength(500);
+            entity.Property(e => e.FaviconUrl).HasMaxLength(500);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.FacebookUrl).HasMaxLength(500);
+            entity.Property(e => e.TwitterUrl).HasMaxLength(500);
+            entity.Property(e => e.InstagramUrl).HasMaxLength(500);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.CurrencySymbol).HasMaxLength(10);
+            entity.Property(e => e.TaxRate).HasPrecision(5, 2);
+            entity.Property(e => e.MetaTitle).HasMaxLength(200);
+            entity.Property(e => e.MetaDescription).HasMaxLength(500);
+            entity.Property(e => e.MetaKeywords).HasMaxLength(500);
+        });
+
+        // WebCategory configuration
+        modelBuilder.Entity<WebCategory>(entity =>
+        {
+            entity.ToTable("WebCategories");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Slug).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.MetaTitle).HasMaxLength(200);
+            entity.Property(e => e.MetaDescription).HasMaxLength(500);
+
+            entity.HasOne(e => e.Parent)
+                .WithMany(c => c.Children)
+                .HasForeignKey(e => e.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // EcommerceProduct configuration
+        modelBuilder.Entity<EcommerceProduct>(entity =>
+        {
+            entity.ToTable("EcommerceProducts");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.HasIndex(e => e.Sku);
+            entity.HasIndex(e => e.Status);
+            entity.Property(e => e.Name).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.Slug).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.Sku).HasMaxLength(100);
+            entity.Property(e => e.ShortDescription).HasMaxLength(500);
+            entity.Property(e => e.Description).HasMaxLength(10000);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.CompareAtPrice).HasPrecision(18, 2);
+            entity.Property(e => e.CostPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Brand).HasMaxLength(100);
+            entity.Property(e => e.Vendor).HasMaxLength(100);
+            entity.Property(e => e.Weight).HasPrecision(10, 3);
+            entity.Property(e => e.WeightUnit).HasMaxLength(10);
+            entity.Property(e => e.MetaTitle).HasMaxLength(200);
+            entity.Property(e => e.MetaDescription).HasMaxLength(500);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+            entity.Property(e => e.AverageRating).HasPrecision(3, 2);
+
+            entity.HasOne(e => e.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.InventoryProduct)
+                .WithMany()
+                .HasForeignKey(e => e.InventoryProductId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ProductImage configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<ProductImage>(entity =>
+        {
+            entity.ToTable("ProductImages");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductId);
+            entity.Property(e => e.Url).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.AltText).HasMaxLength(200);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Images)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ProductVariant configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<ProductVariant>(entity =>
+        {
+            entity.ToTable("ProductVariants");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => e.Sku);
+            entity.Property(e => e.Sku).HasMaxLength(100);
+            entity.Property(e => e.Name).HasMaxLength(200);
+            entity.Property(e => e.Option1Name).HasMaxLength(50);
+            entity.Property(e => e.Option1Value).HasMaxLength(100);
+            entity.Property(e => e.Option2Name).HasMaxLength(50);
+            entity.Property(e => e.Option2Value).HasMaxLength(100);
+            entity.Property(e => e.Option3Name).HasMaxLength(50);
+            entity.Property(e => e.Option3Value).HasMaxLength(100);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.CompareAtPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Weight).HasPrecision(10, 3);
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Variants)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // WebCustomer configuration
+        modelBuilder.Entity<WebCustomer>(entity =>
+        {
+            entity.ToTable("WebCustomers");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.Property(e => e.Email).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.PasswordHash).HasMaxLength(500);
+            entity.Property(e => e.FirstName).HasMaxLength(100);
+            entity.Property(e => e.LastName).HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.State).HasMaxLength(100);
+            entity.Property(e => e.PostalCode).HasMaxLength(20);
+            entity.Property(e => e.Country).HasMaxLength(100);
+            entity.Property(e => e.TotalSpent).HasPrecision(18, 2);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+        });
+
+        // CustomerAddress configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<CustomerAddress>(entity =>
+        {
+            entity.ToTable("CustomerAddresses");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.CustomerId);
+            entity.Property(e => e.Label).HasMaxLength(50);
+            entity.Property(e => e.FirstName).HasMaxLength(100);
+            entity.Property(e => e.LastName).HasMaxLength(100);
+            entity.Property(e => e.Company).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Address1).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.Address2).HasMaxLength(500);
+            entity.Property(e => e.City).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.State).HasMaxLength(100);
+            entity.Property(e => e.Country).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.PostalCode).HasMaxLength(20);
+
+            entity.HasOne(e => e.Customer)
+                .WithMany(c => c.Addresses)
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ShoppingCart configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<ShoppingCart>(entity =>
+        {
+            entity.ToTable("ShoppingCarts");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.CustomerId);
+            entity.HasIndex(e => e.SessionId);
+            entity.Property(e => e.SessionId).HasMaxLength(100);
+            entity.Property(e => e.CouponCode).HasMaxLength(50);
+            entity.Property(e => e.Subtotal).HasPrecision(18, 2);
+            entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.ShippingAmount).HasPrecision(18, 2);
+            entity.Property(e => e.Total).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Customer)
+                .WithMany()
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // CartItem configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.ToTable("CartItems");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.CartId);
+            entity.Property(e => e.ProductName).HasMaxLength(300);
+            entity.Property(e => e.VariantName).HasMaxLength(200);
+            entity.Property(e => e.Sku).HasMaxLength(100);
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            entity.Property(e => e.LineTotal).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Cart)
+                .WithMany(c => c.Items)
+                .HasForeignKey(e => e.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Variant)
+                .WithMany()
+                .HasForeignKey(e => e.VariantId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // WebOrder configuration
+        modelBuilder.Entity<WebOrder>(entity =>
+        {
+            entity.ToTable("WebOrders");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.OrderNumber).IsUnique();
+            entity.HasIndex(e => e.CustomerId);
+            entity.HasIndex(e => e.Status);
+            entity.Property(e => e.OrderNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.CustomerEmail).HasMaxLength(255);
+            entity.Property(e => e.CustomerPhone).HasMaxLength(50);
+            entity.Property(e => e.Subtotal).HasPrecision(18, 2);
+            entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.ShippingAmount).HasPrecision(18, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.Total).HasPrecision(18, 2);
+            entity.Property(e => e.RefundedAmount).HasPrecision(18, 2);
+            entity.Property(e => e.BillingFirstName).HasMaxLength(100);
+            entity.Property(e => e.BillingLastName).HasMaxLength(100);
+            entity.Property(e => e.BillingCompany).HasMaxLength(200);
+            entity.Property(e => e.BillingAddress1).HasMaxLength(500);
+            entity.Property(e => e.BillingAddress2).HasMaxLength(500);
+            entity.Property(e => e.BillingCity).HasMaxLength(100);
+            entity.Property(e => e.BillingState).HasMaxLength(100);
+            entity.Property(e => e.BillingPostalCode).HasMaxLength(20);
+            entity.Property(e => e.BillingCountry).HasMaxLength(100);
+            entity.Property(e => e.ShippingFirstName).HasMaxLength(100);
+            entity.Property(e => e.ShippingLastName).HasMaxLength(100);
+            entity.Property(e => e.ShippingCompany).HasMaxLength(200);
+            entity.Property(e => e.ShippingAddress1).HasMaxLength(500);
+            entity.Property(e => e.ShippingAddress2).HasMaxLength(500);
+            entity.Property(e => e.ShippingCity).HasMaxLength(100);
+            entity.Property(e => e.ShippingState).HasMaxLength(100);
+            entity.Property(e => e.ShippingPostalCode).HasMaxLength(20);
+            entity.Property(e => e.ShippingCountry).HasMaxLength(100);
+            entity.Property(e => e.ShippingMethod).HasMaxLength(100);
+            entity.Property(e => e.ShippingCarrier).HasMaxLength(100);
+            entity.Property(e => e.PaymentMethod).HasMaxLength(100);
+            entity.Property(e => e.PaymentTransactionId).HasMaxLength(100);
+            entity.Property(e => e.TrackingNumber).HasMaxLength(100);
+            entity.Property(e => e.TrackingUrl).HasMaxLength(500);
+            entity.Property(e => e.CustomerNotes).HasMaxLength(1000);
+            entity.Property(e => e.InternalNotes).HasMaxLength(1000);
+            entity.Property(e => e.CouponCode).HasMaxLength(50);
+            entity.Property(e => e.RefundReason).HasMaxLength(1000);
+            entity.Property(e => e.IpAddress).HasMaxLength(50);
+            entity.Property(e => e.UserAgent).HasMaxLength(500);
+            entity.Property(e => e.Source).HasMaxLength(50);
+
+            entity.HasOne(e => e.Customer)
+                .WithMany(c => c.Orders)
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // WebOrderItem configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<WebOrderItem>(entity =>
+        {
+            entity.ToTable("WebOrderItems");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.OrderId);
+            entity.Property(e => e.ProductName).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.VariantName).HasMaxLength(200);
+            entity.Property(e => e.Sku).HasMaxLength(100);
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.LineTotal).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Order)
+                .WithMany(o => o.Items)
+                .HasForeignKey(e => e.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Variant)
+                .WithMany()
+                .HasForeignKey(e => e.VariantId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Coupon configuration
+        modelBuilder.Entity<Coupon>(entity =>
+        {
+            entity.ToTable("Coupons");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Code).IsUnique();
+            entity.Property(e => e.Code).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.DiscountValue).HasPrecision(18, 2);
+            entity.Property(e => e.MaxDiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.MinOrderAmount).HasPrecision(18, 2);
+            entity.Property(e => e.ApplicableProductIds).HasMaxLength(2000);
+            entity.Property(e => e.ApplicableCategoryIds).HasMaxLength(2000);
+            entity.Property(e => e.ExcludedProductIds).HasMaxLength(2000);
+            entity.Property(e => e.CustomerIds).HasMaxLength(2000);
+        });
+
+        // ProductReview configuration
+        modelBuilder.Entity<ProductReview>(entity =>
+        {
+            entity.ToTable("ProductReviews");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => e.CustomerId);
+            entity.HasIndex(e => e.Status);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Content).HasMaxLength(5000);
+            entity.Property(e => e.Pros).HasMaxLength(1000);
+            entity.Property(e => e.Cons).HasMaxLength(1000);
+            entity.Property(e => e.CustomerName).HasMaxLength(100);
+            entity.Property(e => e.CustomerEmail).HasMaxLength(255);
+            entity.Property(e => e.ImageUrls).HasMaxLength(2000);
+            entity.Property(e => e.AdminResponse).HasMaxLength(2000);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Customer)
+                .WithMany()
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // WishlistItem configuration (BaseEntity - no IsDeleted)
+        modelBuilder.Entity<WishlistItem>(entity =>
+        {
+            entity.ToTable("WishlistItems");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.CustomerId, e.ProductId }).IsUnique();
+            entity.Property(e => e.Notes).HasMaxLength(500);
+
+            entity.HasOne(e => e.Customer)
+                .WithMany(c => c.Wishlist)
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Variant)
+                .WithMany()
+                .HasForeignKey(e => e.VariantId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ShippingMethod configuration
+        modelBuilder.Entity<ShippingMethod>(entity =>
+        {
+            entity.ToTable("ShippingMethods");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Carrier).HasMaxLength(50);
+            entity.Property(e => e.Rate).HasPrecision(18, 2);
+            entity.Property(e => e.FreeShippingThreshold).HasPrecision(18, 2);
+            entity.Property(e => e.RatePerKg).HasPrecision(18, 2);
+            entity.Property(e => e.MinWeight).HasPrecision(10, 3);
+            entity.Property(e => e.MaxWeight).HasPrecision(10, 3);
+            entity.Property(e => e.AllowedCountries).HasMaxLength(1000);
+            entity.Property(e => e.ExcludedCountries).HasMaxLength(1000);
+        });
+
+        // WebPaymentMethod configuration
+        modelBuilder.Entity<WebPaymentMethod>(entity =>
+        {
+            entity.ToTable("WebPaymentMethods");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Code).IsUnique();
+            entity.Property(e => e.Code).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Instructions).HasMaxLength(2000);
+            entity.Property(e => e.TransactionFeePercent).HasPrecision(5, 2);
+            entity.Property(e => e.TransactionFeeFixed).HasPrecision(18, 2);
+            entity.Property(e => e.MinAmount).HasPrecision(18, 2);
+            entity.Property(e => e.MaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.ApiKey).HasMaxLength(500);
+            entity.Property(e => e.SecretKey).HasMaxLength(500);
+            entity.Property(e => e.WebhookSecret).HasMaxLength(500);
+            entity.Property(e => e.AllowedCountries).HasMaxLength(1000);
+            entity.Property(e => e.IconUrl).HasMaxLength(500);
+        });
+
+        // Banner configuration
+        modelBuilder.Entity<Banner>(entity =>
+        {
+            entity.ToTable("Banners");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.Position);
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Subtitle).HasMaxLength(500);
+            entity.Property(e => e.ImageUrl).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.MobileImageUrl).HasMaxLength(500);
+            entity.Property(e => e.LinkUrl).HasMaxLength(500);
+            entity.Property(e => e.ButtonText).HasMaxLength(50);
         });
     }
 }

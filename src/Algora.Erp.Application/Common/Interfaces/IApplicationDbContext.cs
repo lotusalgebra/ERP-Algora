@@ -1,4 +1,5 @@
 using Algora.Erp.Domain.Entities.Administration;
+using Algora.Erp.Domain.Entities.Ecommerce;
 using Algora.Erp.Domain.Entities.Finance;
 using Algora.Erp.Domain.Entities.HR;
 using Algora.Erp.Domain.Entities.Inventory;
@@ -82,6 +83,25 @@ public interface IApplicationDbContext
     DbSet<ProjectMember> ProjectMembers { get; }
     DbSet<TimeEntry> TimeEntries { get; }
     DbSet<ProjectMilestone> ProjectMilestones { get; }
+
+    // Ecommerce
+    DbSet<Store> Stores { get; }
+    DbSet<WebCategory> WebCategories { get; }
+    DbSet<EcommerceProduct> EcommerceProducts { get; }
+    DbSet<ProductImage> ProductImages { get; }
+    DbSet<ProductVariant> ProductVariants { get; }
+    DbSet<WebCustomer> WebCustomers { get; }
+    DbSet<CustomerAddress> CustomerAddresses { get; }
+    DbSet<ShoppingCart> ShoppingCarts { get; }
+    DbSet<CartItem> CartItems { get; }
+    DbSet<WebOrder> WebOrders { get; }
+    DbSet<WebOrderItem> WebOrderItems { get; }
+    DbSet<Coupon> Coupons { get; }
+    DbSet<ProductReview> ProductReviews { get; }
+    DbSet<WishlistItem> WishlistItems { get; }
+    DbSet<ShippingMethod> ShippingMethods { get; }
+    DbSet<WebPaymentMethod> WebPaymentMethods { get; }
+    DbSet<Banner> Banners { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -1,0 +1,37 @@
+@model List<Algora.Erp.Domain.Entities.Ecommerce.WebPaymentMethod>
+
+@if (!Model.Any())
+{
+    <div class="list-group-item text-center text-muted py-4">
+        <i class="bi bi-credit-card d-block fs-4 mb-2"></i>
+        No payment methods
+    </div>
+}
+else
+{
+    @foreach (var method in Model)
+    {
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">@method.Name</div>
+                <small class="text-muted">@method.Gateway</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                @if (method.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+                <button class="btn btn-sm btn-outline-danger"
+                        hx-delete="?handler=Payment&id=@method.Id"
+                        hx-target="#paymentMethods"
+                        hx-confirm="Delete this payment method?">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+    }
+}

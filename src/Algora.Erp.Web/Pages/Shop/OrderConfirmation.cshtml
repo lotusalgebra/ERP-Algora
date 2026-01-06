@@ -1,0 +1,191 @@
+@page "{id:guid}"
+@model Algora.Erp.Web.Pages.Shop.OrderConfirmationModel
+@{
+    ViewData["Title"] = "Order Confirmed";
+    Layout = "_LayoutShop";
+}
+
+<div class="container py-5">
+    @if (Model.Order == null)
+    {
+        <div class="text-center">
+            <i class="bi bi-exclamation-circle fs-1 text-warning d-block mb-3"></i>
+            <h2>Order Not Found</h2>
+            <p class="text-muted">We couldn't find this order. Please check your order confirmation email.</p>
+            <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Success Message -->
+                <div class="text-center mb-5">
+                    <div class="rounded-circle bg-success bg-opacity-10 text-success d-inline-flex align-items-center justify-content-center mb-4"
+                         style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-lg" style="font-size: 3rem;"></i>
+                    </div>
+                    <h1 class="h2">Thank You for Your Order!</h1>
+                    <p class="text-muted lead">Your order has been placed successfully.</p>
+                    <p class="mb-0">Order Number: <span class="fw-bold">@Model.Order.OrderNumber</span></p>
+                </div>
+
+                <!-- Order Details -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Order Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">Shipping Address</h6>
+                                <p class="mb-0">
+                                    @Model.Order.ShippingFirstName @Model.Order.ShippingLastName<br>
+                                    @Model.Order.ShippingAddress1
+                                    @if (!string.IsNullOrEmpty(Model.Order.ShippingAddress2))
+                                    {
+                                        <br>@Model.Order.ShippingAddress2
+                                    }
+                                    <br>
+                                    @Model.Order.ShippingCity, @Model.Order.ShippingState @Model.Order.ShippingPostalCode<br>
+                                    @Model.Order.ShippingCountry
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">Order Info</h6>
+                                <p class="mb-0">
+                                    <span class="text-muted">Order Date:</span> @Model.Order.OrderDate.ToString("MMM dd, yyyy")<br>
+                                    <span class="text-muted">Status:</span>
+                                    <span class="badge bg-warning">@Model.Order.Status</span><br>
+                                    <span class="text-muted">Payment:</span>
+                                    <span class="badge bg-secondary">@Model.Order.PaymentStatus</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Order Items -->
+                        <h6 class="text-muted mb-3">Items Ordered</h6>
+                        <table class="table">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Order.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@item.ProductName</div>
+                                            @if (!string.IsNullOrEmpty(item.Sku))
+                                            {
+                                                <small class="text-muted">SKU: @item.Sku</small>
+                                            }
+                                        </td>
+                                        <td class="text-center">@item.Quantity</td>
+                                        <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                                        <td class="text-end fw-semibold">@item.LineTotal.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Totals -->
+                        <div class="border-top pt-3">
+                            <div class="row justify-content-end">
+                                <div class="col-md-5">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subtotal</span>
+                                        <span>@Model.Order.Subtotal.ToString("C")</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Shipping</span>
+                                        <span>@Model.Order.ShippingAmount.ToString("C")</span>
+                                    </div>
+                                    @if (Model.Order.TaxAmount > 0)
+                                    {
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Tax</span>
+                                            <span>@Model.Order.TaxAmount.ToString("C")</span>
+                                        </div>
+                                    }
+                                    @if (Model.Order.DiscountAmount > 0)
+                                    {
+                                        <div class="d-flex justify-content-between mb-2 text-success">
+                                            <span>Discount</span>
+                                            <span>-@Model.Order.DiscountAmount.ToString("C")</span>
+                                        </div>
+                                    }
+                                    <hr>
+                                    <div class="d-flex justify-content-between fw-bold h5">
+                                        <span>Total</span>
+                                        <span>@Model.Order.Total.ToString("C")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="card border mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-3">What's Next?</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-envelope text-primary fs-4 me-3"></i>
+                                    <div>
+                                        <div class="fw-semibold">Confirmation Email</div>
+                                        <small class="text-muted">You'll receive an email with your order details.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-box-seam text-primary fs-4 me-3"></i>
+                                    <div>
+                                        <div class="fw-semibold">Order Processing</div>
+                                        <small class="text-muted">We'll start preparing your order right away.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-truck text-primary fs-4 me-3"></i>
+                                    <div>
+                                        <div class="fw-semibold">Shipping Updates</div>
+                                        <small class="text-muted">Track your package once it ships.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/Shop" class="btn btn-primary">
+                        <i class="bi bi-shop me-2"></i>Continue Shopping
+                    </a>
+                    <a href="/Shop/Account/Orders" class="btn btn-outline-secondary">
+                        <i class="bi bi-list-ul me-2"></i>View All Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Clear cart after successful order
+        localStorage.removeItem('cart');
+        localStorage.removeItem('couponCode');
+        localStorage.removeItem('couponDiscount');
+        updateCartCount();
+    </script>
+}

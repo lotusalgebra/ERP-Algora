@@ -1,0 +1,75 @@
+@model Algora.Erp.Domain.Entities.Ecommerce.WebPaymentMethod
+@{
+    var gateway = Model.Gateway.ToString();
+}
+
+<form hx-post="?handler=Payment" hx-swap="none">
+    @if (Model.Id != Guid.Empty)
+    {
+        <input type="hidden" name="Id" value="@Model.Id" />
+    }
+
+    <div class="mb-3">
+        <label class="form-label">Method Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" name="Name" value="@Model.Name" required placeholder="e.g., Credit Card" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Code <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" name="Code" value="@Model.Code" required placeholder="e.g., stripe, paypal, cod" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Gateway <span class="text-danger">*</span></label>
+        <select class="form-select" name="Gateway" required>
+            @if (gateway == "Manual") { <option value="Manual" selected>Manual</option> } else { <option value="Manual">Manual</option> }
+            @if (gateway == "Stripe") { <option value="Stripe" selected>Stripe</option> } else { <option value="Stripe">Stripe</option> }
+            @if (gateway == "PayPal") { <option value="PayPal" selected>PayPal</option> } else { <option value="PayPal">PayPal</option> }
+            @if (gateway == "Square") { <option value="Square" selected>Square</option> } else { <option value="Square">Square</option> }
+            @if (gateway == "COD") { <option value="COD" selected>Cash on Delivery</option> } else { <option value="COD">Cash on Delivery</option> }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <input type="text" class="form-control" name="Description" value="@Model.Description" placeholder="Visa, Mastercard, Amex" />
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <label class="form-label">Transaction Fee (%)</label>
+            <div class="input-group">
+                <input type="number" step="0.01" class="form-control" name="TransactionFeePercent" value="@Model.TransactionFeePercent?.ToString("F2")" />
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+        <div class="col-6">
+            <label class="form-label">Transaction Fee (Fixed)</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" step="0.01" class="form-control" name="TransactionFeeFixed" value="@Model.TransactionFeeFixed?.ToString("F2")" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <label class="form-label">Sort Order</label>
+            <input type="number" class="form-control" name="SortOrder" value="@Model.SortOrder" />
+        </div>
+        <div class="col-6 d-flex align-items-end">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" name="IsActive" value="true"
+                       @(Model.IsActive ? "checked" : "") id="paymentActive" />
+                <label class="form-check-label" for="paymentActive">Active</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>Save Method
+        </button>
+    </div>
+</form>

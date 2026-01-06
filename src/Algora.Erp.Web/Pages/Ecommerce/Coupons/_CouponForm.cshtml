@@ -1,0 +1,179 @@
+@model Algora.Erp.Web.Pages.Ecommerce.Coupons.CouponFormViewModel
+
+<form hx-post="?handler="
+      hx-target="#couponsTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit)
+    {
+        <input type="hidden" name="Id" value="@Model.Coupon?.Id" />
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Coupon Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control text-uppercase" name="Code" value="@Model.Coupon?.Code"
+                           placeholder="e.g., SUMMER20" required style="text-transform: uppercase;" />
+                    <small class="text-muted">Customers will enter this code at checkout</small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Discount Type <span class="text-danger">*</span></label>
+                    <select class="form-select" name="DiscountType" id="discountType" onchange="updateDiscountLabel()">
+                        @{
+                            var discType = Model.Coupon?.DiscountType ?? Algora.Erp.Domain.Entities.Ecommerce.DiscountType.Percentage;
+                        }
+                        @if (discType == Algora.Erp.Domain.Entities.Ecommerce.DiscountType.Percentage)
+                        {
+                            <option value="Percentage" selected>Percentage</option>
+                        }
+                        else
+                        {
+                            <option value="Percentage">Percentage</option>
+                        }
+                        @if (discType == Algora.Erp.Domain.Entities.Ecommerce.DiscountType.FixedAmount)
+                        {
+                            <option value="FixedAmount" selected>Fixed Amount</option>
+                        }
+                        else
+                        {
+                            <option value="FixedAmount">Fixed Amount</option>
+                        }
+                        @if (discType == Algora.Erp.Domain.Entities.Ecommerce.DiscountType.BuyXGetY)
+                        {
+                            <option value="BuyXGetY" selected>Buy X Get Y</option>
+                        }
+                        else
+                        {
+                            <option value="BuyXGetY">Buy X Get Y</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3" id="discountValueRow">
+                <div class="col-md-6">
+                    <label class="form-label">Discount Value <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="discountPrefix">%</span>
+                        <input type="number" step="0.01" class="form-control" name="DiscountValue"
+                               value="@(Model.Coupon?.DiscountValue.ToString("F2") ?? "0.00")" required />
+                    </div>
+                </div>
+                <div class="col-md-6" id="maxDiscountCol">
+                    <label class="form-label">Maximum Discount</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" name="MaxDiscountAmount"
+                               value="@Model.Coupon?.MaxDiscountAmount?.ToString("F2")" placeholder="No limit" />
+                    </div>
+                    <small class="text-muted">For percentage discounts</small>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="Description" rows="2" placeholder="Internal description or promotion details">@Model.Coupon?.Description</textarea>
+            </div>
+
+            <h6 class="border-bottom pb-2 mb-3 mt-4">Restrictions</h6>
+
+            <div class="mb-3">
+                <label class="form-label">Minimum Order Amount</label>
+                <div class="input-group" style="max-width: 200px;">
+                    <span class="input-group-text">$</span>
+                    <input type="number" step="0.01" class="form-control" name="MinOrderAmount"
+                           value="@Model.Coupon?.MinOrderAmount?.ToString("F2")" placeholder="0.00" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="FreeShipping" value="true"
+                           @(Model.Coupon?.FreeShipping == true ? "checked" : "") id="freeShipping" />
+                    <label class="form-check-label" for="freeShipping">Include Free Shipping</label>
+                </div>
+            </div>
+
+            <h6 class="border-bottom pb-2 mb-3 mt-4">Valid Period</h6>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Start Date</label>
+                    <input type="datetime-local" class="form-control" name="StartsAt"
+                           value="@Model.Coupon?.StartsAt?.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">End Date</label>
+                    <input type="datetime-local" class="form-control" name="ExpiresAt"
+                           value="@Model.Coupon?.ExpiresAt?.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light border-0 mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Usage Limits</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Total Usage Limit</label>
+                        <input type="number" class="form-control" name="UsageLimit"
+                               value="@Model.Coupon?.UsageLimit" placeholder="Unlimited" />
+                        <small class="text-muted">Leave empty for unlimited</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Per Customer Limit</label>
+                        <input type="number" class="form-control" name="UsageLimitPerCustomer"
+                               value="@Model.Coupon?.UsageLimitPerCustomer" placeholder="Unlimited" />
+                        <small class="text-muted">Times a single customer can use</small>
+                    </div>
+                    @if (Model.IsEdit)
+                    {
+                        <div class="pt-2 border-top">
+                            <div class="d-flex justify-content-between text-muted">
+                                <span>Times Used:</span>
+                                <span class="fw-semibold">@Model.Coupon?.TimesUsed</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title">Status</h6>
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" name="IsActive" value="true"
+                               @(Model.Coupon?.IsActive ?? true ? "checked" : "") id="isActive" />
+                        <label class="form-check-label" for="isActive">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer mt-4 px-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Coupon
+        </button>
+    </div>
+</form>
+
+<script>
+    function updateDiscountLabel() {
+        var type = document.getElementById('discountType').value;
+        var prefix = document.getElementById('discountPrefix');
+        var maxDiscountCol = document.getElementById('maxDiscountCol');
+
+        if (type === 'Percentage') {
+            prefix.textContent = '%';
+            maxDiscountCol.style.display = 'block';
+        } else {
+            prefix.textContent = '$';
+            maxDiscountCol.style.display = 'none';
+        }
+    }
+    updateDiscountLabel();
+</script>

@@ -1,0 +1,232 @@
+@page
+@model Algora.Erp.Web.Pages.Shop.CartModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "_LayoutShop";
+}
+
+<div class="container py-5">
+    <h1 class="h3 mb-4">Shopping Cart</h1>
+
+    <div class="row">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div class="card border">
+                <div class="card-body p-0">
+                    <div id="cartItems">
+                        <div class="text-center py-5 text-muted" id="emptyCart">
+                            <i class="bi bi-cart fs-1 d-block mb-3"></i>
+                            <h5>Your cart is empty</h5>
+                            <p>Looks like you haven't added anything to your cart yet.</p>
+                            <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border" id="orderSummaryCard" style="display: none;">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span id="shipping">Calculated at checkout</span>
+                    </div>
+
+                    <!-- Coupon -->
+                    <div class="mb-3 mt-3">
+                        <label class="form-label small">Have a coupon?</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" id="couponCode" placeholder="Enter code">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="applyCoupon()">Apply</button>
+                        </div>
+                        <div id="couponMessage" class="small mt-1"></div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-3 fw-bold">
+                        <span>Total</span>
+                        <span class="h5 mb-0" id="total">$0.00</span>
+                    </div>
+
+                    <a href="/Shop/Checkout" class="btn btn-primary w-100" id="checkoutBtn">
+                        <i class="bi bi-lock me-2"></i>Proceed to Checkout
+                    </a>
+
+                    <div class="text-center mt-3">
+                        <a href="/Shop" class="text-muted small">
+                            <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="mt-4">
+                <div class="d-flex align-items-center gap-3 text-muted small mb-2">
+                    <i class="bi bi-shield-check fs-4"></i>
+                    <span>Secure checkout with SSL encryption</span>
+                </div>
+                <div class="d-flex align-items-center gap-3 text-muted small mb-2">
+                    <i class="bi bi-truck fs-4"></i>
+                    <span>Free shipping on orders over $50</span>
+                </div>
+                <div class="d-flex align-items-center gap-3 text-muted small">
+                    <i class="bi bi-arrow-repeat fs-4"></i>
+                    <span>30-day money-back guarantee</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cartItemsDiv = document.getElementById('cartItems');
+            const emptyCart = document.getElementById('emptyCart');
+            const summaryCard = document.getElementById('orderSummaryCard');
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-cart fs-1 d-block mb-3"></i>
+                        <h5>Your cart is empty</h5>
+                        <p>Looks like you haven't added anything to your cart yet.</p>
+                        <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+                    </div>`;
+                summaryCard.style.display = 'none';
+                return;
+            }
+
+            summaryCard.style.display = 'block';
+
+            let html = '<table class="table mb-0">';
+            html += '<thead class="bg-light"><tr><th class="ps-4">Product</th><th class="text-center">Quantity</th><th class="text-end">Price</th><th></th></tr></thead>';
+            html += '<tbody>';
+
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                html += `
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 60px; height: 60px;">
+                                    ${item.image
+                                        ? `<img src="${item.image}" alt="${item.name}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">`
+                                        : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="bi bi-image text-muted"></i></div>`
+                                    }
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">${item.name}</div>
+                                    <small class="text-muted">$${item.price.toFixed(2)} each</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center align-middle">
+                            <div class="input-group justify-content-center" style="width: 120px; margin: 0 auto;">
+                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateCartItem(${index}, -1)">-</button>
+                                <input type="number" class="form-control form-control-sm text-center" value="${item.quantity}" min="1"
+                                       onchange="setCartItemQuantity(${index}, this.value)" style="max-width: 50px;">
+                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateCartItem(${index}, 1)">+</button>
+                            </div>
+                        </td>
+                        <td class="text-end align-middle fw-semibold">$${itemTotal.toFixed(2)}</td>
+                        <td class="text-end align-middle pe-4">
+                            <button class="btn btn-link text-danger p-0" onclick="removeCartItem(${index})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+
+            html += '</tbody></table>';
+            cartItemsDiv.innerHTML = html;
+
+            // Update summary
+            document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('total').textContent = '$' + subtotal.toFixed(2);
+        }
+
+        function updateCartItem(index, delta) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart[index]) {
+                cart[index].quantity += delta;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCart();
+                updateCartCount();
+            }
+        }
+
+        function setCartItemQuantity(index, quantity) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart[index]) {
+                quantity = parseInt(quantity);
+                if (quantity <= 0) {
+                    cart.splice(index, 1);
+                } else {
+                    cart[index].quantity = quantity;
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCart();
+                updateCartCount();
+            }
+        }
+
+        function removeCartItem(index) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+            updateCartCount();
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponCode').value.trim().toUpperCase();
+            const msgDiv = document.getElementById('couponMessage');
+
+            if (!code) {
+                msgDiv.innerHTML = '<span class="text-danger">Please enter a coupon code</span>';
+                return;
+            }
+
+            // For demo purposes - validate via API in production
+            fetch(`/Shop/Cart?handler=ValidateCoupon&code=${code}`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.valid) {
+                        localStorage.setItem('couponCode', code);
+                        localStorage.setItem('couponDiscount', result.discount);
+                        msgDiv.innerHTML = `<span class="text-success">Coupon applied! ${result.message}</span>`;
+                        // Recalculate totals
+                        renderCart();
+                    } else {
+                        msgDiv.innerHTML = `<span class="text-danger">${result.message}</span>`;
+                    }
+                })
+                .catch(() => {
+                    msgDiv.innerHTML = '<span class="text-danger">Error validating coupon</span>';
+                });
+        }
+
+        // Initialize cart on page load
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+}

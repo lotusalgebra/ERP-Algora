@@ -1,7 +1,9 @@
 using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Application.Common.Interfaces.Ecommerce;
 using Algora.Erp.Infrastructure.Data;
 using Algora.Erp.Infrastructure.MultiTenancy;
 using Algora.Erp.Infrastructure.Services;
+using Algora.Erp.Infrastructure.Services.Ecommerce;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,14 @@ public static class DependencyInjection
         services.AddScoped<IRecurringInvoiceService, RecurringInvoiceService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IFinancialReportService, FinancialReportService>();
+
+        // Ecommerce services
+        services.AddScoped<IStoreService, StoreService>();
+        services.AddScoped<IProductCatalogService, ProductCatalogService>();
+        services.AddScoped<ICouponService, CouponService>();
+        services.AddScoped<IShoppingCartService, ShoppingCartService>();
+        services.AddScoped<IWebOrderService, WebOrderService>();
+        services.AddScoped<IWebCustomerService, WebCustomerService>();
 
         // Email service
         services.Configure<EmailSettings>(configuration.GetSection("Email"));

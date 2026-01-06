@@ -1,0 +1,92 @@
+@model Algora.Erp.Web.Pages.Ecommerce.Categories.CategoryFormViewModel
+
+<form hx-post="?handler="
+      hx-target="#categoriesTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit)
+    {
+        <input type="hidden" name="Id" value="@Model.Category?.Id" />
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="mb-3">
+                <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="Name" value="@Model.Category?.Name" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">URL Slug</label>
+                <input type="text" class="form-control" name="Slug" value="@Model.Category?.Slug" placeholder="auto-generated-from-name" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="Description" rows="3">@Model.Category?.Description</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Image URL</label>
+                <input type="text" class="form-control" name="ImageUrl" value="@Model.Category?.ImageUrl" placeholder="https://..." />
+            </div>
+
+            <h6 class="border-bottom pb-2 mb-3 mt-4">SEO</h6>
+            <div class="mb-3">
+                <label class="form-label">Meta Title</label>
+                <input type="text" class="form-control" name="MetaTitle" value="@Model.Category?.MetaTitle" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Meta Description</label>
+                <textarea class="form-control" name="MetaDescription" rows="2">@Model.Category?.MetaDescription</textarea>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light border-0 mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Organization</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Parent Category</label>
+                        <select class="form-select" name="ParentId">
+                            <option value="">-- None (Top Level) --</option>
+                            @foreach (var parent in Model.ParentCategories)
+                            {
+                                if (Model.Category?.ParentId == parent.Id)
+                                {
+                                    <option value="@parent.Id" selected>@parent.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@parent.Id">@parent.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sort Order</label>
+                        <input type="number" class="form-control" name="SortOrder" value="@(Model.Category?.SortOrder ?? 0)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title">Status</h6>
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" name="IsActive" value="true"
+                               @(Model.Category?.IsActive ?? true ? "checked" : "") id="isActive" />
+                        <label class="form-check-label" for="isActive">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer mt-4 px-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Category
+        </button>
+    </div>
+</form>

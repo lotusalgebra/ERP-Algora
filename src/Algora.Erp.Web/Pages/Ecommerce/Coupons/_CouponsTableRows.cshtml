@@ -1,0 +1,180 @@
+@model Algora.Erp.Web.Pages.Ecommerce.Coupons.CouponsTableViewModel
+
+@if (!Model.Coupons.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5 text-muted">
+            <i class="bi bi-ticket-perforated fs-1 d-block mb-3"></i>
+            No coupons found
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var coupon in Model.Coupons)
+    {
+        var isExpired = coupon.ExpiresAt.HasValue && coupon.ExpiresAt.Value < Model.Now;
+        var isNotStarted = coupon.StartsAt.HasValue && coupon.StartsAt.Value > Model.Now;
+        var isAtLimit = coupon.UsageLimit.HasValue && coupon.TimesUsed >= coupon.UsageLimit;
+
+        <tr>
+            <td class="ps-4">
+                <code class="bg-light px-2 py-1 rounded fs-6">@coupon.Code</code>
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(coupon.Description))
+                {
+                    <span>@coupon.Description</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                @if (coupon.DiscountType == Algora.Erp.Domain.Entities.Ecommerce.DiscountType.Percentage)
+                {
+                    <span class="fw-semibold text-success">@coupon.DiscountValue%</span>
+                    @if (coupon.MaxDiscountAmount.HasValue)
+                    {
+                        <small class="text-muted d-block">Max: @coupon.MaxDiscountAmount.Value.ToString("C")</small>
+                    }
+                }
+                else
+                {
+                    <span class="fw-semibold text-success">@coupon.DiscountValue.ToString("C")</span>
+                }
+                @if (coupon.MinOrderAmount.HasValue)
+                {
+                    <small class="text-muted d-block">Min order: @coupon.MinOrderAmount.Value.ToString("C")</small>
+                }
+            </td>
+            <td class="text-center">
+                <span class="fw-semibold">@coupon.TimesUsed</span>
+                @if (coupon.UsageLimit.HasValue)
+                {
+                    <span class="text-muted">/ @coupon.UsageLimit</span>
+                }
+            </td>
+            <td>
+                @if (coupon.StartsAt.HasValue || coupon.ExpiresAt.HasValue)
+                {
+                    <div class="small">
+                        @if (coupon.StartsAt.HasValue)
+                        {
+                            <span>@coupon.StartsAt.Value.ToString("MMM dd, yyyy")</span>
+                        }
+                        else
+                        {
+                            <span>Start</span>
+                        }
+                        <span class="text-muted">→</span>
+                        @if (coupon.ExpiresAt.HasValue)
+                        {
+                            <span>@coupon.ExpiresAt.Value.ToString("MMM dd, yyyy")</span>
+                        }
+                        else
+                        {
+                            <span>Forever</span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <span class="text-muted">No limit</span>
+                }
+            </td>
+            <td>
+                @if (!coupon.IsActive)
+                {
+                    <span class="badge bg-secondary">Disabled</span>
+                }
+                else if (isExpired)
+                {
+                    <span class="badge bg-dark">Expired</span>
+                }
+                else if (isNotStarted)
+                {
+                    <span class="badge bg-info">Scheduled</span>
+                }
+                else if (isAtLimit)
+                {
+                    <span class="badge bg-warning">Limit Reached</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#"
+                               hx-get="?handler=EditForm&id=@coupon.Id"
+                               hx-target="#couponModalBody"
+                               data-bs-toggle="modal"
+                               data-bs-target="#couponModal">
+                                <i class="bi bi-pencil me-2"></i>Edit
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#"
+                               hx-delete="?handler=&id=@coupon.Id"
+                               hx-target="#couponsTableBody"
+                               hx-confirm="Are you sure you want to delete this coupon?">
+                                <i class="bi bi-trash me-2"></i>Delete
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="7" class="bg-light">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                <small class="text-muted">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)&pageSize=@Model.PageSize"
+                               hx-target="#couponsTableBody"
+                               hx-include="#searchInput, #statusFilter">
+                                Previous
+                            </a>
+                        </li>
+                        @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#"
+                                   hx-get="?handler=Table&page=@i&pageSize=@Model.PageSize"
+                                   hx-target="#couponsTableBody"
+                                   hx-include="#searchInput, #statusFilter">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)&pageSize=@Model.PageSize"
+                               hx-target="#couponsTableBody"
+                               hx-include="#searchInput, #statusFilter">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}

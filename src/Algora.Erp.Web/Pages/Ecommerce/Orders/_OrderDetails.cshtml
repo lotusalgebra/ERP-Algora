@@ -1,0 +1,228 @@
+@model Algora.Erp.Domain.Entities.Ecommerce.WebOrder
+@{
+    var shippingName = $"{Model.ShippingFirstName} {Model.ShippingLastName}".Trim();
+    var billingName = $"{Model.BillingFirstName} {Model.BillingLastName}".Trim();
+}
+
+<div class="row">
+    <!-- Order Info -->
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <h5 class="mb-1">Order @Model.OrderNumber</h5>
+                <small class="text-muted">Placed on @Model.OrderDate.ToString("MMMM dd, yyyy 'at' hh:mm tt")</small>
+            </div>
+            <div class="text-end">
+                @switch (Model.Status)
+                {
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending:
+                        <span class="badge bg-warning fs-6">Pending</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed:
+                        <span class="badge bg-info fs-6">Confirmed</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing:
+                        <span class="badge bg-primary fs-6">Processing</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped:
+                        <span class="badge bg-info fs-6">Shipped</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered:
+                        <span class="badge bg-success fs-6">Delivered</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled:
+                        <span class="badge bg-dark fs-6">Cancelled</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded:
+                        <span class="badge bg-secondary fs-6">Refunded</span>
+                        break;
+                }
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="card border mb-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-box me-2"></i>Order Items</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    @if (!string.IsNullOrEmpty(item.VariantName))
+                                    {
+                                        <small class="text-muted">@item.VariantName</small>
+                                    }
+                                    <div><small class="text-muted">SKU: @item.Sku</small></div>
+                                </td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                                <td class="text-end fw-semibold">@item.LineTotal.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="card border">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 offset-md-6">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-end">@Model.Subtotal.ToString("C")</td>
+                            </tr>
+                            @if (Model.DiscountAmount > 0)
+                            {
+                                <tr class="text-success">
+                                    <td>Discount @(!string.IsNullOrEmpty(Model.CouponCode) ? $"({Model.CouponCode})" : "")</td>
+                                    <td class="text-end">-@Model.DiscountAmount.ToString("C")</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td>Shipping @(!string.IsNullOrEmpty(Model.ShippingMethod) ? $"({Model.ShippingMethod})" : "")</td>
+                                <td class="text-end">@Model.ShippingAmount.ToString("C")</td>
+                            </tr>
+                            <tr>
+                                <td>Tax</td>
+                                <td class="text-end">@Model.TaxAmount.ToString("C")</td>
+                            </tr>
+                            <tr class="fw-bold border-top">
+                                <td>Total</td>
+                                <td class="text-end">@Model.Total.ToString("C")</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer & Addresses -->
+    <div class="col-md-4">
+        <!-- Customer Info -->
+        <div class="card border mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-person me-2"></i>Customer</h6>
+            </div>
+            <div class="card-body">
+                @if (Model.Customer != null)
+                {
+                    <div class="fw-semibold">@Model.Customer.FirstName @Model.Customer.LastName</div>
+                    <div class="text-muted">@Model.Customer.Email</div>
+                    <div class="text-muted">@Model.Customer.Phone</div>
+                }
+                else
+                {
+                    <div class="fw-semibold">@shippingName</div>
+                    <div class="text-muted">@Model.CustomerEmail</div>
+                    <div class="text-muted">@Model.CustomerPhone</div>
+                }
+            </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="card border mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-truck me-2"></i>Shipping Address</h6>
+            </div>
+            <div class="card-body">
+                <div>@shippingName</div>
+                <div>@Model.ShippingAddress1</div>
+                @if (!string.IsNullOrEmpty(Model.ShippingAddress2))
+                {
+                    <div>@Model.ShippingAddress2</div>
+                }
+                <div>@Model.ShippingCity, @Model.ShippingState @Model.ShippingPostalCode</div>
+                <div>@Model.ShippingCountry</div>
+            </div>
+        </div>
+
+        <!-- Billing Address -->
+        <div class="card border mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-credit-card me-2"></i>Billing Address</h6>
+            </div>
+            <div class="card-body">
+                <div>@billingName</div>
+                <div>@Model.BillingAddress1</div>
+                @if (!string.IsNullOrEmpty(Model.BillingAddress2))
+                {
+                    <div>@Model.BillingAddress2</div>
+                }
+                <div>@Model.BillingCity, @Model.BillingState @Model.BillingPostalCode</div>
+                <div>@Model.BillingCountry</div>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="card border">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Payment</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <span>Method:</span>
+                    <span class="fw-semibold">@(Model.PaymentMethod ?? "N/A")</span>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <span>Status:</span>
+                    @switch (Model.PaymentStatus)
+                    {
+                        case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Paid:
+                            <span class="badge bg-success">Paid</span>
+                            break;
+                        case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Pending:
+                            <span class="badge bg-warning">Pending</span>
+                            break;
+                        case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Failed:
+                            <span class="badge bg-danger">Failed</span>
+                            break;
+                        case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Refunded:
+                            <span class="badge bg-secondary">Refunded</span>
+                            break;
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(Model.PaymentTransactionId))
+                {
+                    <div class="d-flex justify-content-between mt-2">
+                        <span>Transaction:</span>
+                        <code class="small">@Model.PaymentTransactionId</code>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Notes -->
+@if (!string.IsNullOrEmpty(Model.Notes))
+{
+    <div class="card border mt-4">
+        <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="bi bi-sticky me-2"></i>Order Notes</h6>
+        </div>
+        <div class="card-body">
+            <p class="mb-0">@Model.Notes</p>
+        </div>
+    </div>
+}
+
+<div class="modal-footer mt-4">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

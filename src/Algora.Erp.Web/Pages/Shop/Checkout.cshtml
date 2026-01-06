@@ -1,0 +1,315 @@
+@page
+@model Algora.Erp.Web.Pages.Shop.CheckoutModel
+@{
+    ViewData["Title"] = "Checkout";
+    Layout = "_LayoutShop";
+}
+
+<div class="container py-5">
+    <h1 class="h3 mb-4">Checkout</h1>
+
+    <form id="checkoutForm" method="post">
+        <div class="row">
+            <!-- Checkout Form -->
+            <div class="col-lg-8">
+                <!-- Contact Information -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-person me-2"></i>Contact Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" name="Email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="Phone">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Shipping Address</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="FirstName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="LastName" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="Address" required placeholder="Street address">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Apartment, suite, etc. (optional)</label>
+                                <input type="text" class="form-control" name="Address2">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="City" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">State/Province <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="State" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">ZIP/Postal Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="PostalCode" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Country <span class="text-danger">*</span></label>
+                                <select class="form-select" name="Country" required>
+                                    <option value="">Select country</option>
+                                    <option value="US" selected>United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Method -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Shipping Method</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.ShippingMethods.Any())
+                        {
+                            @foreach (var method in Model.ShippingMethods)
+                            {
+                                <div class="form-check border rounded p-3 mb-2">
+                                    <input class="form-check-input" type="radio" name="ShippingMethodId" id="shipping_@method.Id"
+                                           value="@method.Id" data-rate="@method.Rate" onchange="updateShipping(@method.Rate)"
+                                           @(Model.ShippingMethods.First().Id == method.Id ? "checked" : "")>
+                                    <label class="form-check-label w-100" for="shipping_@method.Id">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <span class="fw-semibold">@method.Name</span>
+                                                @if (method.MinDeliveryDays.HasValue || method.MaxDeliveryDays.HasValue)
+                                                {
+                                                    <small class="text-muted d-block">
+                                                        @if (method.MinDeliveryDays.HasValue && method.MaxDeliveryDays.HasValue)
+                                                        {
+                                                            <text>@method.MinDeliveryDays - @method.MaxDeliveryDays business days</text>
+                                                        }
+                                                        else if (method.MaxDeliveryDays.HasValue)
+                                                        {
+                                                            <text>Up to @method.MaxDeliveryDays business days</text>
+                                                        }
+                                                    </small>
+                                                }
+                                            </div>
+                                            <span class="fw-semibold">@method.Rate.ToString("C")</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="form-check border rounded p-3">
+                                <input class="form-check-input" type="radio" name="ShippingMethodId" id="shipping_standard"
+                                       value="" checked data-rate="0" onchange="updateShipping(0)">
+                                <label class="form-check-label w-100" for="shipping_standard">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-semibold">Standard Shipping</span>
+                                        <span class="fw-semibold">FREE</span>
+                                    </div>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Payment -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.PaymentMethods.Any())
+                        {
+                            @foreach (var method in Model.PaymentMethods)
+                            {
+                                <div class="form-check border rounded p-3 mb-2">
+                                    <input class="form-check-input" type="radio" name="PaymentMethodId" id="payment_@method.Id"
+                                           value="@method.Id" @(Model.PaymentMethods.First().Id == method.Id ? "checked" : "")>
+                                    <label class="form-check-label" for="payment_@method.Id">
+                                        <span class="fw-semibold">@method.Name</span>
+                                    </label>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="form-check border rounded p-3">
+                                <input class="form-check-input" type="radio" name="PaymentMethodId" id="payment_cod"
+                                       value="" checked>
+                                <label class="form-check-label" for="payment_cod">
+                                    <span class="fw-semibold">Cash on Delivery</span>
+                                </label>
+                            </div>
+                        }
+
+                        <div id="cardPaymentFields" class="mt-3" style="display: none;">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" placeholder="1234 5678 9012 3456">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Expiry Date</label>
+                                    <input type="text" class="form-control" placeholder="MM/YY">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" class="form-control" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Notes -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-chat-text me-2"></i>Order Notes (Optional)</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" name="Notes" rows="3" placeholder="Special instructions for your order..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card border sticky-top" style="top: 100px;">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="orderItems" class="p-3">
+                            <!-- Items rendered by JS -->
+                        </div>
+                        <div class="border-top p-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal</span>
+                                <span id="checkout_subtotal">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping</span>
+                                <span id="checkout_shipping">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2" id="discountRow" style="display: none;">
+                                <span class="text-success">Discount</span>
+                                <span class="text-success" id="checkout_discount">-$0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total</span>
+                                <span class="h5 mb-0" id="checkout_total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <input type="hidden" name="CartData" id="cartDataInput">
+                        <button type="submit" class="btn btn-primary w-100 btn-lg" id="placeOrderBtn">
+                            <i class="bi bi-lock me-2"></i>Place Order
+                        </button>
+                        <p class="text-muted small text-center mt-2 mb-0">
+                            By placing your order, you agree to our Terms of Service and Privacy Policy
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let shippingRate = @(Model.ShippingMethods.FirstOrDefault()?.Rate ?? 0);
+
+        function renderOrderSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const orderItemsDiv = document.getElementById('orderItems');
+
+            if (cart.length === 0) {
+                window.location.href = '/Shop/Cart';
+                return;
+            }
+
+            let html = '';
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                html += `
+                    <div class="d-flex mb-3">
+                        <div class="position-relative me-3" style="width: 60px;">
+                            ${item.image
+                                ? `<img src="${item.image}" alt="${item.name}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">`
+                                : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="bi bi-image text-muted"></i></div>`
+                            }
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">${item.quantity}</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold small">${item.name}</div>
+                            <small class="text-muted">$${item.price.toFixed(2)} x ${item.quantity}</small>
+                        </div>
+                        <div class="fw-semibold">$${itemTotal.toFixed(2)}</div>
+                    </div>`;
+            });
+
+            orderItemsDiv.innerHTML = html;
+
+            // Store cart data for form submission
+            document.getElementById('cartDataInput').value = JSON.stringify(cart);
+
+            updateTotals(subtotal);
+        }
+
+        function updateShipping(rate) {
+            shippingRate = parseFloat(rate);
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            updateTotals(subtotal);
+        }
+
+        function updateTotals(subtotal) {
+            const total = subtotal + shippingRate;
+
+            document.getElementById('checkout_subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('checkout_shipping').textContent = '$' + shippingRate.toFixed(2);
+            document.getElementById('checkout_total').textContent = '$' + total.toFixed(2);
+        }
+
+        // Form submission
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.length === 0) {
+                e.preventDefault();
+                alert('Your cart is empty');
+                return;
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', renderOrderSummary);
+    </script>
+}

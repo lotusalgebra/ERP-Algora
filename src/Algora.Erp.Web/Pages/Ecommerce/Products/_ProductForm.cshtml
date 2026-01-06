@@ -1,0 +1,236 @@
+@model Algora.Erp.Web.Pages.Ecommerce.Products.EcommerceProductFormViewModel
+
+<form hx-post="?handler="
+      hx-target="#productsTableBody"
+      hx-on::after-request="if(event.detail.successful) document.body.dispatchEvent(new Event('formSubmitSuccess'))">
+
+    @if (Model.IsEdit)
+    {
+        <input type="hidden" name="Id" value="@Model.Product?.Id" />
+    }
+
+    <div class="row">
+        <!-- Left Column - Main Info -->
+        <div class="col-md-8">
+            <div class="mb-3">
+                <label class="form-label">Product Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="Name" value="@Model.Product?.Name" required />
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">SKU <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="Sku" value="@Model.Product?.Sku" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">URL Slug</label>
+                    <input type="text" class="form-control" name="Slug" value="@Model.Product?.Slug" placeholder="auto-generated-from-name" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Short Description</label>
+                <textarea class="form-control" name="ShortDescription" rows="2">@Model.Product?.ShortDescription</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Full Description</label>
+                <textarea class="form-control" name="Description" rows="5">@Model.Product?.Description</textarea>
+            </div>
+
+            <!-- Pricing -->
+            <h6 class="border-bottom pb-2 mb-3 mt-4">Pricing</h6>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Price <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" name="Price" value="@Model.Product?.Price.ToString("F2")" required />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Compare At Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" name="CompareAtPrice" value="@Model.Product?.CompareAtPrice?.ToString("F2")" />
+                    </div>
+                    <small class="text-muted">Original price for sale items</small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Cost Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" name="CostPrice" value="@Model.Product?.CostPrice?.ToString("F2")" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory -->
+            <h6 class="border-bottom pb-2 mb-3 mt-4">Inventory</h6>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" name="TrackInventory" value="true"
+                               @(Model.Product?.TrackInventory ?? true ? "checked" : "") id="trackInventory" />
+                        <label class="form-check-label" for="trackInventory">Track Inventory</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Stock Quantity</label>
+                    <input type="number" class="form-control" name="StockQuantity" value="@(Model.Product?.StockQuantity ?? 0)" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Low Stock Threshold</label>
+                    <input type="number" class="form-control" name="LowStockThreshold" value="@(Model.Product?.LowStockThreshold ?? 5)" />
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="AllowBackorder" value="true"
+                           @(Model.Product?.AllowBackorder == true ? "checked" : "") id="allowBackorder" />
+                    <label class="form-check-label" for="allowBackorder">Allow backorders when out of stock</label>
+                </div>
+            </div>
+
+            <!-- SEO -->
+            <h6 class="border-bottom pb-2 mb-3 mt-4">SEO</h6>
+            <div class="mb-3">
+                <label class="form-label">Meta Title</label>
+                <input type="text" class="form-control" name="MetaTitle" value="@Model.Product?.MetaTitle" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Meta Description</label>
+                <textarea class="form-control" name="MetaDescription" rows="2">@Model.Product?.MetaDescription</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tags</label>
+                <input type="text" class="form-control" name="Tags" value="@Model.Product?.Tags" placeholder="summer, sale, new" />
+                <small class="text-muted">Comma-separated tags</small>
+            </div>
+        </div>
+
+        <!-- Right Column - Organization & Status -->
+        <div class="col-md-4">
+            <div class="card bg-light border-0 mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Status</h6>
+                    <select class="form-select" name="Status">
+                        @if (Model.Product?.Status == Algora.Erp.Domain.Entities.Ecommerce.ProductStatus.Draft)
+                        {
+                            <option value="Draft" selected>Draft</option>
+                        }
+                        else
+                        {
+                            <option value="Draft">Draft</option>
+                        }
+                        @if (Model.Product?.Status == Algora.Erp.Domain.Entities.Ecommerce.ProductStatus.Active)
+                        {
+                            <option value="Active" selected>Active</option>
+                        }
+                        else
+                        {
+                            <option value="Active">Active</option>
+                        }
+                        @if (Model.Product?.Status == Algora.Erp.Domain.Entities.Ecommerce.ProductStatus.Archived)
+                        {
+                            <option value="Archived" selected>Archived</option>
+                        }
+                        else
+                        {
+                            <option value="Archived">Archived</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="card bg-light border-0 mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Organization</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="CategoryId">
+                            <option value="">-- Select Category --</option>
+                            @foreach (var category in Model.Categories)
+                            {
+                                if (Model.Product?.CategoryId == category.Id)
+                                {
+                                    <option value="@category.Id" selected>@category.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Brand</label>
+                        <input type="text" class="form-control" name="Brand" value="@Model.Product?.Brand" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vendor</label>
+                        <input type="text" class="form-control" name="Vendor" value="@Model.Product?.Vendor" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-light border-0 mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Shipping</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Weight</label>
+                            <input type="number" step="0.01" class="form-control" name="Weight" value="@Model.Product?.Weight?.ToString("F2")" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Unit</label>
+                            <select class="form-select" name="WeightUnit">
+                                @{
+                                    var weightUnit = Model.Product?.WeightUnit ?? "kg";
+                                }
+                                @if (weightUnit == "kg") { <option value="kg" selected>kg</option> } else { <option value="kg">kg</option> }
+                                @if (weightUnit == "lb") { <option value="lb" selected>lb</option> } else { <option value="lb">lb</option> }
+                                @if (weightUnit == "oz") { <option value="oz" selected>oz</option> } else { <option value="oz">oz</option> }
+                                @if (weightUnit == "g") { <option value="g" selected>g</option> } else { <option value="g">g</option> }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title">Product Badges</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" name="IsFeatured" value="true"
+                               @(Model.Product?.IsFeatured == true ? "checked" : "") id="isFeatured" />
+                        <label class="form-check-label" for="isFeatured">
+                            <i class="bi bi-star-fill text-warning me-1"></i>Featured Product
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" name="IsNewArrival" value="true"
+                               @(Model.Product?.IsNewArrival == true ? "checked" : "") id="isNewArrival" />
+                        <label class="form-check-label" for="isNewArrival">
+                            <i class="bi bi-tag-fill text-info me-1"></i>New Arrival
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="IsBestSeller" value="true"
+                               @(Model.Product?.IsBestSeller == true ? "checked" : "") id="isBestSeller" />
+                        <label class="form-check-label" for="isBestSeller">
+                            <i class="bi bi-trophy-fill text-success me-1"></i>Best Seller
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer mt-4 px-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Product
+        </button>
+    </div>
+</form>

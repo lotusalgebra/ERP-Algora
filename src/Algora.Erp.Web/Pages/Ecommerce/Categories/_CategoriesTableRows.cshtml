@@ -1,0 +1,67 @@
+@model List<Algora.Erp.Domain.Entities.Ecommerce.WebCategory>
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+            No categories found
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var category in Model)
+    {
+        <tr>
+            <td class="ps-4">
+                <div class="d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(category.ImageUrl))
+                    {
+                        <img src="@category.ImageUrl" alt="@category.Name" class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="bi bi-folder text-muted"></i>
+                        </div>
+                    }
+                    <div>
+                        <div class="fw-semibold">@category.Name</div>
+                        @if (!string.IsNullOrEmpty(category.Description))
+                        {
+                            <small class="text-muted">@(category.Description.Length > 50 ? category.Description[..50] + "..." : category.Description)</small>
+                        }
+                    </div>
+                </div>
+            </td>
+            <td><code>@category.Slug</code></td>
+            <td>@(category.Parent?.Name ?? "-")</td>
+            <td class="text-end">@category.Products.Count</td>
+            <td>
+                @if (category.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary"
+                            hx-get="?handler=EditForm&id=@category.Id"
+                            hx-target="#formModalBody"
+                            data-bs-toggle="modal"
+                            data-bs-target="#formModal">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="confirmDelete('@category.Id')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    }
+}

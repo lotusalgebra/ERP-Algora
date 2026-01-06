@@ -1,0 +1,222 @@
+@page
+@model Algora.Erp.Web.Pages.Shop.IndexModel
+@{
+    ViewData["Title"] = "Shop";
+    Layout = "_LayoutShop";
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Welcome to Algora Shop</h1>
+                <p class="lead mb-4">Discover amazing products at unbeatable prices. Quality you can trust.</p>
+                <a href="#products" class="btn btn-light btn-lg px-4">
+                    <i class="bi bi-shop me-2"></i>Shop Now
+                </a>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <i class="bi bi-box-seam" style="font-size: 12rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center">
+            <a href="/Shop" class="category-pill @(string.IsNullOrEmpty(Model.CategorySlug) ? "active" : "")">All Products</a>
+            @foreach (var category in Model.Categories)
+            {
+                <a href="/Shop?category=@category.Slug" class="category-pill @(Model.CategorySlug == category.Slug ? "active" : "")">
+                    @category.Name
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Products Grid -->
+<section class="py-5" id="products">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2 class="h4 mb-0">
+                    @if (!string.IsNullOrEmpty(Model.CategorySlug))
+                    {
+                        @(Model.Categories.FirstOrDefault(c => c.Slug == Model.CategorySlug)?.Name ?? "Products")
+                    }
+                    else
+                    {
+                        <text>All Products</text>
+                    }
+                </h2>
+                <p class="text-muted mb-0">@Model.TotalProducts products found</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="d-inline-flex align-items-center gap-2">
+                    <label class="text-muted">Sort by:</label>
+                    <select class="form-select form-select-sm" style="width: auto;"
+                            onchange="window.location.href='/Shop?category=@Model.CategorySlug&sort=' + this.value">
+                        @if (Model.SortBy == "newest")
+                        {
+                            <option value="newest" selected>Newest</option>
+                        }
+                        else
+                        {
+                            <option value="newest">Newest</option>
+                        }
+                        @if (Model.SortBy == "price-asc")
+                        {
+                            <option value="price-asc" selected>Price: Low to High</option>
+                        }
+                        else
+                        {
+                            <option value="price-asc">Price: Low to High</option>
+                        }
+                        @if (Model.SortBy == "price-desc")
+                        {
+                            <option value="price-desc" selected>Price: High to Low</option>
+                        }
+                        else
+                        {
+                            <option value="price-desc">Price: High to Low</option>
+                        }
+                        @if (Model.SortBy == "name")
+                        {
+                            <option value="name" selected>Name: A-Z</option>
+                        }
+                        else
+                        {
+                            <option value="name">Name: A-Z</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        @if (!Model.Products.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-box-seam fs-1 text-muted d-block mb-3"></i>
+                <h5>No products found</h5>
+                <p class="text-muted">Try adjusting your search or filter criteria.</p>
+                <a href="/Shop" class="btn btn-primary">View All Products</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var product in Model.Products)
+                {
+                    var imageUrl = product.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? product.Images.FirstOrDefault()?.Url;
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="product-card position-relative">
+                            @if (product.CompareAtPrice.HasValue && product.CompareAtPrice > product.Price)
+                            {
+                                var discount = (int)Math.Round((1 - product.Price / product.CompareAtPrice.Value) * 100);
+                                <span class="badge bg-danger quick-view-badge">-@discount%</span>
+                            }
+                            @if (product.IsFeatured)
+                            {
+                                <span class="badge bg-warning quick-view-badge" style="left: 10px; right: auto;">Featured</span>
+                            }
+                            <a href="/Shop/Product/@product.Slug">
+                                @if (!string.IsNullOrEmpty(imageUrl))
+                                {
+                                    <img src="@imageUrl" alt="@product.Name" class="card-img-top">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                }
+                            </a>
+                            <div class="card-body">
+                                <p class="text-muted small mb-1">@product.Category?.Name</p>
+                                <h6 class="card-title mb-2">
+                                    <a href="/Shop/Product/@product.Slug" class="text-decoration-none text-dark">@product.Name</a>
+                                </h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="product-price">
+                                        @product.Price.ToString("C")
+                                        @if (product.CompareAtPrice.HasValue && product.CompareAtPrice > product.Price)
+                                        {
+                                            <span class="original-price ms-1">@product.CompareAtPrice.Value.ToString("C")</span>
+                                        }
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn-sm w-100 mt-2"
+                                        onclick="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price, '@imageUrl')">
+                                    <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="/Shop?category=@Model.CategorySlug&sort=@Model.SortBy&page=@(Model.Page - 1)">Previous</a>
+                        </li>
+                        @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="/Shop?category=@Model.CategorySlug&sort=@Model.SortBy&page=@i">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="/Shop?category=@Model.CategorySlug&sort=@Model.SortBy&page=@(Model.Page + 1)">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+    </div>
+</section>
+
+<!-- Featured Section -->
+@if (Model.FeaturedProducts.Any() && string.IsNullOrEmpty(Model.CategorySlug))
+{
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="h4 mb-4"><i class="bi bi-star me-2"></i>Featured Products</h2>
+            <div class="row g-4">
+                @foreach (var product in Model.FeaturedProducts.Take(4))
+                {
+                    var featuredImageUrl = product.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? product.Images.FirstOrDefault()?.Url;
+                    <div class="col-6 col-md-3">
+                        <div class="product-card">
+                            <a href="/Shop/Product/@product.Slug">
+                                @if (!string.IsNullOrEmpty(featuredImageUrl))
+                                {
+                                    <img src="@featuredImageUrl" alt="@product.Name" class="card-img-top">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                }
+                            </a>
+                            <div class="card-body">
+                                <h6 class="card-title mb-2">
+                                    <a href="/Shop/Product/@product.Slug" class="text-decoration-none text-dark">@product.Name</a>
+                                </h6>
+                                <div class="product-price">@product.Price.ToString("C")</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

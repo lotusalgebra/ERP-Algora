@@ -1,0 +1,150 @@
+@page
+@model Algora.Erp.Web.Pages.Ecommerce.Coupons.IndexModel
+@{
+    ViewData["Title"] = "Coupons";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">Coupons & Discounts</h4>
+        <p class="text-muted mb-0">Manage promotional codes and discounts</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#couponModal"
+            hx-get="?handler=CreateForm" hx-target="#couponModalBody">
+        <i class="bi bi-plus-lg me-2"></i>Create Coupon
+    </button>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
+                    <i class="bi bi-ticket-perforated"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TotalCoupons</div>
+                    <div class="stat-label">Total Coupons</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.ActiveCoupons</div>
+                    <div class="stat-label">Active Coupons</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
+                    <i class="bi bi-hash"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TotalUsage</div>
+                    <div class="stat-label">Total Redemptions</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TotalDiscountGiven.ToString("C0")</div>
+                    <div class="stat-label">Total Discount Given</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by code or name..."
+                       hx-get="?handler=Table" hx-target="#couponsTableBody" hx-trigger="keyup changed delay:300ms"
+                       hx-include="#statusFilter" name="search" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="statusFilter" name="statusFilter"
+                        hx-get="?handler=Table" hx-target="#couponsTableBody" hx-include="#searchInput">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Disabled">Disabled</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Coupons Table -->
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Code</th>
+                    <th>Description</th>
+                    <th>Discount</th>
+                    <th class="text-center">Usage</th>
+                    <th>Valid Period</th>
+                    <th>Status</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="couponsTableBody" hx-get="?handler=Table" hx-trigger="load">
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Coupon Modal -->
+<div class="modal fade" id="couponModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Coupon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="couponModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.body.addEventListener('formSubmitSuccess', function() {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('couponModal'));
+        if (modal) modal.hide();
+    });
+</script>
+}

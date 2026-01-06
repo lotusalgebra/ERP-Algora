@@ -1,0 +1,261 @@
+@page
+@model Algora.Erp.Web.Pages.Ecommerce.Settings.IndexModel
+@{
+    ViewData["Title"] = "Store Settings";
+    var currency = Model.Settings?.Currency ?? "USD";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">Store Settings</h4>
+        <p class="text-muted mb-0">Configure your online store preferences</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Main Settings -->
+    <div class="col-md-8">
+        <!-- General Settings -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-shop me-2"></i>General Settings</h5>
+            </div>
+            <div class="card-body">
+                <form hx-post="?handler=General" hx-swap="none">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Store Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="Name" value="@Model.Settings?.Name" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Store Email</label>
+                            <input type="email" class="form-control" name="Email" value="@Model.Settings?.Email" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="Phone" value="@Model.Settings?.Phone" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Currency</label>
+                            <select class="form-select" name="Currency">
+                                @if (currency == "USD") { <option value="USD" selected>USD ($)</option> } else { <option value="USD">USD ($)</option> }
+                                @if (currency == "EUR") { <option value="EUR" selected>EUR (€)</option> } else { <option value="EUR">EUR (€)</option> }
+                                @if (currency == "GBP") { <option value="GBP" selected>GBP (£)</option> } else { <option value="GBP">GBP (£)</option> }
+                                @if (currency == "CAD") { <option value="CAD" selected>CAD ($)</option> } else { <option value="CAD">CAD ($)</option> }
+                                @if (currency == "AUD") { <option value="AUD" selected>AUD ($)</option> } else { <option value="AUD">AUD ($)</option> }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Store Address</label>
+                        <textarea class="form-control" name="Address" rows="2">@Model.Settings?.Address</textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" name="EnableTax" value="true"
+                                       @(Model.Settings?.EnableTax == true ? "checked" : "") id="enableTax" />
+                                <label class="form-check-label" for="enableTax">Enable Tax</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tax Rate (%)</label>
+                            <input type="number" step="0.01" class="form-control" name="TaxRate"
+                                   value="@Model.Settings?.TaxRate.ToString("F2")" placeholder="0.00" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-2"></i>Save General Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Checkout Settings -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-cart-check me-2"></i>Checkout Settings</h5>
+            </div>
+            <div class="card-body">
+                <form hx-post="?handler=Checkout" hx-swap="none">
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" name="GuestCheckout" value="true"
+                               @(Model.Settings?.EnableGuestCheckout == true ? "checked" : "") id="guestCheckout" />
+                        <label class="form-check-label" for="guestCheckout">Allow Guest Checkout</label>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Minimum Order Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="MinOrderAmount"
+                                       value="@(Model.Settings?.MinOrderAmount ?? 0)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Free Shipping Threshold</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="FreeShippingThreshold"
+                                       value="@(Model.Settings?.FreeShippingThreshold ?? 0)" />
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-2"></i>Save Checkout Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Feature Settings -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-toggles me-2"></i>Features</h5>
+            </div>
+            <div class="card-body">
+                <form hx-post="?handler=Features" hx-swap="none">
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" name="EnableReviews" value="true"
+                               @(Model.Settings?.EnableReviews == true ? "checked" : "") id="enableReviews" />
+                        <label class="form-check-label" for="enableReviews">Enable Product Reviews</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" name="EnableWishlist" value="true"
+                               @(Model.Settings?.EnableWishlist == true ? "checked" : "") id="enableWishlist" />
+                        <label class="form-check-label" for="enableWishlist">Enable Wishlist</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-2"></i>Save Feature Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/Ecommerce/Products" class="btn btn-outline-primary">
+                        <i class="bi bi-box me-2"></i>Manage Products
+                    </a>
+                    <a href="/Ecommerce/Categories" class="btn btn-outline-primary">
+                        <i class="bi bi-tags me-2"></i>Manage Categories
+                    </a>
+                    <a href="/Ecommerce/Coupons" class="btn btn-outline-primary">
+                        <i class="bi bi-ticket-perforated me-2"></i>Manage Coupons
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Methods -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Shipping Methods</h6>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#shippingModal"
+                        hx-get="?handler=ShippingForm" hx-target="#shippingModalBody">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+            <div class="list-group list-group-flush" id="shippingMethods" hx-get="?handler=ShippingList" hx-trigger="load">
+                <div class="list-group-item text-center py-4">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Payment Methods</h6>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#paymentModal"
+                        hx-get="?handler=PaymentForm" hx-target="#paymentModalBody">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+            <div class="list-group list-group-flush" id="paymentMethods" hx-get="?handler=PaymentList" hx-trigger="load">
+                <div class="list-group-item text-center py-4">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Store Status -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Store Status</h6>
+            </div>
+            <div class="card-body">
+                <form hx-post="?handler=Status" hx-swap="none">
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" name="StoreOpen" value="true"
+                               @(Model.Settings?.IsActive == true ? "checked" : "") id="storeOpen" />
+                        <label class="form-check-label fw-semibold" for="storeOpen">Store Open</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-check-lg me-2"></i>Update Status
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shipping Modal -->
+<div class="modal fade" id="shippingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shipping Method</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="shippingModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Method</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="paymentModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful && evt.detail.requestConfig.verb === 'post') {
+            // Close any open modals
+            document.querySelectorAll('.modal.show').forEach(function(modal) {
+                bootstrap.Modal.getInstance(modal)?.hide();
+            });
+            // Refresh shipping/payment lists
+            htmx.trigger('#shippingMethods', 'load');
+            htmx.trigger('#paymentMethods', 'load');
+        }
+    });
+</script>
+}

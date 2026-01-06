@@ -1,0 +1,168 @@
+@model Algora.Erp.Web.Pages.Ecommerce.Orders.WebOrdersTableViewModel
+
+@if (!Model.Orders.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+            No orders found
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var order in Model.Orders)
+    {
+        var customerName = $"{order.ShippingFirstName} {order.ShippingLastName}".Trim();
+        <tr>
+            <td class="ps-4">
+                <a href="#" class="text-primary fw-semibold"
+                   hx-get="?handler=Details&id=@order.Id"
+                   hx-target="#detailsModalBody"
+                   data-bs-toggle="modal"
+                   data-bs-target="#detailsModal">
+                    @order.OrderNumber
+                </a>
+            </td>
+            <td>
+                <div class="fw-semibold">@customerName</div>
+                <small class="text-muted">@order.CustomerEmail</small>
+            </td>
+            <td>
+                <span class="badge bg-secondary">@order.Items.Sum(i => i.Quantity) items</span>
+            </td>
+            <td class="text-end fw-semibold">@order.Total.ToString("C")</td>
+            <td>
+                @switch (order.PaymentStatus)
+                {
+                    case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Paid:
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Paid</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Pending:
+                        <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pending</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Failed:
+                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Refunded:
+                        <span class="badge bg-dark"><i class="bi bi-arrow-return-left me-1"></i>Refunded</span>
+                        break;
+                }
+            </td>
+            <td>
+                @switch (order.Status)
+                {
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending:
+                        <span class="badge bg-warning">Pending</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed:
+                        <span class="badge bg-info">Confirmed</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing:
+                        <span class="badge bg-primary">Processing</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped:
+                        <span class="badge bg-info">Shipped</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered:
+                        <span class="badge bg-success">Delivered</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled:
+                        <span class="badge bg-dark">Cancelled</span>
+                        break;
+                    case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded:
+                        <span class="badge bg-secondary">Refunded</span>
+                        break;
+                }
+            </td>
+            <td>
+                <div>@order.OrderDate.ToString("MMM dd, yyyy")</div>
+                <small class="text-muted">@order.OrderDate.ToString("hh:mm tt")</small>
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#"
+                               hx-get="?handler=Details&id=@order.Id"
+                               hx-target="#detailsModalBody"
+                               data-bs-toggle="modal"
+                               data-bs-target="#detailsModal">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending)
+                        {
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Confirmed')"><i class="bi bi-check me-2"></i>Confirm Order</a></li>
+                        }
+                        @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed)
+                        {
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Processing')"><i class="bi bi-box me-2"></i>Start Processing</a></li>
+                        }
+                        @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing)
+                        {
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Shipped')"><i class="bi bi-truck me-2"></i>Mark Shipped</a></li>
+                        }
+                        @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped)
+                        {
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Delivered')"><i class="bi bi-check-circle me-2"></i>Mark Delivered</a></li>
+                        }
+                        @if (order.Status != Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled &&
+                             order.Status != Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered &&
+                             order.Status != Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="updateStatus('@order.Id', 'Cancelled')"><i class="bi bi-x-circle me-2"></i>Cancel Order</a></li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="8" class="bg-light">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                <small class="text-muted">
+                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                </small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)&pageSize=@Model.PageSize"
+                               hx-target="#ordersTableBody"
+                               hx-include="#searchInput, #statusFilter">
+                                Previous
+                            </a>
+                        </li>
+                        @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="#"
+                                   hx-get="?handler=Table&page=@i&pageSize=@Model.PageSize"
+                                   hx-target="#ordersTableBody"
+                                   hx-include="#searchInput, #statusFilter">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="#"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)&pageSize=@Model.PageSize"
+                               hx-target="#ordersTableBody"
+                               hx-include="#searchInput, #statusFilter">
+                                Next
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </td>
+    </tr>
+}
