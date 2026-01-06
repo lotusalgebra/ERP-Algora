@@ -1,6 +1,9 @@
 -- CRM Integrations Database Tables
 -- Run this script to create the required tables for CRM sync functionality
 
+SET QUOTED_IDENTIFIER ON;
+GO
+
 -- CRM Integration Mappings
 -- Maps ERP entities to their corresponding CRM entities
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CrmIntegrationMappings')
