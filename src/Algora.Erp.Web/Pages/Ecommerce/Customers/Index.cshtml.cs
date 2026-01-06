@@ -34,7 +34,7 @@ public class IndexModel : PageModel
         NewThisMonth = await _context.WebCustomers.CountAsync(c => c.CreatedAt >= monthStart);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.WebCustomers.AsQueryable();
 
@@ -58,14 +58,14 @@ public class IndexModel : PageModel
 
         var customers = await query
             .OrderByDescending(c => c.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_CustomersTableRows", new WebCustomersTableViewModel
         {
             Customers = customers,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

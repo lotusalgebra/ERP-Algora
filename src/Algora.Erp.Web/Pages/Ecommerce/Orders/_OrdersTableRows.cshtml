@@ -125,6 +125,8 @@ else
     }
 
     <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
     <tr>
         <td colspan="8" class="bg-light">
             <div class="d-flex justify-content-between align-items-center px-3 py-2">
@@ -133,36 +135,53 @@ else
                 </small>
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link" href="#"
-                               hx-get="?handler=Table&page=@(Model.Page - 1)&pageSize=@Model.PageSize"
-                               hx-target="#ordersTableBody"
-                               hx-include="#searchInput, #statusFilter">
-                                Previous
-                            </a>
-                        </li>
+                        @if (Model.Page > 1)
+                        {
+                            <li class="page-item">
+                                <button type="button" class="page-link"
+                                        hx-get="?handler=Table&pageNumber=@(Model.Page - 1)&pageSize=@Model.PageSize"
+                                        hx-target="#ordersTableBody"
+                                        hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                                    Previous
+                                </button>
+                            </li>
+                        }
                         @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                         {
                             <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" href="#"
-                                   hx-get="?handler=Table&page=@i&pageSize=@Model.PageSize"
-                                   hx-target="#ordersTableBody"
-                                   hx-include="#searchInput, #statusFilter">
+                                <button type="button" class="page-link"
+                                        hx-get="?handler=Table&pageNumber=@i&pageSize=@Model.PageSize"
+                                        hx-target="#ordersTableBody"
+                                        hx-include="#searchInput, #statusFilter, #pageSizeSelect">
                                     @i
-                                </a>
+                                </button>
                             </li>
                         }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="#"
-                               hx-get="?handler=Table&page=@(Model.Page + 1)&pageSize=@Model.PageSize"
-                               hx-target="#ordersTableBody"
-                               hx-include="#searchInput, #statusFilter">
-                                Next
-                            </a>
-                        </li>
+                        @if (Model.Page < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <button type="button" class="page-link"
+                                        hx-get="?handler=Table&pageNumber=@(Model.Page + 1)&pageSize=@Model.PageSize"
+                                        hx-target="#ordersTableBody"
+                                        hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                                    Next
+                                </button>
+                            </li>
+                        }
                     </ul>
                 </nav>
             </div>
         </td>
     </tr>
+    }
+    else if (Model.TotalRecords > 0)
+    {
+    <tr>
+        <td colspan="8" class="bg-light">
+            <div class="px-3 py-2">
+                <small class="text-muted">Showing @Model.TotalRecords entries</small>
+            </div>
+        </td>
+    </tr>
+    }
 }

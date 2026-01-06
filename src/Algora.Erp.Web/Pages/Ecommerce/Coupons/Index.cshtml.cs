@@ -36,7 +36,7 @@ public class IndexModel : PageModel
         TotalDiscountGiven = await _context.Coupons.SumAsync(c => c.TotalDiscountGiven);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var now = _dateTime.UtcNow;
         var query = _context.Coupons.AsQueryable();
@@ -67,14 +67,14 @@ public class IndexModel : PageModel
 
         var coupons = await query
             .OrderByDescending(c => c.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_CouponsTableRows", new CouponsTableViewModel
         {
             Coupons = coupons,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages,
