@@ -45,5 +45,12 @@ IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('WebOrders'
 PRINT 'WebOrders columns updated';
 GO
 
+-- Add missing columns to Coupons
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('Coupons') AND name = 'TotalDiscountGiven')
+    ALTER TABLE Coupons ADD TotalDiscountGiven DECIMAL(18,2) NOT NULL DEFAULT 0;
+
+PRINT 'Coupons columns updated';
+GO
+
 PRINT 'eCommerce schema fix completed successfully';
 GO
