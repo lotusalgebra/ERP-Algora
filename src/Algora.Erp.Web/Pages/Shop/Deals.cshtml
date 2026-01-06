@@ -1,0 +1,100 @@
+@page
+@model Algora.Erp.Web.Pages.Shop.DealsModel
+@{
+    ViewData["Title"] = "Deals & Offers";
+    Layout = "_LayoutShop";
+}
+
+<!-- Hero Banner -->
+<section class="bg-danger text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="bi bi-tag-fill me-2"></i>Hot Deals
+        </h1>
+        <p class="lead mb-0">Don't miss out on our best offers!</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    @if (Model.DealsProducts.Any())
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.DealsProducts)
+            {
+                var imageUrl = product.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? product.Images.FirstOrDefault()?.Url;
+                var discount = product.CompareAtPrice.HasValue && product.CompareAtPrice > 0
+                    ? (int)Math.Round((1 - product.Price / product.CompareAtPrice.Value) * 100)
+                    : 0;
+
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="product-card position-relative">
+                        @if (discount > 0)
+                        {
+                            <span class="badge bg-danger position-absolute top-0 end-0 m-2 fs-6">
+                                -@discount% OFF
+                            </span>
+                        }
+                        <a href="/Shop/Product/@product.Slug">
+                            @if (!string.IsNullOrEmpty(imageUrl))
+                            {
+                                <img src="@imageUrl" alt="@product.Name" class="card-img-top">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            }
+                        </a>
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">@product.Category?.Name</p>
+                            <h6 class="card-title mb-2">
+                                <a href="/Shop/Product/@product.Slug" class="text-decoration-none text-dark">@product.Name</a>
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="product-price">
+                                    @product.Price.ToString("C")
+                                    @if (product.CompareAtPrice.HasValue && product.CompareAtPrice > product.Price)
+                                    {
+                                        <span class="original-price ms-1">@product.CompareAtPrice.Value.ToString("C")</span>
+                                    }
+                                </div>
+                            </div>
+                            <button class="btn btn-danger btn-sm w-100 mt-2"
+                                    onclick="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price, '@imageUrl')">
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-tag fs-1 text-muted d-block mb-3"></i>
+            <h4>No deals available right now</h4>
+            <p class="text-muted mb-4">Check back soon for amazing offers!</p>
+            <a href="/Shop" class="btn btn-primary">
+                <i class="bi bi-shop me-2"></i>Continue Shopping
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Newsletter Section -->
+<section class="bg-light py-5">
+    <div class="container text-center">
+        <h3 class="mb-3">Get Notified About Deals</h3>
+        <p class="text-muted mb-4">Subscribe to receive exclusive offers and discounts directly in your inbox.</p>
+        <form class="row g-2 justify-content-center">
+            <div class="col-auto">
+                <input type="email" class="form-control" placeholder="Enter your email" style="min-width: 300px;">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </div>
+        </form>
+    </div>
+</section>

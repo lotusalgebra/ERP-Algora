@@ -1,0 +1,85 @@
+@page
+@model Algora.Erp.Web.Pages.Shop.CategoriesModel
+@{
+    ViewData["Title"] = "Categories";
+    Layout = "_LayoutShop";
+}
+
+<div class="container py-5">
+    <h1 class="mb-4">Shop by Category</h1>
+    <p class="text-muted mb-5">Browse our wide selection of products organized by category.</p>
+
+    <div class="row g-4">
+        @foreach (var category in Model.Categories)
+        {
+            var productCount = Model.ProductCounts.ContainsKey(category.Id) ? Model.ProductCounts[category.Id] : 0;
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="/Shop?category=@category.Slug" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center p-4">
+                            <div class="category-icon mb-3">
+                                <i class="bi @GetCategoryIcon(category.Name) fs-1 text-primary"></i>
+                            </div>
+                            <h5 class="card-title mb-2">@category.Name</h5>
+                            <p class="text-muted small mb-0">@productCount products</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Categories.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-tags fs-1 text-muted d-block mb-3"></i>
+            <h5>No categories available</h5>
+            <p class="text-muted">Check back soon for our product categories.</p>
+        </div>
+    }
+</div>
+
+<style>
+    .category-card {
+        transition: all 0.3s ease;
+        border-radius: 1rem;
+    }
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .category-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    .category-icon i {
+        color: #fff !important;
+    }
+</style>
+
+@functions {
+    string GetCategoryIcon(string categoryName)
+    {
+        return categoryName.ToLower() switch
+        {
+            var n when n.Contains("electronic") => "bi-laptop",
+            var n when n.Contains("clothing") || n.Contains("fashion") => "bi-bag",
+            var n when n.Contains("home") || n.Contains("garden") => "bi-house",
+            var n when n.Contains("sport") => "bi-bicycle",
+            var n when n.Contains("book") => "bi-book",
+            var n when n.Contains("toy") => "bi-controller",
+            var n when n.Contains("phone") || n.Contains("mobile") => "bi-phone",
+            var n when n.Contains("laptop") || n.Contains("computer") => "bi-laptop",
+            var n when n.Contains("accessory") || n.Contains("accessories") => "bi-watch",
+            var n when n.Contains("men") => "bi-person",
+            var n when n.Contains("women") => "bi-person-dress",
+            _ => "bi-box"
+        };
+    }
+}
