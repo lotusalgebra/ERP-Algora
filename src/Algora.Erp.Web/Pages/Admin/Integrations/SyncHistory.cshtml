@@ -1,0 +1,293 @@
+@page
+@model Algora.Erp.Web.Pages.Admin.Integrations.SyncHistoryModel
+@{
+    ViewData["Title"] = "Sync History";
+}
+
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Admin/Integrations">Integrations</a></li>
+            <li class="breadcrumb-item active">Sync History</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Sync History</h4>
+            <p class="text-muted mb-0">View all CRM synchronization logs</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">CRM</label>
+                    <select class="form-select" name="crm" asp-for="CrmFilter">
+                        <option value="">All CRMs</option>
+                        <option value="Salesforce">Salesforce</option>
+                        <option value="Dynamics365">Dynamics 365</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Entity Type</label>
+                    <select class="form-select" name="entity" asp-for="EntityFilter">
+                        <option value="">All Entities</option>
+                        <option value="Contact">Contacts</option>
+                        <option value="Lead">Leads</option>
+                        <option value="Opportunity">Opportunities</option>
+                        <option value="Account">Accounts</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" asp-for="StatusFilter">
+                        <option value="">All</option>
+                        <option value="success">Success</option>
+                        <option value="partial">Partial</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Date Range</label>
+                    <select class="form-select" name="range" asp-for="DateRange">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="all">All time</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-arrow-repeat text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">@Model.TotalSyncs</h4>
+                            <small class="text-muted">Total Syncs</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-check-circle text-success fs-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">@Model.SuccessfulSyncs</h4>
+                            <small class="text-muted">Successful</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">@Model.PartialSyncs</h4>
+                            <small class="text-muted">Partial</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-x-circle text-danger fs-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">@Model.FailedSyncs</h4>
+                            <small class="text-muted">Failed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync Logs Table -->
+    <div class="card border">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>CRM</th>
+                            <th>Entity Type</th>
+                            <th>Direction</th>
+                            <th>Processed</th>
+                            <th>Succeeded</th>
+                            <th>Failed</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                            <th>Duration</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.SyncLogs.Any())
+                        {
+                            @foreach (var log in Model.SyncLogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (log.CrmType == "Salesforce")
+                                        {
+                                            <span class="badge bg-primary">Salesforce</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">Dynamics 365</span>
+                                        }
+                                    </td>
+                                    <td>@(log.EntityType ?? "Full Sync")</td>
+                                    <td>
+                                        @switch (log.Direction)
+                                        {
+                                            case "ToCrm":
+                                                <i class="bi bi-arrow-up me-1"></i>
+                                                <span>To CRM</span>
+                                                break;
+                                            case "ToErp":
+                                                <i class="bi bi-arrow-down me-1"></i>
+                                                <span>To ERP</span>
+                                                break;
+                                            default:
+                                                <i class="bi bi-arrow-left-right me-1"></i>
+                                                <span>Bidirectional</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@log.RecordsProcessed</td>
+                                    <td class="text-success">@log.RecordsSucceeded</td>
+                                    <td class="text-danger">@log.RecordsFailed</td>
+                                    <td>
+                                        @if (log.RecordsFailed == 0 && log.RecordsProcessed > 0)
+                                        {
+                                            <span class="badge bg-success">Success</span>
+                                        }
+                                        else if (log.RecordsSucceeded > 0 && log.RecordsFailed > 0)
+                                        {
+                                            <span class="badge bg-warning text-dark">Partial</span>
+                                        }
+                                        else if (log.RecordsProcessed == 0)
+                                        {
+                                            <span class="badge bg-secondary">No Records</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Failed</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>@log.StartedAt.ToString("MMM d, yyyy h:mm tt")</small>
+                                    </td>
+                                    <td>
+                                        @if (log.CompletedAt.HasValue)
+                                        {
+                                            var duration = log.CompletedAt.Value - log.StartedAt;
+                                            <small class="text-muted">@duration.TotalSeconds.ToString("0.0")s</small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted">-</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(log.ErrorMessage))
+                                        {
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal" data-bs-target="#errorModal"
+                                                    data-error="@log.ErrorMessage">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="10" class="text-center py-4 text-muted">
+                                    No sync logs found for the selected filters.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(Model.CurrentPage - 1)&crm=@Model.CrmFilter&entity=@Model.EntityFilter&status=@Model.StatusFilter&range=@Model.DateRange">Previous</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="?page=@i&crm=@Model.CrmFilter&entity=@Model.EntityFilter&status=@Model.StatusFilter&range=@Model.DateRange">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(Model.CurrentPage + 1)&crm=@Model.CrmFilter&entity=@Model.EntityFilter&status=@Model.StatusFilter&range=@Model.DateRange">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Error Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="errorContent" class="bg-light p-3 rounded" style="white-space: pre-wrap;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('errorModal').addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var error = button.getAttribute('data-error');
+            document.getElementById('errorContent').textContent = error;
+        });
+    </script>
+}

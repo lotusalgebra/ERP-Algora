@@ -1,6 +1,7 @@
 using Algora.Erp.Application;
 using Algora.Erp.Infrastructure;
 using Algora.Erp.Infrastructure.MultiTenancy;
+using Algora.Erp.Integrations;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,9 +19,19 @@ builder.Host.UseSerilog();
 // Add services to the container
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCrmIntegrations(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorPages();
+
+// Add session support for shopping cart
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // Add authentication and authorization
 builder.Services.AddAuthentication("Cookies")
@@ -48,6 +59,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Session must come before endpoints
+app.UseSession();
 
 // Tenant middleware must come after routing but before authentication
 app.UseMiddleware<TenantMiddleware>();

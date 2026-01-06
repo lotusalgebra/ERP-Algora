@@ -1,0 +1,248 @@
+@page
+@model Algora.Erp.Web.Pages.Admin.Integrations.IndexModel
+@{
+    ViewData["Title"] = "CRM Integrations";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">CRM Integrations</h4>
+            <p class="text-muted mb-0">Connect your ERP with Salesforce and Microsoft Dynamics 365</p>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Salesforce Card -->
+        <div class="col-md-6">
+            <div class="card border h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-primary">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Salesforce</h5>
+                            <small class="text-muted">Sync contacts, leads, opportunities, and accounts</small>
+                        </div>
+                        <div class="ms-auto">
+                            @if (Model.SalesforceEnabled)
+                            {
+                                <span class="badge bg-success">Connected</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Not Connected</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.SalesforceEnabled)
+                    {
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.SalesforceStats.Contacts</div>
+                                    <small class="text-muted">Contacts</small>
+                                </div>
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.SalesforceStats.Leads</div>
+                                    <small class="text-muted">Leads</small>
+                                </div>
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.SalesforceStats.Opportunities</div>
+                                    <small class="text-muted">Opportunities</small>
+                                </div>
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.SalesforceStats.Accounts</div>
+                                    <small class="text-muted">Accounts</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/Admin/Integrations/Salesforce" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-gear me-1"></i>Settings
+                            </a>
+                            <form method="post" asp-page-handler="SyncSalesforce" class="d-inline">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Sync Now
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/Admin/Integrations/Salesforce" class="btn btn-primary">
+                            <i class="bi bi-plug me-1"></i>Connect Salesforce
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamics 365 Card -->
+        <div class="col-md-6">
+            <div class="card border h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-info">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Microsoft Dynamics 365</h5>
+                            <small class="text-muted">Sync contacts, leads, opportunities, and accounts</small>
+                        </div>
+                        <div class="ms-auto">
+                            @if (Model.Dynamics365Enabled)
+                            {
+                                <span class="badge bg-success">Connected</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Not Connected</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.Dynamics365Enabled)
+                    {
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.Dynamics365Stats.Contacts</div>
+                                    <small class="text-muted">Contacts</small>
+                                </div>
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.Dynamics365Stats.Leads</div>
+                                    <small class="text-muted">Leads</small>
+                                </div>
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.Dynamics365Stats.Opportunities</div>
+                                    <small class="text-muted">Opportunities</small>
+                                </div>
+                                <div class="col-3">
+                                    <div class="fw-bold">@Model.Dynamics365Stats.Accounts</div>
+                                    <small class="text-muted">Accounts</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/Admin/Integrations/Dynamics365" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-gear me-1"></i>Settings
+                            </a>
+                            <form method="post" asp-page-handler="SyncDynamics365" class="d-inline">
+                                <button type="submit" class="btn btn-info btn-sm">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Sync Now
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/Admin/Integrations/Dynamics365" class="btn btn-info">
+                            <i class="bi bi-plug me-1"></i>Connect Dynamics 365
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sync History -->
+    <div class="card border mt-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Sync History</h5>
+            <a href="/Admin/Integrations/SyncHistory" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>CRM</th>
+                            <th>Entity Type</th>
+                            <th>Direction</th>
+                            <th>Records</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentSyncLogs.Any())
+                        {
+                            @foreach (var log in Model.RecentSyncLogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (log.CrmType == "Salesforce")
+                                        {
+                                            <span class="badge bg-primary">Salesforce</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">Dynamics 365</span>
+                                        }
+                                    </td>
+                                    <td>@(log.EntityType ?? "Full Sync")</td>
+                                    <td>
+                                        <i class="bi @(log.Direction == "ToCrm" ? "bi-arrow-up" : log.Direction == "ToErp" ? "bi-arrow-down" : "bi-arrow-left-right") me-1"></i>
+                                        @log.Direction
+                                    </td>
+                                    <td>
+                                        <span class="text-success">@log.RecordsSucceeded</span> /
+                                        <span class="text-danger">@log.RecordsFailed</span>
+                                    </td>
+                                    <td>
+                                        @if (log.RecordsFailed == 0)
+                                        {
+                                            <span class="badge bg-success">Success</span>
+                                        }
+                                        else if (log.RecordsSucceeded > 0)
+                                        {
+                                            <span class="badge bg-warning">Partial</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Failed</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">@log.StartedAt.ToString("MMM d, h:mm tt")</small>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No sync history yet. Connect a CRM to start syncing.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
