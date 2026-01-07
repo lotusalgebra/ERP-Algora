@@ -107,7 +107,7 @@
                                hx-get="?handler=Table"
                                hx-trigger="keyup changed delay:300ms"
                                hx-target="#cancellationsTableBody"
-                               hx-include="#documentTypeFilter, #fromDate, #toDate, #pageSizeSelect"
+                               hx-include="#documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect"
                                name="search">
                     </div>
                 </div>
@@ -118,7 +118,7 @@
                             hx-get="?handler=Table"
                             hx-trigger="change"
                             hx-target="#cancellationsTableBody"
-                            hx-include="#searchInput, #fromDate, #toDate, #pageSizeSelect">
+                            hx-include="#searchInput, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
                         <option value="">All Types</option>
                         <option value="PurchaseOrder">Purchase Order</option>
                         <option value="SalesOrder">Sales Order</option>
@@ -129,6 +129,28 @@
                     </select>
                 </div>
                 <div class="col-md-2">
+                    <select class="form-select"
+                            id="reasonCategoryFilter"
+                            name="reasonCategoryFilter"
+                            hx-get="?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#cancellationsTableBody"
+                            hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                        <option value="">All Reasons</option>
+                        <option value="0">Customer Request</option>
+                        <option value="1">Duplicate Entry</option>
+                        <option value="2">Data Entry Error</option>
+                        <option value="3">Supplier Issue</option>
+                        <option value="4">Quality Issue</option>
+                        <option value="5">Price Dispute</option>
+                        <option value="6">Delivery Issue</option>
+                        <option value="7">Payment Issue</option>
+                        <option value="8">Out of Stock</option>
+                        <option value="9">System Error</option>
+                        <option value="99">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <input type="date" class="form-control"
                            id="fromDate"
                            name="fromDate"
@@ -136,7 +158,7 @@
                            hx-get="?handler=Table"
                            hx-trigger="change"
                            hx-target="#cancellationsTableBody"
-                           hx-include="#searchInput, #documentTypeFilter, #toDate, #pageSizeSelect">
+                           hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #toDate, #pageSizeSelect">
                 </div>
                 <div class="col-md-2">
                     <input type="date" class="form-control"
@@ -146,24 +168,23 @@
                            hx-get="?handler=Table"
                            hx-trigger="change"
                            hx-target="#cancellationsTableBody"
-                           hx-include="#searchInput, #documentTypeFilter, #fromDate, #pageSizeSelect">
+                           hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #pageSizeSelect">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <select class="form-select"
                             id="pageSizeSelect"
                             name="pageSize"
                             hx-get="?handler=Table"
                             hx-trigger="change"
                             hx-target="#cancellationsTableBody"
-                            hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate">
-                        <option value="10">10 per page</option>
-                        <option value="25">25 per page</option>
-                        <option value="50">50 per page</option>
-                        <option value="100">100 per page</option>
+                            hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                    <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()" title="Clear filters">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -185,7 +206,7 @@
                     <tbody id="cancellationsTableBody"
                            hx-get="?handler=Table"
                            hx-trigger="load"
-                           hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                           hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
                         <tr>
                             <td colspan="6" class="text-center py-5">
                                 <div class="spinner-border text-primary" role="status">
@@ -232,12 +253,14 @@
         function clearFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('documentTypeFilter').value = '';
+            document.getElementById('reasonCategoryFilter').value = '';
             document.getElementById('fromDate').value = '';
             document.getElementById('toDate').value = '';
             htmx.ajax('GET', '?handler=Table', {
                 target: '#cancellationsTableBody',
                 swap: 'innerHTML'
             });
+            updateExportUrl();
         }
 
         // Update export button URL based on filters
@@ -246,10 +269,12 @@
             params.append('handler', 'Export');
 
             const docType = document.getElementById('documentTypeFilter').value;
+            const reasonCategory = document.getElementById('reasonCategoryFilter').value;
             const fromDate = document.getElementById('fromDate').value;
             const toDate = document.getElementById('toDate').value;
 
             if (docType) params.append('documentTypeFilter', docType);
+            if (reasonCategory) params.append('reasonCategoryFilter', reasonCategory);
             if (fromDate) params.append('fromDate', fromDate);
             if (toDate) params.append('toDate', toDate);
 
@@ -257,6 +282,7 @@
         }
 
         document.getElementById('documentTypeFilter').addEventListener('change', updateExportUrl);
+        document.getElementById('reasonCategoryFilter').addEventListener('change', updateExportUrl);
         document.getElementById('fromDate').addEventListener('change', updateExportUrl);
         document.getElementById('toDate').addEventListener('change', updateExportUrl);
     </script>

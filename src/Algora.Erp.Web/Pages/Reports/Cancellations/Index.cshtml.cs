@@ -38,6 +38,7 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnGetTableAsync(
         string? search,
         string? documentTypeFilter,
+        int? reasonCategoryFilter,
         DateTime? fromDate,
         DateTime? toDate,
         int page = 1,
@@ -58,6 +59,11 @@ public class IndexModel : PageModel
         if (!string.IsNullOrWhiteSpace(documentTypeFilter))
         {
             query = query.Where(c => c.DocumentType == documentTypeFilter);
+        }
+
+        if (reasonCategoryFilter.HasValue)
+        {
+            query = query.Where(c => (int)c.ReasonCategory == reasonCategoryFilter.Value);
         }
 
         if (fromDate.HasValue)
@@ -102,6 +108,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGetExportAsync(
         string? documentTypeFilter,
+        int? reasonCategoryFilter,
         DateTime? fromDate,
         DateTime? toDate)
     {
@@ -111,6 +118,11 @@ public class IndexModel : PageModel
         if (!string.IsNullOrWhiteSpace(documentTypeFilter))
         {
             query = query.Where(c => c.DocumentType == documentTypeFilter);
+        }
+
+        if (reasonCategoryFilter.HasValue)
+        {
+            query = query.Where(c => (int)c.ReasonCategory == reasonCategoryFilter.Value);
         }
 
         if (fromDate.HasValue)
@@ -128,13 +140,13 @@ public class IndexModel : PageModel
             .ToListAsync();
 
         var csv = new System.Text.StringBuilder();
-        csv.AppendLine("Document Type,Document Number,Cancelled At,Cancelled By,Reason,Notes");
+        csv.AppendLine("Document Type,Document Number,Cancelled At,Cancelled By,Reason Category,Reason,Notes");
 
         foreach (var c in cancellations)
         {
             var reason = EscapeCsvField(c.CancellationReason ?? "");
             var notes = EscapeCsvField(c.Notes ?? "");
-            csv.AppendLine($"{c.DocumentType},{c.DocumentNumber},{c.CancelledAt:yyyy-MM-dd HH:mm},{c.CancelledByName ?? ""},{reason},{notes}");
+            csv.AppendLine($"{c.DocumentType},{c.DocumentNumber},{c.CancelledAt:yyyy-MM-dd HH:mm},{c.CancelledByName ?? ""},{c.ReasonCategory},{reason},{notes}");
         }
 
         return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", $"cancellations_{DateTime.UtcNow:yyyyMMdd}.csv");
