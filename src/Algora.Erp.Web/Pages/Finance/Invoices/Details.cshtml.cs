@@ -1,5 +1,6 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Finance;
+using Algora.Erp.Domain.Entities.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +12,25 @@ public class DetailsModel : PageModel
     private readonly IApplicationDbContext _context;
     private readonly IEmailService _emailService;
     private readonly IInvoicePdfService _pdfService;
+    private readonly ITaxConfigurationService _taxService;
 
     public DetailsModel(
         IApplicationDbContext context,
         IEmailService emailService,
-        IInvoicePdfService pdfService)
+        IInvoicePdfService pdfService,
+        ITaxConfigurationService taxService)
     {
         _context = context;
         _emailService = emailService;
         _pdfService = pdfService;
+        _taxService = taxService;
     }
 
     public Invoice Invoice { get; set; } = null!;
     public List<InvoicePayment> Payments { get; set; } = new();
+
+    // Tax configuration for dynamic labels
+    public TaxConfiguration? TaxConfig { get; set; }
 
     [BindProperty]
     public RecordPaymentInput PaymentInput { get; set; } = new();
@@ -48,6 +55,9 @@ public class DetailsModel : PageModel
 
         Invoice = invoice;
         Payments = invoice.Payments.OrderByDescending(p => p.PaymentDate).ToList();
+
+        // Load tax configuration for dynamic labels
+        TaxConfig = await _taxService.GetCurrentTaxConfigurationAsync();
 
         // Initialize payment input
         PaymentInput.InvoiceId = id;

@@ -12,10 +12,12 @@ namespace Algora.Erp.Web.Pages.Finance.Invoices;
 public class CreateModel : PageModel
 {
     private readonly IApplicationDbContext _context;
+    private readonly ITaxConfigurationService _taxService;
 
-    public CreateModel(IApplicationDbContext context)
+    public CreateModel(IApplicationDbContext context, ITaxConfigurationService taxService)
     {
         _context = context;
+        _taxService = taxService;
     }
 
     [BindProperty]
@@ -24,8 +26,15 @@ public class CreateModel : PageModel
     public List<Customer> Customers { get; set; } = new();
     public List<Product> Products { get; set; } = new();
     public List<SalesOrder> SalesOrders { get; set; } = new();
-    public List<GstSlab> GstSlabs { get; set; } = new();
     public List<OfficeLocation> Locations { get; set; } = new();
+
+    // Tax configuration (loaded from TaxConfigurationService)
+    public TaxConfiguration? TaxConfig { get; set; }
+    public List<TaxSlab> TaxSlabs { get; set; } = new();
+    public List<TaxRegion> TaxRegions { get; set; } = new();
+
+    // Legacy support (for existing GstSlab data)
+    public List<GstSlab> GstSlabs { get; set; } = new();
     public List<IndianState> States { get; set; } = new();
 
     public async Task OnGetAsync(Guid? salesOrderId = null)
@@ -100,15 +109,34 @@ public class CreateModel : PageModel
 
         var invoiceNumber = $"INV-{DateTime.Now.Year}-{nextNumber:D4}";
 
-        // Determine if inter-state transaction
+        // Load tax configuration
+        var taxConfig = await _taxService.GetCurrentTaxConfigurationAsync();
+
+        // Determine if inter-state/inter-regional transaction
         var fromLocation = Input.FromLocationId.HasValue
             ? await _context.OfficeLocations.Include(l => l.State).FirstOrDefaultAsync(l => l.Id == Input.FromLocationId)
             : null;
-        var customerState = Input.CustomerStateId.HasValue
-            ? await _context.IndianStates.FirstOrDefaultAsync(s => s.Id == Input.CustomerStateId)
-            : null;
 
-        var isInterState = fromLocation?.StateId != Input.CustomerStateId && Input.CustomerStateId.HasValue;
+        // Get customer region (from TaxRegions or legacy IndianStates)
+        TaxRegion? customerRegion = null;
+        IndianState? customerState = null;
+
+        if (Input.CustomerStateId.HasValue)
+        {
+            customerRegion = await _context.TaxRegions
+                .FirstOrDefaultAsync(r => r.Id == Input.CustomerStateId && !r.IsDeleted);
+
+            // Fallback to legacy IndianStates if no TaxRegion found
+            if (customerRegion == null)
+            {
+                customerState = await _context.IndianStates
+                    .FirstOrDefaultAsync(s => s.Id == Input.CustomerStateId);
+            }
+        }
+
+        var isInterState = taxConfig?.HasInterRegionalTax == true
+            && fromLocation?.StateId != Input.CustomerStateId
+            && Input.CustomerStateId.HasValue;
 
         // Calculate totals
         decimal subtotal = 0;
@@ -133,16 +161,16 @@ public class CreateModel : PageModel
             BillingName = Input.BillingName,
             BillingAddress = Input.BillingAddress,
             BillingCity = Input.BillingCity,
-            BillingState = customerState?.Name ?? Input.BillingState,
+            BillingState = customerRegion?.Name ?? customerState?.Name ?? Input.BillingState,
             BillingPostalCode = Input.BillingPostalCode,
             BillingCountry = Input.BillingCountry,
             Reference = Input.Reference,
             Notes = Input.Notes,
             InternalNotes = Input.InternalNotes,
-            // GST Fields
+            // GST/Tax Fields
             FromLocationId = Input.FromLocationId,
             CustomerGstin = Input.CustomerGstin,
-            CustomerStateCode = customerState?.ShortName,
+            CustomerStateCode = customerRegion?.ShortName ?? customerRegion?.Code ?? customerState?.ShortName,
             IsInterState = isInterState
         };
 
@@ -153,25 +181,60 @@ public class CreateModel : PageModel
             var lineDiscountAmt = lineSubtotal * (lineInput.DiscountPercent / 100);
             var lineAfterDiscount = lineSubtotal - lineDiscountAmt;
 
-            // Get GST slab for this line
-            var gstSlab = lineInput.GstSlabId.HasValue
-                ? await _context.GstSlabs.FirstOrDefaultAsync(g => g.Id == lineInput.GstSlabId)
-                : null;
+            // Get tax slab for this line (try new TaxSlabs first, fallback to legacy GstSlabs)
+            TaxSlab? taxSlab = null;
+            GstSlab? gstSlab = null;
+
+            if (lineInput.GstSlabId.HasValue)
+            {
+                taxSlab = await _context.TaxSlabs.FirstOrDefaultAsync(t => t.Id == lineInput.GstSlabId && !t.IsDeleted);
+
+                // Fallback to legacy GstSlabs if no TaxSlab found
+                if (taxSlab == null)
+                {
+                    gstSlab = await _context.GstSlabs.FirstOrDefaultAsync(g => g.Id == lineInput.GstSlabId);
+                }
+            }
 
             decimal lineCgst = 0, lineSgst = 0, lineIgst = 0;
             decimal cgstRate = 0, sgstRate = 0, igstRate = 0;
+            decimal taxRate = 0;
 
-            if (gstSlab != null)
+            if (taxSlab != null)
             {
+                taxRate = taxSlab.Rate;
+                if (isInterState && taxSlab.InterRegionalRate > 0)
+                {
+                    // Inter-regional: Apply inter-regional tax (e.g., IGST)
+                    igstRate = taxSlab.InterRegionalRate;
+                    lineIgst = lineAfterDiscount * (igstRate / 100);
+                }
+                else if (taxSlab.CentralRate > 0 || taxSlab.RegionalRate > 0)
+                {
+                    // Intra-regional: Apply split tax (e.g., CGST + SGST)
+                    cgstRate = taxSlab.CentralRate;
+                    sgstRate = taxSlab.RegionalRate;
+                    lineCgst = lineAfterDiscount * (cgstRate / 100);
+                    lineSgst = lineAfterDiscount * (sgstRate / 100);
+                }
+                else
+                {
+                    // Simple single-rate tax (e.g., VAT)
+                    lineIgst = lineAfterDiscount * (taxSlab.Rate / 100);
+                    igstRate = taxSlab.Rate;
+                }
+            }
+            else if (gstSlab != null)
+            {
+                // Legacy GST slab support
+                taxRate = gstSlab.Rate;
                 if (isInterState)
                 {
-                    // Inter-state: Apply IGST
                     igstRate = gstSlab.IgstRate;
                     lineIgst = lineAfterDiscount * (igstRate / 100);
                 }
                 else
                 {
-                    // Intra-state: Apply CGST + SGST
                     cgstRate = gstSlab.CgstRate;
                     sgstRate = gstSlab.SgstRate;
                     lineCgst = lineAfterDiscount * (cgstRate / 100);
@@ -193,7 +256,7 @@ public class CreateModel : PageModel
                 UnitPrice = lineInput.UnitPrice,
                 DiscountPercent = lineInput.DiscountPercent,
                 DiscountAmount = lineDiscountAmt,
-                TaxPercent = gstSlab?.Rate ?? lineInput.TaxPercent,
+                TaxPercent = taxSlab?.Rate ?? gstSlab?.Rate ?? lineInput.TaxPercent,
                 TaxAmount = lineTaxAmt,
                 LineTotal = lineTotal,
                 // GST Fields
@@ -253,20 +316,32 @@ public class CreateModel : PageModel
             .Take(50)
             .ToListAsync();
 
-        GstSlabs = await _context.GstSlabs
-            .Where(g => g.IsActive && !g.IsDeleted)
-            .OrderBy(g => g.DisplayOrder)
-            .ToListAsync();
-
         Locations = await _context.OfficeLocations
             .Include(l => l.State)
             .Where(l => l.IsActive && !l.IsDeleted)
             .OrderBy(l => l.DisplayOrder)
             .ToListAsync();
 
-        States = await _context.IndianStates
-            .OrderBy(s => s.Name)
-            .ToListAsync();
+        // Load tax configuration from service
+        TaxConfig = await _taxService.GetCurrentTaxConfigurationAsync();
+        TaxSlabs = await _taxService.GetActiveTaxSlabsAsync();
+        TaxRegions = await _taxService.GetActiveTaxRegionsAsync();
+
+        // Legacy support - load GstSlabs and States if no TaxConfig exists
+        if (TaxConfig == null || !TaxSlabs.Any())
+        {
+            GstSlabs = await _context.GstSlabs
+                .Where(g => g.IsActive && !g.IsDeleted)
+                .OrderBy(g => g.DisplayOrder)
+                .ToListAsync();
+        }
+
+        if (TaxConfig == null || !TaxRegions.Any())
+        {
+            States = await _context.IndianStates
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+        }
     }
 }
 
