@@ -1,0 +1,407 @@
+@page
+@model Algora.Erp.Web.Pages.Finance.JournalEntries.CreateModel
+@using Algora.Erp.Domain.Entities.Finance
+@{
+    ViewData["Title"] = "New Journal Entry";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">New Journal Entry</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
+                    <li class="breadcrumb-item"><a href="/Finance/JournalEntries">Journal Entries</a></li>
+                    <li class="breadcrumb-item active">New</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <form method="post" id="journalEntryForm">
+        <!-- Validation Summary -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <span>@error.ErrorMessage</span><br />
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-4">
+            <!-- Entry Header -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Entry Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Entry Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" asp-for="Input.EntryDate" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Entry Type <span class="text-danger">*</span></label>
+                                <select class="form-select" asp-for="Input.EntryType" asp-items="Model.EntryTypes"></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Reference</label>
+                                <input type="text" class="form-control" asp-for="Input.Reference" placeholder="e.g., INV-001, PO-123" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" asp-for="Input.Description" placeholder="Brief description of this entry" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" asp-for="Input.Notes" rows="2" placeholder="Additional notes (optional)"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" asp-for="Input.IsAdjusting" />
+                                    <label class="form-check-label" asp-for="Input.IsAdjusting">
+                                        This is an adjusting entry
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Total Debit:</span>
+                            <span class="fw-bold text-success" id="totalDebit">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Total Credit:</span>
+                            <span class="fw-bold text-danger" id="totalCredit">$0.00</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Difference:</span>
+                            <span class="fw-bold" id="difference">$0.00</span>
+                        </div>
+                        <div id="balanceStatus" class="mt-3 text-center">
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle me-1"></i>Entry not balanced
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mt-3">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-outline-primary" name="Input.SaveAsDraft" value="true">
+                                <i class="bi bi-save me-2"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-primary" name="Input.SaveAsDraft" value="false" id="submitBtn">
+                                <i class="bi bi-check-lg me-2"></i>Submit for Approval
+                            </button>
+                            <a href="/Finance/JournalEntries" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Line Items</h5>
+                <button type="button" class="btn btn-sm btn-primary" id="addLineBtn">
+                    <i class="bi bi-plus-lg me-1"></i>Add Line
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th style="width: 35%;">Account <span class="text-danger">*</span></th>
+                                <th>Description</th>
+                                <th style="width: 150px;" class="text-end">Debit</th>
+                                <th style="width: 150px;" class="text-end">Credit</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="linesContainer">
+                            @for (int i = 0; i < Model.Input.Lines.Count; i++)
+                            {
+                                <tr class="line-row" data-index="@i">
+                                    <td class="text-muted line-number">@(i + 1)</td>
+                                    <td>
+                                        <select class="form-select form-select-sm account-select"
+                                                name="Input.Lines[@i].AccountId">
+                                            <option value="">-- Select Account --</option>
+                                            @foreach (var group in Model.Accounts.GroupBy(a => a.Group?.Name))
+                                            {
+                                                <optgroup label="@group.Key">
+                                                    @foreach (var account in group)
+                                                    {
+                                                        <option value="@account.Value"
+                                                                selected="@(account.Value == Model.Input.Lines[i].AccountId.ToString())">
+                                                            @account.Text
+                                                        </option>
+                                                    }
+                                                </optgroup>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                               name="Input.Lines[@i].Description"
+                                               value="@Model.Input.Lines[i].Description"
+                                               placeholder="Line description" />
+                                    </td>
+                                    <td>
+                                        <input type="number" step="0.01" min="0"
+                                               class="form-control form-control-sm text-end debit-input"
+                                               name="Input.Lines[@i].DebitAmount"
+                                               value="@(Model.Input.Lines[i].DebitAmount > 0 ? Model.Input.Lines[i].DebitAmount : "")"
+                                               placeholder="0.00" />
+                                    </td>
+                                    <td>
+                                        <input type="number" step="0.01" min="0"
+                                               class="form-control form-control-sm text-end credit-input"
+                                               name="Input.Lines[@i].CreditAmount"
+                                               value="@(Model.Input.Lines[i].CreditAmount > 0 ? Model.Input.Lines[i].CreditAmount : "")"
+                                               placeholder="0.00" />
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-line-btn" title="Remove line">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Totals:</td>
+                                <td class="text-end fw-bold text-success" id="footerDebit">$0.00</td>
+                                <td class="text-end fw-bold text-danger" id="footerCredit">$0.00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Line Template (hidden) -->
+<template id="lineTemplate">
+    <tr class="line-row" data-index="__INDEX__">
+        <td class="text-muted line-number">__LINE_NUM__</td>
+        <td>
+            <select class="form-select form-select-sm account-select"
+                    name="Input.Lines[__INDEX__].AccountId">
+                <option value="">-- Select Account --</option>
+                @foreach (var group in Model.Accounts.GroupBy(a => a.Group?.Name))
+                {
+                    <optgroup label="@group.Key">
+                        @foreach (var account in group)
+                        {
+                            <option value="@account.Value">@account.Text</option>
+                        }
+                    </optgroup>
+                }
+            </select>
+        </td>
+        <td>
+            <input type="text" class="form-control form-control-sm"
+                   name="Input.Lines[__INDEX__].Description"
+                   placeholder="Line description" />
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0"
+                   class="form-control form-control-sm text-end debit-input"
+                   name="Input.Lines[__INDEX__].DebitAmount"
+                   placeholder="0.00" />
+        </td>
+        <td>
+            <input type="number" step="0.01" min="0"
+                   class="form-control form-control-sm text-end credit-input"
+                   name="Input.Lines[__INDEX__].CreditAmount"
+                   placeholder="0.00" />
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-line-btn" title="Remove line">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const linesContainer = document.getElementById('linesContainer');
+            const lineTemplate = document.getElementById('lineTemplate');
+            const addLineBtn = document.getElementById('addLineBtn');
+
+            function getNextIndex() {
+                const rows = linesContainer.querySelectorAll('.line-row');
+                let maxIndex = -1;
+                rows.forEach(row => {
+                    const idx = parseInt(row.dataset.index);
+                    if (idx > maxIndex) maxIndex = idx;
+                });
+                return maxIndex + 1;
+            }
+
+            function updateLineNumbers() {
+                const rows = linesContainer.querySelectorAll('.line-row');
+                rows.forEach((row, i) => {
+                    row.querySelector('.line-number').textContent = i + 1;
+                });
+            }
+
+            function calculateTotals() {
+                let totalDebit = 0;
+                let totalCredit = 0;
+
+                linesContainer.querySelectorAll('.line-row').forEach(row => {
+                    const debit = parseFloat(row.querySelector('.debit-input').value) || 0;
+                    const credit = parseFloat(row.querySelector('.credit-input').value) || 0;
+                    totalDebit += debit;
+                    totalCredit += credit;
+                });
+
+                const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+                document.getElementById('totalDebit').textContent = formatter.format(totalDebit);
+                document.getElementById('totalCredit').textContent = formatter.format(totalCredit);
+                document.getElementById('footerDebit').textContent = formatter.format(totalDebit);
+                document.getElementById('footerCredit').textContent = formatter.format(totalCredit);
+
+                const difference = Math.abs(totalDebit - totalCredit);
+                const diffElement = document.getElementById('difference');
+                diffElement.textContent = formatter.format(difference);
+
+                const balanceStatus = document.getElementById('balanceStatus');
+                if (difference === 0 && totalDebit > 0) {
+                    diffElement.classList.remove('text-danger');
+                    diffElement.classList.add('text-success');
+                    balanceStatus.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Entry is balanced</span>';
+                } else {
+                    diffElement.classList.remove('text-success');
+                    diffElement.classList.add('text-danger');
+                    balanceStatus.innerHTML = '<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Entry not balanced</span>';
+                }
+            }
+
+            function addLine() {
+                const index = getNextIndex();
+                const lineNum = linesContainer.querySelectorAll('.line-row').length + 1;
+                let html = lineTemplate.innerHTML
+                    .replace(/__INDEX__/g, index)
+                    .replace(/__LINE_NUM__/g, lineNum);
+
+                const temp = document.createElement('tbody');
+                temp.innerHTML = html;
+                const newRow = temp.firstElementChild;
+                linesContainer.appendChild(newRow);
+
+                // Add event listeners to new row
+                attachRowListeners(newRow);
+
+                // Focus the account dropdown
+                newRow.querySelector('.account-select').focus();
+            }
+
+            function removeLine(row) {
+                if (linesContainer.querySelectorAll('.line-row').length > 2) {
+                    row.remove();
+                    updateLineNumbers();
+                    calculateTotals();
+                } else {
+                    alert('A journal entry must have at least 2 lines.');
+                }
+            }
+
+            function attachRowListeners(row) {
+                row.querySelector('.remove-line-btn').addEventListener('click', () => removeLine(row));
+                row.querySelector('.debit-input').addEventListener('input', function() {
+                    // If debit has value, clear credit
+                    if (this.value && parseFloat(this.value) > 0) {
+                        row.querySelector('.credit-input').value = '';
+                    }
+                    calculateTotals();
+                });
+                row.querySelector('.credit-input').addEventListener('input', function() {
+                    // If credit has value, clear debit
+                    if (this.value && parseFloat(this.value) > 0) {
+                        row.querySelector('.debit-input').value = '';
+                    }
+                    calculateTotals();
+                });
+            }
+
+            // Attach listeners to existing rows
+            linesContainer.querySelectorAll('.line-row').forEach(attachRowListeners);
+
+            // Add line button
+            addLineBtn.addEventListener('click', addLine);
+
+            // Initial calculation
+            calculateTotals();
+
+            // Form validation
+            document.getElementById('journalEntryForm').addEventListener('submit', function(e) {
+                const rows = linesContainer.querySelectorAll('.line-row');
+                let validLines = 0;
+
+                rows.forEach(row => {
+                    const account = row.querySelector('.account-select').value;
+                    const debit = parseFloat(row.querySelector('.debit-input').value) || 0;
+                    const credit = parseFloat(row.querySelector('.credit-input').value) || 0;
+
+                    if (account && (debit > 0 || credit > 0)) {
+                        validLines++;
+                    }
+                });
+
+                if (validLines < 2) {
+                    e.preventDefault();
+                    alert('A journal entry must have at least 2 valid lines with accounts and amounts.');
+                    return;
+                }
+
+                // Check balance
+                let totalDebit = 0;
+                let totalCredit = 0;
+                rows.forEach(row => {
+                    totalDebit += parseFloat(row.querySelector('.debit-input').value) || 0;
+                    totalCredit += parseFloat(row.querySelector('.credit-input').value) || 0;
+                });
+
+                if (Math.abs(totalDebit - totalCredit) > 0.001) {
+                    e.preventDefault();
+                    alert('The journal entry is not balanced. Total Debit must equal Total Credit.');
+                }
+            });
+        });
+    </script>
+}
