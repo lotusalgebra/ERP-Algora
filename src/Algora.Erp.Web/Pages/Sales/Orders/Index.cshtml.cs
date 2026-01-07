@@ -1,8 +1,10 @@
 using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Sales;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Sales.Orders;
 
@@ -230,11 +232,48 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostUpdateStatusAsync(Guid id, SalesOrderStatus status)
     {
-        var order = await _context.SalesOrders.FindAsync(id);
+        var order = await _context.SalesOrders
+            .Include(o => o.Lines)
+            .Include(o => o.Customer)
+            .FirstOrDefaultAsync(o => o.Id == id);
         if (order == null)
             return NotFound();
 
+        var oldStatus = order.Status;
         order.Status = status;
+
+        if (status == SalesOrderStatus.Cancelled)
+        {
+            // Create cancellation log entry
+            var cancellationLog = new CancellationLog
+            {
+                Id = Guid.NewGuid(),
+                DocumentType = "SalesOrder",
+                DocumentId = order.Id,
+                DocumentNumber = order.OrderNumber,
+                CancelledAt = DateTime.UtcNow,
+                CancelledBy = Guid.Empty,
+                CancelledByName = User.Identity?.Name ?? "System",
+                CancellationReason = "Cancelled by user",
+                ReasonCategory = CancellationReasonCategory.Other,
+                OriginalDocumentState = JsonSerializer.Serialize(new
+                {
+                    Status = oldStatus.ToString(),
+                    order.OrderDate,
+                    CustomerName = order.Customer?.Name,
+                    order.TotalAmount,
+                    order.AmountPaid,
+                    TotalLines = order.Lines?.Count ?? 0
+                }),
+                FinancialReversed = order.AmountPaid > 0,
+                FinancialReversalDetails = order.AmountPaid > 0
+                    ? JsonSerializer.Serialize(new { order.AmountPaid, order.TotalAmount })
+                    : null,
+                Notes = $"Sales order cancelled from status: {oldStatus}"
+            };
+            _context.CancellationLogs.Add(cancellationLog);
+        }
+
         await _context.SaveChangesAsync();
 
         return await OnGetTableAsync(null, null, null);
