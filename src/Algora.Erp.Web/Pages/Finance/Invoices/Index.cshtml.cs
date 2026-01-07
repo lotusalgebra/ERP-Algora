@@ -1,8 +1,10 @@
 using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Finance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Finance.Invoices;
 
@@ -135,11 +137,44 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostVoidAsync(Guid id)
     {
-        var invoice = await _context.Invoices.FindAsync(id);
+        var invoice = await _context.Invoices
+            .Include(i => i.Lines)
+            .FirstOrDefaultAsync(i => i.Id == id);
         if (invoice == null)
             return NotFound();
 
+        var oldStatus = invoice.Status;
         invoice.Status = InvoiceStatus.Void;
+
+        // Create cancellation log entry
+        var cancellationLog = new CancellationLog
+        {
+            Id = Guid.NewGuid(),
+            DocumentType = "Invoice",
+            DocumentId = invoice.Id,
+            DocumentNumber = invoice.InvoiceNumber,
+            CancelledAt = DateTime.UtcNow,
+            CancelledBy = Guid.Empty,
+            CancelledByName = User.Identity?.Name ?? "System",
+            CancellationReason = "Voided by user",
+            ReasonCategory = CancellationReasonCategory.Other,
+            OriginalDocumentState = JsonSerializer.Serialize(new
+            {
+                Status = oldStatus.ToString(),
+                invoice.InvoiceDate,
+                invoice.DueDate,
+                CustomerName = invoice.BillingName,
+                invoice.TotalAmount,
+                invoice.PaidAmount,
+                TotalLines = invoice.Lines?.Count ?? 0
+            }),
+            FinancialReversed = invoice.PaidAmount > 0,
+            FinancialReversalDetails = invoice.PaidAmount > 0
+                ? JsonSerializer.Serialize(new { invoice.PaidAmount, invoice.TotalAmount })
+                : null,
+            Notes = $"Invoice voided from status: {oldStatus}"
+        };
+        _context.CancellationLogs.Add(cancellationLog);
 
         await _context.SaveChangesAsync();
 

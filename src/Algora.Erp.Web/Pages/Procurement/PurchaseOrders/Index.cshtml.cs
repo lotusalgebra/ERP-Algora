@@ -1,8 +1,10 @@
 using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Procurement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Procurement.PurchaseOrders;
 
@@ -230,16 +232,46 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostUpdateStatusAsync(Guid id, PurchaseOrderStatus status)
     {
-        var order = await _context.PurchaseOrders.FindAsync(id);
+        var order = await _context.PurchaseOrders
+            .Include(p => p.Lines)
+            .Include(p => p.Supplier)
+            .FirstOrDefaultAsync(p => p.Id == id);
         if (order == null)
             return NotFound();
 
+        var oldStatus = order.Status;
         order.Status = status;
 
         if (status == PurchaseOrderStatus.Approved)
         {
             // Set approved info - in real app, get from current user
             order.ApprovedAt = DateTime.UtcNow;
+        }
+        else if (status == PurchaseOrderStatus.Cancelled)
+        {
+            // Create cancellation log entry
+            var cancellationLog = new CancellationLog
+            {
+                Id = Guid.NewGuid(),
+                DocumentType = "PurchaseOrder",
+                DocumentId = order.Id,
+                DocumentNumber = order.OrderNumber,
+                CancelledAt = DateTime.UtcNow,
+                CancelledBy = Guid.Empty,
+                CancelledByName = User.Identity?.Name ?? "System",
+                CancellationReason = "Cancelled by user",
+                ReasonCategory = CancellationReasonCategory.Other,
+                OriginalDocumentState = JsonSerializer.Serialize(new
+                {
+                    Status = oldStatus.ToString(),
+                    order.OrderDate,
+                    SupplierName = order.Supplier?.Name,
+                    order.TotalAmount,
+                    TotalLines = order.Lines?.Count ?? 0
+                }),
+                Notes = $"Purchase order cancelled from status: {oldStatus}"
+            };
+            _context.CancellationLogs.Add(cancellationLog);
         }
 
         await _context.SaveChangesAsync();
