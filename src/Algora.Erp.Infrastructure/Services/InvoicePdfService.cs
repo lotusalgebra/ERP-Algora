@@ -196,25 +196,28 @@ public class InvoicePdfService : IInvoicePdfService
         {
             table.ColumnsDefinition(columns =>
             {
-                columns.ConstantColumn(30);   // #
+                columns.ConstantColumn(25);   // #
                 columns.RelativeColumn(3);    // Description
-                columns.ConstantColumn(50);   // Qty
-                columns.ConstantColumn(70);   // Unit Price
-                columns.ConstantColumn(50);   // Disc
-                columns.ConstantColumn(40);   // Tax
-                columns.ConstantColumn(80);   // Amount
+                columns.ConstantColumn(60);   // HSN
+                columns.ConstantColumn(40);   // Qty
+                columns.ConstantColumn(65);   // Unit Price
+                columns.ConstantColumn(70);   // GST
+                columns.ConstantColumn(70);   // Tax Amt
+                columns.ConstantColumn(75);   // Amount
             });
 
-            // Header
+            // Header - show appropriate tax column based on transaction type
+            var taxHeader = invoice.IsInterState ? "IGST" : "CGST/SGST";
             table.Header(header =>
             {
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).Text("#").FontColor(Colors.White).Bold().FontSize(9);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).Text("Description").FontColor(Colors.White).Bold().FontSize(9);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).AlignCenter().Text("Qty").FontColor(Colors.White).Bold().FontSize(9);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).AlignRight().Text("Unit Price").FontColor(Colors.White).Bold().FontSize(9);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).AlignCenter().Text("Disc").FontColor(Colors.White).Bold().FontSize(9);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).AlignCenter().Text("Tax").FontColor(Colors.White).Bold().FontSize(9);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(8).AlignRight().Text("Amount").FontColor(Colors.White).Bold().FontSize(9);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).Text("#").FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).Text("Description").FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text("HSN").FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text("Qty").FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignRight().Text("Rate").FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text(taxHeader).FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignRight().Text("Tax Amt").FontColor(Colors.White).Bold().FontSize(8);
+                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignRight().Text("Amount").FontColor(Colors.White).Bold().FontSize(8);
             });
 
             // Rows
@@ -223,18 +226,51 @@ public class InvoicePdfService : IInvoicePdfService
             {
                 var bgColor = lines.IndexOf(line) % 2 == 0 ? Colors.White : Colors.Grey.Lighten4;
 
-                table.Cell().Background(bgColor).Padding(8).Text(line.LineNumber.ToString());
-                table.Cell().Background(bgColor).Padding(8).Column(col =>
+                // Line number
+                table.Cell().Background(bgColor).Padding(6).Text(line.LineNumber.ToString()).FontSize(9);
+
+                // Description with SKU
+                table.Cell().Background(bgColor).Padding(6).Column(col =>
                 {
-                    col.Item().Text(line.Description).Bold();
+                    col.Item().Text(line.Description).Bold().FontSize(9);
                     if (!string.IsNullOrEmpty(line.ProductCode))
-                        col.Item().Text($"SKU: {line.ProductCode}").FontSize(8).FontColor(Colors.Grey.Darken1);
+                        col.Item().Text($"SKU: {line.ProductCode}").FontSize(7).FontColor(Colors.Grey.Darken1);
                 });
-                table.Cell().Background(bgColor).Padding(8).AlignCenter().Text(line.Quantity.ToString("0.##"));
-                table.Cell().Background(bgColor).Padding(8).AlignRight().Text(line.UnitPrice.ToString("C2"));
-                table.Cell().Background(bgColor).Padding(8).AlignCenter().Text(line.DiscountPercent > 0 ? $"{line.DiscountPercent:0.##}%" : "-");
-                table.Cell().Background(bgColor).Padding(8).AlignCenter().Text(line.TaxPercent > 0 ? $"{line.TaxPercent:0.##}%" : "-");
-                table.Cell().Background(bgColor).Padding(8).AlignRight().Text(line.LineTotal.ToString("C2")).Bold();
+
+                // HSN Code
+                table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(line.HsnCode ?? "-").FontSize(9);
+
+                // Quantity
+                table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(line.Quantity.ToString("0.##")).FontSize(9);
+
+                // Unit Price
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(line.UnitPrice.ToString("C2")).FontSize(9);
+
+                // GST Rate - show IGST for inter-state, CGST+SGST for intra-state
+                string gstRateText;
+                if (invoice.IsInterState && line.IgstRate > 0)
+                {
+                    gstRateText = $"{line.IgstRate:0.##}%";
+                }
+                else if (line.CgstRate > 0 || line.SgstRate > 0)
+                {
+                    gstRateText = $"{line.CgstRate:0.##}%+{line.SgstRate:0.##}%";
+                }
+                else if (line.TaxPercent > 0)
+                {
+                    gstRateText = $"{line.TaxPercent:0.##}%";
+                }
+                else
+                {
+                    gstRateText = "-";
+                }
+                table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(gstRateText).FontSize(9);
+
+                // Tax Amount
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(line.TaxAmount.ToString("C2")).FontSize(9);
+
+                // Line Total
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(line.LineTotal.ToString("C2")).Bold().FontSize(9);
             }
         });
     }
@@ -258,11 +294,45 @@ public class InvoicePdfService : IInvoicePdfService
                 });
             }
 
-            column.Item().Row(row =>
+            // GST Breakdown - show CGST/SGST for intra-state, IGST for inter-state
+            if (invoice.IsInterState && invoice.IgstAmount > 0)
             {
-                row.RelativeItem().AlignRight().Text("Tax:");
-                row.ConstantItem(100).AlignRight().Text(invoice.TaxAmount.ToString("C2"));
-            });
+                // Inter-state: Show IGST only
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().AlignRight().Text("IGST:");
+                    row.ConstantItem(100).AlignRight().Text(invoice.IgstAmount.ToString("C2"));
+                });
+            }
+            else if (invoice.CgstAmount > 0 || invoice.SgstAmount > 0)
+            {
+                // Intra-state: Show CGST and SGST separately
+                if (invoice.CgstAmount > 0)
+                {
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem().AlignRight().Text("CGST:");
+                        row.ConstantItem(100).AlignRight().Text(invoice.CgstAmount.ToString("C2"));
+                    });
+                }
+                if (invoice.SgstAmount > 0)
+                {
+                    column.Item().Row(row =>
+                    {
+                        row.RelativeItem().AlignRight().Text("SGST:");
+                        row.ConstantItem(100).AlignRight().Text(invoice.SgstAmount.ToString("C2"));
+                    });
+                }
+            }
+            else if (invoice.TaxAmount > 0)
+            {
+                // Fallback: Show generic tax if no GST breakdown
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().AlignRight().Text("Tax:");
+                    row.ConstantItem(100).AlignRight().Text(invoice.TaxAmount.ToString("C2"));
+                });
+            }
 
             column.Item().PaddingTop(5).BorderTop(2).BorderColor(Colors.Blue.Darken3).PaddingTop(5).Row(row =>
             {
