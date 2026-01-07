@@ -2,6 +2,9 @@
 -- Procurement & Quality Module Tables Migration Script
 -- Algora ERP - Enterprise Resource Planning
 -- =============================================================================
+-- NOTE: This system uses database-per-tenant multi-tenancy. Each tenant has
+--       its own database, so TenantId columns are NOT needed in tables.
+-- =============================================================================
 
 SET QUOTED_IDENTIFIER ON;
 GO
@@ -15,7 +18,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'DeliveryChallans')
 BEGIN
     CREATE TABLE DeliveryChallans (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         ChallanNumber NVARCHAR(50) NOT NULL,
         ChallanDate DATETIME2 NOT NULL,
@@ -25,7 +27,7 @@ BEGIN
 
         -- Customer
         CustomerId UNIQUEIDENTIFIER NOT NULL,
-        CustomerName NVARCHAR(200) NOT NULL,
+        CustomerName NVARCHAR(200) NULL,
 
         -- Warehouse
         WarehouseId UNIQUEIDENTIFIER NOT NULL,
@@ -40,42 +42,54 @@ BEGIN
         TransportMode NVARCHAR(50) NULL,
         TransporterName NVARCHAR(200) NULL,
 
+        -- Confirmation Details
+        ConfirmedAt DATETIME2 NULL,
+        ConfirmedBy UNIQUEIDENTIFIER NULL,
+
         -- Dispatch Details
         DispatchedBy UNIQUEIDENTIFIER NULL,
         DispatchedAt DATETIME2 NULL,
-        DispatcherName NVARCHAR(100) NULL,
 
         -- Delivery Details
         DeliveredAt DATETIME2 NULL,
-        ReceiverName NVARCHAR(100) NULL,
-        ReceiverSignature NVARCHAR(MAX) NULL,
+        DeliveredBy UNIQUEIDENTIFIER NULL,
 
-        -- Shipping Address
+        -- Shipping Address (ShipTo)
         ShipToName NVARCHAR(200) NULL,
+        ShipToPhone NVARCHAR(20) NULL,
         ShipToAddress1 NVARCHAR(500) NULL,
         ShipToAddress2 NVARCHAR(500) NULL,
         ShipToCity NVARCHAR(100) NULL,
         ShipToState NVARCHAR(100) NULL,
         ShipToPostalCode NVARCHAR(20) NULL,
         ShipToCountry NVARCHAR(100) NULL,
-        ShipToPhone NVARCHAR(20) NULL,
+
+        -- Legacy shipping address (backward compatibility)
+        ShippingAddress NVARCHAR(500) NULL,
+        ShippingCity NVARCHAR(100) NULL,
+        ShippingState NVARCHAR(100) NULL,
+        ShippingCountry NVARCHAR(100) NULL,
+        ShippingPostalCode NVARCHAR(20) NULL,
+        ContactPerson NVARCHAR(100) NULL,
+        ContactPhone NVARCHAR(20) NULL,
 
         -- Totals
         TotalQuantity DECIMAL(18,4) NOT NULL DEFAULT 0,
-        TotalPackages INT NOT NULL DEFAULT 0,
+        TotalPackages INT NULL DEFAULT 1,
         TotalWeight DECIMAL(18,4) NULL,
         WeightUnit NVARCHAR(10) NULL DEFAULT 'KG',
 
+        Reference NVARCHAR(200) NULL,
         Notes NVARCHAR(MAX) NULL,
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL
+        DeletedBy UNIQUEIDENTIFIER NULL
     );
 
     PRINT 'Created table: DeliveryChallans';
@@ -87,7 +101,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'DeliveryChallanLines')
 BEGIN
     CREATE TABLE DeliveryChallanLines (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         DeliveryChallanId UNIQUEIDENTIFIER NOT NULL,
         LineNumber INT NOT NULL,
@@ -104,20 +117,20 @@ BEGIN
         Quantity DECIMAL(18,4) NOT NULL,
         UnitOfMeasure NVARCHAR(20) NOT NULL DEFAULT 'EA',
 
-        -- Packaging
-        PackageCount INT NULL DEFAULT 1,
-        PackageType NVARCHAR(50) NULL,
+        -- Batch/Serial
+        BatchNumber NVARCHAR(100) NULL,
+        SerialNumbers NVARCHAR(MAX) NULL,
 
         Notes NVARCHAR(500) NULL,
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL,
+        DeletedBy UNIQUEIDENTIFIER NULL,
 
         CONSTRAINT FK_DeliveryChallanLines_DeliveryChallans
             FOREIGN KEY (DeliveryChallanId) REFERENCES DeliveryChallans(Id)
@@ -136,7 +149,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'GoodsReceiptNotes')
 BEGIN
     CREATE TABLE GoodsReceiptNotes (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         GrnNumber NVARCHAR(50) NOT NULL,
         GrnDate DATETIME2 NOT NULL,
@@ -147,7 +159,7 @@ BEGIN
 
         -- Supplier
         SupplierId UNIQUEIDENTIFIER NOT NULL,
-        SupplierName NVARCHAR(200) NOT NULL,
+        SupplierName NVARCHAR(200) NULL,
         SupplierInvoiceNumber NVARCHAR(100) NULL,
         SupplierInvoiceDate DATETIME2 NULL,
 
@@ -162,34 +174,40 @@ BEGIN
         DriverName NVARCHAR(100) NULL,
         TransporterName NVARCHAR(200) NULL,
         WayBillNumber NVARCHAR(100) NULL,
+        LrNumber NVARCHAR(100) NULL, -- Lorry Receipt Number
+        LrDate DATETIME2 NULL,
 
         -- Receipt Details
         ReceivedBy UNIQUEIDENTIFIER NULL,
         ReceivedAt DATETIME2 NULL,
-        ReceiverName NVARCHAR(100) NULL,
 
-        -- Totals
+        -- Quantity Totals
         TotalOrderedQuantity DECIMAL(18,4) NOT NULL DEFAULT 0,
         TotalReceivedQuantity DECIMAL(18,4) NOT NULL DEFAULT 0,
         TotalAcceptedQuantity DECIMAL(18,4) NOT NULL DEFAULT 0,
         TotalRejectedQuantity DECIMAL(18,4) NOT NULL DEFAULT 0,
+
+        -- Value Totals
+        SubTotal DECIMAL(18,2) NOT NULL DEFAULT 0,
+        TaxAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
+        TotalAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
         TotalValue DECIMAL(18,4) NOT NULL DEFAULT 0,
 
         -- QC
         QCRequired BIT NOT NULL DEFAULT 0,
         QCCompletedAt DATETIME2 NULL,
-        QCCompletedBy UNIQUEIDENTIFIER NULL,
 
+        Reference NVARCHAR(200) NULL,
         Notes NVARCHAR(MAX) NULL,
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL
+        DeletedBy UNIQUEIDENTIFIER NULL
     );
 
     PRINT 'Created table: GoodsReceiptNotes';
@@ -201,7 +219,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'GoodsReceiptLines')
 BEGIN
     CREATE TABLE GoodsReceiptLines (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         GoodsReceiptNoteId UNIQUEIDENTIFIER NOT NULL,
         LineNumber INT NOT NULL,
@@ -223,28 +240,30 @@ BEGIN
 
         -- Pricing
         UnitPrice DECIMAL(18,4) NOT NULL DEFAULT 0,
+        TaxPercent DECIMAL(5,2) NOT NULL DEFAULT 0,
+        TaxAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
         LineTotal DECIMAL(18,4) NOT NULL DEFAULT 0,
 
         -- QC Status
-        QCStatus INT NOT NULL DEFAULT 0, -- 0=Pending, 1=Passed, 2=Failed, 3=PartialPass
-        QCInspectionId UNIQUEIDENTIFIER NULL,
+        QCStatus INT NOT NULL DEFAULT 0, -- 0=Pending, 1=Passed, 2=Failed, 3=PartialPass, 4=NotRequired
+        QualityInspectionId UNIQUEIDENTIFIER NULL,
 
-        -- Storage Location
-        WarehouseLocationId UNIQUEIDENTIFIER NULL,
+        -- Batch/Serial Tracking
         BatchNumber NVARCHAR(100) NULL,
         ExpiryDate DATETIME2 NULL,
+        SerialNumbers NVARCHAR(MAX) NULL,
 
         Notes NVARCHAR(500) NULL,
         RejectionReason NVARCHAR(500) NULL,
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL,
+        DeletedBy UNIQUEIDENTIFIER NULL,
 
         CONSTRAINT FK_GoodsReceiptLines_GoodsReceiptNotes
             FOREIGN KEY (GoodsReceiptNoteId) REFERENCES GoodsReceiptNotes(Id)
@@ -263,7 +282,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'QualityInspections')
 BEGIN
     CREATE TABLE QualityInspections (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         InspectionNumber NVARCHAR(50) NOT NULL,
         InspectionDate DATETIME2 NOT NULL,
@@ -313,12 +331,12 @@ BEGIN
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL
+        DeletedBy UNIQUEIDENTIFIER NULL
     );
 
     PRINT 'Created table: QualityInspections';
@@ -330,7 +348,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'QualityParameters')
 BEGIN
     CREATE TABLE QualityParameters (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         QualityInspectionId UNIQUEIDENTIFIER NOT NULL,
         SequenceNumber INT NOT NULL,
@@ -359,12 +376,12 @@ BEGIN
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL,
+        DeletedBy UNIQUEIDENTIFIER NULL,
 
         CONSTRAINT FK_QualityParameters_QualityInspections
             FOREIGN KEY (QualityInspectionId) REFERENCES QualityInspections(Id)
@@ -383,7 +400,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'RejectionNotes')
 BEGIN
     CREATE TABLE RejectionNotes (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         RejectionNumber NVARCHAR(50) NOT NULL,
         RejectionDate DATETIME2 NOT NULL,
@@ -450,12 +466,12 @@ BEGIN
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL
+        DeletedBy UNIQUEIDENTIFIER NULL
     );
 
     PRINT 'Created table: RejectionNotes';
@@ -471,7 +487,6 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CancellationLogs')
 BEGIN
     CREATE TABLE CancellationLogs (
         Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-        TenantId UNIQUEIDENTIFIER NOT NULL,
 
         -- Document Reference
         DocumentType NVARCHAR(50) NOT NULL,
@@ -505,18 +520,19 @@ BEGIN
         Notes NVARCHAR(MAX) NULL,
 
         -- Approval
+        ApprovalRequired BIT NOT NULL DEFAULT 0,
         ApprovalReference NVARCHAR(100) NULL,
         ApprovedBy UNIQUEIDENTIFIER NULL,
         ApprovedAt DATETIME2 NULL,
 
         -- Audit
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CreatedBy NVARCHAR(100) NULL,
+        CreatedBy UNIQUEIDENTIFIER NULL,
         ModifiedAt DATETIME2 NULL,
-        ModifiedBy NVARCHAR(100) NULL,
+        ModifiedBy UNIQUEIDENTIFIER NULL,
         IsDeleted BIT NOT NULL DEFAULT 0,
         DeletedAt DATETIME2 NULL,
-        DeletedBy NVARCHAR(100) NULL
+        DeletedBy UNIQUEIDENTIFIER NULL
     );
 
     PRINT 'Created table: CancellationLogs';
@@ -524,25 +540,37 @@ END
 GO
 
 -- =============================================================================
--- INDEXES
+-- UPDATE EXISTING TABLES (Add missing columns)
+-- =============================================================================
+
+-- Add SourceDocumentNumber to StockMovements if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('StockMovements') AND name = 'SourceDocumentNumber')
+BEGIN
+    ALTER TABLE StockMovements ADD SourceDocumentNumber NVARCHAR(100) NULL;
+    PRINT 'Added SourceDocumentNumber column to StockMovements';
+END
+GO
+
+-- =============================================================================
+-- INDEXES (without TenantId since we use database-per-tenant)
 -- =============================================================================
 
 -- DeliveryChallans indexes
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_TenantId_ChallanNumber')
-    CREATE UNIQUE INDEX IX_DeliveryChallans_TenantId_ChallanNumber
-    ON DeliveryChallans(TenantId, ChallanNumber) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_ChallanNumber')
+    CREATE UNIQUE INDEX IX_DeliveryChallans_ChallanNumber
+    ON DeliveryChallans(ChallanNumber) WHERE IsDeleted = 0;
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_TenantId_ChallanDate')
-    CREATE INDEX IX_DeliveryChallans_TenantId_ChallanDate
-    ON DeliveryChallans(TenantId, ChallanDate);
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_ChallanDate')
+    CREATE INDEX IX_DeliveryChallans_ChallanDate
+    ON DeliveryChallans(ChallanDate);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_TenantId_Status')
-    CREATE INDEX IX_DeliveryChallans_TenantId_Status
-    ON DeliveryChallans(TenantId, Status) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_Status')
+    CREATE INDEX IX_DeliveryChallans_Status
+    ON DeliveryChallans(Status) WHERE IsDeleted = 0;
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_TenantId_CustomerId')
-    CREATE INDEX IX_DeliveryChallans_TenantId_CustomerId
-    ON DeliveryChallans(TenantId, CustomerId) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_CustomerId')
+    CREATE INDEX IX_DeliveryChallans_CustomerId
+    ON DeliveryChallans(CustomerId) WHERE IsDeleted = 0;
 
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallans_SalesOrderId')
     CREATE INDEX IX_DeliveryChallans_SalesOrderId
@@ -558,21 +586,21 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_DeliveryChallanLines_P
     ON DeliveryChallanLines(ProductId);
 
 -- GoodsReceiptNotes indexes
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_TenantId_GrnNumber')
-    CREATE UNIQUE INDEX IX_GoodsReceiptNotes_TenantId_GrnNumber
-    ON GoodsReceiptNotes(TenantId, GrnNumber) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_GrnNumber')
+    CREATE UNIQUE INDEX IX_GoodsReceiptNotes_GrnNumber
+    ON GoodsReceiptNotes(GrnNumber) WHERE IsDeleted = 0;
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_TenantId_GrnDate')
-    CREATE INDEX IX_GoodsReceiptNotes_TenantId_GrnDate
-    ON GoodsReceiptNotes(TenantId, GrnDate);
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_GrnDate')
+    CREATE INDEX IX_GoodsReceiptNotes_GrnDate
+    ON GoodsReceiptNotes(GrnDate);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_TenantId_Status')
-    CREATE INDEX IX_GoodsReceiptNotes_TenantId_Status
-    ON GoodsReceiptNotes(TenantId, Status) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_Status')
+    CREATE INDEX IX_GoodsReceiptNotes_Status
+    ON GoodsReceiptNotes(Status) WHERE IsDeleted = 0;
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_TenantId_SupplierId')
-    CREATE INDEX IX_GoodsReceiptNotes_TenantId_SupplierId
-    ON GoodsReceiptNotes(TenantId, SupplierId) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_SupplierId')
+    CREATE INDEX IX_GoodsReceiptNotes_SupplierId
+    ON GoodsReceiptNotes(SupplierId) WHERE IsDeleted = 0;
 
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptNotes_PurchaseOrderId')
     CREATE INDEX IX_GoodsReceiptNotes_PurchaseOrderId
@@ -587,22 +615,26 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptLines_Prod
     CREATE INDEX IX_GoodsReceiptLines_ProductId
     ON GoodsReceiptLines(ProductId);
 
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptLines_PurchaseOrderLineId')
+    CREATE INDEX IX_GoodsReceiptLines_PurchaseOrderLineId
+    ON GoodsReceiptLines(PurchaseOrderLineId) WHERE PurchaseOrderLineId IS NOT NULL;
+
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_GoodsReceiptLines_QCStatus')
     CREATE INDEX IX_GoodsReceiptLines_QCStatus
     ON GoodsReceiptLines(QCStatus);
 
 -- QualityInspections indexes
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_TenantId_InspectionNumber')
-    CREATE UNIQUE INDEX IX_QualityInspections_TenantId_InspectionNumber
-    ON QualityInspections(TenantId, InspectionNumber) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_InspectionNumber')
+    CREATE UNIQUE INDEX IX_QualityInspections_InspectionNumber
+    ON QualityInspections(InspectionNumber) WHERE IsDeleted = 0;
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_TenantId_InspectionDate')
-    CREATE INDEX IX_QualityInspections_TenantId_InspectionDate
-    ON QualityInspections(TenantId, InspectionDate);
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_InspectionDate')
+    CREATE INDEX IX_QualityInspections_InspectionDate
+    ON QualityInspections(InspectionDate);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_TenantId_Status')
-    CREATE INDEX IX_QualityInspections_TenantId_Status
-    ON QualityInspections(TenantId, Status) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_Status')
+    CREATE INDEX IX_QualityInspections_Status
+    ON QualityInspections(Status) WHERE IsDeleted = 0;
 
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityInspections_SourceDocument')
     CREATE INDEX IX_QualityInspections_SourceDocument
@@ -618,17 +650,17 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_QualityParameters_Qual
     ON QualityParameters(QualityInspectionId);
 
 -- RejectionNotes indexes
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_TenantId_RejectionNumber')
-    CREATE UNIQUE INDEX IX_RejectionNotes_TenantId_RejectionNumber
-    ON RejectionNotes(TenantId, RejectionNumber) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_RejectionNumber')
+    CREATE UNIQUE INDEX IX_RejectionNotes_RejectionNumber
+    ON RejectionNotes(RejectionNumber) WHERE IsDeleted = 0;
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_TenantId_RejectionDate')
-    CREATE INDEX IX_RejectionNotes_TenantId_RejectionDate
-    ON RejectionNotes(TenantId, RejectionDate);
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_RejectionDate')
+    CREATE INDEX IX_RejectionNotes_RejectionDate
+    ON RejectionNotes(RejectionDate);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_TenantId_DispositionStatus')
-    CREATE INDEX IX_RejectionNotes_TenantId_DispositionStatus
-    ON RejectionNotes(TenantId, DispositionStatus) WHERE IsDeleted = 0;
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_DispositionStatus')
+    CREATE INDEX IX_RejectionNotes_DispositionStatus
+    ON RejectionNotes(DispositionStatus) WHERE IsDeleted = 0;
 
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_SourceDocument')
     CREATE INDEX IX_RejectionNotes_SourceDocument
@@ -647,13 +679,13 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_RejectionNotes_Supplie
     ON RejectionNotes(SupplierId) WHERE SupplierId IS NOT NULL;
 
 -- CancellationLogs indexes
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_CancellationLogs_TenantId_DocumentType')
-    CREATE INDEX IX_CancellationLogs_TenantId_DocumentType
-    ON CancellationLogs(TenantId, DocumentType);
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_CancellationLogs_DocumentType')
+    CREATE INDEX IX_CancellationLogs_DocumentType
+    ON CancellationLogs(DocumentType);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_CancellationLogs_TenantId_CancelledAt')
-    CREATE INDEX IX_CancellationLogs_TenantId_CancelledAt
-    ON CancellationLogs(TenantId, CancelledAt);
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_CancellationLogs_CancelledAt')
+    CREATE INDEX IX_CancellationLogs_CancelledAt
+    ON CancellationLogs(CancelledAt);
 
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_CancellationLogs_DocumentId')
     CREATE INDEX IX_CancellationLogs_DocumentId
@@ -682,5 +714,11 @@ PRINT '  - QualityInspections (Quality)';
 PRINT '  - QualityParameters (Quality)';
 PRINT '  - RejectionNotes (Quality)';
 PRINT '  - CancellationLogs (Common)';
+PRINT '';
+PRINT 'Existing Tables Updated:';
+PRINT '  - StockMovements (added SourceDocumentNumber)';
+PRINT '';
+PRINT 'NOTE: This script uses database-per-tenant multi-tenancy.';
+PRINT '      TenantId columns are NOT included in tables.';
 PRINT '=============================================================================';
 GO
