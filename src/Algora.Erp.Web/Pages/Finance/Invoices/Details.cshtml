@@ -212,6 +212,66 @@
                 </div>
             </div>
 
+            <!-- GST Details Card -->
+            @if (Model.Invoice.FromLocation != null || !string.IsNullOrEmpty(Model.Invoice.CustomerGstin))
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-percent me-2"></i>GST Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                @if (Model.Invoice.FromLocation != null)
+                                {
+                                    <div class="mb-3">
+                                        <h6 class="text-muted text-uppercase small mb-2">From Location</h6>
+                                        <p class="mb-1 fw-medium">@Model.Invoice.FromLocation.Name</p>
+                                        <p class="text-muted mb-0">
+                                            @Model.Invoice.FromLocation.AddressLine1<br />
+                                            @Model.Invoice.FromLocation.City, @Model.Invoice.FromLocation.State?.Name @Model.Invoice.FromLocation.PostalCode<br />
+                                            @if (!string.IsNullOrEmpty(Model.Invoice.FromLocation.GstNumber))
+                                            {
+                                                <span class="badge bg-light text-dark mt-1">GSTIN: @Model.Invoice.FromLocation.GstNumber</span>
+                                            }
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6 class="text-muted text-uppercase small mb-2">Customer GST Info</h6>
+                                    @if (!string.IsNullOrEmpty(Model.Invoice.CustomerGstin))
+                                    {
+                                        <p class="mb-1">
+                                            <span class="badge bg-primary">GSTIN: @Model.Invoice.CustomerGstin</span>
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Invoice.CustomerStateCode))
+                                    {
+                                        <p class="mb-1">State Code: @Model.Invoice.CustomerStateCode</p>
+                                    }
+                                    <p class="mb-0">
+                                        @if (Model.Invoice.IsInterState)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-arrow-left-right me-1"></i>Inter-State (IGST)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-geo-alt me-1"></i>Intra-State (CGST + SGST)
+                                            </span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             <!-- Line Items Card -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white py-3">
@@ -227,7 +287,8 @@
                                     <th class="text-center">Qty</th>
                                     <th class="text-end">Unit Price</th>
                                     <th class="text-center">Disc %</th>
-                                    <th class="text-center">Tax %</th>
+                                    <th>GST</th>
+                                    <th>HSN</th>
                                     <th class="text-end pe-4">Total</th>
                                 </tr>
                             </thead>
@@ -244,7 +305,7 @@
                                             }
                                         </td>
                                         <td class="text-center">@line.Quantity</td>
-                                        <td class="text-end">@line.UnitPrice.ToString("C2")</td>
+                                        <td class="text-end">₹@line.UnitPrice.ToString("N2")</td>
                                         <td class="text-center">
                                             @if (line.DiscountPercent > 0)
                                             {
@@ -255,39 +316,80 @@
                                                 <span class="text-muted">-</span>
                                             }
                                         </td>
-                                        <td class="text-center">
-                                            @if (line.TaxPercent > 0)
+                                        <td>
+                                            @if (line.GstSlab != null)
                                             {
-                                                @line.TaxPercent.ToString("0.##")@:%
+                                                <span class="badge bg-light text-dark">@line.GstSlab.Name</span>
+                                            }
+                                            else if (line.TaxPercent > 0)
+                                            {
+                                                <span class="text-muted">@line.TaxPercent.ToString("0.##")%</span>
                                             }
                                             else
                                             {
                                                 <span class="text-muted">-</span>
                                             }
                                         </td>
-                                        <td class="text-end pe-4 fw-medium">@line.LineTotal.ToString("C2")</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(line.HsnCode))
+                                            {
+                                                <code>@line.HsnCode</code>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end pe-4 fw-medium">₹@line.LineTotal.ToString("N2")</td>
                                     </tr>
                                 }
                             </tbody>
                             <tfoot class="bg-light">
                                 <tr>
-                                    <td colspan="6" class="text-end">Subtotal:</td>
-                                    <td class="text-end pe-4">@Model.Invoice.SubTotal.ToString("C2")</td>
+                                    <td colspan="7" class="text-end">Subtotal:</td>
+                                    <td class="text-end pe-4">₹@Model.Invoice.SubTotal.ToString("N2")</td>
                                 </tr>
                                 @if (Model.Invoice.DiscountAmount > 0)
                                 {
                                     <tr>
-                                        <td colspan="6" class="text-end text-danger">Discount:</td>
-                                        <td class="text-end pe-4 text-danger">-@Model.Invoice.DiscountAmount.ToString("C2")</td>
+                                        <td colspan="7" class="text-end text-danger">Discount:</td>
+                                        <td class="text-end pe-4 text-danger">-₹@Model.Invoice.DiscountAmount.ToString("N2")</td>
                                     </tr>
                                 }
-                                <tr>
-                                    <td colspan="6" class="text-end">Tax:</td>
-                                    <td class="text-end pe-4">@Model.Invoice.TaxAmount.ToString("C2")</td>
-                                </tr>
+                                @if (Model.Invoice.IsInterState)
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-end text-warning">IGST:</td>
+                                        <td class="text-end pe-4 text-warning">₹@Model.Invoice.IgstAmount.ToString("N2")</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @if (Model.Invoice.CgstAmount > 0)
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-end text-success">CGST:</td>
+                                            <td class="text-end pe-4 text-success">₹@Model.Invoice.CgstAmount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (Model.Invoice.SgstAmount > 0)
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-end text-info">SGST:</td>
+                                            <td class="text-end pe-4 text-info">₹@Model.Invoice.SgstAmount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                }
+                                @if (Model.Invoice.TaxAmount > 0 && Model.Invoice.CgstAmount == 0 && Model.Invoice.SgstAmount == 0 && Model.Invoice.IgstAmount == 0)
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-end">Tax:</td>
+                                        <td class="text-end pe-4">₹@Model.Invoice.TaxAmount.ToString("N2")</td>
+                                    </tr>
+                                }
                                 <tr class="fw-bold fs-5">
-                                    <td colspan="6" class="text-end">Total:</td>
-                                    <td class="text-end pe-4">@Model.Invoice.TotalAmount.ToString("C2")</td>
+                                    <td colspan="7" class="text-end">Total:</td>
+                                    <td class="text-end pe-4">₹@Model.Invoice.TotalAmount.ToString("N2")</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -394,17 +496,17 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Invoice Total</span>
-                        <span class="fw-medium">@Model.Invoice.TotalAmount.ToString("C2")</span>
+                        <span class="fw-medium">₹@Model.Invoice.TotalAmount.ToString("N2")</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Amount Paid</span>
-                        <span class="text-success">@Model.Invoice.PaidAmount.ToString("C2")</span>
+                        <span class="text-success">₹@Model.Invoice.PaidAmount.ToString("N2")</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between">
                         <span class="fw-bold">Balance Due</span>
                         <span class="fw-bold fs-4 @(Model.Invoice.BalanceDue > 0 ? "text-danger" : "text-success")">
-                            @Model.Invoice.BalanceDue.ToString("C2")
+                            ₹@Model.Invoice.BalanceDue.ToString("N2")
                         </span>
                     </div>
 

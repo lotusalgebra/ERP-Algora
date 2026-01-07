@@ -37,7 +37,10 @@ public class DetailsModel : PageModel
             .Include(i => i.Customer)
             .Include(i => i.SalesOrder)
             .Include(i => i.Lines)
+                .ThenInclude(l => l.GstSlab)
             .Include(i => i.Payments)
+            .Include(i => i.FromLocation)
+                .ThenInclude(l => l!.State)
             .FirstOrDefaultAsync(i => i.Id == id);
 
         if (invoice == null)
