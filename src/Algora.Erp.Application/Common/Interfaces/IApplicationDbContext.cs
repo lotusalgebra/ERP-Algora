@@ -11,6 +11,7 @@ using Algora.Erp.Domain.Entities.Procurement;
 using Algora.Erp.Domain.Entities.Projects;
 using Algora.Erp.Domain.Entities.Quality;
 using Algora.Erp.Domain.Entities.Sales;
+using Algora.Erp.Domain.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Application.Common.Interfaces;
@@ -119,6 +120,12 @@ public interface IApplicationDbContext
     DbSet<ShippingMethod> ShippingMethods { get; }
     DbSet<WebPaymentMethod> WebPaymentMethods { get; }
     DbSet<Banner> Banners { get; }
+
+    // Settings
+    DbSet<Currency> Currencies { get; }
+    DbSet<IndianState> IndianStates { get; }
+    DbSet<GstSlab> GstSlabs { get; }
+    DbSet<OfficeLocation> OfficeLocations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

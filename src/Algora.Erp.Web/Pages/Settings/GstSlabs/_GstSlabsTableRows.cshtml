@@ -1,0 +1,97 @@
+@model List<Algora.Erp.Domain.Entities.Settings.GstSlab>
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-percent fs-1 d-block mb-2"></i>
+                <p class="mb-0">No GST slabs configured</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var slab in Model)
+    {
+        <tr>
+            <td class="ps-4">
+                <span class="fw-semibold">@slab.Name</span>
+                @if (slab.IsDefault)
+                {
+                    <span class="badge bg-primary ms-1">Default</span>
+                }
+            </td>
+            <td class="text-center">
+                <span class="badge bg-dark fs-6">@slab.Rate%</span>
+            </td>
+            <td class="text-center">
+                <span class="text-success">@slab.CgstRate%</span>
+            </td>
+            <td class="text-center">
+                <span class="text-info">@slab.SgstRate%</span>
+            </td>
+            <td class="text-center">
+                <span class="text-warning">@slab.IgstRate%</span>
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(slab.HsnCodes))
+                {
+                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="@slab.HsnCodes">
+                        @slab.HsnCodes
+                    </span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                @if (slab.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#"
+                               onclick='editSlab(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                                   id = slab.Id,
+                                   name = slab.Name,
+                                   rate = slab.Rate,
+                                   cgstRate = slab.CgstRate,
+                                   sgstRate = slab.SgstRate,
+                                   igstRate = slab.IgstRate,
+                                   hsnCodes = slab.HsnCodes,
+                                   displayOrder = slab.DisplayOrder,
+                                   isDefault = slab.IsDefault,
+                                   isActive = slab.IsActive
+                               })))'>
+                                <i class="bi bi-pencil me-2"></i> Edit
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#"
+                               hx-delete="?handler=&id=@slab.Id"
+                               hx-target="#gstSlabsTableBody"
+                               hx-confirm="Delete @slab.Name?">
+                                <i class="bi bi-trash me-2"></i> Delete
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+}

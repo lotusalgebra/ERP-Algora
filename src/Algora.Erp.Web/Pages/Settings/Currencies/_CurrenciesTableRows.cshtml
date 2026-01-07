@@ -1,0 +1,107 @@
+@model List<Algora.Erp.Domain.Entities.Settings.Currency>
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-currency-exchange fs-1 d-block mb-2"></i>
+                <p class="mb-0">No currencies configured</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var currency in Model)
+    {
+        var sample = currency.SymbolPosition == "before"
+            ? $"{currency.Symbol}1{currency.ThousandsSeparator}234{currency.DecimalSeparator}{"".PadRight(currency.DecimalPlaces, '0')}"
+            : $"1{currency.ThousandsSeparator}234{currency.DecimalSeparator}{"".PadRight(currency.DecimalPlaces, '0')}{currency.Symbol}";
+
+        <tr>
+            <td class="ps-4">
+                <span class="fw-semibold">@currency.Code</span>
+                @if (currency.IsBaseCurrency)
+                {
+                    <span class="badge bg-primary ms-1">Base</span>
+                }
+            </td>
+            <td>@currency.Name</td>
+            <td>
+                <span class="fs-5">@currency.Symbol</span>
+            </td>
+            <td class="text-end">
+                @if (currency.IsBaseCurrency)
+                {
+                    <span class="text-muted">1.000000</span>
+                }
+                else
+                {
+                    @currency.ExchangeRate.ToString("N6")
+                }
+            </td>
+            <td>
+                <code>@sample</code>
+            </td>
+            <td>
+                @if (currency.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="#"
+                               onclick='editCurrency(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                                   id = currency.Id,
+                                   code = currency.Code,
+                                   name = currency.Name,
+                                   symbol = currency.Symbol,
+                                   symbolPosition = currency.SymbolPosition,
+                                   decimalPlaces = currency.DecimalPlaces,
+                                   decimalSeparator = currency.DecimalSeparator,
+                                   thousandsSeparator = currency.ThousandsSeparator,
+                                   exchangeRate = currency.ExchangeRate,
+                                   displayOrder = currency.DisplayOrder,
+                                   isActive = currency.IsActive,
+                                   isBaseCurrency = currency.IsBaseCurrency
+                               })))'>
+                                <i class="bi bi-pencil me-2"></i> Edit
+                            </a>
+                        </li>
+                        @if (!currency.IsBaseCurrency)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="#"
+                                   hx-post="?handler=SetBase&id=@currency.Id"
+                                   hx-target="#currenciesTableBody"
+                                   hx-confirm="Set @currency.Name as the base currency?">
+                                    <i class="bi bi-star me-2"></i> Set as Base
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#"
+                                   hx-delete="?handler=&id=@currency.Id"
+                                   hx-target="#currenciesTableBody"
+                                   hx-confirm="Delete @currency.Name?">
+                                    <i class="bi bi-trash me-2"></i> Delete
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+}

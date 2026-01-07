@@ -1,0 +1,168 @@
+@model List<Algora.Erp.Domain.Entities.Settings.OfficeLocation>
+@using Algora.Erp.Domain.Entities.Settings
+
+@functions {
+    string GetTypeIcon(OfficeType type) => type switch
+    {
+        OfficeType.HeadOffice => "bi-building",
+        OfficeType.Branch => "bi-shop",
+        OfficeType.Warehouse => "bi-box-seam",
+        OfficeType.Factory => "bi-gear",
+        OfficeType.RegisteredOffice => "bi-bank",
+        _ => "bi-geo-alt"
+    };
+
+    string GetTypeName(OfficeType type) => type switch
+    {
+        OfficeType.HeadOffice => "Head Office",
+        OfficeType.Branch => "Branch",
+        OfficeType.Warehouse => "Warehouse",
+        OfficeType.Factory => "Factory",
+        OfficeType.RegisteredOffice => "Registered Office",
+        _ => type.ToString()
+    };
+
+    string GetTypeColor(OfficeType type) => type switch
+    {
+        OfficeType.HeadOffice => "primary",
+        OfficeType.Branch => "success",
+        OfficeType.Warehouse => "warning",
+        OfficeType.Factory => "info",
+        OfficeType.RegisteredOffice => "secondary",
+        _ => "dark"
+    };
+}
+
+@if (!Model.Any())
+{
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-geo-alt fs-1 text-muted d-block mb-3"></i>
+                <p class="mb-0 text-muted">No office locations configured</p>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var location in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-@GetTypeColor(location.Type) bg-opacity-10 rounded-3 p-2 me-3">
+                            <i class="bi @GetTypeIcon(location.Type) text-@GetTypeColor(location.Type) fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">
+                                @location.Name
+                                @if (location.IsHeadOffice)
+                                {
+                                    <span class="badge bg-primary ms-1">HQ</span>
+                                }
+                            </h6>
+                            <small class="text-muted">@location.Code</small>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#"
+                                   onclick='editLocation(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                                       id = location.Id,
+                                       code = location.Code,
+                                       name = location.Name,
+                                       type = (int)location.Type,
+                                       addressLine1 = location.AddressLine1,
+                                       addressLine2 = location.AddressLine2,
+                                       city = location.City,
+                                       stateId = location.StateId,
+                                       postalCode = location.PostalCode,
+                                       gstNumber = location.GstNumber,
+                                       gstRegistrationType = (int)location.GstRegistrationType,
+                                       isGstRegistered = location.IsGstRegistered,
+                                       defaultCurrencyId = location.DefaultCurrencyId,
+                                       contactPerson = location.ContactPerson,
+                                       phone = location.Phone,
+                                       email = location.Email,
+                                       displayOrder = location.DisplayOrder,
+                                       isHeadOffice = location.IsHeadOffice,
+                                       isActive = location.IsActive
+                                   })))'>
+                                    <i class="bi bi-pencil me-2"></i> Edit
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#"
+                                   hx-delete="?handler=&id=@location.Id"
+                                   hx-target="#locationsContainer"
+                                   hx-confirm="Delete @location.Name?">
+                                    <i class="bi bi-trash me-2"></i> Delete
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1"><i class="bi bi-geo-alt me-1"></i>Address</small>
+                        <span>@location.AddressLine1</span>
+                        @if (!string.IsNullOrEmpty(location.AddressLine2))
+                        {
+                            <br /><span>@location.AddressLine2</span>
+                        }
+                        <br />
+                        <span>@location.City, @(location.State?.Name ?? "N/A") @location.PostalCode</span>
+                    </div>
+
+                    @if (location.IsGstRegistered && !string.IsNullOrEmpty(location.GstNumber))
+                    {
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1"><i class="bi bi-receipt me-1"></i>GSTIN</small>
+                            <code class="fs-6">@location.GstNumber</code>
+                        </div>
+                    }
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-@GetTypeColor(location.Type) bg-opacity-10 text-@GetTypeColor(location.Type)">
+                            @GetTypeName(location.Type)
+                        </span>
+                        @if (location.DefaultCurrency != null)
+                        {
+                            <span class="badge bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-currency-exchange me-1"></i>@location.DefaultCurrency.Code
+                            </span>
+                        }
+                        @if (location.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(location.Phone) || !string.IsNullOrEmpty(location.Email))
+                {
+                    <div class="card-footer bg-light border-0">
+                        @if (!string.IsNullOrEmpty(location.Phone))
+                        {
+                            <small class="text-muted me-3"><i class="bi bi-telephone me-1"></i>@location.Phone</small>
+                        }
+                        @if (!string.IsNullOrEmpty(location.Email))
+                        {
+                            <small class="text-muted"><i class="bi bi-envelope me-1"></i>@location.Email</small>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}

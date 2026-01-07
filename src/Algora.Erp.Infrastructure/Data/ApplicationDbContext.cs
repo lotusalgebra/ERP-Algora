@@ -12,6 +12,7 @@ using Algora.Erp.Domain.Entities.Procurement;
 using Algora.Erp.Domain.Entities.Projects;
 using Algora.Erp.Domain.Entities.Quality;
 using Algora.Erp.Domain.Entities.Sales;
+using Algora.Erp.Domain.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Infrastructure.Data;
@@ -133,6 +134,12 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<ShippingMethod> ShippingMethods => Set<ShippingMethod>();
     public DbSet<WebPaymentMethod> WebPaymentMethods => Set<WebPaymentMethod>();
     public DbSet<Banner> Banners => Set<Banner>();
+
+    // Settings
+    public DbSet<Currency> Currencies => Set<Currency>();
+    public DbSet<IndianState> IndianStates => Set<IndianState>();
+    public DbSet<GstSlab> GstSlabs => Set<GstSlab>();
+    public DbSet<OfficeLocation> OfficeLocations => Set<OfficeLocation>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
