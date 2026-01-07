@@ -316,10 +316,10 @@ public class IndexModel : PageModel
             // Update stock levels
             await UpdateStockLevelsAsync(grn);
 
-            // Update PO status if linked
+            // Update PO status if linked (pass current GRN lines since they're not saved yet)
             if (grn.PurchaseOrderId.HasValue)
             {
-                await UpdatePurchaseOrderStatusAsync(grn.PurchaseOrderId.Value);
+                await UpdatePurchaseOrderStatusAsync(grn.PurchaseOrderId.Value, grn.Lines);
             }
         }
 
@@ -470,7 +470,7 @@ public class IndexModel : PageModel
         }
     }
 
-    private async Task UpdatePurchaseOrderStatusAsync(Guid purchaseOrderId)
+    private async Task UpdatePurchaseOrderStatusAsync(Guid purchaseOrderId, IEnumerable<GoodsReceiptLine>? currentGrnLines = null)
     {
         var po = await _context.PurchaseOrders
             .Include(p => p.Lines)
@@ -478,19 +478,37 @@ public class IndexModel : PageModel
 
         if (po == null) return;
 
-        // Calculate total received across all GRNs for this PO
-        var receivedQuantities = await _context.GoodsReceiptLines
+        var poLineIds = po.Lines.Select(x => x.Id).ToList();
+
+        // Calculate total received across all SAVED GRNs for this PO
+        var savedReceivedQuantities = await _context.GoodsReceiptLines
             .Where(l => l.PurchaseOrderLineId.HasValue &&
-                       po.Lines.Select(x => x.Id).Contains(l.PurchaseOrderLineId.Value))
+                       poLineIds.Contains(l.PurchaseOrderLineId.Value))
             .GroupBy(l => l.PurchaseOrderLineId)
             .Select(g => new { PoLineId = g.Key, ReceivedQty = g.Sum(x => x.AcceptedQuantity) })
-            .ToListAsync();
+            .ToDictionaryAsync(x => x.PoLineId!.Value, x => x.ReceivedQty);
+
+        // Add quantities from current unsaved GRN lines (if provided)
+        if (currentGrnLines != null)
+        {
+            foreach (var line in currentGrnLines.Where(l => l.PurchaseOrderLineId.HasValue))
+            {
+                var poLineId = line.PurchaseOrderLineId!.Value;
+                if (savedReceivedQuantities.ContainsKey(poLineId))
+                {
+                    savedReceivedQuantities[poLineId] += line.AcceptedQuantity;
+                }
+                else
+                {
+                    savedReceivedQuantities[poLineId] = line.AcceptedQuantity;
+                }
+            }
+        }
 
         // Update PO line received quantities
         foreach (var poLine in po.Lines)
         {
-            poLine.QuantityReceived = receivedQuantities
-                .FirstOrDefault(r => r.PoLineId == poLine.Id)?.ReceivedQty ?? 0;
+            poLine.QuantityReceived = savedReceivedQuantities.GetValueOrDefault(poLine.Id, 0);
         }
 
         // Determine PO status
