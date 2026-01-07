@@ -1,0 +1,210 @@
+@model Algora.Erp.Web.Pages.Quality.Rejections.RejectionFormViewModel
+@using Algora.Erp.Domain.Entities.Quality
+
+<form hx-post="?handler=" hx-target="#rejectionsTableBody" hx-swap="innerHTML">
+    @if (Model.IsEdit && Model.Rejection != null)
+    {
+        <input type="hidden" name="Id" value="@Model.Rejection.Id" />
+    }
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Rejection Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="RejectionDate"
+                   value="@(Model.Rejection?.RejectionDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Rejection Category <span class="text-danger">*</span></label>
+            <select class="form-select" name="RejectionCategory" required>
+                @foreach (var category in Enum.GetValues<RejectionCategory>())
+                {
+                    if (Model.Rejection?.RejectionCategory == category)
+                    {
+                        <option value="@category" selected>@category</option>
+                    }
+                    else
+                    {
+                        <option value="@category">@category</option>
+                    }
+                }
+            </select>
+        </div>
+
+        @if (Model.FailedInspections?.Any() == true)
+        {
+            <div class="col-12">
+                <label class="form-label">Link to QC Inspection (Optional)</label>
+                <select class="form-select" name="QualityInspectionId" id="qcSelect" onchange="loadQcDetails(this.value)">
+                    <option value="">-- Create Manual Rejection --</option>
+                    @foreach (var qc in Model.FailedInspections)
+                    {
+                        if (Model.Rejection?.QualityInspectionId == qc.Id)
+                        {
+                            <option value="@qc.Id" data-product="@qc.ProductId" data-warehouse="@qc.WarehouseId"
+                                    data-supplier="@qc.SupplierId" data-qty="@qc.FailedQuantity"
+                                    data-source-type="@qc.SourceDocumentType" data-source-id="@qc.SourceDocumentId"
+                                    data-source-number="@qc.SourceDocumentNumber" selected>
+                                @qc.InspectionNumber - @qc.Product?.Name (@qc.OverallResult)
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@qc.Id" data-product="@qc.ProductId" data-warehouse="@qc.WarehouseId"
+                                    data-supplier="@qc.SupplierId" data-qty="@qc.FailedQuantity"
+                                    data-source-type="@qc.SourceDocumentType" data-source-id="@qc.SourceDocumentId"
+                                    data-source-number="@qc.SourceDocumentNumber">
+                                @qc.InspectionNumber - @qc.Product?.Name (@qc.OverallResult)
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+        }
+
+        <div class="col-md-6">
+            <label class="form-label">Source Document Type</label>
+            <input type="text" class="form-control" name="SourceDocumentType" id="sourceDocumentType"
+                   value="@Model.Rejection?.SourceDocumentType" placeholder="e.g., GoodsReceipt, QualityInspection" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Source Document Number</label>
+            <input type="text" class="form-control" name="SourceDocumentNumber" id="sourceDocumentNumber"
+                   value="@Model.Rejection?.SourceDocumentNumber" />
+            <input type="hidden" name="SourceDocumentId" id="sourceDocumentId" value="@Model.Rejection?.SourceDocumentId" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Product <span class="text-danger">*</span></label>
+            <select class="form-select" name="ProductId" id="productSelect" required>
+                <option value="">-- Select Product --</option>
+                @foreach (var product in Model.Products)
+                {
+                    if (Model.Rejection?.ProductId == product.Id)
+                    {
+                        <option value="@product.Id" selected>@product.Name (@product.Sku)</option>
+                    }
+                    else
+                    {
+                        <option value="@product.Id">@product.Name (@product.Sku)</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Warehouse <span class="text-danger">*</span></label>
+            <select class="form-select" name="WarehouseId" id="warehouseSelect" required>
+                <option value="">-- Select Warehouse --</option>
+                @foreach (var warehouse in Model.Warehouses)
+                {
+                    if (Model.Rejection?.WarehouseId == warehouse.Id)
+                    {
+                        <option value="@warehouse.Id" selected>@warehouse.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@warehouse.Id">@warehouse.Name</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Supplier (if applicable)</label>
+            <select class="form-select" name="SupplierId" id="supplierSelect">
+                <option value="">-- Select Supplier --</option>
+                @foreach (var supplier in Model.Suppliers)
+                {
+                    if (Model.Rejection?.SupplierId == supplier.Id)
+                    {
+                        <option value="@supplier.Id" selected>@supplier.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@supplier.Id">@supplier.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            &nbsp;
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Rejected Quantity <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" name="RejectedQuantity" id="rejectedQty"
+                   value="@Model.Rejection?.RejectedQuantity" required step="0.01" min="0.01" onchange="calculateTotal()" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Unit of Measure</label>
+            <input type="text" class="form-control" name="UnitOfMeasure"
+                   value="@(Model.Rejection?.UnitOfMeasure ?? "EA")" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Unit Cost</label>
+            <input type="number" class="form-control" name="UnitCost" id="unitCost"
+                   value="@Model.Rejection?.UnitCost" step="0.01" min="0" onchange="calculateTotal()" />
+        </div>
+
+        <div class="col-12">
+            <div class="alert alert-info mb-0">
+                <div class="d-flex justify-content-between">
+                    <span>Total Rejection Value:</span>
+                    <strong id="totalValue">@Model.Rejection?.TotalValue.ToString("C2")</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+            <textarea class="form-control" name="RejectionReason" rows="2" required>@Model.Rejection?.RejectionReason</textarea>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Defect Description</label>
+            <textarea class="form-control" name="DefectDescription" rows="2">@Model.Rejection?.DefectDescription</textarea>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="Notes" rows="2">@Model.Rejection?.Notes</textarea>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-3">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Rejection
+        </button>
+    </div>
+</form>
+
+<script>
+    function loadQcDetails(qcId) {
+        const select = document.getElementById('qcSelect');
+        const option = select.options[select.selectedIndex];
+        if (option && option.value) {
+            document.getElementById('productSelect').value = option.dataset.product || '';
+            document.getElementById('warehouseSelect').value = option.dataset.warehouse || '';
+            document.getElementById('supplierSelect').value = option.dataset.supplier || '';
+            document.getElementById('rejectedQty').value = option.dataset.qty || '';
+            document.getElementById('sourceDocumentType').value = option.dataset.sourceType || '';
+            document.getElementById('sourceDocumentId').value = option.dataset.sourceId || '';
+            document.getElementById('sourceDocumentNumber').value = option.dataset.sourceNumber || '';
+            calculateTotal();
+        }
+    }
+
+    function calculateTotal() {
+        const qty = parseFloat(document.getElementById('rejectedQty').value) || 0;
+        const cost = parseFloat(document.getElementById('unitCost').value) || 0;
+        const total = qty * cost;
+        document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
+    }
+
+    // Handle form submission success
+    document.querySelector('form').addEventListener('htmx:afterRequest', function(e) {
+        if (e.detail.successful) {
+            document.body.dispatchEvent(new CustomEvent('formSubmitSuccess'));
+        }
+    });
+</script>

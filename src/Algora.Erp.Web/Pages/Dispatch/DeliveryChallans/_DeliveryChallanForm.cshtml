@@ -1,0 +1,366 @@
+@model Algora.Erp.Web.Pages.Dispatch.DeliveryChallans.DeliveryChallanFormViewModel
+
+<form hx-post="?handler=" hx-target="#challansTableBody" hx-swap="innerHTML">
+    @if (Model.IsEdit && Model.DeliveryChallan != null)
+    {
+        <input type="hidden" name="Id" value="@Model.DeliveryChallan.Id" />
+    }
+
+    <div class="row g-3">
+        <!-- Left Column -->
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Challan Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Challan Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="ChallanDate"
+                               value="@(Model.DeliveryChallan?.ChallanDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
+                    </div>
+                    @if (Model.SalesOrders?.Any() == true)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Sales Order (Optional)</label>
+                            <select class="form-select" name="SalesOrderId" id="salesOrderSelect" onchange="loadSalesOrderDetails(this.value)">
+                                <option value="">-- Create Manual DC --</option>
+                                @foreach (var so in Model.SalesOrders)
+                                {
+                                    var isSelected = Model.DeliveryChallan?.SalesOrderId == so.Id || Model.SelectedSalesOrder?.Id == so.Id;
+                                    if (isSelected)
+                                    {
+                                        <option value="@so.Id" data-customer="@so.CustomerId" data-customer-name="@so.Customer?.Name" selected>
+                                            @so.OrderNumber - @so.Customer?.Name (@so.OrderDate.ToString("dd MMM"))
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@so.Id" data-customer="@so.CustomerId" data-customer-name="@so.Customer?.Name">
+                                            @so.OrderNumber - @so.Customer?.Name (@so.OrderDate.ToString("dd MMM"))
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">Customer <span class="text-danger">*</span></label>
+                        <select class="form-select" name="CustomerId" id="customerSelect" required>
+                            <option value="">-- Select Customer --</option>
+                            @foreach (var customer in Model.Customers)
+                            {
+                                var isSelected = Model.DeliveryChallan?.CustomerId == customer.Id || Model.SelectedSalesOrder?.CustomerId == customer.Id;
+                                if (isSelected)
+                                {
+                                    <option value="@customer.Id" selected>@customer.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@customer.Id">@customer.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Warehouse <span class="text-danger">*</span></label>
+                        <select class="form-select" name="WarehouseId" required>
+                            <option value="">-- Select Warehouse --</option>
+                            @foreach (var warehouse in Model.Warehouses)
+                            {
+                                var isSelected = Model.DeliveryChallan?.WarehouseId == warehouse.Id;
+                                if (isSelected)
+                                {
+                                    <option value="@warehouse.Id" selected>@warehouse.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@warehouse.Id">@warehouse.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Transport Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Vehicle Number</label>
+                            <input type="text" class="form-control" name="VehicleNumber"
+                                   value="@Model.DeliveryChallan?.VehicleNumber" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transport Mode</label>
+                            @{
+                                var transportMode = Model.DeliveryChallan?.TransportMode;
+                            }
+                            <select class="form-select" name="TransportMode">
+                                <option value="">-- Select --</option>
+                                @if (transportMode == "Road") { <option value="Road" selected>Road</option> } else { <option value="Road">Road</option> }
+                                @if (transportMode == "Rail") { <option value="Rail" selected>Rail</option> } else { <option value="Rail">Rail</option> }
+                                @if (transportMode == "Air") { <option value="Air" selected>Air</option> } else { <option value="Air">Air</option> }
+                                @if (transportMode == "Sea") { <option value="Sea" selected>Sea</option> } else { <option value="Sea">Sea</option> }
+                                @if (transportMode == "Courier") { <option value="Courier" selected>Courier</option> } else { <option value="Courier">Courier</option> }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Driver Name</label>
+                            <input type="text" class="form-control" name="DriverName"
+                                   value="@Model.DeliveryChallan?.DriverName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Driver Phone</label>
+                            <input type="text" class="form-control" name="DriverPhone"
+                                   value="@Model.DeliveryChallan?.DriverPhone" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Transporter Name</label>
+                            <input type="text" class="form-control" name="TransporterName"
+                                   value="@Model.DeliveryChallan?.TransporterName" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="col-12">
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Shipping Address</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ship To Name</label>
+                            <input type="text" class="form-control" name="ShipToName"
+                                   value="@Model.DeliveryChallan?.ShipToName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control" name="ShipToPhone"
+                                   value="@Model.DeliveryChallan?.ShipToPhone" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Address Line 1</label>
+                            <input type="text" class="form-control" name="ShipToAddress1"
+                                   value="@Model.DeliveryChallan?.ShipToAddress1" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control" name="ShipToAddress2"
+                                   value="@Model.DeliveryChallan?.ShipToAddress2" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" name="ShipToCity"
+                                   value="@Model.DeliveryChallan?.ShipToCity" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">State</label>
+                            <input type="text" class="form-control" name="ShipToState"
+                                   value="@Model.DeliveryChallan?.ShipToState" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" name="ShipToPostalCode"
+                                   value="@Model.DeliveryChallan?.ShipToPostalCode" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Country</label>
+                            <input type="text" class="form-control" name="ShipToCountry"
+                                   value="@(Model.DeliveryChallan?.ShipToCountry ?? "India")" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Line Items</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLine()">
+                        <i class="bi bi-plus-lg me-1"></i>Add Line
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0" id="linesTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 40%;">Product</th>
+                                    <th class="text-end" style="width: 20%;">Quantity</th>
+                                    <th style="width: 15%;">UOM</th>
+                                    <th style="width: 20%;">Notes</th>
+                                    <th style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="linesBody">
+                                @if (Model.DeliveryChallan?.Lines?.Any() == true)
+                                {
+                                    var idx = 0;
+                                    foreach (var line in Model.DeliveryChallan.Lines.OrderBy(l => l.LineNumber))
+                                    {
+                                        <tr class="line-row">
+                                            <td>
+                                                <input type="hidden" name="Lines[@idx].SalesOrderLineId" value="@line.SalesOrderLineId" />
+                                                <select class="form-select form-select-sm" name="Lines[@idx].ProductId" required>
+                                                    @foreach (var product in Model.Products)
+                                                    {
+                                                        if (line.ProductId == product.Id)
+                                                        {
+                                                            <option value="@product.Id" selected>@product.Name (@product.Sku)</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@product.Id">@product.Name (@product.Sku)</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm text-end" name="Lines[@idx].Quantity"
+                                                       value="@line.Quantity" required step="0.01" min="0.01" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].UnitOfMeasure"
+                                                       value="@line.UnitOfMeasure" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].Notes"
+                                                       value="@line.Notes" />
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        idx++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Package Info -->
+        <div class="col-md-4">
+            <label class="form-label">Total Packages</label>
+            <input type="number" class="form-control" name="TotalPackages" min="0"
+                   value="@(Model.DeliveryChallan?.TotalPackages ?? 1)" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Total Weight</label>
+            <input type="number" class="form-control" name="TotalWeight" step="0.01" min="0"
+                   value="@Model.DeliveryChallan?.TotalWeight" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Weight Unit</label>
+            @{
+                var weightUnit = Model.DeliveryChallan?.WeightUnit ?? "KG";
+            }
+            <select class="form-select" name="WeightUnit">
+                @if (weightUnit == "KG") { <option value="KG" selected>KG</option> } else { <option value="KG">KG</option> }
+                @if (weightUnit == "LB") { <option value="LB" selected>LB</option> } else { <option value="LB">LB</option> }
+            </select>
+        </div>
+
+        <!-- Notes -->
+        <div class="col-12">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" name="Notes" rows="2">@Model.DeliveryChallan?.Notes</textarea>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-3">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Challan
+        </button>
+    </div>
+</form>
+
+<script>
+    let lineIndex = @(Model.DeliveryChallan?.Lines?.Count ?? 0);
+
+    const productsJson = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Products.Select(p => new { p.Id, p.Name, p.Sku })));
+
+    function loadSalesOrderDetails(soId) {
+        const select = document.getElementById('salesOrderSelect');
+        const option = select.options[select.selectedIndex];
+        if (option && option.value) {
+            document.getElementById('customerSelect').value = option.dataset.customer || '';
+        }
+    }
+
+    function addLine() {
+        let optionsHtml = '';
+        productsJson.forEach(p => {
+            optionsHtml += `<option value="${p.Id}">${p.Name} (${p.Sku})</option>`;
+        });
+
+        const html = `
+            <tr class="line-row">
+                <td>
+                    <select class="form-select form-select-sm" name="Lines[${lineIndex}].ProductId" required>
+                        <option value="">-- Select Product --</option>
+                        ${optionsHtml}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-end" name="Lines[${lineIndex}].Quantity"
+                           required step="0.01" min="0.01" value="1" />
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="Lines[${lineIndex}].UnitOfMeasure" value="EA" />
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="Lines[${lineIndex}].Notes" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        document.getElementById('linesBody').insertAdjacentHTML('beforeend', html);
+        lineIndex++;
+    }
+
+    function removeLine(btn) {
+        btn.closest('tr').remove();
+        reindexLines();
+    }
+
+    function reindexLines() {
+        const rows = document.querySelectorAll('#linesBody .line-row');
+        rows.forEach((row, idx) => {
+            row.querySelectorAll('input[name], select[name]').forEach(input => {
+                const name = input.name.replace(/\[\d+\]/, `[${idx}]`);
+                input.name = name;
+            });
+        });
+        lineIndex = rows.length;
+    }
+
+    // Handle form submission success
+    document.querySelector('form').addEventListener('htmx:afterRequest', function(e) {
+        if (e.detail.successful) {
+            document.body.dispatchEvent(new CustomEvent('formSubmitSuccess'));
+        }
+    });
+</script>
