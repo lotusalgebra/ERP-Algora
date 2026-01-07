@@ -1,4 +1,6 @@
 using Algora.Erp.Domain.Entities.Administration;
+using Algora.Erp.Domain.Entities.Common;
+using Algora.Erp.Domain.Entities.Dispatch;
 using Algora.Erp.Domain.Entities.Ecommerce;
 using Algora.Erp.Domain.Entities.Finance;
 using Algora.Erp.Domain.Entities.HR;
@@ -7,6 +9,7 @@ using Algora.Erp.Domain.Entities.Manufacturing;
 using Algora.Erp.Domain.Entities.Payroll;
 using Algora.Erp.Domain.Entities.Procurement;
 using Algora.Erp.Domain.Entities.Projects;
+using Algora.Erp.Domain.Entities.Quality;
 using Algora.Erp.Domain.Entities.Sales;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,6 +58,20 @@ public interface IApplicationDbContext
     DbSet<Supplier> Suppliers { get; }
     DbSet<PurchaseOrder> PurchaseOrders { get; }
     DbSet<PurchaseOrderLine> PurchaseOrderLines { get; }
+    DbSet<GoodsReceiptNote> GoodsReceiptNotes { get; }
+    DbSet<GoodsReceiptLine> GoodsReceiptLines { get; }
+
+    // Dispatch
+    DbSet<DeliveryChallan> DeliveryChallans { get; }
+    DbSet<DeliveryChallanLine> DeliveryChallanLines { get; }
+
+    // Quality
+    DbSet<QualityInspection> QualityInspections { get; }
+    DbSet<QualityParameter> QualityParameters { get; }
+    DbSet<RejectionNote> RejectionNotes { get; }
+
+    // Common
+    DbSet<CancellationLog> CancellationLogs { get; }
 
     // Sales
     DbSet<Customer> Customers { get; }

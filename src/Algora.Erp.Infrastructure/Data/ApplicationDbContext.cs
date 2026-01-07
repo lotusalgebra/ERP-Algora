@@ -1,6 +1,7 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Administration;
 using Algora.Erp.Domain.Entities.Common;
+using Algora.Erp.Domain.Entities.Dispatch;
 using Algora.Erp.Domain.Entities.Ecommerce;
 using Algora.Erp.Domain.Entities.Finance;
 using Algora.Erp.Domain.Entities.HR;
@@ -9,6 +10,7 @@ using Algora.Erp.Domain.Entities.Manufacturing;
 using Algora.Erp.Domain.Entities.Payroll;
 using Algora.Erp.Domain.Entities.Procurement;
 using Algora.Erp.Domain.Entities.Projects;
+using Algora.Erp.Domain.Entities.Quality;
 using Algora.Erp.Domain.Entities.Sales;
 using Microsoft.EntityFrameworkCore;
 
@@ -70,6 +72,20 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<PurchaseOrderLine> PurchaseOrderLines => Set<PurchaseOrderLine>();
+    public DbSet<GoodsReceiptNote> GoodsReceiptNotes => Set<GoodsReceiptNote>();
+    public DbSet<GoodsReceiptLine> GoodsReceiptLines => Set<GoodsReceiptLine>();
+
+    // Dispatch
+    public DbSet<DeliveryChallan> DeliveryChallans => Set<DeliveryChallan>();
+    public DbSet<DeliveryChallanLine> DeliveryChallanLines => Set<DeliveryChallanLine>();
+
+    // Quality
+    public DbSet<QualityInspection> QualityInspections => Set<QualityInspection>();
+    public DbSet<QualityParameter> QualityParameters => Set<QualityParameter>();
+    public DbSet<RejectionNote> RejectionNotes => Set<RejectionNote>();
+
+    // Common
+    public DbSet<CancellationLog> CancellationLogs => Set<CancellationLog>();
 
     // Sales
     public DbSet<Customer> Customers => Set<Customer>();
@@ -843,6 +859,281 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 .WithMany(p => p.Lines)
                 .HasForeignKey(e => e.PurchaseOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // GoodsReceiptNote configuration
+        modelBuilder.Entity<GoodsReceiptNote>(entity =>
+        {
+            entity.ToTable("GoodsReceiptNotes");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.GrnNumber).IsUnique();
+            entity.HasIndex(e => e.GrnDate);
+            entity.Property(e => e.GrnNumber).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.SupplierInvoiceNumber).HasMaxLength(50);
+            entity.Property(e => e.VehicleNumber).HasMaxLength(50);
+            entity.Property(e => e.DriverName).HasMaxLength(100);
+            entity.Property(e => e.TransporterName).HasMaxLength(200);
+            entity.Property(e => e.LrNumber).HasMaxLength(50);
+            entity.Property(e => e.Reference).HasMaxLength(100);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.SubTotal).HasPrecision(18, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.PurchaseOrder)
+                .WithMany()
+                .HasForeignKey(e => e.PurchaseOrderId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Supplier)
+                .WithMany()
+                .HasForeignKey(e => e.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Warehouse)
+                .WithMany()
+                .HasForeignKey(e => e.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // GoodsReceiptLine configuration
+        modelBuilder.Entity<GoodsReceiptLine>(entity =>
+        {
+            entity.ToTable("GoodsReceiptLines");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.Property(e => e.ProductName).HasMaxLength(200);
+            entity.Property(e => e.ProductSku).HasMaxLength(50);
+            entity.Property(e => e.UnitOfMeasure).HasMaxLength(20);
+            entity.Property(e => e.BatchNumber).HasMaxLength(50);
+            entity.Property(e => e.SerialNumbers).HasMaxLength(1000);
+            entity.Property(e => e.RejectionReason).HasMaxLength(500);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.OrderedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.ReceivedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.AcceptedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.RejectedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            entity.Property(e => e.TaxPercent).HasPrecision(5, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.LineTotal).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.GoodsReceiptNote)
+                .WithMany(g => g.Lines)
+                .HasForeignKey(e => e.GoodsReceiptNoteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.PurchaseOrderLine)
+                .WithMany()
+                .HasForeignKey(e => e.PurchaseOrderLineId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // =============================================
+        // DISPATCH ENTITIES
+        // =============================================
+
+        // DeliveryChallan configuration
+        modelBuilder.Entity<DeliveryChallan>(entity =>
+        {
+            entity.ToTable("DeliveryChallans");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.ChallanNumber).IsUnique();
+            entity.HasIndex(e => e.ChallanDate);
+            entity.Property(e => e.ChallanNumber).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.VehicleNumber).HasMaxLength(50);
+            entity.Property(e => e.DriverName).HasMaxLength(100);
+            entity.Property(e => e.DriverPhone).HasMaxLength(50);
+            entity.Property(e => e.TransporterName).HasMaxLength(200);
+            entity.Property(e => e.ShippingAddress).HasMaxLength(500);
+            entity.Property(e => e.ShippingCity).HasMaxLength(100);
+            entity.Property(e => e.ShippingState).HasMaxLength(100);
+            entity.Property(e => e.ShippingCountry).HasMaxLength(100);
+            entity.Property(e => e.ShippingPostalCode).HasMaxLength(20);
+            entity.Property(e => e.ContactPerson).HasMaxLength(100);
+            entity.Property(e => e.ContactPhone).HasMaxLength(50);
+            entity.Property(e => e.Reference).HasMaxLength(100);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+
+            entity.HasOne(e => e.SalesOrder)
+                .WithMany()
+                .HasForeignKey(e => e.SalesOrderId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Customer)
+                .WithMany()
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Warehouse)
+                .WithMany()
+                .HasForeignKey(e => e.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // DeliveryChallanLine configuration
+        modelBuilder.Entity<DeliveryChallanLine>(entity =>
+        {
+            entity.ToTable("DeliveryChallanLines");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.Property(e => e.ProductName).HasMaxLength(200);
+            entity.Property(e => e.ProductSku).HasMaxLength(50);
+            entity.Property(e => e.UnitOfMeasure).HasMaxLength(20);
+            entity.Property(e => e.BatchNumber).HasMaxLength(50);
+            entity.Property(e => e.SerialNumbers).HasMaxLength(1000);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.Quantity).HasPrecision(18, 4);
+
+            entity.HasOne(e => e.DeliveryChallan)
+                .WithMany(d => d.Lines)
+                .HasForeignKey(e => e.DeliveryChallanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // =============================================
+        // QUALITY ENTITIES
+        // =============================================
+
+        // QualityInspection configuration
+        modelBuilder.Entity<QualityInspection>(entity =>
+        {
+            entity.ToTable("QualityInspections");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.InspectionNumber).IsUnique();
+            entity.HasIndex(e => e.InspectionDate);
+            entity.HasIndex(e => new { e.SourceDocumentType, e.SourceDocumentId });
+            entity.Property(e => e.InspectionNumber).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.SourceDocumentType).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.SourceDocumentNumber).HasMaxLength(50);
+            entity.Property(e => e.InspectorName).HasMaxLength(100);
+            entity.Property(e => e.ApproverName).HasMaxLength(100);
+            entity.Property(e => e.ResultRemarks).HasMaxLength(1000);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.TotalQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.SampleSize).HasPrecision(18, 4);
+            entity.Property(e => e.InspectedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.PassedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.FailedQuantity).HasPrecision(18, 4);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Warehouse)
+                .WithMany()
+                .HasForeignKey(e => e.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // QualityParameter configuration
+        modelBuilder.Entity<QualityParameter>(entity =>
+        {
+            entity.ToTable("QualityParameters");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.Property(e => e.ParameterName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.ParameterCode).HasMaxLength(20);
+            entity.Property(e => e.ExpectedValue).HasMaxLength(200);
+            entity.Property(e => e.ActualValue).HasMaxLength(200);
+            entity.Property(e => e.Unit).HasMaxLength(20);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+            entity.Property(e => e.AttachmentUrl).HasMaxLength(500);
+            entity.Property(e => e.MinValue).HasPrecision(18, 4);
+            entity.Property(e => e.MaxValue).HasPrecision(18, 4);
+            entity.Property(e => e.Tolerance).HasPrecision(18, 4);
+            entity.Property(e => e.MeasuredValue).HasPrecision(18, 4);
+
+            entity.HasOne(e => e.QualityInspection)
+                .WithMany(q => q.Parameters)
+                .HasForeignKey(e => e.QualityInspectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // RejectionNote configuration
+        modelBuilder.Entity<RejectionNote>(entity =>
+        {
+            entity.ToTable("RejectionNotes");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => e.RejectionNumber).IsUnique();
+            entity.HasIndex(e => e.RejectionDate);
+            entity.HasIndex(e => new { e.SourceDocumentType, e.SourceDocumentId });
+            entity.Property(e => e.RejectionNumber).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.SourceDocumentType).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.SourceDocumentNumber).HasMaxLength(50);
+            entity.Property(e => e.ProductName).HasMaxLength(200);
+            entity.Property(e => e.ProductSku).HasMaxLength(50);
+            entity.Property(e => e.UnitOfMeasure).HasMaxLength(20);
+            entity.Property(e => e.RejectionReason).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.DefectDescription).HasMaxLength(1000);
+            entity.Property(e => e.DispositionAction).HasMaxLength(200);
+            entity.Property(e => e.DisposerName).HasMaxLength(100);
+            entity.Property(e => e.DebitNoteNumber).HasMaxLength(50);
+            entity.Property(e => e.ReturnReference).HasMaxLength(100);
+            entity.Property(e => e.ScrapReference).HasMaxLength(100);
+            entity.Property(e => e.ReworkInstructions).HasMaxLength(1000);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.AttachmentUrls).HasMaxLength(2000);
+            entity.Property(e => e.RejectedQuantity).HasPrecision(18, 4);
+            entity.Property(e => e.UnitCost).HasPrecision(18, 2);
+            entity.Property(e => e.TotalValue).HasPrecision(18, 2);
+            entity.Property(e => e.ScrapValue).HasPrecision(18, 2);
+            entity.Property(e => e.ReworkCost).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.QualityInspection)
+                .WithMany()
+                .HasForeignKey(e => e.QualityInspectionId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Warehouse)
+                .WithMany()
+                .HasForeignKey(e => e.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Supplier)
+                .WithMany()
+                .HasForeignKey(e => e.SupplierId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // =============================================
+        // COMMON ENTITIES
+        // =============================================
+
+        // CancellationLog configuration
+        modelBuilder.Entity<CancellationLog>(entity =>
+        {
+            entity.ToTable("CancellationLogs");
+            entity.HasKey(e => e.Id);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+            entity.HasIndex(e => new { e.DocumentType, e.DocumentId });
+            entity.HasIndex(e => e.CancelledAt);
+            entity.Property(e => e.DocumentType).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.DocumentNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.CancelledByName).HasMaxLength(100);
+            entity.Property(e => e.CancellationReason).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.ApprovalReference).HasMaxLength(100);
         });
 
         // =============================================

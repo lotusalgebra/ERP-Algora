@@ -1,0 +1,180 @@
+@model Algora.Erp.Web.Pages.Procurement.GoodsReceipt.GrnTableViewModel
+@using Algora.Erp.Domain.Entities.Procurement
+
+@if (!Model.GoodsReceiptNotes.Any())
+{
+    <tr>
+        <td colspan="9" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <p class="mb-0">No goods receipt notes found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var grn in Model.GoodsReceiptNotes)
+    {
+        var statusClass = grn.Status switch
+        {
+            GoodsReceiptStatus.Draft => "bg-secondary",
+            GoodsReceiptStatus.Pending => "bg-info",
+            GoodsReceiptStatus.QCPending => "bg-warning",
+            GoodsReceiptStatus.QCCompleted => "bg-primary",
+            GoodsReceiptStatus.Accepted => "bg-success",
+            GoodsReceiptStatus.PartiallyAccepted => "bg-warning",
+            GoodsReceiptStatus.Rejected => "bg-danger",
+            GoodsReceiptStatus.Cancelled => "bg-dark",
+            _ => "bg-secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <a href="javascript:void(0)" onclick="viewDetails('@grn.Id')" class="text-decoration-none fw-medium">
+                    @grn.GrnNumber
+                </a>
+            </td>
+            <td>
+                <span class="text-truncate d-inline-block" style="max-width: 150px;">
+                    @grn.SupplierName
+                </span>
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(grn.PurchaseOrderNumber))
+                {
+                    <span class="badge bg-light text-dark">@grn.PurchaseOrderNumber</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>@grn.GrnDate.ToString("dd MMM yyyy")</td>
+            <td class="text-center">
+                <span class="badge bg-light text-dark">@grn.Lines.Count items</span>
+            </td>
+            <td class="text-end">@grn.TotalReceivedQuantity.ToString("N2")</td>
+            <td class="text-end">@grn.TotalValue.ToString("C2")</td>
+            <td>
+                <span class="badge @statusClass">@grn.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@grn.Id')">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        @if (grn.Status == GoodsReceiptStatus.Draft || grn.Status == GoodsReceiptStatus.Pending)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="editGrn('@grn.Id')">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                            </li>
+                        }
+                        @if (grn.Status == GoodsReceiptStatus.QCPending)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-success" href="/Quality/Inspections?grnId=@grn.Id">
+                                    <i class="bi bi-clipboard-check me-2"></i>Start QC Inspection
+                                </a>
+                            </li>
+                        }
+                        @if (grn.Status == GoodsReceiptStatus.QCCompleted)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-success" href="javascript:void(0)" onclick="updateStatus('@grn.Id', 'Accepted')">
+                                    <i class="bi bi-check-circle me-2"></i>Accept GRN
+                                </a>
+                            </li>
+                        }
+                        @if (grn.Status == GoodsReceiptStatus.Pending)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-success" href="javascript:void(0)" onclick="updateStatus('@grn.Id', 'Accepted')">
+                                    <i class="bi bi-check-circle me-2"></i>Accept (No QC)
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-warning" href="javascript:void(0)" onclick="updateStatus('@grn.Id', 'QCPending')">
+                                    <i class="bi bi-clipboard-check me-2"></i>Send to QC
+                                </a>
+                            </li>
+                        }
+                        @if (grn.Status != GoodsReceiptStatus.Cancelled && grn.Status != GoodsReceiptStatus.Accepted)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="updateStatus('@grn.Id', 'Cancelled')">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </a>
+                            </li>
+                        }
+                        @if (grn.Status == GoodsReceiptStatus.Draft)
+                        {
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete('@grn.Id')">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="9" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                                   hx-target="#grnTableBody"
+                                   hx-include="#searchInput, #supplierFilter, #statusFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)"
+                                       hx-get="?handler=Table&page=@i"
+                                       hx-target="#grnTableBody"
+                                       hx-include="#searchInput, #supplierFilter, #statusFilter, #pageSizeSelect">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                                   hx-target="#grnTableBody"
+                                   hx-include="#searchInput, #supplierFilter, #statusFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+}

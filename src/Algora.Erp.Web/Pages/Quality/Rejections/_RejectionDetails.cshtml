@@ -1,0 +1,289 @@
+@model Algora.Erp.Domain.Entities.Quality.RejectionNote
+@using Algora.Erp.Domain.Entities.Quality
+
+@{
+    var dispositionClass = Model.DispositionStatus switch
+    {
+        RejectionDisposition.Pending => "bg-secondary",
+        RejectionDisposition.ReturnToSupplier => "bg-primary",
+        RejectionDisposition.Scrapped => "bg-danger",
+        RejectionDisposition.Reworked => "bg-info",
+        RejectionDisposition.Disposed => "bg-dark",
+        RejectionDisposition.AcceptedWithDeviation => "bg-warning",
+        RejectionDisposition.HoldForReview => "bg-warning",
+        _ => "bg-secondary"
+    };
+
+    var categoryClass = Model.RejectionCategory switch
+    {
+        RejectionCategory.QualityDefect => "bg-danger",
+        RejectionCategory.DamagedInTransit => "bg-warning",
+        RejectionCategory.WrongProduct => "bg-info",
+        RejectionCategory.QuantityMismatch => "bg-secondary",
+        RejectionCategory.ExpiredProduct => "bg-dark",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="row g-4">
+    <!-- Header Info -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1">@Model.RejectionNumber</h5>
+                <p class="text-muted mb-0">@Model.RejectionDate.ToString("dd MMM yyyy")</p>
+            </div>
+            <div class="text-end">
+                <span class="badge @categoryClass fs-6 me-2">@Model.RejectionCategory</span>
+                <span class="badge @dispositionClass fs-6">@Model.DispositionStatus</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Product Information</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 40%;">Product:</td>
+                        <td>
+                            <div class="fw-medium">@Model.ProductName</div>
+                            <small class="text-muted">@Model.ProductSku</small>
+                        </td>
+                    </tr>
+                    @if (Model.Warehouse != null)
+                    {
+                        <tr>
+                            <td class="text-muted">Warehouse:</td>
+                            <td class="fw-medium">@Model.Warehouse.Name</td>
+                        </tr>
+                    }
+                    @if (Model.Supplier != null)
+                    {
+                        <tr>
+                            <td class="text-muted">Supplier:</td>
+                            <td class="fw-medium">@Model.Supplier.Name</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td class="text-muted">Source Document:</td>
+                        <td class="fw-medium">
+                            @(Model.SourceDocumentType): @(Model.SourceDocumentNumber ?? "-")
+                        </td>
+                    </tr>
+                    @if (Model.QualityInspection != null)
+                    {
+                        <tr>
+                            <td class="text-muted">QC Inspection:</td>
+                            <td class="fw-medium">@Model.QualityInspection.InspectionNumber</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quantity & Value -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Quantity & Value</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 40%;">Rejected Quantity:</td>
+                        <td class="fw-medium">@Model.RejectedQuantity.ToString("N2") @Model.UnitOfMeasure</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Unit Cost:</td>
+                        <td class="fw-medium">@Model.UnitCost.ToString("C2")</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Total Value:</td>
+                        <td class="fw-medium text-danger fs-5">@Model.TotalValue.ToString("C2")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Details -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Rejection Details</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small">Category</label>
+                        <p class="mb-0"><span class="badge @categoryClass">@Model.RejectionCategory</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small">Reason</label>
+                        <p class="mb-0 fw-medium">@Model.RejectionReason</p>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.DefectDescription))
+                    {
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Defect Description</label>
+                            <p class="mb-0">@Model.DefectDescription</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disposition Details -->
+    @if (Model.DispositionStatus != RejectionDisposition.Pending)
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Disposition Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small">Disposition</label>
+                            <p class="mb-0"><span class="badge @dispositionClass">@Model.DispositionStatus</span></p>
+                        </div>
+                        @if (Model.DispositionDate.HasValue)
+                        {
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small">Disposition Date</label>
+                                <p class="mb-0 fw-medium">@Model.DispositionDate.Value.ToString("dd MMM yyyy")</p>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.DisposerName))
+                        {
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small">Processed By</label>
+                                <p class="mb-0 fw-medium">@Model.DisposerName</p>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.DispositionAction))
+                        {
+                            <div class="col-12">
+                                <label class="form-label text-muted small">Action Taken</label>
+                                <p class="mb-0">@Model.DispositionAction</p>
+                            </div>
+                        }
+
+                        @* Return to Supplier Details *@
+                        @if (Model.DispositionStatus == RejectionDisposition.ReturnToSupplier)
+                        {
+                            @if (Model.ReturnDate.HasValue)
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Return Date</label>
+                                    <p class="mb-0 fw-medium">@Model.ReturnDate.Value.ToString("dd MMM yyyy")</p>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ReturnReference))
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Return Reference</label>
+                                    <p class="mb-0 fw-medium">@Model.ReturnReference</p>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.DebitNoteNumber))
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Debit Note</label>
+                                    <p class="mb-0 fw-medium">@Model.DebitNoteNumber</p>
+                                </div>
+                            }
+                        }
+
+                        @* Scrap Details *@
+                        @if (Model.DispositionStatus == RejectionDisposition.Scrapped)
+                        {
+                            @if (Model.ScrapDate.HasValue)
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Scrap Date</label>
+                                    <p class="mb-0 fw-medium">@Model.ScrapDate.Value.ToString("dd MMM yyyy")</p>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ScrapReference))
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Scrap Reference</label>
+                                    <p class="mb-0 fw-medium">@Model.ScrapReference</p>
+                                </div>
+                            }
+                            @if (Model.ScrapValue.HasValue)
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Scrap Value</label>
+                                    <p class="mb-0 fw-medium">@Model.ScrapValue.Value.ToString("C2")</p>
+                                </div>
+                            }
+                        }
+
+                        @* Rework Details *@
+                        @if (Model.DispositionStatus == RejectionDisposition.Reworked)
+                        {
+                            @if (!string.IsNullOrEmpty(Model.ReworkInstructions))
+                            {
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Rework Instructions</label>
+                                    <p class="mb-0">@Model.ReworkInstructions</p>
+                                </div>
+                            }
+                            @if (Model.ReworkCompletedAt.HasValue)
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Rework Completed</label>
+                                    <p class="mb-0 fw-medium">@Model.ReworkCompletedAt.Value.ToString("dd MMM yyyy HH:mm")</p>
+                                </div>
+                            }
+                            @if (Model.ReworkCost.HasValue)
+                            {
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Rework Cost</label>
+                                    <p class="mb-0 fw-medium">@Model.ReworkCost.Value.ToString("C2")</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Notes -->
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Notes</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.Notes</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer mt-4 px-0 pb-0">
+    @if (Model.DispositionStatus == RejectionDisposition.Pending || Model.DispositionStatus == RejectionDisposition.HoldForReview)
+    {
+        <button type="button" class="btn btn-outline-primary" onclick="editRejection('@Model.Id')" data-bs-dismiss="modal">
+            <i class="bi bi-pencil me-2"></i>Edit
+        </button>
+        <button type="button" class="btn btn-primary" onclick="showDispositionModal('@Model.Id', '@Model.DispositionStatus')" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-right-circle me-2"></i>Update Disposition
+        </button>
+    }
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

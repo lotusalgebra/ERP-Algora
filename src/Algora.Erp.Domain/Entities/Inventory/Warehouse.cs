@@ -85,6 +85,7 @@ public class StockMovement : AuditableEntity
     public string? Reference { get; set; }
     public string? SourceDocumentType { get; set; }
     public Guid? SourceDocumentId { get; set; }
+    public string? SourceDocumentNumber { get; set; }
 
     public DateTime MovementDate { get; set; }
     public string? Notes { get; set; }

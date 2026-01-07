@@ -1,0 +1,129 @@
+@model Algora.Erp.Web.Pages.Reports.Cancellations.CancellationsTableViewModel
+
+@if (!Model.Cancellations.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-check-circle fs-1 d-block mb-3"></i>
+                <p class="mb-0">No cancellations found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var cancellation in Model.Cancellations)
+    {
+        var typeClass = cancellation.DocumentType switch
+        {
+            "PurchaseOrder" => "bg-primary",
+            "SalesOrder" => "bg-success",
+            "Invoice" => "bg-info",
+            "GoodsReceipt" => "bg-warning",
+            "DeliveryChallan" => "bg-secondary",
+            "QualityInspection" => "bg-danger",
+            _ => "bg-dark"
+        };
+
+        var typeIcon = cancellation.DocumentType switch
+        {
+            "PurchaseOrder" => "bi-cart",
+            "SalesOrder" => "bi-bag",
+            "Invoice" => "bi-receipt",
+            "GoodsReceipt" => "bi-box-seam",
+            "DeliveryChallan" => "bi-truck",
+            "QualityInspection" => "bi-clipboard-check",
+            _ => "bi-file-text"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <a href="javascript:void(0)" onclick="viewDetails('@cancellation.Id')" class="text-decoration-none fw-medium">
+                    @cancellation.DocumentNumber
+                </a>
+            </td>
+            <td>
+                <span class="badge @typeClass">
+                    <i class="bi @typeIcon me-1"></i>@cancellation.DocumentType
+                </span>
+            </td>
+            <td>
+                <div>@cancellation.CancelledAt.ToString("dd MMM yyyy")</div>
+                <small class="text-muted">@cancellation.CancelledAt.ToString("HH:mm")</small>
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(cancellation.CancelledByName))
+                {
+                    <span>@cancellation.CancelledByName</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(cancellation.CancellationReason))
+                {
+                    <span class="text-truncate d-inline-block" style="max-width: 200px;" title="@cancellation.CancellationReason">
+                        @cancellation.CancellationReason
+                    </span>
+                }
+                else
+                {
+                    <span class="text-muted">No reason provided</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <button class="btn btn-sm btn-outline-secondary" onclick="viewDetails('@cancellation.Id')">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="6" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                                   hx-target="#cancellationsTableBody"
+                                   hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)"
+                                       hx-get="?handler=Table&page=@i"
+                                       hx-target="#cancellationsTableBody"
+                                       hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                                   hx-target="#cancellationsTableBody"
+                                   hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+}

@@ -1,0 +1,263 @@
+@page
+@model Algora.Erp.Web.Pages.Reports.Cancellations.IndexModel
+@{
+    ViewData["Title"] = "Cancellation Report";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Cancellation Report</h4>
+            <p class="text-muted mb-0">Audit trail of all cancelled documents</p>
+        </div>
+        <a href="?handler=Export" class="btn btn-outline-primary" id="exportBtn">
+            <i class="bi bi-download me-2"></i>Export CSV
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-x-circle text-danger fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Cancellations</p>
+                            <h4 class="mb-0">@Model.TotalCancellations</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-calendar-month text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">This Month</p>
+                            <h4 class="mb-0">@Model.ThisMonth</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-calendar-week text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">This Week</p>
+                            <h4 class="mb-0">@Model.ThisWeek</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2 small">By Document Type</p>
+                    @if (Model.ByDocumentType.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var item in Model.ByDocumentType.OrderByDescending(x => x.Value).Take(4))
+                            {
+                                <span class="badge bg-light text-dark">@item.Key: @item.Value</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">No data</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancellations Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text"
+                               class="form-control border-start-0"
+                               placeholder="Search..."
+                               id="searchInput"
+                               hx-get="?handler=Table"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#cancellationsTableBody"
+                               hx-include="#documentTypeFilter, #fromDate, #toDate, #pageSizeSelect"
+                               name="search">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select"
+                            id="documentTypeFilter"
+                            name="documentTypeFilter"
+                            hx-get="?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#cancellationsTableBody"
+                            hx-include="#searchInput, #fromDate, #toDate, #pageSizeSelect">
+                        <option value="">All Types</option>
+                        <option value="PurchaseOrder">Purchase Order</option>
+                        <option value="SalesOrder">Sales Order</option>
+                        <option value="Invoice">Invoice</option>
+                        <option value="GoodsReceipt">Goods Receipt</option>
+                        <option value="DeliveryChallan">Delivery Challan</option>
+                        <option value="QualityInspection">Quality Inspection</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control"
+                           id="fromDate"
+                           name="fromDate"
+                           placeholder="From Date"
+                           hx-get="?handler=Table"
+                           hx-trigger="change"
+                           hx-target="#cancellationsTableBody"
+                           hx-include="#searchInput, #documentTypeFilter, #toDate, #pageSizeSelect">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control"
+                           id="toDate"
+                           name="toDate"
+                           placeholder="To Date"
+                           hx-get="?handler=Table"
+                           hx-trigger="change"
+                           hx-target="#cancellationsTableBody"
+                           hx-include="#searchInput, #documentTypeFilter, #fromDate, #pageSizeSelect">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select"
+                            id="pageSizeSelect"
+                            name="pageSize"
+                            hx-get="?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#cancellationsTableBody"
+                            hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate">
+                        <option value="10">10 per page</option>
+                        <option value="25">25 per page</option>
+                        <option value="50">50 per page</option>
+                        <option value="100">100 per page</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Document</th>
+                            <th>Type</th>
+                            <th>Cancelled At</th>
+                            <th>Cancelled By</th>
+                            <th>Reason</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cancellationsTableBody"
+                           hx-get="?handler=Table"
+                           hx-trigger="load"
+                           hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancellation Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function viewDetails(id) {
+            htmx.ajax('GET', `?handler=Details&id=${id}`, {
+                target: '#detailsModalBody',
+                swap: 'innerHTML'
+            });
+            new bootstrap.Modal(document.getElementById('detailsModal')).show();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('documentTypeFilter').value = '';
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            htmx.ajax('GET', '?handler=Table', {
+                target: '#cancellationsTableBody',
+                swap: 'innerHTML'
+            });
+        }
+
+        // Update export button URL based on filters
+        function updateExportUrl() {
+            const params = new URLSearchParams();
+            params.append('handler', 'Export');
+
+            const docType = document.getElementById('documentTypeFilter').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            if (docType) params.append('documentTypeFilter', docType);
+            if (fromDate) params.append('fromDate', fromDate);
+            if (toDate) params.append('toDate', toDate);
+
+            document.getElementById('exportBtn').href = `?${params.toString()}`;
+        }
+
+        document.getElementById('documentTypeFilter').addEventListener('change', updateExportUrl);
+        document.getElementById('fromDate').addEventListener('change', updateExportUrl);
+        document.getElementById('toDate').addEventListener('change', updateExportUrl);
+    </script>
+}

@@ -1,0 +1,185 @@
+@model Algora.Erp.Web.Pages.Procurement.PurchaseInvoices.PurchaseInvoicesTableViewModel
+@using Algora.Erp.Domain.Entities.Finance
+
+@if (!Model.Invoices.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-receipt fs-1 d-block mb-3"></i>
+                <p class="mb-0">No purchase invoices found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var invoice in Model.Invoices)
+    {
+        var statusClass = invoice.Status switch
+        {
+            InvoiceStatus.Draft => "bg-secondary",
+            InvoiceStatus.Pending => "bg-warning",
+            InvoiceStatus.Sent => "bg-info",
+            InvoiceStatus.PartiallyPaid => "bg-primary",
+            InvoiceStatus.Paid => "bg-success",
+            InvoiceStatus.Overdue => "bg-danger",
+            InvoiceStatus.Void => "bg-dark",
+            InvoiceStatus.Cancelled => "bg-dark",
+            _ => "bg-secondary"
+        };
+
+        var isOverdue = invoice.Status != InvoiceStatus.Paid &&
+                        invoice.Status != InvoiceStatus.Void &&
+                        invoice.Status != InvoiceStatus.Cancelled &&
+                        invoice.DueDate < DateTime.Today;
+
+        var supplierName = invoice.SupplierId.HasValue && Model.SupplierNames.TryGetValue(invoice.SupplierId.Value, out var name)
+            ? name
+            : invoice.BillingName ?? "-";
+
+        <tr>
+            <td class="ps-4">
+                <a href="javascript:void(0)" onclick="viewDetails('@invoice.Id')" class="text-decoration-none fw-medium">
+                    @invoice.InvoiceNumber
+                </a>
+                @if (!string.IsNullOrEmpty(invoice.Reference))
+                {
+                    <br /><small class="text-muted">Ref: @invoice.Reference</small>
+                }
+            </td>
+            <td>
+                <span class="text-truncate d-inline-block" style="max-width: 150px;">
+                    @supplierName
+                </span>
+            </td>
+            <td>@invoice.InvoiceDate.ToString("dd MMM yyyy")</td>
+            <td>
+                <span class="@(isOverdue ? "text-danger fw-medium" : "")">
+                    @invoice.DueDate.ToString("dd MMM yyyy")
+                </span>
+                @if (isOverdue)
+                {
+                    <i class="bi bi-exclamation-triangle-fill text-danger ms-1" title="Overdue"></i>
+                }
+            </td>
+            <td class="text-end fw-medium">@invoice.TotalAmount.ToString("C2")</td>
+            <td class="text-end">
+                @if (invoice.BalanceDue > 0)
+                {
+                    <span class="text-danger fw-medium">@invoice.BalanceDue.ToString("C2")</span>
+                }
+                else
+                {
+                    <span class="text-success">Paid</span>
+                }
+            </td>
+            <td>
+                <span class="badge @statusClass">@invoice.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@invoice.Id')">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        @if (invoice.Status == InvoiceStatus.Draft || invoice.Status == InvoiceStatus.Pending)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="editInvoice('@invoice.Id')">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                            </li>
+                        }
+                        @if (invoice.Status == InvoiceStatus.Pending)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-info" href="javascript:void(0)" onclick="updateStatus('@invoice.Id', 'Sent')">
+                                    <i class="bi bi-send me-2"></i>Mark as Received
+                                </a>
+                            </li>
+                        }
+                        @if (invoice.BalanceDue > 0 && invoice.Status != InvoiceStatus.Draft && invoice.Status != InvoiceStatus.Void && invoice.Status != InvoiceStatus.Cancelled)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-success" href="javascript:void(0)"
+                                   onclick="showPaymentModal('@invoice.Id', '@invoice.BalanceDue.ToString("C2")')">
+                                    <i class="bi bi-cash me-2"></i>Record Payment
+                                </a>
+                            </li>
+                        }
+                        @if (invoice.Status != InvoiceStatus.Void && invoice.Status != InvoiceStatus.Cancelled && invoice.Status != InvoiceStatus.Paid)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="updateStatus('@invoice.Id', 'Void')">
+                                    <i class="bi bi-x-circle me-2"></i>Void
+                                </a>
+                            </li>
+                        }
+                        @if (invoice.Status == InvoiceStatus.Draft || invoice.Status == InvoiceStatus.Pending)
+                        {
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete('@invoice.Id')">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="8" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                                   hx-target="#invoicesTableBody"
+                                   hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)"
+                                       hx-get="?handler=Table&page=@i"
+                                       hx-target="#invoicesTableBody"
+                                       hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                                   hx-target="#invoicesTableBody"
+                                   hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+}

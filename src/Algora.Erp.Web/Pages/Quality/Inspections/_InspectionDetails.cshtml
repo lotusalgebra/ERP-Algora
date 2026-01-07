@@ -1,0 +1,279 @@
+@model Algora.Erp.Domain.Entities.Quality.QualityInspection
+@using Algora.Erp.Domain.Entities.Quality
+
+@{
+    var statusClass = Model.Status switch
+    {
+        InspectionStatus.Pending => "bg-secondary",
+        InspectionStatus.InProgress => "bg-info",
+        InspectionStatus.Completed => "bg-primary",
+        InspectionStatus.Approved => "bg-success",
+        InspectionStatus.Rejected => "bg-danger",
+        InspectionStatus.Cancelled => "bg-dark",
+        _ => "bg-secondary"
+    };
+
+    var resultClass = Model.OverallResult switch
+    {
+        QCOverallResult.Pending => "bg-secondary",
+        QCOverallResult.Pass => "bg-success",
+        QCOverallResult.Fail => "bg-danger",
+        QCOverallResult.PartialPass => "bg-warning",
+        QCOverallResult.ConditionalPass => "bg-info",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="row g-4">
+    <!-- Header Info -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1">@Model.InspectionNumber</h5>
+                <p class="text-muted mb-0">@Model.InspectionType Inspection</p>
+            </div>
+            <div class="text-end">
+                <span class="badge @statusClass fs-6 me-2">@Model.Status</span>
+                <span class="badge @resultClass fs-6">@Model.OverallResult</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inspection Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Inspection Information</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 40%;">Inspection Date:</td>
+                        <td class="fw-medium">@Model.InspectionDate.ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Type:</td>
+                        <td class="fw-medium">@Model.InspectionType</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Source Document:</td>
+                        <td class="fw-medium">
+                            @Model.SourceDocumentType: @(Model.SourceDocumentNumber ?? "-")
+                        </td>
+                    </tr>
+                    @if (Model.InspectedAt.HasValue)
+                    {
+                        <tr>
+                            <td class="text-muted">Inspected At:</td>
+                            <td class="fw-medium">@Model.InspectedAt.Value.ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.InspectorName))
+                    {
+                        <tr>
+                            <td class="text-muted">Inspector:</td>
+                            <td class="fw-medium">@Model.InspectorName</td>
+                        </tr>
+                    }
+                    @if (Model.ApprovedAt.HasValue)
+                    {
+                        <tr>
+                            <td class="text-muted">Approved At:</td>
+                            <td class="fw-medium">@Model.ApprovedAt.Value.ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product & Quantities -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Product & Quantities</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    @if (Model.Product != null)
+                    {
+                        <tr>
+                            <td class="text-muted" style="width: 40%;">Product:</td>
+                            <td>
+                                <div class="fw-medium">@Model.Product.Name</div>
+                                <small class="text-muted">@Model.Product.Sku</small>
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.Warehouse != null)
+                    {
+                        <tr>
+                            <td class="text-muted">Warehouse:</td>
+                            <td class="fw-medium">@Model.Warehouse.Name</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td class="text-muted">Total Quantity:</td>
+                        <td class="fw-medium">@Model.TotalQuantity.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Sample Size:</td>
+                        <td class="fw-medium">@Model.SampleSize.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Inspected:</td>
+                        <td class="fw-medium">@Model.InspectedQuantity.ToString("N2")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quantity Summary -->
+    <div class="col-12">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center py-3">
+                        <p class="text-muted mb-1 small">Total Inspected</p>
+                        <h5 class="mb-0">@Model.InspectedQuantity.ToString("N2")</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success bg-opacity-10 border-0">
+                    <div class="card-body text-center py-3">
+                        <p class="text-muted mb-1 small">Passed</p>
+                        <h5 class="mb-0 text-success">@Model.PassedQuantity.ToString("N2")</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger bg-opacity-10 border-0">
+                    <div class="card-body text-center py-3">
+                        <p class="text-muted mb-1 small">Failed</p>
+                        <h5 class="mb-0 text-danger">@Model.FailedQuantity.ToString("N2")</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QC Parameters -->
+    @if (Model.Parameters.Any())
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Quality Check Parameters</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Parameter</th>
+                                    <th>Expected</th>
+                                    <th>Min/Max</th>
+                                    <th>Actual</th>
+                                    <th>Result</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var param in Model.Parameters.OrderBy(p => p.SequenceNumber))
+                                {
+                                    var paramResultClass = param.Result switch
+                                    {
+                                        QCParameterResult.Pending => "bg-secondary",
+                                        QCParameterResult.Pass => "bg-success",
+                                        QCParameterResult.Fail => "bg-danger",
+                                        QCParameterResult.Warning => "bg-warning",
+                                        QCParameterResult.NotApplicable => "bg-light text-dark",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    <tr>
+                                        <td>@param.SequenceNumber</td>
+                                        <td>
+                                            <div class="fw-medium">@param.ParameterName</div>
+                                            @if (!string.IsNullOrEmpty(param.ParameterCode))
+                                            {
+                                                <small class="text-muted">@param.ParameterCode</small>
+                                            }
+                                        </td>
+                                        <td>@(param.ExpectedValue ?? "-")</td>
+                                        <td>
+                                            @if (param.MinValue.HasValue || param.MaxValue.HasValue)
+                                            {
+                                                <text>@(param.MinValue?.ToString("N2") ?? "-") / @(param.MaxValue?.ToString("N2") ?? "-")</text>
+                                            }
+                                            else
+                                            {
+                                                <text>-</text>
+                                            }
+                                        </td>
+                                        <td class="fw-medium">
+                                            @(param.ActualValue ?? (param.MeasuredValue?.ToString("N2") ?? "-"))
+                                        </td>
+                                        <td>
+                                            <span class="badge @paramResultClass">@param.Result</span>
+                                        </td>
+                                        <td>@(param.Remarks ?? "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Result Remarks -->
+    @if (!string.IsNullOrEmpty(Model.ResultRemarks))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Result Remarks</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.ResultRemarks</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Notes -->
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Notes</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.Notes</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer mt-4 px-0 pb-0">
+    @if (Model.Status == InspectionStatus.Pending || Model.Status == InspectionStatus.InProgress)
+    {
+        <button type="button" class="btn btn-outline-primary" onclick="editInspection('@Model.Id')" data-bs-dismiss="modal">
+            <i class="bi bi-pencil me-2"></i>Edit / Record Results
+        </button>
+    }
+    @if (Model.Status == InspectionStatus.Completed)
+    {
+        <button type="button" class="btn btn-success" onclick="approveInspection('@Model.Id')" data-bs-dismiss="modal">
+            <i class="bi bi-check-circle me-2"></i>Approve
+        </button>
+    }
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

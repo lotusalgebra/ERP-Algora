@@ -1,0 +1,315 @@
+@model Algora.Erp.Domain.Entities.Dispatch.DeliveryChallan
+@using Algora.Erp.Domain.Entities.Dispatch
+
+@{
+    var statusClass = Model.Status switch
+    {
+        DeliveryChallanStatus.Draft => "bg-secondary",
+        DeliveryChallanStatus.Confirmed => "bg-info",
+        DeliveryChallanStatus.Dispatched => "bg-primary",
+        DeliveryChallanStatus.Delivered => "bg-success",
+        DeliveryChallanStatus.Cancelled => "bg-dark",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="row g-4">
+    <!-- Header Info -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1">@Model.ChallanNumber</h5>
+                <p class="text-muted mb-0">@Model.ChallanDate.ToString("dd MMM yyyy")</p>
+            </div>
+            <span class="badge @statusClass fs-6">@Model.Status</span>
+        </div>
+    </div>
+
+    <!-- Customer & Sales Order -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Customer Details</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 40%;">Customer:</td>
+                        <td class="fw-medium">@Model.Customer?.Name</td>
+                    </tr>
+                    @if (Model.SalesOrder != null)
+                    {
+                        <tr>
+                            <td class="text-muted">Sales Order:</td>
+                            <td class="fw-medium">@Model.SalesOrder.OrderNumber</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td class="text-muted">Warehouse:</td>
+                        <td class="fw-medium">@Model.Warehouse?.Name</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transport Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Transport Details</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    @if (!string.IsNullOrEmpty(Model.VehicleNumber))
+                    {
+                        <tr>
+                            <td class="text-muted" style="width: 40%;">Vehicle:</td>
+                            <td class="fw-medium">@Model.VehicleNumber</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.TransportMode))
+                    {
+                        <tr>
+                            <td class="text-muted">Mode:</td>
+                            <td class="fw-medium">@Model.TransportMode</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.DriverName))
+                    {
+                        <tr>
+                            <td class="text-muted">Driver:</td>
+                            <td class="fw-medium">@Model.DriverName</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.DriverPhone))
+                    {
+                        <tr>
+                            <td class="text-muted">Phone:</td>
+                            <td class="fw-medium">@Model.DriverPhone</td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.TransporterName))
+                    {
+                        <tr>
+                            <td class="text-muted">Transporter:</td>
+                            <td class="fw-medium">@Model.TransporterName</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping Address -->
+    @if (!string.IsNullOrEmpty(Model.ShipToName) || !string.IsNullOrEmpty(Model.ShipToAddress1))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Shipping Address</h6>
+                </div>
+                <div class="card-body">
+                    <address class="mb-0">
+                        @if (!string.IsNullOrEmpty(Model.ShipToName))
+                        {
+                            <strong>@Model.ShipToName</strong><br />
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ShipToAddress1))
+                        {
+                            @Model.ShipToAddress1<br />
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ShipToAddress2))
+                        {
+                            @Model.ShipToAddress2<br />
+                        }
+                        @{
+                            var cityStateZip = new List<string>();
+                            if (!string.IsNullOrEmpty(Model.ShipToCity)) cityStateZip.Add(Model.ShipToCity);
+                            if (!string.IsNullOrEmpty(Model.ShipToState)) cityStateZip.Add(Model.ShipToState);
+                            if (!string.IsNullOrEmpty(Model.ShipToPostalCode)) cityStateZip.Add(Model.ShipToPostalCode);
+                        }
+                        @if (cityStateZip.Any())
+                        {
+                            @string.Join(", ", cityStateZip)<br />
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ShipToCountry))
+                        {
+                            @Model.ShipToCountry<br />
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ShipToPhone))
+                        {
+                            <i class="bi bi-telephone me-1"></i>@Model.ShipToPhone
+                        }
+                    </address>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Line Items -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Line Items</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 45%;">Product</th>
+                                <th class="text-end" style="width: 20%;">Quantity</th>
+                                <th style="width: 15%;">UOM</th>
+                                <th style="width: 15%;">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Lines?.Any() == true)
+                            {
+                                foreach (var line in Model.Lines.OrderBy(l => l.LineNumber))
+                                {
+                                    <tr>
+                                        <td>@line.LineNumber</td>
+                                        <td>
+                                            <div class="fw-medium">@line.ProductName</div>
+                                            <small class="text-muted">@line.ProductSku</small>
+                                        </td>
+                                        <td class="text-end fw-medium">@line.Quantity.ToString("N2")</td>
+                                        <td>@line.UnitOfMeasure</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(line.Notes))
+                                            {
+                                                <span class="text-muted">@line.Notes</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No line items</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="2" class="text-end fw-medium">Total:</td>
+                                <td class="text-end fw-medium">@Model.Lines?.Sum(l => l.Quantity).ToString("N2")</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Package Info -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Package Information</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 50%;">Total Packages:</td>
+                        <td class="fw-medium">@(Model.TotalPackages ?? 0)</td>
+                    </tr>
+                    @if (Model.TotalWeight.HasValue)
+                    {
+                        <tr>
+                            <td class="text-muted">Total Weight:</td>
+                            <td class="fw-medium">@Model.TotalWeight.Value.ToString("N2") @Model.WeightUnit</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Timeline -->
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Timeline</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-4">
+                    <div>
+                        <small class="text-muted d-block">Created</small>
+                        <span class="fw-medium">@Model.CreatedAt.ToString("dd MMM yyyy HH:mm")</span>
+                    </div>
+                    @if (Model.ConfirmedAt.HasValue)
+                    {
+                        <div>
+                            <small class="text-muted d-block">Confirmed</small>
+                            <span class="fw-medium">@Model.ConfirmedAt.Value.ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    }
+                    @if (Model.DispatchedAt.HasValue)
+                    {
+                        <div>
+                            <small class="text-muted d-block">Dispatched</small>
+                            <span class="fw-medium">@Model.DispatchedAt.Value.ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    }
+                    @if (Model.DeliveredAt.HasValue)
+                    {
+                        <div>
+                            <small class="text-muted d-block">Delivered</small>
+                            <span class="fw-medium">@Model.DeliveredAt.Value.ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Notes</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.Notes</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer mt-4 px-0 pb-0">
+    @if (Model.Status == DeliveryChallanStatus.Draft)
+    {
+        <button type="button" class="btn btn-outline-primary" onclick="editChallan('@Model.Id')" data-bs-dismiss="modal">
+            <i class="bi bi-pencil me-2"></i>Edit
+        </button>
+        <button type="button" class="btn btn-info" onclick="updateStatus('@Model.Id', 'Confirmed')" data-bs-dismiss="modal">
+            <i class="bi bi-check-circle me-2"></i>Confirm
+        </button>
+    }
+    @if (Model.Status == DeliveryChallanStatus.Confirmed)
+    {
+        <button type="button" class="btn btn-primary" onclick="updateStatus('@Model.Id', 'Dispatched')" data-bs-dismiss="modal">
+            <i class="bi bi-truck me-2"></i>Mark Dispatched
+        </button>
+    }
+    @if (Model.Status == DeliveryChallanStatus.Dispatched)
+    {
+        <button type="button" class="btn btn-success" onclick="updateStatus('@Model.Id', 'Delivered')" data-bs-dismiss="modal">
+            <i class="bi bi-check-all me-2"></i>Mark Delivered
+        </button>
+    }
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

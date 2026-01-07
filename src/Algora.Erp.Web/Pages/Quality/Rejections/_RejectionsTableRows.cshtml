@@ -1,0 +1,157 @@
+@model Algora.Erp.Web.Pages.Quality.Rejections.RejectionsTableViewModel
+@using Algora.Erp.Domain.Entities.Quality
+
+@if (!Model.Rejections.Any())
+{
+    <tr>
+        <td colspan="9" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-x-circle fs-1 d-block mb-3"></i>
+                <p class="mb-0">No rejection notes found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var rejection in Model.Rejections)
+    {
+        var dispositionClass = rejection.DispositionStatus switch
+        {
+            RejectionDisposition.Pending => "bg-secondary",
+            RejectionDisposition.ReturnToSupplier => "bg-primary",
+            RejectionDisposition.Scrapped => "bg-danger",
+            RejectionDisposition.Reworked => "bg-info",
+            RejectionDisposition.Disposed => "bg-dark",
+            RejectionDisposition.AcceptedWithDeviation => "bg-warning",
+            RejectionDisposition.HoldForReview => "bg-warning",
+            _ => "bg-secondary"
+        };
+
+        var categoryClass = rejection.RejectionCategory switch
+        {
+            RejectionCategory.QualityDefect => "bg-danger",
+            RejectionCategory.DamagedInTransit => "bg-warning",
+            RejectionCategory.WrongProduct => "bg-info",
+            RejectionCategory.QuantityMismatch => "bg-secondary",
+            RejectionCategory.ExpiredProduct => "bg-dark",
+            _ => "bg-secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <a href="javascript:void(0)" onclick="viewDetails('@rejection.Id')" class="text-decoration-none fw-medium">
+                    @rejection.RejectionNumber
+                </a>
+            </td>
+            <td>
+                <div class="fw-medium">@rejection.ProductName</div>
+                <small class="text-muted">@rejection.ProductSku</small>
+            </td>
+            <td>
+                @if (rejection.Supplier != null)
+                {
+                    <span class="text-truncate d-inline-block" style="max-width: 120px;">@rejection.Supplier.Name</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>@rejection.RejectionDate.ToString("dd MMM yyyy")</td>
+            <td class="text-end">
+                @rejection.RejectedQuantity.ToString("N2")
+                <small class="text-muted">@rejection.UnitOfMeasure</small>
+            </td>
+            <td class="text-end text-danger fw-medium">@rejection.TotalValue.ToString("C2")</td>
+            <td>
+                <span class="badge @categoryClass">@rejection.RejectionCategory</span>
+            </td>
+            <td>
+                <span class="badge @dispositionClass">@rejection.DispositionStatus</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@rejection.Id')">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        @if (rejection.DispositionStatus == RejectionDisposition.Pending || rejection.DispositionStatus == RejectionDisposition.HoldForReview)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="editRejection('@rejection.Id')">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-primary" href="javascript:void(0)" onclick="showDispositionModal('@rejection.Id', '@rejection.DispositionStatus')">
+                                    <i class="bi bi-arrow-right-circle me-2"></i>Update Disposition
+                                </a>
+                            </li>
+                        }
+                        @if (rejection.DispositionStatus == RejectionDisposition.Pending)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete('@rejection.Id')">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="9" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                                   hx-target="#rejectionsTableBody"
+                                   hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)"
+                                       hx-get="?handler=Table&page=@i"
+                                       hx-target="#rejectionsTableBody"
+                                       hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                                   hx-target="#rejectionsTableBody"
+                                   hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+}

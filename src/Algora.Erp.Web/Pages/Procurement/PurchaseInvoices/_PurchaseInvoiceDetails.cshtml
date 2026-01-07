@@ -1,0 +1,288 @@
+@model Algora.Erp.Domain.Entities.Finance.Invoice
+@using Algora.Erp.Domain.Entities.Finance
+
+@{
+    var statusClass = Model.Status switch
+    {
+        InvoiceStatus.Draft => "bg-secondary",
+        InvoiceStatus.Pending => "bg-warning",
+        InvoiceStatus.Sent => "bg-info",
+        InvoiceStatus.PartiallyPaid => "bg-primary",
+        InvoiceStatus.Paid => "bg-success",
+        InvoiceStatus.Overdue => "bg-danger",
+        InvoiceStatus.Void => "bg-dark",
+        InvoiceStatus.Cancelled => "bg-dark",
+        _ => "bg-secondary"
+    };
+
+    var isOverdue = Model.Status != InvoiceStatus.Paid &&
+                    Model.Status != InvoiceStatus.Void &&
+                    Model.Status != InvoiceStatus.Cancelled &&
+                    Model.DueDate < DateTime.Today;
+
+    var supplierName = ViewData["SupplierName"] as string ?? Model.BillingName ?? "-";
+}
+
+<div class="row g-4">
+    <!-- Header Info -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1">@Model.InvoiceNumber</h5>
+                <p class="text-muted mb-0">
+                    Invoice Date: @Model.InvoiceDate.ToString("dd MMM yyyy")
+                    @if (!string.IsNullOrEmpty(Model.Reference))
+                    {
+                        <span class="ms-2">| Ref: @Model.Reference</span>
+                    }
+                </p>
+            </div>
+            <div class="text-end">
+                <span class="badge @statusClass fs-6">@Model.Status</span>
+                @if (isOverdue)
+                {
+                    <span class="badge bg-danger fs-6 ms-1">Overdue</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier & Dates -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Supplier Details</h6>
+            </div>
+            <div class="card-body">
+                <p class="fw-medium mb-2">@supplierName</p>
+                @if (!string.IsNullOrEmpty(Model.BillingAddress))
+                {
+                    <address class="text-muted mb-0">
+                        @Model.BillingAddress<br />
+                        @if (!string.IsNullOrEmpty(Model.BillingCity) || !string.IsNullOrEmpty(Model.BillingState))
+                        {
+                            @Model.BillingCity@(Model.BillingCity != null && Model.BillingState != null ? ", " : "")@Model.BillingState @Model.BillingPostalCode<br />
+                        }
+                        @Model.BillingCountry
+                    </address>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Payment Information</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 40%;">Due Date:</td>
+                        <td class="fw-medium @(isOverdue ? "text-danger" : "")">
+                            @Model.DueDate.ToString("dd MMM yyyy")
+                            @if (isOverdue)
+                            {
+                                <i class="bi bi-exclamation-triangle-fill text-danger ms-1"></i>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Payment Terms:</td>
+                        <td class="fw-medium">@Model.PaymentTermDays days</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Currency:</td>
+                        <td class="fw-medium">@Model.Currency</td>
+                    </tr>
+                    @if (Model.PaidDate.HasValue)
+                    {
+                        <tr>
+                            <td class="text-muted">Paid Date:</td>
+                            <td class="fw-medium text-success">@Model.PaidDate.Value.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Line Items</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 35%;">Description</th>
+                                <th class="text-end" style="width: 12%;">Qty</th>
+                                <th class="text-end" style="width: 15%;">Unit Price</th>
+                                <th class="text-end" style="width: 10%;">Discount</th>
+                                <th class="text-end" style="width: 10%;">Tax</th>
+                                <th class="text-end" style="width: 13%;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Lines?.Any() == true)
+                            {
+                                foreach (var line in Model.Lines.Where(l => !l.IsDeleted).OrderBy(l => l.LineNumber))
+                                {
+                                    <tr>
+                                        <td>@line.LineNumber</td>
+                                        <td>
+                                            <div class="fw-medium">@line.Description</div>
+                                            @if (!string.IsNullOrEmpty(line.ProductCode))
+                                            {
+                                                <small class="text-muted">@line.ProductCode</small>
+                                            }
+                                        </td>
+                                        <td class="text-end">@line.Quantity.ToString("N2") @line.UnitOfMeasure</td>
+                                        <td class="text-end">@line.UnitPrice.ToString("C2")</td>
+                                        <td class="text-end">
+                                            @if (line.DiscountPercent > 0)
+                                            {
+                                                <span>@line.DiscountPercent.ToString("N1")%</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            @if (line.TaxPercent > 0)
+                                            {
+                                                <span>@line.TaxPercent.ToString("N1")%</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end fw-medium">@line.LineTotal.ToString("C2")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">No line items</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="6" class="text-end">Subtotal:</td>
+                                <td class="text-end fw-medium">@Model.SubTotal.ToString("C2")</td>
+                            </tr>
+                            @if (Model.DiscountAmount > 0)
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-end">Discount:</td>
+                                    <td class="text-end text-danger">-@Model.DiscountAmount.ToString("C2")</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="6" class="text-end">Tax:</td>
+                                <td class="text-end">@Model.TaxAmount.ToString("C2")</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" class="text-end fw-bold">Total:</td>
+                                <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("C2")</td>
+                            </tr>
+                            @if (Model.PaidAmount > 0)
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-end text-success">Paid:</td>
+                                    <td class="text-end text-success">@Model.PaidAmount.ToString("C2")</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="6" class="text-end fw-bold">Balance Due:</td>
+                                <td class="text-end fw-bold fs-5 @(Model.BalanceDue > 0 ? "text-danger" : "text-success")">
+                                    @Model.BalanceDue.ToString("C2")
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment History -->
+    @if (Model.Payments?.Any() == true)
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Payment History</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Payment #</th>
+                                    <th>Date</th>
+                                    <th>Method</th>
+                                    <th>Reference</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var payment in Model.Payments.OrderBy(p => p.PaymentDate))
+                                {
+                                    <tr>
+                                        <td class="fw-medium">@payment.PaymentNumber</td>
+                                        <td>@payment.PaymentDate.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">@payment.PaymentMethod</span>
+                                        </td>
+                                        <td>@(payment.Reference ?? "-")</td>
+                                        <td class="text-end fw-medium text-success">@payment.Amount.ToString("C2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Notes -->
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Notes</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.Notes</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer mt-4 px-0 pb-0">
+    @if (Model.Status == InvoiceStatus.Draft || Model.Status == InvoiceStatus.Pending)
+    {
+        <button type="button" class="btn btn-outline-primary" onclick="editInvoice('@Model.Id')" data-bs-dismiss="modal">
+            <i class="bi bi-pencil me-2"></i>Edit
+        </button>
+    }
+    @if (Model.BalanceDue > 0 && Model.Status != InvoiceStatus.Draft && Model.Status != InvoiceStatus.Void && Model.Status != InvoiceStatus.Cancelled)
+    {
+        <button type="button" class="btn btn-success" onclick="showPaymentModal('@Model.Id', '@Model.BalanceDue.ToString("C2")')" data-bs-dismiss="modal">
+            <i class="bi bi-cash me-2"></i>Record Payment
+        </button>
+    }
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

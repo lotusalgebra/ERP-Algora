@@ -1,0 +1,168 @@
+@model Algora.Erp.Web.Pages.Dispatch.DeliveryChallans.DeliveryChallansTableViewModel
+@using Algora.Erp.Domain.Entities.Dispatch
+
+@if (!Model.DeliveryChallans.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-truck fs-1 d-block mb-3"></i>
+                <p class="mb-0">No delivery challans found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var challan in Model.DeliveryChallans)
+    {
+        var statusClass = challan.Status switch
+        {
+            DeliveryChallanStatus.Draft => "bg-secondary",
+            DeliveryChallanStatus.Confirmed => "bg-info",
+            DeliveryChallanStatus.Dispatched => "bg-primary",
+            DeliveryChallanStatus.Delivered => "bg-success",
+            DeliveryChallanStatus.Cancelled => "bg-dark",
+            _ => "bg-secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <a href="javascript:void(0)" onclick="viewDetails('@challan.Id')" class="text-decoration-none fw-medium">
+                    @challan.ChallanNumber
+                </a>
+            </td>
+            <td>
+                <span class="text-truncate d-inline-block" style="max-width: 150px;">
+                    @challan.CustomerName
+                </span>
+            </td>
+            <td>@challan.ChallanDate.ToString("dd MMM yyyy")</td>
+            <td class="text-center">
+                <span class="badge bg-light text-dark">@challan.Lines.Count items</span>
+            </td>
+            <td class="text-end">@challan.TotalQuantity.ToString("N2")</td>
+            <td>
+                @if (!string.IsNullOrEmpty(challan.VehicleNumber))
+                {
+                    <span class="badge bg-light text-dark">@challan.VehicleNumber</span>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>
+                <span class="badge @statusClass">@challan.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@challan.Id')">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        @if (challan.Status == DeliveryChallanStatus.Draft)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="editChallan('@challan.Id')">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-info" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Confirmed')">
+                                    <i class="bi bi-check-circle me-2"></i>Confirm
+                                </a>
+                            </li>
+                        }
+                        @if (challan.Status == DeliveryChallanStatus.Confirmed)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-primary" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Dispatched')">
+                                    <i class="bi bi-truck me-2"></i>Mark as Dispatched
+                                </a>
+                            </li>
+                        }
+                        @if (challan.Status == DeliveryChallanStatus.Dispatched)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-success" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Delivered')">
+                                    <i class="bi bi-check-all me-2"></i>Mark as Delivered
+                                </a>
+                            </li>
+                        }
+                        @if (challan.Status != DeliveryChallanStatus.Cancelled && challan.Status != DeliveryChallanStatus.Delivered)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Cancelled')">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </a>
+                            </li>
+                        }
+                        @if (challan.Status == DeliveryChallanStatus.Draft)
+                        {
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete('@challan.Id')">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="8" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                                   hx-target="#challansTableBody"
+                                   hx-include="#searchInput, #statusFilter, #customerFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)"
+                                       hx-get="?handler=Table&page=@i"
+                                       hx-target="#challansTableBody"
+                                       hx-include="#searchInput, #statusFilter, #customerFilter, #pageSizeSelect">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                                   hx-target="#challansTableBody"
+                                   hx-include="#searchInput, #statusFilter, #customerFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+}

@@ -1,0 +1,173 @@
+@model Algora.Erp.Web.Pages.Quality.Inspections.InspectionsTableViewModel
+@using Algora.Erp.Domain.Entities.Quality
+
+@if (!Model.Inspections.Any())
+{
+    <tr>
+        <td colspan="9" class="text-center py-5">
+            <div class="text-muted">
+                <i class="bi bi-clipboard-check fs-1 d-block mb-3"></i>
+                <p class="mb-0">No inspections found</p>
+            </div>
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var inspection in Model.Inspections)
+    {
+        var statusClass = inspection.Status switch
+        {
+            InspectionStatus.Pending => "bg-secondary",
+            InspectionStatus.InProgress => "bg-info",
+            InspectionStatus.Completed => "bg-primary",
+            InspectionStatus.Approved => "bg-success",
+            InspectionStatus.Rejected => "bg-danger",
+            InspectionStatus.Cancelled => "bg-dark",
+            _ => "bg-secondary"
+        };
+
+        var resultClass = inspection.OverallResult switch
+        {
+            QCOverallResult.Pending => "bg-secondary",
+            QCOverallResult.Pass => "bg-success",
+            QCOverallResult.Fail => "bg-danger",
+            QCOverallResult.PartialPass => "bg-warning",
+            QCOverallResult.ConditionalPass => "bg-info",
+            _ => "bg-secondary"
+        };
+
+        var typeClass = inspection.InspectionType switch
+        {
+            InspectionType.Incoming => "bg-primary",
+            InspectionType.Outgoing => "bg-success",
+            InspectionType.InProcess => "bg-warning",
+            InspectionType.Random => "bg-info",
+            InspectionType.Final => "bg-dark",
+            _ => "bg-secondary"
+        };
+
+        <tr>
+            <td class="ps-4">
+                <a href="javascript:void(0)" onclick="viewDetails('@inspection.Id')" class="text-decoration-none fw-medium">
+                    @inspection.InspectionNumber
+                </a>
+            </td>
+            <td>
+                <span class="badge @typeClass">@inspection.InspectionType</span>
+            </td>
+            <td>
+                <div class="small">
+                    <span class="text-muted">@inspection.SourceDocumentType:</span>
+                    <span class="fw-medium">@inspection.SourceDocumentNumber</span>
+                </div>
+            </td>
+            <td>
+                @if (inspection.Product != null)
+                {
+                    <div class="fw-medium">@inspection.Product.Name</div>
+                    <small class="text-muted">@inspection.Product.Sku</small>
+                }
+                else
+                {
+                    <span class="text-muted">-</span>
+                }
+            </td>
+            <td>@inspection.InspectionDate.ToString("dd MMM yyyy")</td>
+            <td class="text-center">
+                <span class="badge bg-light text-dark">@inspection.SampleSize / @inspection.TotalQuantity</span>
+            </td>
+            <td>
+                <span class="badge @resultClass">@inspection.OverallResult</span>
+            </td>
+            <td>
+                <span class="badge @statusClass">@inspection.Status</span>
+            </td>
+            <td class="text-end pe-4">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@inspection.Id')">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                        </li>
+                        @if (inspection.Status == InspectionStatus.Pending || inspection.Status == InspectionStatus.InProgress)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="editInspection('@inspection.Id')">
+                                    <i class="bi bi-pencil me-2"></i>Edit / Record Results
+                                </a>
+                            </li>
+                        }
+                        @if (inspection.Status == InspectionStatus.Completed)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-success" href="javascript:void(0)" onclick="approveInspection('@inspection.Id')">
+                                    <i class="bi bi-check-circle me-2"></i>Approve
+                                </a>
+                            </li>
+                        }
+                        @if (inspection.Status == InspectionStatus.Pending)
+                        {
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete('@inspection.Id')">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <tr>
+            <td colspan="9" class="py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                                   hx-target="#inspectionsTableBody"
+                                   hx-include="#searchInput, #statusFilter, #typeFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <a class="page-link" href="javascript:void(0)"
+                                       hx-get="?handler=Table&page=@i"
+                                       hx-target="#inspectionsTableBody"
+                                       hx-include="#searchInput, #statusFilter, #typeFilter, #pageSizeSelect">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)"
+                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                                   hx-target="#inspectionsTableBody"
+                                   hx-include="#searchInput, #statusFilter, #typeFilter, #pageSizeSelect">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </td>
+        </tr>
+    }
+}
