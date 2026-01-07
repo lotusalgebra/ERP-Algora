@@ -29,7 +29,7 @@
 
     <tr>
         <td class="ps-4">
-            <a href="/Finance/JournalEntries/Details/@entry.Id" class="text-decoration-none fw-semibold">
+            <a href="/Finance/JournalEntries/Edit/@entry.Id" class="text-decoration-none fw-semibold">
                 @entry.EntryNumber
             </a>
             @if (!string.IsNullOrEmpty(entry.Reference))
@@ -64,18 +64,10 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                        <a class="dropdown-item" href="/Finance/JournalEntries/Details/@entry.Id">
-                            <i class="bi bi-eye me-2"></i> View Details
+                        <a class="dropdown-item" href="/Finance/JournalEntries/Edit/@entry.Id">
+                            <i class="bi bi-eye me-2"></i> View / Edit
                         </a>
                     </li>
-                    @if (entry.Status == JournalEntryStatus.Draft)
-                    {
-                        <li>
-                            <a class="dropdown-item" href="/Finance/JournalEntries/Edit/@entry.Id">
-                                <i class="bi bi-pencil me-2"></i> Edit
-                            </a>
-                        </li>
-                    }
                     @if (entry.Status == JournalEntryStatus.Draft || entry.Status == JournalEntryStatus.Pending)
                     {
                         @if (entry.TotalDebit == entry.TotalCredit && entry.TotalDebit > 0)
