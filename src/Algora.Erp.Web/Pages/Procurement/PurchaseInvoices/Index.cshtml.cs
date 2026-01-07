@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Procurement.PurchaseInvoices;
 
+[IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {
     private readonly IApplicationDbContext _context;
