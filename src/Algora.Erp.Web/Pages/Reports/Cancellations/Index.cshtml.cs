@@ -20,6 +20,7 @@ public class IndexModel : PageModel
     public int ThisMonth { get; set; }
     public int ThisWeek { get; set; }
     public Dictionary<string, int> ByDocumentType { get; set; } = new();
+    public Dictionary<CancellationReasonCategory, int> ByReasonCategory { get; set; } = new();
 
     public async Task OnGetAsync()
     {
@@ -32,6 +33,9 @@ public class IndexModel : PageModel
         ThisWeek = cancellations.Count(c => c.CancelledAt >= DateTime.UtcNow.AddDays(-7));
         ByDocumentType = cancellations
             .GroupBy(c => c.DocumentType)
+            .ToDictionary(g => g.Key, g => g.Count());
+        ByReasonCategory = cancellations
+            .GroupBy(c => c.ReasonCategory)
             .ToDictionary(g => g.Key, g => g.Count());
     }
 

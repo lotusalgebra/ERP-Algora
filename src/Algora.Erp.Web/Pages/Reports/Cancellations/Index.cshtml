@@ -16,9 +16,45 @@
         </a>
     </div>
 
+    @functions {
+        string FormatCategoryName(Algora.Erp.Domain.Entities.Common.CancellationReasonCategory category)
+        {
+            return category switch
+            {
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.CustomerRequest => "Customer Request",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.DuplicateEntry => "Duplicate",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.DataEntryError => "Data Error",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.SupplierIssue => "Supplier",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.QualityIssue => "Quality",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.PriceDispute => "Price",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.DeliveryIssue => "Delivery",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.PaymentIssue => "Payment",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.OutOfStock => "Out of Stock",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.SystemError => "System Error",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.Other => "Other",
+                _ => category.ToString()
+            };
+        }
+
+        string GetCategoryBadgeClass(Algora.Erp.Domain.Entities.Common.CancellationReasonCategory category)
+        {
+            return category switch
+            {
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.CustomerRequest => "bg-primary text-white",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.QualityIssue => "bg-danger text-white",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.PaymentIssue => "bg-danger text-white",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.DataEntryError => "bg-warning text-dark",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.PriceDispute => "bg-warning text-dark",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.SupplierIssue => "bg-info text-white",
+                Algora.Erp.Domain.Entities.Common.CancellationReasonCategory.DeliveryIssue => "bg-info text-white",
+                _ => "bg-secondary text-white"
+            };
+        }
+    }
+
     <!-- Stats Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -28,14 +64,14 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-muted mb-1 small">Total Cancellations</p>
+                            <p class="text-muted mb-1 small">Total</p>
                             <h4 class="mb-0">@Model.TotalCancellations</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -52,7 +88,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -72,13 +108,33 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2 small">By Document Type</p>
+                    <p class="text-muted mb-2 small"><i class="bi bi-file-text me-1"></i>By Document Type</p>
                     @if (Model.ByDocumentType.Any())
                     {
-                        <div class="d-flex flex-wrap gap-2">
+                        <div class="d-flex flex-wrap gap-1">
                             @foreach (var item in Model.ByDocumentType.OrderByDescending(x => x.Value).Take(4))
                             {
                                 <span class="badge bg-light text-dark">@item.Key: @item.Value</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">No data</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2 small"><i class="bi bi-tag me-1"></i>By Reason Category</p>
+                    @if (Model.ByReasonCategory.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var item in Model.ByReasonCategory.OrderByDescending(x => x.Value).Take(4))
+                            {
+                                <span class="badge @GetCategoryBadgeClass(item.Key)">@FormatCategoryName(item.Key): @item.Value</span>
                             }
                         </div>
                     }
