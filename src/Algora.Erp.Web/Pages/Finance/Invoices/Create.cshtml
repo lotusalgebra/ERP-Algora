@@ -103,11 +103,10 @@
                             <div class="col-md-4">
                                 <label class="form-label">Currency</label>
                                 <select class="form-select" name="Input.Currency">
+                                    <option value="INR" selected="@(Model.Input.Currency == "INR")">INR - Indian Rupee</option>
                                     <option value="USD" selected="@(Model.Input.Currency == "USD")">USD - US Dollar</option>
                                     <option value="EUR" selected="@(Model.Input.Currency == "EUR")">EUR - Euro</option>
                                     <option value="GBP" selected="@(Model.Input.Currency == "GBP")">GBP - British Pound</option>
-                                    <option value="CAD" selected="@(Model.Input.Currency == "CAD")">CAD - Canadian Dollar</option>
-                                    <option value="AUD" selected="@(Model.Input.Currency == "AUD")">AUD - Australian Dollar</option>
                                 </select>
                             </div>
 
@@ -115,6 +114,55 @@
                                 <label class="form-label">Reference</label>
                                 <input type="text" class="form-control" name="Input.Reference"
                                        value="@Model.Input.Reference" placeholder="PO#, Quote#, etc.">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GST Details Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="bi bi-percent me-2"></i>GST Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">From Location <span class="text-danger">*</span></label>
+                                <select class="form-select" name="Input.FromLocationId" id="fromLocationSelect" required onchange="checkInterState()">
+                                    <option value="">Select Location</option>
+                                    @foreach (var location in Model.Locations)
+                                    {
+                                        <option value="@location.Id"
+                                                data-state-id="@location.StateId"
+                                                data-gstin="@location.GstNumber">
+                                            @location.Name (@location.Code) - @(location.State?.Name ?? "N/A")
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Customer State <span class="text-danger">*</span></label>
+                                <select class="form-select" name="Input.CustomerStateId" id="customerStateSelect" required onchange="checkInterState()">
+                                    <option value="">Select State</option>
+                                    @foreach (var state in Model.States)
+                                    {
+                                        <option value="@state.Id" data-code="@state.ShortName">
+                                            @state.Name (@state.ShortName)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Customer GSTIN</label>
+                                <input type="text" class="form-control" name="Input.CustomerGstin"
+                                       placeholder="e.g., 27AABCU9603R1ZM" maxlength="15"
+                                       pattern="[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info mb-0 d-flex align-items-center" id="gstTypeAlert">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <span id="gstTypeText">Select locations to determine GST type</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -135,14 +183,15 @@
                             <table class="table table-hover mb-0" id="linesTable">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th style="width: 25%">Product</th>
-                                        <th style="width: 20%">Description</th>
-                                        <th style="width: 8%" class="text-center">Qty</th>
-                                        <th style="width: 12%" class="text-end">Unit Price</th>
-                                        <th style="width: 8%" class="text-center">Disc %</th>
-                                        <th style="width: 8%" class="text-center">Tax %</th>
+                                        <th style="width: 20%">Product</th>
+                                        <th style="width: 15%">Description</th>
+                                        <th style="width: 7%" class="text-center">Qty</th>
+                                        <th style="width: 10%" class="text-end">Unit Price</th>
+                                        <th style="width: 7%" class="text-center">Disc %</th>
+                                        <th style="width: 12%">GST Slab</th>
+                                        <th style="width: 8%" class="text-center">HSN</th>
                                         <th style="width: 12%" class="text-end">Total</th>
-                                        <th style="width: 7%" class="text-center"></th>
+                                        <th style="width: 5%" class="text-center"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="linesBody">
@@ -204,23 +253,33 @@
                                 </tbody>
                                 <tfoot class="bg-light">
                                     <tr>
-                                        <td colspan="6" class="text-end fw-medium">Subtotal:</td>
-                                        <td class="text-end fw-medium" id="subtotalDisplay">$0.00</td>
+                                        <td colspan="7" class="text-end fw-medium">Subtotal:</td>
+                                        <td class="text-end fw-medium" id="subtotalDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="6" class="text-end text-danger">Discount:</td>
-                                        <td class="text-end text-danger" id="discountDisplay">-$0.00</td>
+                                        <td colspan="7" class="text-end text-danger">Discount:</td>
+                                        <td class="text-end text-danger" id="discountDisplay">-₹0.00</td>
                                         <td></td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="6" class="text-end">Tax:</td>
-                                        <td class="text-end" id="taxDisplay">$0.00</td>
+                                    <tr id="cgstRow">
+                                        <td colspan="7" class="text-end text-success">CGST:</td>
+                                        <td class="text-end text-success" id="cgstDisplay">₹0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr id="sgstRow">
+                                        <td colspan="7" class="text-end text-info">SGST:</td>
+                                        <td class="text-end text-info" id="sgstDisplay">₹0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr id="igstRow" style="display: none;">
+                                        <td colspan="7" class="text-end text-warning">IGST:</td>
+                                        <td class="text-end text-warning" id="igstDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr class="fw-bold fs-5">
-                                        <td colspan="6" class="text-end">Total:</td>
-                                        <td class="text-end text-primary" id="totalDisplay">$0.00</td>
+                                        <td colspan="7" class="text-end">Total:</td>
+                                        <td class="text-end text-primary" id="totalDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
                                 </tfoot>
@@ -300,20 +359,28 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Subtotal</span>
-                            <span id="summarySubtotal">$0.00</span>
+                            <span id="summarySubtotal">₹0.00</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Discount</span>
-                            <span class="text-danger" id="summaryDiscount">-$0.00</span>
+                            <span class="text-danger" id="summaryDiscount">-₹0.00</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Tax</span>
-                            <span id="summaryTax">$0.00</span>
+                        <div class="d-flex justify-content-between mb-2" id="summaryCgstRow">
+                            <span class="text-muted">CGST</span>
+                            <span class="text-success" id="summaryCgst">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" id="summarySgstRow">
+                            <span class="text-muted">SGST</span>
+                            <span class="text-info" id="summarySgst">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" id="summaryIgstRow" style="display: none;">
+                            <span class="text-muted">IGST</span>
+                            <span class="text-warning" id="summaryIgst">₹0.00</span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="fw-bold fs-5">Total</span>
-                            <span class="fw-bold fs-5 text-primary" id="summaryTotal">$0.00</span>
+                            <span class="fw-bold fs-5 text-primary" id="summaryTotal">₹0.00</span>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -333,6 +400,7 @@
 
 <script>
     let lineIndex = @(Model.Input.Lines.Count);
+    let isInterState = false;
 
     const products = [
         @foreach (var product in Model.Products)
@@ -340,6 +408,57 @@
             <text>{ id: '@product.Id', sku: '@product.Sku', name: '@product.Name.Replace("'", "\\'")', price: @product.SellingPrice, tax: @(product.TaxRate ?? 0) },</text>
         }
     ];
+
+    const gstSlabs = [
+        @foreach (var slab in Model.GstSlabs)
+        {
+            <text>{ id: '@slab.Id', name: '@slab.Name', rate: @slab.Rate, cgst: @slab.CgstRate, sgst: @slab.SgstRate, igst: @slab.IgstRate },</text>
+        }
+    ];
+
+    function checkInterState() {
+        const fromSelect = document.getElementById('fromLocationSelect');
+        const customerStateSelect = document.getElementById('customerStateSelect');
+        const gstTypeAlert = document.getElementById('gstTypeAlert');
+        const gstTypeText = document.getElementById('gstTypeText');
+
+        if (fromSelect.value && customerStateSelect.value) {
+            const fromOption = fromSelect.options[fromSelect.selectedIndex];
+            const fromStateId = fromOption.dataset.stateId;
+            const customerStateId = customerStateSelect.value;
+
+            isInterState = fromStateId !== customerStateId;
+
+            if (isInterState) {
+                gstTypeAlert.classList.remove('alert-info', 'alert-success');
+                gstTypeAlert.classList.add('alert-warning');
+                gstTypeText.textContent = 'Inter-State: IGST will be applied';
+                // Show IGST rows, hide CGST/SGST
+                document.getElementById('cgstRow').style.display = 'none';
+                document.getElementById('sgstRow').style.display = 'none';
+                document.getElementById('igstRow').style.display = '';
+                document.getElementById('summaryCgstRow').style.display = 'none';
+                document.getElementById('summarySgstRow').style.display = 'none';
+                document.getElementById('summaryIgstRow').style.display = '';
+            } else {
+                gstTypeAlert.classList.remove('alert-info', 'alert-warning');
+                gstTypeAlert.classList.add('alert-success');
+                gstTypeText.textContent = 'Intra-State: CGST + SGST will be applied';
+                // Show CGST/SGST rows, hide IGST
+                document.getElementById('cgstRow').style.display = '';
+                document.getElementById('sgstRow').style.display = '';
+                document.getElementById('igstRow').style.display = 'none';
+                document.getElementById('summaryCgstRow').style.display = '';
+                document.getElementById('summarySgstRow').style.display = '';
+                document.getElementById('summaryIgstRow').style.display = 'none';
+            }
+        } else {
+            gstTypeAlert.classList.remove('alert-success', 'alert-warning');
+            gstTypeAlert.classList.add('alert-info');
+            gstTypeText.textContent = 'Select locations to determine GST type';
+        }
+        calculateTotals();
+    }
 
     function addLine() {
         const tbody = document.getElementById('linesBody');
@@ -370,11 +489,17 @@
                        name="Input.Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
             </td>
             <td>
-                <input type="number" class="form-control form-control-sm text-center tax-input"
-                       name="Input.Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
+                <select class="form-select form-select-sm gst-slab-select" name="Input.Lines[${lineIndex}].GstSlabId" onchange="calculateLineTotal(this)">
+                    <option value="">No GST</option>
+                    ${gstSlabs.map(g => `<option value="${g.id}" data-rate="${g.rate}" data-cgst="${g.cgst}" data-sgst="${g.sgst}" data-igst="${g.igst}">${g.name} (${g.rate}%)</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm text-center hsn-input"
+                       name="Input.Lines[${lineIndex}].HsnCode" value="" placeholder="HSN">
             </td>
             <td class="text-end align-middle">
-                <span class="line-total fw-medium">$0.00</span>
+                <span class="line-total fw-medium">₹0.00</span>
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
@@ -425,52 +550,78 @@
         const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
         const price = parseFloat(row.querySelector('.price-input').value) || 0;
         const discount = parseFloat(row.querySelector('.discount-input').value) || 0;
-        const tax = parseFloat(row.querySelector('.tax-input').value) || 0;
+
+        const gstSelect = row.querySelector('.gst-slab-select');
+        const gstOption = gstSelect?.options[gstSelect.selectedIndex];
 
         const subtotal = qty * price;
         const discountAmt = subtotal * discount / 100;
         const afterDiscount = subtotal - discountAmt;
-        const taxAmount = afterDiscount * tax / 100;
-        const total = afterDiscount + taxAmount;
 
-        row.querySelector('.line-total').textContent = '$' + total.toFixed(2);
+        let taxAmount = 0;
+        if (gstOption && gstOption.value) {
+            if (isInterState) {
+                taxAmount = afterDiscount * (parseFloat(gstOption.dataset.igst) || 0) / 100;
+            } else {
+                taxAmount = afterDiscount * ((parseFloat(gstOption.dataset.cgst) || 0) + (parseFloat(gstOption.dataset.sgst) || 0)) / 100;
+            }
+        }
+
+        const total = afterDiscount + taxAmount;
+        row.querySelector('.line-total').textContent = '₹' + total.toFixed(2);
         calculateTotals();
     }
 
     function calculateTotals() {
         let subtotal = 0;
         let discountTotal = 0;
-        let taxTotal = 0;
+        let cgstTotal = 0;
+        let sgstTotal = 0;
+        let igstTotal = 0;
 
         document.querySelectorAll('#linesBody tr').forEach(row => {
             const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
             const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
             const discount = parseFloat(row.querySelector('.discount-input')?.value) || 0;
-            const tax = parseFloat(row.querySelector('.tax-input')?.value) || 0;
+
+            const gstSelect = row.querySelector('.gst-slab-select');
+            const gstOption = gstSelect?.options[gstSelect.selectedIndex];
 
             const lineSubtotal = qty * price;
             const lineDiscount = lineSubtotal * discount / 100;
             const lineAfterDiscount = lineSubtotal - lineDiscount;
-            const lineTax = lineAfterDiscount * tax / 100;
 
             subtotal += lineSubtotal;
             discountTotal += lineDiscount;
-            taxTotal += lineTax;
+
+            if (gstOption && gstOption.value) {
+                if (isInterState) {
+                    igstTotal += lineAfterDiscount * (parseFloat(gstOption.dataset.igst) || 0) / 100;
+                } else {
+                    cgstTotal += lineAfterDiscount * (parseFloat(gstOption.dataset.cgst) || 0) / 100;
+                    sgstTotal += lineAfterDiscount * (parseFloat(gstOption.dataset.sgst) || 0) / 100;
+                }
+            }
         });
 
+        const taxTotal = cgstTotal + sgstTotal + igstTotal;
         const total = subtotal - discountTotal + taxTotal;
 
         // Update table footer
-        document.getElementById('subtotalDisplay').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('discountDisplay').textContent = '-$' + discountTotal.toFixed(2);
-        document.getElementById('taxDisplay').textContent = '$' + taxTotal.toFixed(2);
-        document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+        document.getElementById('subtotalDisplay').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('discountDisplay').textContent = '-₹' + discountTotal.toFixed(2);
+        document.getElementById('cgstDisplay').textContent = '₹' + cgstTotal.toFixed(2);
+        document.getElementById('sgstDisplay').textContent = '₹' + sgstTotal.toFixed(2);
+        document.getElementById('igstDisplay').textContent = '₹' + igstTotal.toFixed(2);
+        document.getElementById('totalDisplay').textContent = '₹' + total.toFixed(2);
 
         // Update sidebar summary
-        document.getElementById('summarySubtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('summaryDiscount').textContent = '-$' + discountTotal.toFixed(2);
-        document.getElementById('summaryTax').textContent = '$' + taxTotal.toFixed(2);
-        document.getElementById('summaryTotal').textContent = '$' + total.toFixed(2);
+        document.getElementById('summarySubtotal').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('summaryDiscount').textContent = '-₹' + discountTotal.toFixed(2);
+        document.getElementById('summaryCgst').textContent = '₹' + cgstTotal.toFixed(2);
+        document.getElementById('summarySgst').textContent = '₹' + sgstTotal.toFixed(2);
+        document.getElementById('summaryIgst').textContent = '₹' + igstTotal.toFixed(2);
+        document.getElementById('summaryTotal').textContent = '₹' + total.toFixed(2);
     }
 
     function updateDueDate() {

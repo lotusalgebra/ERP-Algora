@@ -2,6 +2,7 @@ using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Finance;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Sales;
+using Algora.Erp.Domain.Entities.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,9 @@ public class CreateModel : PageModel
     public List<Customer> Customers { get; set; } = new();
     public List<Product> Products { get; set; } = new();
     public List<SalesOrder> SalesOrders { get; set; } = new();
+    public List<GstSlab> GstSlabs { get; set; } = new();
+    public List<OfficeLocation> Locations { get; set; } = new();
+    public List<IndianState> States { get; set; } = new();
 
     public async Task OnGetAsync(Guid? salesOrderId = null)
     {
@@ -96,10 +100,23 @@ public class CreateModel : PageModel
 
         var invoiceNumber = $"INV-{DateTime.Now.Year}-{nextNumber:D4}";
 
+        // Determine if inter-state transaction
+        var fromLocation = Input.FromLocationId.HasValue
+            ? await _context.OfficeLocations.Include(l => l.State).FirstOrDefaultAsync(l => l.Id == Input.FromLocationId)
+            : null;
+        var customerState = Input.CustomerStateId.HasValue
+            ? await _context.IndianStates.FirstOrDefaultAsync(s => s.Id == Input.CustomerStateId)
+            : null;
+
+        var isInterState = fromLocation?.StateId != Input.CustomerStateId && Input.CustomerStateId.HasValue;
+
         // Calculate totals
         decimal subtotal = 0;
         decimal totalDiscount = 0;
         decimal totalTax = 0;
+        decimal totalCgst = 0;
+        decimal totalSgst = 0;
+        decimal totalIgst = 0;
 
         var invoice = new Invoice
         {
@@ -116,12 +133,17 @@ public class CreateModel : PageModel
             BillingName = Input.BillingName,
             BillingAddress = Input.BillingAddress,
             BillingCity = Input.BillingCity,
-            BillingState = Input.BillingState,
+            BillingState = customerState?.Name ?? Input.BillingState,
             BillingPostalCode = Input.BillingPostalCode,
             BillingCountry = Input.BillingCountry,
             Reference = Input.Reference,
             Notes = Input.Notes,
-            InternalNotes = Input.InternalNotes
+            InternalNotes = Input.InternalNotes,
+            // GST Fields
+            FromLocationId = Input.FromLocationId,
+            CustomerGstin = Input.CustomerGstin,
+            CustomerStateCode = customerState?.ShortName,
+            IsInterState = isInterState
         };
 
         var lineNumber = 1;
@@ -130,7 +152,34 @@ public class CreateModel : PageModel
             var lineSubtotal = lineInput.Quantity * lineInput.UnitPrice;
             var lineDiscountAmt = lineSubtotal * (lineInput.DiscountPercent / 100);
             var lineAfterDiscount = lineSubtotal - lineDiscountAmt;
-            var lineTaxAmt = lineAfterDiscount * (lineInput.TaxPercent / 100);
+
+            // Get GST slab for this line
+            var gstSlab = lineInput.GstSlabId.HasValue
+                ? await _context.GstSlabs.FirstOrDefaultAsync(g => g.Id == lineInput.GstSlabId)
+                : null;
+
+            decimal lineCgst = 0, lineSgst = 0, lineIgst = 0;
+            decimal cgstRate = 0, sgstRate = 0, igstRate = 0;
+
+            if (gstSlab != null)
+            {
+                if (isInterState)
+                {
+                    // Inter-state: Apply IGST
+                    igstRate = gstSlab.IgstRate;
+                    lineIgst = lineAfterDiscount * (igstRate / 100);
+                }
+                else
+                {
+                    // Intra-state: Apply CGST + SGST
+                    cgstRate = gstSlab.CgstRate;
+                    sgstRate = gstSlab.SgstRate;
+                    lineCgst = lineAfterDiscount * (cgstRate / 100);
+                    lineSgst = lineAfterDiscount * (sgstRate / 100);
+                }
+            }
+
+            var lineTaxAmt = lineCgst + lineSgst + lineIgst;
             var lineTotal = lineAfterDiscount + lineTaxAmt;
 
             var line = new InvoiceLine
@@ -144,9 +193,18 @@ public class CreateModel : PageModel
                 UnitPrice = lineInput.UnitPrice,
                 DiscountPercent = lineInput.DiscountPercent,
                 DiscountAmount = lineDiscountAmt,
-                TaxPercent = lineInput.TaxPercent,
+                TaxPercent = gstSlab?.Rate ?? lineInput.TaxPercent,
                 TaxAmount = lineTaxAmt,
-                LineTotal = lineTotal
+                LineTotal = lineTotal,
+                // GST Fields
+                GstSlabId = lineInput.GstSlabId,
+                HsnCode = lineInput.HsnCode,
+                CgstRate = cgstRate,
+                SgstRate = sgstRate,
+                IgstRate = igstRate,
+                CgstAmount = lineCgst,
+                SgstAmount = lineSgst,
+                IgstAmount = lineIgst
             };
 
             invoice.Lines.Add(line);
@@ -154,12 +212,18 @@ public class CreateModel : PageModel
             subtotal += lineSubtotal;
             totalDiscount += lineDiscountAmt;
             totalTax += lineTaxAmt;
+            totalCgst += lineCgst;
+            totalSgst += lineSgst;
+            totalIgst += lineIgst;
         }
 
         invoice.SubTotal = subtotal;
         invoice.DiscountPercent = subtotal > 0 ? (totalDiscount / subtotal) * 100 : 0;
         invoice.DiscountAmount = totalDiscount;
         invoice.TaxAmount = totalTax;
+        invoice.CgstAmount = totalCgst;
+        invoice.SgstAmount = totalSgst;
+        invoice.IgstAmount = totalIgst;
         invoice.TotalAmount = subtotal - totalDiscount + totalTax;
         invoice.BalanceDue = invoice.TotalAmount;
 
@@ -188,6 +252,21 @@ public class CreateModel : PageModel
             .OrderByDescending(s => s.OrderDate)
             .Take(50)
             .ToListAsync();
+
+        GstSlabs = await _context.GstSlabs
+            .Where(g => g.IsActive && !g.IsDeleted)
+            .OrderBy(g => g.DisplayOrder)
+            .ToListAsync();
+
+        Locations = await _context.OfficeLocations
+            .Include(l => l.State)
+            .Where(l => l.IsActive && !l.IsDeleted)
+            .OrderBy(l => l.DisplayOrder)
+            .ToListAsync();
+
+        States = await _context.IndianStates
+            .OrderBy(s => s.Name)
+            .ToListAsync();
     }
 }
 
@@ -202,18 +281,24 @@ public class InvoiceCreateViewModel
 
     public string? PaymentTerms { get; set; } = "Net 30";
     public int PaymentTermDays { get; set; } = 30;
-    public string Currency { get; set; } = "USD";
+    public string Currency { get; set; } = "INR";
 
     public string? BillingName { get; set; }
     public string? BillingAddress { get; set; }
     public string? BillingCity { get; set; }
     public string? BillingState { get; set; }
     public string? BillingPostalCode { get; set; }
-    public string? BillingCountry { get; set; }
+    public string? BillingCountry { get; set; } = "India";
 
     public string? Reference { get; set; }
     public string? Notes { get; set; }
     public string? InternalNotes { get; set; }
+
+    // GST Fields
+    public Guid? FromLocationId { get; set; }
+    public string? CustomerGstin { get; set; }
+    public Guid? CustomerStateId { get; set; }
+    public bool IsInterState { get; set; }
 
     public List<InvoiceLineInput> Lines { get; set; } = new();
 }
@@ -228,4 +313,8 @@ public class InvoiceLineInput
     public decimal UnitPrice { get; set; }
     public decimal DiscountPercent { get; set; }
     public decimal TaxPercent { get; set; }
+
+    // GST Fields
+    public Guid? GstSlabId { get; set; }
+    public string? HsnCode { get; set; }
 }

@@ -1,5 +1,6 @@
 using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Sales;
+using Algora.Erp.Domain.Entities.Settings;
 
 namespace Algora.Erp.Domain.Entities.Finance;
 
@@ -34,7 +35,24 @@ public class Invoice : AuditableEntity
     public decimal TotalAmount { get; set; }
     public decimal PaidAmount { get; set; }
     public decimal BalanceDue { get; set; }
-    public string Currency { get; set; } = "USD";
+    public string Currency { get; set; } = "INR";
+
+    // GST Fields
+    public Guid? GstSlabId { get; set; }
+    public GstSlab? GstSlab { get; set; }
+    public bool IsInterState { get; set; } // True = IGST, False = CGST+SGST
+    public decimal CgstAmount { get; set; }
+    public decimal SgstAmount { get; set; }
+    public decimal IgstAmount { get; set; }
+    public decimal CgstRate { get; set; }
+    public decimal SgstRate { get; set; }
+    public decimal IgstRate { get; set; }
+
+    // Location for GST
+    public Guid? FromLocationId { get; set; }
+    public OfficeLocation? FromLocation { get; set; }
+    public string? CustomerGstin { get; set; }
+    public string? CustomerStateCode { get; set; }
 
     // Payment Terms
     public string? PaymentTerms { get; set; }
@@ -82,6 +100,17 @@ public class InvoiceLine : AuditableEntity
     public decimal TaxPercent { get; set; }
     public decimal TaxAmount { get; set; }
     public decimal LineTotal { get; set; }
+
+    // GST Fields for line item
+    public Guid? GstSlabId { get; set; }
+    public GstSlab? GstSlab { get; set; }
+    public decimal CgstRate { get; set; }
+    public decimal SgstRate { get; set; }
+    public decimal IgstRate { get; set; }
+    public decimal CgstAmount { get; set; }
+    public decimal SgstAmount { get; set; }
+    public decimal IgstAmount { get; set; }
+    public string? HsnCode { get; set; }
 
     public Guid? AccountId { get; set; }
     public string? Notes { get; set; }
