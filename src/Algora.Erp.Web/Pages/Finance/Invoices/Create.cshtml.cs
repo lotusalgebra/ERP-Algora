@@ -92,22 +92,33 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        // Generate invoice number
-        var lastInvoice = await _context.Invoices
-            .OrderByDescending(i => i.InvoiceNumber)
-            .FirstOrDefaultAsync();
+        // Generate invoice number - find max for current year
+        var currentYear = DateTime.Now.Year;
+        var yearPrefix = $"INV-{currentYear}-";
+
+        // Get all invoice numbers for current year and find max sequence number
+        var currentYearInvoices = await _context.Invoices
+            .IgnoreQueryFilters() // Ignore tenant filters to find all invoices
+            .Where(i => i.InvoiceNumber.StartsWith(yearPrefix))
+            .Select(i => i.InvoiceNumber)
+            .ToListAsync();
 
         var nextNumber = 1;
-        if (lastInvoice != null && lastInvoice.InvoiceNumber.StartsWith("INV-"))
+        if (currentYearInvoices.Any())
         {
-            var parts = lastInvoice.InvoiceNumber.Split('-');
-            if (parts.Length >= 3 && int.TryParse(parts[2], out var num))
-            {
-                nextNumber = num + 1;
-            }
+            var maxNumber = currentYearInvoices
+                .Select(inv =>
+                {
+                    var parts = inv.Split('-');
+                    if (parts.Length >= 3 && int.TryParse(parts[2], out var num))
+                        return num;
+                    return 0;
+                })
+                .Max();
+            nextNumber = maxNumber + 1;
         }
 
-        var invoiceNumber = $"INV-{DateTime.Now.Year}-{nextNumber:D4}";
+        var invoiceNumber = $"INV-{currentYear}-{nextNumber:D4}";
 
         // Load tax configuration
         var taxConfig = await _taxService.GetCurrentTaxConfigurationAsync();

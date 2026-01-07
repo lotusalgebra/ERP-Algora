@@ -3,11 +3,25 @@ using Algora.Erp.Domain.Entities.Finance;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System.Globalization;
 
 namespace Algora.Erp.Infrastructure.Services;
 
 public class InvoicePdfService : IInvoicePdfService
 {
+    // Currency formatting based on invoice currency
+    private string FormatCurrency(decimal amount, string? currency)
+    {
+        return currency?.ToUpperInvariant() switch
+        {
+            "INR" => $"₹{amount:N2}",
+            "USD" => $"${amount:N2}",
+            "EUR" => $"€{amount:N2}",
+            "GBP" => $"£{amount:N2}",
+            _ => $"₹{amount:N2}" // Default to INR
+        };
+    }
+
     public byte[] GenerateInvoicePdf(Invoice invoice)
     {
         var document = Document.Create(container =>
@@ -244,7 +258,7 @@ public class InvoicePdfService : IInvoicePdfService
                 table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(line.Quantity.ToString("0.##")).FontSize(9);
 
                 // Unit Price
-                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(line.UnitPrice.ToString("C2")).FontSize(9);
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.UnitPrice, invoice.Currency)).FontSize(9);
 
                 // GST Rate - show IGST for inter-state, CGST+SGST for intra-state
                 string gstRateText;
@@ -267,22 +281,24 @@ public class InvoicePdfService : IInvoicePdfService
                 table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(gstRateText).FontSize(9);
 
                 // Tax Amount
-                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(line.TaxAmount.ToString("C2")).FontSize(9);
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.TaxAmount, invoice.Currency)).FontSize(9);
 
                 // Line Total
-                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(line.LineTotal.ToString("C2")).Bold().FontSize(9);
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.LineTotal, invoice.Currency)).Bold().FontSize(9);
             }
         });
     }
 
     private void ComposeTotals(IContainer container, Invoice invoice)
     {
+        var currency = invoice.Currency;
+
         container.AlignRight().Width(250).Column(column =>
         {
             column.Item().Row(row =>
             {
                 row.RelativeItem().AlignRight().Text("Subtotal:");
-                row.ConstantItem(100).AlignRight().Text(invoice.SubTotal.ToString("C2"));
+                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.SubTotal, currency));
             });
 
             if (invoice.DiscountAmount > 0)
@@ -290,7 +306,7 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("Discount:").FontColor(Colors.Red.Darken2);
-                    row.ConstantItem(100).AlignRight().Text($"-{invoice.DiscountAmount:C2}").FontColor(Colors.Red.Darken2);
+                    row.ConstantItem(100).AlignRight().Text($"-{FormatCurrency(invoice.DiscountAmount, currency)}").FontColor(Colors.Red.Darken2);
                 });
             }
 
@@ -301,7 +317,7 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("IGST:");
-                    row.ConstantItem(100).AlignRight().Text(invoice.IgstAmount.ToString("C2"));
+                    row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.IgstAmount, currency));
                 });
             }
             else if (invoice.CgstAmount > 0 || invoice.SgstAmount > 0)
@@ -312,7 +328,7 @@ public class InvoicePdfService : IInvoicePdfService
                     column.Item().Row(row =>
                     {
                         row.RelativeItem().AlignRight().Text("CGST:");
-                        row.ConstantItem(100).AlignRight().Text(invoice.CgstAmount.ToString("C2"));
+                        row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.CgstAmount, currency));
                     });
                 }
                 if (invoice.SgstAmount > 0)
@@ -320,7 +336,7 @@ public class InvoicePdfService : IInvoicePdfService
                     column.Item().Row(row =>
                     {
                         row.RelativeItem().AlignRight().Text("SGST:");
-                        row.ConstantItem(100).AlignRight().Text(invoice.SgstAmount.ToString("C2"));
+                        row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.SgstAmount, currency));
                     });
                 }
             }
@@ -330,14 +346,14 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("Tax:");
-                    row.ConstantItem(100).AlignRight().Text(invoice.TaxAmount.ToString("C2"));
+                    row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TaxAmount, currency));
                 });
             }
 
             column.Item().PaddingTop(5).BorderTop(2).BorderColor(Colors.Blue.Darken3).PaddingTop(5).Row(row =>
             {
                 row.RelativeItem().AlignRight().Text("Total:").Bold().FontSize(14);
-                row.ConstantItem(100).AlignRight().Text(invoice.TotalAmount.ToString("C2")).Bold().FontSize(14);
+                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TotalAmount, currency)).Bold().FontSize(14);
             });
 
             if (invoice.PaidAmount > 0)
@@ -345,14 +361,14 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().PaddingTop(5).Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("Amount Paid:");
-                    row.ConstantItem(100).AlignRight().Text($"-{invoice.PaidAmount:C2}").FontColor(Colors.Green.Darken2);
+                    row.ConstantItem(100).AlignRight().Text($"-{FormatCurrency(invoice.PaidAmount, currency)}").FontColor(Colors.Green.Darken2);
                 });
             }
 
             column.Item().PaddingTop(5).Background(Colors.Grey.Lighten3).Padding(8).Row(row =>
             {
                 row.RelativeItem().AlignRight().Text("Balance Due:").Bold();
-                row.ConstantItem(100).AlignRight().Text(invoice.BalanceDue.ToString("C2")).Bold()
+                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.BalanceDue, currency)).Bold()
                     .FontColor(invoice.BalanceDue > 0 ? Colors.Red.Darken2 : Colors.Green.Darken2);
             });
         });
@@ -373,7 +389,7 @@ public class InvoicePdfService : IInvoicePdfService
                     row.ConstantItem(100).Text(payment.PaymentDate.ToString("MMM dd, yyyy"));
                     row.ConstantItem(100).Text(payment.PaymentMethod.ToString());
                     row.RelativeItem().Text(payment.Reference ?? "-");
-                    row.ConstantItem(80).AlignRight().Text(payment.Amount.ToString("C2")).FontColor(Colors.Green.Darken2).Bold();
+                    row.ConstantItem(80).AlignRight().Text(FormatCurrency(payment.Amount, invoice.Currency)).FontColor(Colors.Green.Darken2).Bold();
                 });
             }
         });
