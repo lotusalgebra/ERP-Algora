@@ -141,6 +141,11 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<GstSlab> GstSlabs => Set<GstSlab>();
     public DbSet<OfficeLocation> OfficeLocations => Set<OfficeLocation>();
 
+    // Tax Configuration (Multi-country support)
+    public DbSet<TaxConfiguration> TaxConfigurations => Set<TaxConfiguration>();
+    public DbSet<TaxSlab> TaxSlabs => Set<TaxSlab>();
+    public DbSet<TaxRegion> TaxRegions => Set<TaxRegion>();
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())

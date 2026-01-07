@@ -127,5 +127,10 @@ public interface IApplicationDbContext
     DbSet<GstSlab> GstSlabs { get; }
     DbSet<OfficeLocation> OfficeLocations { get; }
 
+    // Tax Configuration (Multi-country support)
+    DbSet<TaxConfiguration> TaxConfigurations { get; }
+    DbSet<TaxSlab> TaxSlabs { get; }
+    DbSet<TaxRegion> TaxRegions { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

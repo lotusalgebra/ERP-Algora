@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IRecurringInvoiceService, RecurringInvoiceService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IFinancialReportService, FinancialReportService>();
+        services.AddScoped<ITaxConfigurationService, TaxConfigurationService>();
 
         // Ecommerce services
         services.AddScoped<IStoreService, StoreService>();
