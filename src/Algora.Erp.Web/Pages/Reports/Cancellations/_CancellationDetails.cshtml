@@ -1,5 +1,29 @@
 @model Algora.Erp.Domain.Entities.Common.CancellationLog
 
+@functions {
+    string FormatFieldName(string name)
+    {
+        // Convert PascalCase to Title Case with spaces
+        var result = System.Text.RegularExpressions.Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
+        return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(result.ToLower());
+    }
+
+    string FormatFieldValue(System.Text.Json.JsonElement value)
+    {
+        return value.ValueKind switch
+        {
+            System.Text.Json.JsonValueKind.String => value.GetString() ?? "-",
+            System.Text.Json.JsonValueKind.Number => value.TryGetDecimal(out var d)
+                ? d.ToString("N2")
+                : value.ToString(),
+            System.Text.Json.JsonValueKind.True => "Yes",
+            System.Text.Json.JsonValueKind.False => "No",
+            System.Text.Json.JsonValueKind.Null => "-",
+            _ => value.ToString()
+        };
+    }
+}
+
 @{
     var typeClass = Model.DocumentType switch
     {
@@ -162,6 +186,48 @@
                             </p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Original Document State -->
+    @if (!string.IsNullOrEmpty(Model.OriginalDocumentState))
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Original Document State</h6>
+                    <span class="badge bg-secondary">At time of cancellation</span>
+                </div>
+                <div class="card-body">
+                    @try
+                    {
+                        var jsonDoc = System.Text.Json.JsonDocument.Parse(Model.OriginalDocumentState);
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 35%;">Field</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var prop in jsonDoc.RootElement.EnumerateObject())
+                                    {
+                                        <tr>
+                                            <td class="text-muted">@FormatFieldName(prop.Name)</td>
+                                            <td class="fw-medium">@FormatFieldValue(prop.Value)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    catch
+                    {
+                        <pre class="mb-0 bg-light p-3 rounded small"><code>@Model.OriginalDocumentState</code></pre>
+                    }
                 </div>
             </div>
         </div>
