@@ -1,10 +1,12 @@
 using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Dispatch;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Sales;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Dispatch.DeliveryChallans;
 
@@ -279,10 +281,41 @@ public class IndexModel : PageModel
                 await UpdateSalesOrderStatusAsync(challan.SalesOrderId.Value);
             }
         }
-        else if (status == DeliveryChallanStatus.Cancelled && oldStatus == DeliveryChallanStatus.Dispatched)
+        else if (status == DeliveryChallanStatus.Cancelled)
         {
+            // Create cancellation log entry
+            var cancellationLog = new CancellationLog
+            {
+                Id = Guid.NewGuid(),
+                DocumentType = "DeliveryChallan",
+                DocumentId = challan.Id,
+                DocumentNumber = challan.ChallanNumber,
+                CancelledAt = DateTime.UtcNow,
+                CancelledBy = Guid.Empty,
+                CancelledByName = User.Identity?.Name ?? "System",
+                CancellationReason = "Cancelled by user",
+                ReasonCategory = CancellationReasonCategory.Other,
+                OriginalDocumentState = JsonSerializer.Serialize(new
+                {
+                    Status = oldStatus.ToString(),
+                    challan.ChallanDate,
+                    challan.CustomerName,
+                    TotalLines = challan.Lines.Count,
+                    TotalQuantity = challan.Lines.Sum(l => l.Quantity)
+                }),
+                StockReversed = oldStatus == DeliveryChallanStatus.Dispatched,
+                Notes = $"Delivery challan cancelled from status: {oldStatus}"
+            };
+            _context.CancellationLogs.Add(cancellationLog);
+
             // Reverse stock if cancelling a dispatched challan
-            await ReverseStockAsync(challan);
+            if (oldStatus == DeliveryChallanStatus.Dispatched)
+            {
+                await ReverseStockAsync(challan);
+                cancellationLog.StockReversalDetails = JsonSerializer.Serialize(
+                    challan.Lines.Select(l => new { l.ProductId, l.ProductName, l.Quantity })
+                        .ToList());
+            }
         }
 
         await _context.SaveChangesAsync();

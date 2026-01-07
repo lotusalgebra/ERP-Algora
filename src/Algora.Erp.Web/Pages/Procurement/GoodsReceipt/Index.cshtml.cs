@@ -1,9 +1,11 @@
 using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Procurement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Procurement.GoodsReceipt;
 
@@ -354,10 +356,42 @@ public class IndexModel : PageModel
                 await UpdatePurchaseOrderStatusAsync(grn.PurchaseOrderId.Value);
             }
         }
-        else if (status == GoodsReceiptStatus.Cancelled && oldStatus == GoodsReceiptStatus.Accepted)
+        else if (status == GoodsReceiptStatus.Cancelled)
         {
+            // Create cancellation log entry
+            var cancellationLog = new CancellationLog
+            {
+                Id = Guid.NewGuid(),
+                DocumentType = "GoodsReceiptNote",
+                DocumentId = grn.Id,
+                DocumentNumber = grn.GrnNumber,
+                CancelledAt = DateTime.UtcNow,
+                CancelledBy = Guid.Empty,
+                CancelledByName = User.Identity?.Name ?? "System",
+                CancellationReason = "Cancelled by user",
+                ReasonCategory = CancellationReasonCategory.Other,
+                OriginalDocumentState = JsonSerializer.Serialize(new
+                {
+                    Status = oldStatus.ToString(),
+                    grn.TotalReceivedQuantity,
+                    grn.TotalAcceptedQuantity,
+                    grn.TotalValue,
+                    grn.GrnDate
+                }),
+                StockReversed = oldStatus == GoodsReceiptStatus.Accepted,
+                Notes = $"GRN cancelled from status: {oldStatus}"
+            };
+            _context.CancellationLogs.Add(cancellationLog);
+
             // Reverse stock movements if cancelling an accepted GRN
-            await ReverseStockLevelsAsync(grn);
+            if (oldStatus == GoodsReceiptStatus.Accepted)
+            {
+                await ReverseStockLevelsAsync(grn);
+                cancellationLog.StockReversalDetails = JsonSerializer.Serialize(
+                    grn.Lines.Where(l => l.AcceptedQuantity > 0)
+                        .Select(l => new { l.ProductId, l.ProductName, l.AcceptedQuantity })
+                        .ToList());
+            }
         }
 
         await _context.SaveChangesAsync();
