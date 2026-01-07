@@ -1,9 +1,49 @@
+@using Algora.Erp.Domain.Entities.Common
 @model Algora.Erp.Web.Pages.Reports.Cancellations.CancellationsTableViewModel
+
+@functions {
+    string FormatReasonCategory(CancellationReasonCategory category)
+    {
+        return category switch
+        {
+            CancellationReasonCategory.CustomerRequest => "Customer Request",
+            CancellationReasonCategory.DuplicateEntry => "Duplicate Entry",
+            CancellationReasonCategory.DataEntryError => "Data Entry Error",
+            CancellationReasonCategory.SupplierIssue => "Supplier Issue",
+            CancellationReasonCategory.QualityIssue => "Quality Issue",
+            CancellationReasonCategory.PriceDispute => "Price Dispute",
+            CancellationReasonCategory.DeliveryIssue => "Delivery Issue",
+            CancellationReasonCategory.PaymentIssue => "Payment Issue",
+            CancellationReasonCategory.OutOfStock => "Out of Stock",
+            CancellationReasonCategory.SystemError => "System Error",
+            CancellationReasonCategory.Other => "Other",
+            _ => category.ToString()
+        };
+    }
+
+    string GetCategoryBadgeClass(CancellationReasonCategory category)
+    {
+        return category switch
+        {
+            CancellationReasonCategory.CustomerRequest => "bg-primary bg-opacity-10 text-primary",
+            CancellationReasonCategory.DuplicateEntry => "bg-secondary bg-opacity-10 text-secondary",
+            CancellationReasonCategory.DataEntryError => "bg-warning bg-opacity-10 text-warning",
+            CancellationReasonCategory.SupplierIssue => "bg-info bg-opacity-10 text-info",
+            CancellationReasonCategory.QualityIssue => "bg-danger bg-opacity-10 text-danger",
+            CancellationReasonCategory.PriceDispute => "bg-warning bg-opacity-10 text-warning",
+            CancellationReasonCategory.DeliveryIssue => "bg-info bg-opacity-10 text-info",
+            CancellationReasonCategory.PaymentIssue => "bg-danger bg-opacity-10 text-danger",
+            CancellationReasonCategory.OutOfStock => "bg-secondary bg-opacity-10 text-secondary",
+            CancellationReasonCategory.SystemError => "bg-dark bg-opacity-10 text-dark",
+            _ => "bg-light text-muted"
+        };
+    }
+}
 
 @if (!Model.Cancellations.Any())
 {
     <tr>
-        <td colspan="6" class="text-center py-5">
+        <td colspan="7" class="text-center py-5">
             <div class="text-muted">
                 <i class="bi bi-check-circle fs-1 d-block mb-3"></i>
                 <p class="mb-0">No cancellations found</p>
@@ -63,15 +103,20 @@ else
                 }
             </td>
             <td>
+                <span class="badge @GetCategoryBadgeClass(cancellation.ReasonCategory)">
+                    @FormatReasonCategory(cancellation.ReasonCategory)
+                </span>
+            </td>
+            <td>
                 @if (!string.IsNullOrEmpty(cancellation.CancellationReason))
                 {
-                    <span class="text-truncate d-inline-block" style="max-width: 200px;" title="@cancellation.CancellationReason">
+                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="@cancellation.CancellationReason">
                         @cancellation.CancellationReason
                     </span>
                 }
                 else
                 {
-                    <span class="text-muted">No reason provided</span>
+                    <span class="text-muted">-</span>
                 }
             </td>
             <td class="text-end pe-4">
@@ -86,7 +131,7 @@ else
     @if (Model.TotalPages > 1)
     {
         <tr>
-            <td colspan="6" class="py-3">
+            <td colspan="7" class="py-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted">
                         Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
@@ -97,7 +142,7 @@ else
                                 <a class="page-link" href="javascript:void(0)"
                                    hx-get="?handler=Table&page=@(Model.Page - 1)"
                                    hx-target="#cancellationsTableBody"
-                                   hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                                   hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
                                     <i class="bi bi-chevron-left"></i>
                                 </a>
                             </li>
@@ -107,7 +152,7 @@ else
                                     <a class="page-link" href="javascript:void(0)"
                                        hx-get="?handler=Table&page=@i"
                                        hx-target="#cancellationsTableBody"
-                                       hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                                       hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
                                         @i
                                     </a>
                                 </li>
@@ -116,7 +161,7 @@ else
                                 <a class="page-link" href="javascript:void(0)"
                                    hx-get="?handler=Table&page=@(Model.Page + 1)"
                                    hx-target="#cancellationsTableBody"
-                                   hx-include="#searchInput, #documentTypeFilter, #fromDate, #toDate, #pageSizeSelect">
+                                   hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
                                     <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
