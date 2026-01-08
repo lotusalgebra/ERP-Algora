@@ -132,5 +132,8 @@ public interface IApplicationDbContext
     DbSet<TaxSlab> TaxSlabs { get; }
     DbSet<TaxRegion> TaxRegions { get; }
 
+    // Tenant Settings
+    DbSet<TenantSettings> TenantSettings { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IFinancialReportService, FinancialReportService>();
         services.AddScoped<ITaxConfigurationService, TaxConfigurationService>();
+        services.AddScoped<ITenantSettingsService, TenantSettingsService>();
 
         // Ecommerce services
         services.AddScoped<IStoreService, StoreService>();

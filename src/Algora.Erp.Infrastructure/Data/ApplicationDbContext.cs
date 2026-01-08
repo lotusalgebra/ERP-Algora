@@ -146,6 +146,9 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<TaxSlab> TaxSlabs => Set<TaxSlab>();
     public DbSet<TaxRegion> TaxRegions => Set<TaxRegion>();
 
+    // Tenant Settings
+    public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
