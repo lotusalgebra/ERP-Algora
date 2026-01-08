@@ -138,16 +138,29 @@ using (var scope = app.Services.CreateScope())
         }
 
         // Seed default billing plans if not exist
+        // Pricing is calculated from module prices:
+        // Core modules: inventory(500), sales(500), customers(0)
+        // Finance: finance(1000), banking(500), tax(750)
+        // Operations: procurement(750), manufacturing(1500), warehouse(500)
+        // HR: hr(1000), payroll(1500)
+        // Advanced: crm(1000), projects(750), ecommerce(1500), reports(500)
+        // Integration: api(1000), webhooks(500)
         if (!await context.BillingPlans.AnyAsync())
         {
+            // Get module IDs for linking
+            var modules = await context.PlanModules.ToListAsync();
+            var getModuleIds = (string[] codes) =>
+                System.Text.Json.JsonSerializer.Serialize(
+                    modules.Where(m => codes.Contains(m.Code)).Select(m => m.Id));
+
             var plans = new[]
             {
                 new Algora.Erp.Admin.Entities.BillingPlan
                 {
                     Code = "FREE",
                     Name = "Free",
-                    Description = "Get started with basic features",
-                    MonthlyPrice = 0,
+                    Description = "Get started with basic features - 14 day trial",
+                    MonthlyPrice = 0, // Free tier
                     AnnualPrice = 0,
                     MaxUsers = 2,
                     MaxWarehouses = 1,
@@ -155,24 +168,25 @@ using (var scope = app.Services.CreateScope())
                     MaxTransactionsPerMonth = 50,
                     StorageLimitMB = 500,
                     Features = "[\"Basic Inventory\", \"Simple Invoicing\", \"Email Support\"]",
-                    IncludedModules = "[\"inventory\", \"sales\", \"customers\"]",
+                    IncludedModules = getModuleIds(new[] { "inventory", "sales", "customers" }),
                     IsActive = true,
-                    DisplayOrder = 1
+                    DisplayOrder = 1,
+                    TrialDays = 14
                 },
                 new Algora.Erp.Admin.Entities.BillingPlan
                 {
                     Code = "STARTER",
                     Name = "Starter",
                     Description = "For small businesses getting started",
-                    MonthlyPrice = 49,
-                    AnnualPrice = 490,
+                    MonthlyPrice = 2500, // inventory(500) + sales(500) + customers(0) + finance(1000) + reports(500)
+                    AnnualPrice = 25000,
                     MaxUsers = 5,
                     MaxWarehouses = 2,
                     MaxProducts = 500,
-                    MaxTransactionsPerMonth = 200,
+                    MaxTransactionsPerMonth = 500,
                     StorageLimitMB = 2000,
-                    Features = "[\"Full Inventory\", \"Invoicing & Payments\", \"Basic Reports\", \"Email Support\"]",
-                    IncludedModules = "[\"inventory\", \"sales\", \"customers\", \"finance\", \"reports\"]",
+                    Features = "[\"Full Inventory\", \"Invoicing & Payments\", \"Finance & Accounting\", \"Basic Reports\", \"Email Support\"]",
+                    IncludedModules = getModuleIds(new[] { "inventory", "sales", "customers", "finance", "reports" }),
                     IsActive = true,
                     DisplayOrder = 2
                 },
@@ -181,15 +195,15 @@ using (var scope = app.Services.CreateScope())
                     Code = "PROFESSIONAL",
                     Name = "Professional",
                     Description = "For growing businesses",
-                    MonthlyPrice = 149,
-                    AnnualPrice = 1490,
+                    MonthlyPrice = 5750, // inventory(500) + sales(500) + customers(0) + finance(1000) + hr(1000) + payroll(1500) + reports(500) + procurement(750)
+                    AnnualPrice = 57500,
                     MaxUsers = 15,
                     MaxWarehouses = 5,
                     MaxProducts = 2000,
-                    MaxTransactionsPerMonth = 1000,
+                    MaxTransactionsPerMonth = 2000,
                     StorageLimitMB = 10000,
-                    Features = "[\"Full Inventory\", \"Multi-Warehouse\", \"Advanced Reports\", \"Payroll\", \"Priority Support\"]",
-                    IncludedModules = "[\"inventory\", \"sales\", \"customers\", \"finance\", \"hr\", \"payroll\", \"reports\", \"procurement\"]",
+                    Features = "[\"Full Inventory\", \"Multi-Warehouse\", \"Finance & Accounting\", \"HR & Payroll\", \"Procurement\", \"Advanced Reports\", \"Priority Support\"]",
+                    IncludedModules = getModuleIds(new[] { "inventory", "sales", "customers", "finance", "hr", "payroll", "reports", "procurement" }),
                     IsActive = true,
                     IsPopular = true,
                     DisplayOrder = 3
@@ -198,23 +212,23 @@ using (var scope = app.Services.CreateScope())
                 {
                     Code = "ENTERPRISE",
                     Name = "Enterprise",
-                    Description = "For large organizations",
-                    MonthlyPrice = 399,
-                    AnnualPrice = 3990,
+                    Description = "For large organizations - all modules included",
+                    MonthlyPrice = 13750, // All 17 modules
+                    AnnualPrice = 137500,
                     MaxUsers = -1, // Unlimited
                     MaxWarehouses = -1,
                     MaxProducts = -1,
                     MaxTransactionsPerMonth = -1,
                     StorageLimitMB = -1,
-                    Features = "[\"Unlimited Everything\", \"Manufacturing\", \"Projects\", \"Custom Reports\", \"API Access\", \"Dedicated Support\", \"SLA\"]",
-                    IncludedModules = "[\"*\"]",
+                    Features = "[\"All Modules Included\", \"Unlimited Everything\", \"Manufacturing\", \"E-Commerce\", \"API Access\", \"Webhooks\", \"Dedicated Support\", \"SLA\"]",
+                    IncludedModules = getModuleIds(modules.Select(m => m.Code).ToArray()),
                     IsActive = true,
                     DisplayOrder = 4
                 }
             };
             context.BillingPlans.AddRange(plans);
             await context.SaveChangesAsync();
-            logger.LogInformation("Seeded default billing plans");
+            logger.LogInformation("Seeded default billing plans with module-based pricing");
         }
     }
     catch (Exception ex)
