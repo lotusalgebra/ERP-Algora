@@ -44,7 +44,9 @@ public class BillingPlan
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ModifiedAt { get; set; }
 
+    // Navigation properties
     public ICollection<TenantSubscription> Subscriptions { get; set; } = new List<TenantSubscription>();
+    public ICollection<BillingPlanModule> PlanModules { get; set; } = new List<BillingPlanModule>();
 }
 
 /// <summary>

@@ -21,6 +21,8 @@ public class AdminDbContext : DbContext
 
     // Billing
     public DbSet<BillingPlan> BillingPlans => Set<BillingPlan>();
+    public DbSet<PlanModule> PlanModules => Set<PlanModule>();
+    public DbSet<BillingPlanModule> BillingPlanModules => Set<BillingPlanModule>();
     public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
     public DbSet<TenantBillingInvoice> TenantBillingInvoices => Set<TenantBillingInvoice>();
     public DbSet<TenantBillingInvoiceLine> TenantBillingInvoiceLines => Set<TenantBillingInvoiceLine>();
@@ -187,6 +189,52 @@ public class AdminDbContext : DbContext
                 .WithMany(t => t.Users)
                 .HasForeignKey(e => e.TenantId)
                 .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // ===========================================
+        // PlanModule Configuration
+        // ===========================================
+        modelBuilder.Entity<PlanModule>(entity =>
+        {
+            entity.ToTable("PlanModules");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Code).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Icon).HasMaxLength(50);
+            entity.Property(e => e.MonthlyPrice).HasPrecision(18, 2);
+            entity.Property(e => e.AnnualPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(10);
+            entity.Property(e => e.RequiredModules).HasMaxLength(500);
+            entity.Property(e => e.Category).HasMaxLength(50);
+
+            entity.HasIndex(e => e.Code).IsUnique();
+            entity.HasIndex(e => e.Category);
+        });
+
+        // ===========================================
+        // BillingPlanModule Configuration
+        // ===========================================
+        modelBuilder.Entity<BillingPlanModule>(entity =>
+        {
+            entity.ToTable("BillingPlanModules");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.OverrideMonthlyPrice).HasPrecision(18, 2);
+            entity.Property(e => e.OverrideAnnualPrice).HasPrecision(18, 2);
+
+            entity.HasIndex(e => new { e.PlanId, e.ModuleId }).IsUnique();
+
+            entity.HasOne(e => e.Plan)
+                .WithMany(p => p.PlanModules)
+                .HasForeignKey(e => e.PlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Module)
+                .WithMany()
+                .HasForeignKey(e => e.ModuleId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ===========================================

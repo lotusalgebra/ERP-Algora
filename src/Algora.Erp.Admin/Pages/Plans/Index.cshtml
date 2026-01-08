@@ -38,9 +38,9 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="mb-1 text-white-50">Total MRR</h6>
-                        <h3 class="mb-0">$@Model.TotalMRR.ToString("N0")</h3>
+                        <h3 class="mb-0">@Model.TotalMRR.ToString("N0")</h3>
                     </div>
-                    <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                    <i class="bi bi-currency-rupee fs-1 opacity-50"></i>
                 </div>
             </div>
         </div>
@@ -66,9 +66,14 @@
         <h5 class="mb-0">
             <i class="bi bi-tags me-2"></i>Billing Plans
         </h5>
-        <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#planModal" onclick="openCreateModal()">
-            <i class="bi bi-plus-lg me-1"></i>Add Plan
-        </button>
+        <div>
+            <a href="/Modules" class="btn btn-outline-primary me-2">
+                <i class="bi bi-grid me-1"></i>Manage Modules
+            </a>
+            <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#planModal" onclick="openCreateModal()">
+                <i class="bi bi-plus-lg me-1"></i>Add Plan
+            </button>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -76,7 +81,8 @@
                 <thead class="table-light">
                     <tr>
                         <th>Plan</th>
-                        <th>Pricing</th>
+                        <th>Pricing (INR)</th>
+                        <th>Modules</th>
                         <th>Limits</th>
                         <th>Subscriptions</th>
                         <th>Status</th>
@@ -86,6 +92,12 @@
                 <tbody>
                     @foreach (var plan in Model.Plans)
                     {
+                        var moduleCount = 0;
+                        try {
+                            var modules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(plan.IncludedModules ?? "[]");
+                            moduleCount = modules?.Count ?? 0;
+                        } catch { }
+
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -105,8 +117,11 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="fw-semibold text-primary">$@plan.MonthlyPrice/mo</div>
-                                <small class="text-muted">$@plan.AnnualPrice/yr</small>
+                                <div class="fw-semibold text-primary">@plan.MonthlyPrice.ToString("N0")/mo</div>
+                                <small class="text-muted">@plan.AnnualPrice.ToString("N0")/yr</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@moduleCount modules</span>
                             </td>
                             <td>
                                 <div><i class="bi bi-people me-1"></i>@(plan.MaxUsers == -1 ? "Unlimited" : plan.MaxUsers.ToString()) users</div>
@@ -176,7 +191,7 @@
 
 <!-- Plan Modal -->
 <div class="modal fade" id="planModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="planModalTitle">
@@ -189,85 +204,149 @@
                     <input type="hidden" id="planId" name="PlanId" />
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Plan Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="Input.Code" id="planCode" required
-                                   pattern="^[A-Z0-9_]+$" title="Uppercase letters, numbers, and underscores only" />
-                            <small class="text-muted">Unique identifier (e.g., STARTER, PROFESSIONAL)</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Plan Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="Input.Name" id="planName" required />
-                        </div>
-                    </div>
+                        <!-- Left Column: Plan Details -->
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Plan Code <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="Input.Code" id="planCode" required
+                                           pattern="^[A-Z0-9_]+$" title="Uppercase letters, numbers, and underscores only" />
+                                    <small class="text-muted">e.g., STARTER, PROFESSIONAL</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Plan Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="Input.Name" id="planName" required />
+                                </div>
+                            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="Input.Description" id="planDescription" rows="2"></textarea>
-                    </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="Input.Description" id="planDescription" rows="2"></textarea>
+                            </div>
 
-                    <hr class="my-4" />
-                    <h6 class="mb-3"><i class="bi bi-currency-dollar me-2"></i>Pricing</h6>
+                            <hr class="my-3" />
+                            <h6 class="mb-3"><i class="bi bi-currency-rupee me-2"></i>Calculated Pricing (INR)</h6>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Monthly Price ($) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="Input.MonthlyPrice" id="planMonthlyPrice" required min="0" step="0.01" />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Annual Price ($) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="Input.AnnualPrice" id="planAnnualPrice" required min="0" step="0.01" />
-                        </div>
-                    </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Monthly Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">INR</span>
+                                        <input type="number" class="form-control bg-light" name="Input.MonthlyPrice" id="planMonthlyPrice" readonly />
+                                    </div>
+                                    <small class="text-muted">Auto-calculated from modules</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Annual Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">INR</span>
+                                        <input type="number" class="form-control bg-light" name="Input.AnnualPrice" id="planAnnualPrice" readonly />
+                                    </div>
+                                </div>
+                            </div>
 
-                    <hr class="my-4" />
-                    <h6 class="mb-3"><i class="bi bi-speedometer2 me-2"></i>Limits</h6>
+                            <hr class="my-3" />
+                            <h6 class="mb-3"><i class="bi bi-speedometer2 me-2"></i>Limits</h6>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Max Users</label>
-                            <input type="number" class="form-control" name="Input.MaxUsers" id="planMaxUsers" min="-1" />
-                            <small class="text-muted">-1 for unlimited</small>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Max Warehouses</label>
-                            <input type="number" class="form-control" name="Input.MaxWarehouses" id="planMaxWarehouses" min="-1" />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Max Products</label>
-                            <input type="number" class="form-control" name="Input.MaxProducts" id="planMaxProducts" min="-1" />
-                        </div>
-                    </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Max Users</label>
+                                    <input type="number" class="form-control" name="Input.MaxUsers" id="planMaxUsers" value="5" min="-1" />
+                                    <small class="text-muted">-1 = unlimited</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Max Warehouses</label>
+                                    <input type="number" class="form-control" name="Input.MaxWarehouses" id="planMaxWarehouses" value="1" min="-1" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Max Products</label>
+                                    <input type="number" class="form-control" name="Input.MaxProducts" id="planMaxProducts" value="100" min="-1" />
+                                </div>
+                            </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Max Monthly Transactions</label>
-                            <input type="number" class="form-control" name="Input.MaxMonthlyTransactions" id="planMaxTransactions" min="-1" />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Storage Limit (MB)</label>
-                            <input type="number" class="form-control" name="Input.StorageLimitMb" id="planStorageLimit" min="-1" />
-                        </div>
-                    </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Max Monthly Transactions</label>
+                                    <input type="number" class="form-control" name="Input.MaxMonthlyTransactions" id="planMaxTransactions" value="100" min="-1" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Storage Limit (MB)</label>
+                                    <input type="number" class="form-control" name="Input.StorageLimitMb" id="planStorageLimit" value="1000" min="-1" />
+                                </div>
+                            </div>
 
-                    <hr class="my-4" />
-                    <h6 class="mb-3"><i class="bi bi-gear me-2"></i>Options</h6>
+                            <hr class="my-3" />
+                            <h6 class="mb-3"><i class="bi bi-gear me-2"></i>Options</h6>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Sort Order</label>
-                            <input type="number" class="form-control" name="Input.SortOrder" id="planSortOrder" value="1" min="1" />
-                        </div>
-                        <div class="col-md-4 mb-3 d-flex align-items-end">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="Input.IsActive" id="planIsActive" value="true" checked />
-                                <label class="form-check-label" for="planIsActive">Active</label>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Sort Order</label>
+                                    <input type="number" class="form-control" name="Input.SortOrder" id="planSortOrder" value="1" min="1" />
+                                </div>
+                                <div class="col-md-4 mb-3 d-flex align-items-end">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="Input.IsActive" id="planIsActive" value="true" checked />
+                                        <label class="form-check-label" for="planIsActive">Active</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 d-flex align-items-end">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="Input.IsFeatured" id="planIsFeatured" value="true" />
+                                        <label class="form-check-label" for="planIsFeatured">Featured</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3 d-flex align-items-end">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="Input.IsFeatured" id="planIsFeatured" value="true" />
-                                <label class="form-check-label" for="planIsFeatured">Featured</label>
+
+                        <!-- Right Column: Module Selection -->
+                        <div class="col-lg-6">
+                            <div class="card bg-light h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0"><i class="bi bi-grid me-2"></i>Select Modules</h6>
+                                </div>
+                                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                    @foreach (var category in Model.Modules.GroupBy(m => m.Category).OrderBy(g => g.Key))
+                                    {
+                                        <h6 class="text-uppercase text-muted small mb-2 mt-3">@category.Key</h6>
+                                        @foreach (var module in category.OrderBy(m => m.DisplayOrder))
+                                        {
+                                            <div class="form-check mb-2 p-2 bg-white rounded border module-item" data-module-id="@module.Id" data-monthly="@module.MonthlyPrice" data-annual="@module.AnnualPrice">
+                                                <input class="form-check-input module-checkbox" type="checkbox"
+                                                       name="SelectedModules" value="@module.Id" id="module_@module.Id"
+                                                       onchange="updatePricing()" @(module.IsCore ? "checked" : "")>
+                                                <label class="form-check-label d-flex justify-content-between w-100" for="module_@module.Id">
+                                                    <span>
+                                                        <i class="@module.Icon me-2 text-primary"></i>
+                                                        @module.Name
+                                                        @if (module.IsCore)
+                                                        {
+                                                            <span class="badge bg-warning text-dark ms-1">Core</span>
+                                                        }
+                                                    </span>
+                                                    <span class="text-primary fw-semibold">
+                                                        @if (module.MonthlyPrice > 0)
+                                                        {
+                                                            @:@module.MonthlyPrice.ToString("N0")/mo
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-success">Free</span>
+                                                        }
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><strong id="selectedCount">0</strong> modules selected</span>
+                                        <div class="text-end">
+                                            <div class="text-primary fw-bold fs-5" id="totalMonthly">INR 0/mo</div>
+                                            <small class="text-muted" id="totalAnnual">INR 0/yr</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -285,20 +364,52 @@
 
 @section Scripts {
     <script>
-        // Store plans data for editing
+        // Store plans and modules data
         const plansData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Plans.Select(p => new {
             p.Id, p.Code, p.Name, p.Description,
             p.MonthlyPrice, p.AnnualPrice,
             p.MaxUsers, p.MaxWarehouses, p.MaxProducts,
             MaxMonthlyTransactions = p.MaxTransactionsPerMonth, StorageLimitMb = p.StorageLimitMB,
-            SortOrder = p.DisplayOrder, p.IsActive, IsFeatured = p.IsPopular
+            SortOrder = p.DisplayOrder, p.IsActive, IsFeatured = p.IsPopular,
+            p.IncludedModules
         })));
+
+        const modulesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Modules.Select(m => new {
+            m.Id, m.Code, m.MonthlyPrice, m.AnnualPrice, m.IsCore
+        })));
+
+        function updatePricing() {
+            let monthlyTotal = 0;
+            let annualTotal = 0;
+            let count = 0;
+
+            document.querySelectorAll('.module-checkbox:checked').forEach(checkbox => {
+                const item = checkbox.closest('.module-item');
+                monthlyTotal += parseFloat(item.dataset.monthly) || 0;
+                annualTotal += parseFloat(item.dataset.annual) || 0;
+                count++;
+            });
+
+            document.getElementById('planMonthlyPrice').value = monthlyTotal;
+            document.getElementById('planAnnualPrice').value = annualTotal;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('totalMonthly').textContent = 'INR ' + monthlyTotal.toLocaleString() + '/mo';
+            document.getElementById('totalAnnual').textContent = 'INR ' + annualTotal.toLocaleString() + '/yr';
+        }
 
         function openCreateModal() {
             document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-tag me-2"></i>New Plan';
             document.getElementById('planForm').reset();
             document.getElementById('planId').value = '';
             document.getElementById('planIsActive').checked = true;
+
+            // Check only core modules
+            document.querySelectorAll('.module-checkbox').forEach(checkbox => {
+                const module = modulesData.find(m => m.id === checkbox.value);
+                checkbox.checked = module && module.isCore;
+            });
+
+            updatePricing();
         }
 
         function openEditModal(planId) {
@@ -310,8 +421,6 @@
             document.getElementById('planCode').value = plan.code;
             document.getElementById('planName').value = plan.name;
             document.getElementById('planDescription').value = plan.description || '';
-            document.getElementById('planMonthlyPrice').value = plan.monthlyPrice;
-            document.getElementById('planAnnualPrice').value = plan.annualPrice;
             document.getElementById('planMaxUsers').value = plan.maxUsers;
             document.getElementById('planMaxWarehouses').value = plan.maxWarehouses;
             document.getElementById('planMaxProducts').value = plan.maxProducts;
@@ -320,6 +429,18 @@
             document.getElementById('planSortOrder').value = plan.sortOrder;
             document.getElementById('planIsActive').checked = plan.isActive;
             document.getElementById('planIsFeatured').checked = plan.isFeatured;
+
+            // Parse and check included modules
+            let includedModules = [];
+            try {
+                includedModules = JSON.parse(plan.includedModules || '[]');
+            } catch {}
+
+            document.querySelectorAll('.module-checkbox').forEach(checkbox => {
+                checkbox.checked = includedModules.includes(checkbox.value);
+            });
+
+            updatePricing();
 
             const modal = new bootstrap.Modal(document.getElementById('planModal'));
             modal.show();
@@ -330,8 +451,12 @@
             if (event.detail.successful) {
                 window.location.reload();
             } else {
-                const response = JSON.parse(event.detail.xhr.responseText);
-                alert(response.error || 'An error occurred');
+                try {
+                    const response = JSON.parse(event.detail.xhr.responseText);
+                    alert(response.error || 'An error occurred');
+                } catch {
+                    alert('An error occurred');
+                }
             }
         });
 
@@ -357,5 +482,8 @@
                 alert('An error occurred while saving');
             }
         });
+
+        // Initialize pricing on page load
+        document.addEventListener('DOMContentLoaded', updatePricing);
     </script>
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Algora.Erp.Admin.Pages.Plans;
 
@@ -12,15 +13,18 @@ namespace Algora.Erp.Admin.Pages.Plans;
 public class IndexModel : PageModel
 {
     private readonly IPlanService _planService;
+    private readonly IModuleService _moduleService;
     private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(IPlanService planService, ILogger<IndexModel> logger)
+    public IndexModel(IPlanService planService, IModuleService moduleService, ILogger<IndexModel> logger)
     {
         _planService = planService;
+        _moduleService = moduleService;
         _logger = logger;
     }
 
     public List<BillingPlan> Plans { get; set; } = new();
+    public List<PlanModule> Modules { get; set; } = new();
     public Dictionary<Guid, int> PlanSubscriptions { get; set; } = new();
     public decimal TotalMRR { get; set; }
     public int TotalSubscriptions { get; set; }
@@ -31,9 +35,13 @@ public class IndexModel : PageModel
     [BindProperty]
     public Guid? PlanId { get; set; }
 
+    [BindProperty]
+    public List<Guid> SelectedModules { get; set; } = new();
+
     public async Task OnGetAsync()
     {
         Plans = await _planService.GetAllPlansAsync(includeInactive: true);
+        Modules = await _moduleService.GetAllModulesAsync(includeInactive: false);
 
         // Get subscription counts for each plan
         foreach (var plan in Plans)
@@ -49,12 +57,26 @@ public class IndexModel : PageModel
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new { error = "Invalid form data" });
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            return BadRequest(new { error = string.Join(", ", errors) });
         }
 
         try
         {
             var userId = GetCurrentUserId();
+
+            // Calculate prices based on selected modules
+            var monthlyPrice = Input.MonthlyPrice;
+            var annualPrice = Input.AnnualPrice;
+
+            if (SelectedModules.Any())
+            {
+                monthlyPrice = await _moduleService.CalculatePlanPriceAsync(SelectedModules, false);
+                annualPrice = await _moduleService.CalculatePlanPriceAsync(SelectedModules, true);
+            }
+
+            // Convert selected modules to JSON
+            var modulesJson = JsonSerializer.Serialize(SelectedModules);
 
             if (PlanId.HasValue && PlanId.Value != Guid.Empty)
             {
@@ -64,8 +86,8 @@ public class IndexModel : PageModel
                     Code = Input.Code,
                     Name = Input.Name,
                     Description = Input.Description,
-                    MonthlyPrice = Input.MonthlyPrice,
-                    AnnualPrice = Input.AnnualPrice,
+                    MonthlyPrice = monthlyPrice,
+                    AnnualPrice = annualPrice,
                     MaxUsers = Input.MaxUsers,
                     MaxWarehouses = Input.MaxWarehouses,
                     MaxProducts = Input.MaxProducts,
@@ -73,7 +95,8 @@ public class IndexModel : PageModel
                     StorageLimitMb = Input.StorageLimitMb,
                     IsActive = Input.IsActive,
                     IsFeatured = Input.IsFeatured,
-                    SortOrder = Input.SortOrder
+                    SortOrder = Input.SortOrder,
+                    IncludedModules = modulesJson
                 };
 
                 var success = await _planService.UpdatePlanAsync(PlanId.Value, request, userId);
@@ -92,8 +115,8 @@ public class IndexModel : PageModel
                     Code = Input.Code,
                     Name = Input.Name,
                     Description = Input.Description,
-                    MonthlyPrice = Input.MonthlyPrice,
-                    AnnualPrice = Input.AnnualPrice,
+                    MonthlyPrice = monthlyPrice,
+                    AnnualPrice = annualPrice,
                     MaxUsers = Input.MaxUsers,
                     MaxWarehouses = Input.MaxWarehouses,
                     MaxProducts = Input.MaxProducts,
@@ -101,7 +124,8 @@ public class IndexModel : PageModel
                     StorageLimitMb = Input.StorageLimitMb,
                     IsActive = Input.IsActive,
                     IsFeatured = Input.IsFeatured,
-                    SortOrder = Input.SortOrder
+                    SortOrder = Input.SortOrder,
+                    IncludedModules = modulesJson
                 };
 
                 await _planService.CreatePlanAsync(request, userId);
@@ -159,6 +183,25 @@ public class IndexModel : PageModel
         }
     }
 
+    public async Task<IActionResult> OnGetCalculatePriceAsync(string moduleIds)
+    {
+        try
+        {
+            var ids = string.IsNullOrEmpty(moduleIds)
+                ? new List<Guid>()
+                : moduleIds.Split(',').Select(Guid.Parse).ToList();
+
+            var monthlyPrice = await _moduleService.CalculatePlanPriceAsync(ids, false);
+            var annualPrice = await _moduleService.CalculatePlanPriceAsync(ids, true);
+
+            return new JsonResult(new { monthlyPrice, annualPrice });
+        }
+        catch
+        {
+            return new JsonResult(new { monthlyPrice = 0, annualPrice = 0 });
+        }
+    }
+
     private Guid GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -179,12 +222,10 @@ public class PlanInput
 
     public string? Description { get; set; }
 
-    [Required]
-    [Range(0, 10000)]
+    [Range(0, 1000000)]
     public decimal MonthlyPrice { get; set; }
 
-    [Required]
-    [Range(0, 100000)]
+    [Range(0, 10000000)]
     public decimal AnnualPrice { get; set; }
 
     public int MaxUsers { get; set; } = 5;
