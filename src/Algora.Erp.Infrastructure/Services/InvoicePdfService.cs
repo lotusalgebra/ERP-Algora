@@ -1,5 +1,6 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Finance;
+using Algora.Erp.Domain.Entities.Settings;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -9,21 +10,56 @@ namespace Algora.Erp.Infrastructure.Services;
 
 public class InvoicePdfService : IInvoicePdfService
 {
-    // Currency formatting based on invoice currency
-    private string FormatCurrency(decimal amount, string? currency)
+    private readonly ITenantSettingsService _settingsService;
+    private TenantSettings? _settings;
+
+    public InvoicePdfService(ITenantSettingsService settingsService)
     {
-        return currency?.ToUpperInvariant() switch
+        _settingsService = settingsService;
+    }
+
+    // Currency formatting based on tenant settings
+    private string FormatCurrency(decimal amount, string? currency = null)
+    {
+        // If no settings loaded yet, use defaults
+        if (_settings == null)
         {
-            "INR" => $"₹{amount:N2}",
-            "USD" => $"${amount:N2}",
-            "EUR" => $"€{amount:N2}",
-            "GBP" => $"£{amount:N2}",
-            _ => $"₹{amount:N2}" // Default to INR
+            return currency?.ToUpperInvariant() switch
+            {
+                "INR" => $"₹{amount:N2}",
+                "USD" => $"${amount:N2}",
+                "EUR" => $"€{amount:N2}",
+                "GBP" => $"£{amount:N2}",
+                "JPY" => $"¥{amount:N0}",
+                "CAD" => $"C${amount:N2}",
+                "AUD" => $"A${amount:N2}",
+                "CHF" => $"CHF {amount:N2}",
+                "CNY" => $"¥{amount:N2}",
+                "SGD" => $"S${amount:N2}",
+                "AED" => $"د.إ{amount:N2}",
+                "SAR" => $"﷼{amount:N2}",
+                _ => $"₹{amount:N2}" // Default to INR
+            };
+        }
+
+        // Use settings currency symbol and decimal places
+        var symbol = _settings.CurrencySymbol;
+        var decimalPlaces = _settings.CurrencyDecimalPlaces;
+        var format = decimalPlaces switch
+        {
+            0 => "N0",
+            3 => "N3",
+            _ => "N2"
         };
+
+        return $"{symbol}{amount.ToString(format)}";
     }
 
     public byte[] GenerateInvoicePdf(Invoice invoice)
     {
+        // Load settings synchronously for PDF generation
+        _settings = _settingsService.GetSettingsAsync().GetAwaiter().GetResult();
+
         var document = Document.Create(container =>
         {
             container.Page(page =>
@@ -49,16 +85,48 @@ public class InvoicePdfService : IInvoicePdfService
             {
                 row.RelativeItem().Column(col =>
                 {
-                    col.Item().Text("Algora ERP").Bold().FontSize(24).FontColor(Colors.Blue.Darken3);
-                    col.Item().Text("123 Business Street");
-                    col.Item().Text("City, State 12345");
-                    col.Item().Text("Phone: (555) 123-4567");
-                    col.Item().Text("Email: invoices@algora-erp.com");
+                    // Use company name from settings
+                    col.Item().Text(_settings?.CompanyName ?? "Company Name")
+                        .Bold().FontSize(24).FontColor(Colors.Blue.Darken3);
+
+                    // Company address from settings
+                    if (!string.IsNullOrEmpty(_settings?.AddressLine1))
+                        col.Item().Text(_settings.AddressLine1);
+                    if (!string.IsNullOrEmpty(_settings?.AddressLine2))
+                        col.Item().Text(_settings.AddressLine2);
+
+                    var cityStateZip = new List<string>();
+                    if (!string.IsNullOrEmpty(_settings?.City))
+                        cityStateZip.Add(_settings.City);
+                    if (!string.IsNullOrEmpty(_settings?.State))
+                        cityStateZip.Add(_settings.State);
+                    if (!string.IsNullOrEmpty(_settings?.PostalCode))
+                        cityStateZip.Add(_settings.PostalCode);
+                    if (cityStateZip.Any())
+                        col.Item().Text(string.Join(", ", cityStateZip));
+
+                    if (!string.IsNullOrEmpty(_settings?.Country))
+                        col.Item().Text(_settings.Country);
+
+                    if (!string.IsNullOrEmpty(_settings?.CompanyPhone))
+                        col.Item().Text($"Phone: {_settings.CompanyPhone}");
+                    if (!string.IsNullOrEmpty(_settings?.CompanyEmail))
+                        col.Item().Text($"Email: {_settings.CompanyEmail}");
+
+                    // Tax ID (GSTIN/VAT/TIN)
+                    if (!string.IsNullOrEmpty(_settings?.TaxId))
+                        col.Item().Text($"{_settings.TaxIdLabel}: {_settings.TaxId}").FontSize(9);
+                    if (!string.IsNullOrEmpty(_settings?.PanNumber))
+                        col.Item().Text($"PAN: {_settings.PanNumber}").FontSize(9);
                 });
 
                 row.RelativeItem().Column(col =>
                 {
-                    col.Item().AlignRight().Text("INVOICE").Bold().FontSize(28).FontColor(Colors.Grey.Darken2);
+                    // Invoice header text from settings
+                    var headerText = !string.IsNullOrEmpty(_settings?.InvoiceHeaderText)
+                        ? _settings.InvoiceHeaderText
+                        : "INVOICE";
+                    col.Item().AlignRight().Text(headerText).Bold().FontSize(28).FontColor(Colors.Grey.Darken2);
                     col.Item().AlignRight().Text(invoice.InvoiceNumber).FontSize(14);
                     col.Item().AlignRight().PaddingTop(10).Element(c => ComposeStatusBadge(c, invoice));
                 });
@@ -138,10 +206,12 @@ public class InvoicePdfService : IInvoicePdfService
                         r.ConstantItem(100).AlignRight().Text(invoice.InvoiceNumber).Bold();
                     });
 
+                    // Format date using settings
+                    var dateFormat = _settings?.DateFormat ?? "dd/MM/yyyy";
                     col.Item().Row(r =>
                     {
                         r.RelativeItem().Text("Invoice Date:");
-                        r.ConstantItem(100).AlignRight().Text(invoice.InvoiceDate.ToString("MMM dd, yyyy"));
+                        r.ConstantItem(100).AlignRight().Text(invoice.InvoiceDate.ToString(dateFormat));
                     });
 
                     var isOverdue = invoice.DueDate < DateTime.UtcNow &&
@@ -151,7 +221,7 @@ public class InvoicePdfService : IInvoicePdfService
                     col.Item().Row(r =>
                     {
                         r.RelativeItem().Text("Due Date:");
-                        r.ConstantItem(100).AlignRight().Text(invoice.DueDate.ToString("MMM dd, yyyy"))
+                        r.ConstantItem(100).AlignRight().Text(invoice.DueDate.ToString(dateFormat))
                             .FontColor(isOverdue ? Colors.Red.Darken2 : Colors.Black);
                     });
 
@@ -201,24 +271,50 @@ public class InvoicePdfService : IInvoicePdfService
             {
                 column.Item().PaddingTop(20).Element(c => ComposeNotes(c, invoice));
             }
+
+            // Terms & Conditions from settings
+            if (!string.IsNullOrEmpty(_settings?.InvoiceTermsText))
+            {
+                column.Item().PaddingTop(20).Element(c => ComposeTerms(c));
+            }
         });
     }
 
     private void ComposeLineItemsTable(IContainer container, Invoice invoice)
     {
+        // Check if HSN code should be shown
+        var showHsn = _settings?.ShowHsnCode ?? true;
+        var showGstBreakdown = _settings?.ShowGstBreakdown ?? true;
+
         container.Table(table =>
         {
-            table.ColumnsDefinition(columns =>
+            if (showHsn)
             {
-                columns.ConstantColumn(25);   // #
-                columns.RelativeColumn(3);    // Description
-                columns.ConstantColumn(60);   // HSN
-                columns.ConstantColumn(40);   // Qty
-                columns.ConstantColumn(65);   // Unit Price
-                columns.ConstantColumn(70);   // GST
-                columns.ConstantColumn(70);   // Tax Amt
-                columns.ConstantColumn(75);   // Amount
-            });
+                table.ColumnsDefinition(columns =>
+                {
+                    columns.ConstantColumn(25);   // #
+                    columns.RelativeColumn(3);    // Description
+                    columns.ConstantColumn(60);   // HSN
+                    columns.ConstantColumn(40);   // Qty
+                    columns.ConstantColumn(65);   // Unit Price
+                    columns.ConstantColumn(70);   // GST
+                    columns.ConstantColumn(70);   // Tax Amt
+                    columns.ConstantColumn(75);   // Amount
+                });
+            }
+            else
+            {
+                table.ColumnsDefinition(columns =>
+                {
+                    columns.ConstantColumn(25);   // #
+                    columns.RelativeColumn(4);    // Description (wider)
+                    columns.ConstantColumn(50);   // Qty
+                    columns.ConstantColumn(70);   // Unit Price
+                    columns.ConstantColumn(70);   // GST
+                    columns.ConstantColumn(70);   // Tax Amt
+                    columns.ConstantColumn(80);   // Amount
+                });
+            }
 
             // Header - show appropriate tax column based on transaction type
             var taxHeader = invoice.IsInterState ? "IGST" : "CGST/SGST";
@@ -226,10 +322,12 @@ public class InvoicePdfService : IInvoicePdfService
             {
                 header.Cell().Background(Colors.Blue.Darken3).Padding(6).Text("#").FontColor(Colors.White).Bold().FontSize(8);
                 header.Cell().Background(Colors.Blue.Darken3).Padding(6).Text("Description").FontColor(Colors.White).Bold().FontSize(8);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text("HSN").FontColor(Colors.White).Bold().FontSize(8);
+                if (showHsn)
+                    header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text("HSN").FontColor(Colors.White).Bold().FontSize(8);
                 header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text("Qty").FontColor(Colors.White).Bold().FontSize(8);
                 header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignRight().Text("Rate").FontColor(Colors.White).Bold().FontSize(8);
-                header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text(taxHeader).FontColor(Colors.White).Bold().FontSize(8);
+                if (showGstBreakdown)
+                    header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignCenter().Text(taxHeader).FontColor(Colors.White).Bold().FontSize(8);
                 header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignRight().Text("Tax Amt").FontColor(Colors.White).Bold().FontSize(8);
                 header.Cell().Background(Colors.Blue.Darken3).Padding(6).AlignRight().Text("Amount").FontColor(Colors.White).Bold().FontSize(8);
             });
@@ -251,54 +349,58 @@ public class InvoicePdfService : IInvoicePdfService
                         col.Item().Text($"SKU: {line.ProductCode}").FontSize(7).FontColor(Colors.Grey.Darken1);
                 });
 
-                // HSN Code
-                table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(line.HsnCode ?? "-").FontSize(9);
+                // HSN Code (if enabled)
+                if (showHsn)
+                    table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(line.HsnCode ?? "-").FontSize(9);
 
                 // Quantity
                 table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(line.Quantity.ToString("0.##")).FontSize(9);
 
                 // Unit Price
-                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.UnitPrice, invoice.Currency)).FontSize(9);
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.UnitPrice)).FontSize(9);
 
                 // GST Rate - show IGST for inter-state, CGST+SGST for intra-state
-                string gstRateText;
-                if (invoice.IsInterState && line.IgstRate > 0)
+                if (showGstBreakdown)
                 {
-                    gstRateText = $"{line.IgstRate:0.##}%";
+                    string gstRateText;
+                    if (invoice.IsInterState && line.IgstRate > 0)
+                    {
+                        gstRateText = $"{line.IgstRate:0.##}%";
+                    }
+                    else if (line.CgstRate > 0 || line.SgstRate > 0)
+                    {
+                        gstRateText = $"{line.CgstRate:0.##}%+{line.SgstRate:0.##}%";
+                    }
+                    else if (line.TaxPercent > 0)
+                    {
+                        gstRateText = $"{line.TaxPercent:0.##}%";
+                    }
+                    else
+                    {
+                        gstRateText = "-";
+                    }
+                    table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(gstRateText).FontSize(9);
                 }
-                else if (line.CgstRate > 0 || line.SgstRate > 0)
-                {
-                    gstRateText = $"{line.CgstRate:0.##}%+{line.SgstRate:0.##}%";
-                }
-                else if (line.TaxPercent > 0)
-                {
-                    gstRateText = $"{line.TaxPercent:0.##}%";
-                }
-                else
-                {
-                    gstRateText = "-";
-                }
-                table.Cell().Background(bgColor).Padding(6).AlignCenter().Text(gstRateText).FontSize(9);
 
                 // Tax Amount
-                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.TaxAmount, invoice.Currency)).FontSize(9);
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.TaxAmount)).FontSize(9);
 
                 // Line Total
-                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.LineTotal, invoice.Currency)).Bold().FontSize(9);
+                table.Cell().Background(bgColor).Padding(6).AlignRight().Text(FormatCurrency(line.LineTotal)).Bold().FontSize(9);
             }
         });
     }
 
     private void ComposeTotals(IContainer container, Invoice invoice)
     {
-        var currency = invoice.Currency;
+        var showGstBreakdown = _settings?.ShowGstBreakdown ?? true;
 
         container.AlignRight().Width(250).Column(column =>
         {
             column.Item().Row(row =>
             {
                 row.RelativeItem().AlignRight().Text("Subtotal:");
-                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.SubTotal, currency));
+                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.SubTotal));
             });
 
             if (invoice.DiscountAmount > 0)
@@ -306,54 +408,66 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("Discount:").FontColor(Colors.Red.Darken2);
-                    row.ConstantItem(100).AlignRight().Text($"-{FormatCurrency(invoice.DiscountAmount, currency)}").FontColor(Colors.Red.Darken2);
+                    row.ConstantItem(100).AlignRight().Text($"-{FormatCurrency(invoice.DiscountAmount)}").FontColor(Colors.Red.Darken2);
                 });
             }
 
             // GST Breakdown - show CGST/SGST for intra-state, IGST for inter-state
-            if (invoice.IsInterState && invoice.IgstAmount > 0)
+            if (showGstBreakdown)
             {
-                // Inter-state: Show IGST only
-                column.Item().Row(row =>
+                if (invoice.IsInterState && invoice.IgstAmount > 0)
                 {
-                    row.RelativeItem().AlignRight().Text("IGST:");
-                    row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.IgstAmount, currency));
-                });
-            }
-            else if (invoice.CgstAmount > 0 || invoice.SgstAmount > 0)
-            {
-                // Intra-state: Show CGST and SGST separately
-                if (invoice.CgstAmount > 0)
-                {
+                    // Inter-state: Show IGST only
                     column.Item().Row(row =>
                     {
-                        row.RelativeItem().AlignRight().Text("CGST:");
-                        row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.CgstAmount, currency));
+                        row.RelativeItem().AlignRight().Text("IGST:");
+                        row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.IgstAmount));
                     });
                 }
-                if (invoice.SgstAmount > 0)
+                else if (invoice.CgstAmount > 0 || invoice.SgstAmount > 0)
                 {
+                    // Intra-state: Show CGST and SGST separately
+                    if (invoice.CgstAmount > 0)
+                    {
+                        column.Item().Row(row =>
+                        {
+                            row.RelativeItem().AlignRight().Text("CGST:");
+                            row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.CgstAmount));
+                        });
+                    }
+                    if (invoice.SgstAmount > 0)
+                    {
+                        column.Item().Row(row =>
+                        {
+                            row.RelativeItem().AlignRight().Text("SGST:");
+                            row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.SgstAmount));
+                        });
+                    }
+                }
+                else if (invoice.TaxAmount > 0)
+                {
+                    // Fallback: Show generic tax if no GST breakdown
                     column.Item().Row(row =>
                     {
-                        row.RelativeItem().AlignRight().Text("SGST:");
-                        row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.SgstAmount, currency));
+                        row.RelativeItem().AlignRight().Text("Tax:");
+                        row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TaxAmount));
                     });
                 }
             }
             else if (invoice.TaxAmount > 0)
             {
-                // Fallback: Show generic tax if no GST breakdown
+                // Show combined tax if GST breakdown is disabled
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("Tax:");
-                    row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TaxAmount, currency));
+                    row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TaxAmount));
                 });
             }
 
             column.Item().PaddingTop(5).BorderTop(2).BorderColor(Colors.Blue.Darken3).PaddingTop(5).Row(row =>
             {
                 row.RelativeItem().AlignRight().Text("Total:").Bold().FontSize(14);
-                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TotalAmount, currency)).Bold().FontSize(14);
+                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.TotalAmount)).Bold().FontSize(14);
             });
 
             if (invoice.PaidAmount > 0)
@@ -361,14 +475,14 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().PaddingTop(5).Row(row =>
                 {
                     row.RelativeItem().AlignRight().Text("Amount Paid:");
-                    row.ConstantItem(100).AlignRight().Text($"-{FormatCurrency(invoice.PaidAmount, currency)}").FontColor(Colors.Green.Darken2);
+                    row.ConstantItem(100).AlignRight().Text($"-{FormatCurrency(invoice.PaidAmount)}").FontColor(Colors.Green.Darken2);
                 });
             }
 
             column.Item().PaddingTop(5).Background(Colors.Grey.Lighten3).Padding(8).Row(row =>
             {
                 row.RelativeItem().AlignRight().Text("Balance Due:").Bold();
-                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.BalanceDue, currency)).Bold()
+                row.ConstantItem(100).AlignRight().Text(FormatCurrency(invoice.BalanceDue)).Bold()
                     .FontColor(invoice.BalanceDue > 0 ? Colors.Red.Darken2 : Colors.Green.Darken2);
             });
         });
@@ -376,6 +490,8 @@ public class InvoicePdfService : IInvoicePdfService
 
     private void ComposePaymentHistory(IContainer container, Invoice invoice)
     {
+        var dateFormat = _settings?.DateFormat ?? "dd/MM/yyyy";
+
         container.Background(Colors.Grey.Lighten4).Padding(15).Column(column =>
         {
             column.Item().Text("PAYMENT HISTORY").Bold().FontSize(9).FontColor(Colors.Grey.Darken1);
@@ -386,10 +502,10 @@ public class InvoicePdfService : IInvoicePdfService
                 column.Item().PaddingBottom(5).Row(row =>
                 {
                     row.ConstantItem(100).Text(payment.PaymentNumber);
-                    row.ConstantItem(100).Text(payment.PaymentDate.ToString("MMM dd, yyyy"));
+                    row.ConstantItem(100).Text(payment.PaymentDate.ToString(dateFormat));
                     row.ConstantItem(100).Text(payment.PaymentMethod.ToString());
                     row.RelativeItem().Text(payment.Reference ?? "-");
-                    row.ConstantItem(80).AlignRight().Text(FormatCurrency(payment.Amount, invoice.Currency)).FontColor(Colors.Green.Darken2).Bold();
+                    row.ConstantItem(80).AlignRight().Text(FormatCurrency(payment.Amount)).FontColor(Colors.Green.Darken2).Bold();
                 });
             }
         });
@@ -404,14 +520,29 @@ public class InvoicePdfService : IInvoicePdfService
         });
     }
 
+    private void ComposeTerms(IContainer container)
+    {
+        if (string.IsNullOrEmpty(_settings?.InvoiceTermsText))
+            return;
+
+        container.Background(Colors.Grey.Lighten4).Padding(15).Column(column =>
+        {
+            column.Item().Text("TERMS & CONDITIONS").Bold().FontSize(9).FontColor(Colors.Grey.Darken1);
+            column.Item().PaddingTop(5).Text(_settings.InvoiceTermsText).FontSize(8);
+        });
+    }
+
     private void ComposeFooter(IContainer container, Invoice invoice)
     {
+        var dateFormat = _settings?.DateFormat ?? "dd/MM/yyyy";
+        var footerText = _settings?.InvoiceFooterText ?? "Thank you for your business!";
+
         container.Column(column =>
         {
             column.Item().PaddingTop(20).BorderTop(1).BorderColor(Colors.Grey.Lighten2).PaddingTop(15);
 
-            column.Item().AlignCenter().Text("Thank you for your business!").Bold();
-            column.Item().AlignCenter().Text($"Payment is due by {invoice.DueDate:MMMM dd, yyyy}").FontSize(9);
+            column.Item().AlignCenter().Text(footerText).Bold();
+            column.Item().AlignCenter().Text($"Payment is due by {invoice.DueDate.ToString(dateFormat)}").FontSize(9);
             column.Item().AlignCenter().Text($"Please include invoice number {invoice.InvoiceNumber} with your payment").FontSize(9).FontColor(Colors.Grey.Darken1);
 
             if (!string.IsNullOrEmpty(invoice.PaymentTerms))
