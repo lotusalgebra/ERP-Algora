@@ -17,6 +17,7 @@ public class AdminDbContext : DbContext
     // Tenants
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<TenantUser> TenantUsers => Set<TenantUser>();
+    public DbSet<DatabaseBackup> DatabaseBackups => Set<DatabaseBackup>();
 
     // Billing
     public DbSet<BillingPlan> BillingPlans => Set<BillingPlan>();
@@ -137,6 +138,35 @@ public class AdminDbContext : DbContext
 
             // Soft delete query filter
             entity.HasQueryFilter(e => !e.IsDeleted);
+        });
+
+        // ===========================================
+        // DatabaseBackup Configuration
+        // ===========================================
+        modelBuilder.Entity<DatabaseBackup>(entity =>
+        {
+            entity.ToTable("DatabaseBackups");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.DatabaseName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.FileName).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.FilePath).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.ErrorMessage).HasMaxLength(4000);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+
+            entity.HasIndex(e => new { e.TenantId, e.CreatedAt });
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.ExpiresAt);
+
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.Backups)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Ignore computed properties
+            entity.Ignore(e => e.FileSizeFormatted);
+            entity.Ignore(e => e.Duration);
+            entity.Ignore(e => e.IsExpired);
         });
 
         // ===========================================

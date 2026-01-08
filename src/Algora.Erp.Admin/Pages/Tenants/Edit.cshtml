@@ -1,0 +1,212 @@
+@page "{id:guid}"
+@model Algora.Erp.Admin.Pages.Tenants.EditModel
+@{
+    ViewData["Title"] = $"Edit Tenant: {Model.Tenant.Name}";
+}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="/Tenants">Tenants</a></li>
+                <li class="breadcrumb-item"><a href="/Tenants/Details/@Model.Tenant.Id">@Model.Tenant.Name</a></li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+        <h4 class="mb-0">
+            <i class="bi bi-pencil me-2 text-primary"></i>Edit Tenant
+        </h4>
+    </div>
+    <div>
+        <a href="/Tenants/Details/@Model.Tenant.Id" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Cancel
+        </a>
+    </div>
+</div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form method="post">
+    <input type="hidden" asp-for="Input.Id" />
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Basic Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Organization Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" asp-for="Input.Name" />
+                            <span asp-validation-for="Input.Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subdomain</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" asp-for="Input.Subdomain" readonly />
+                                <span class="input-group-text">.algora.app</span>
+                            </div>
+                            <small class="text-muted">Subdomain cannot be changed after creation</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" asp-for="Input.CompanyName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tax ID / GST Number</label>
+                            <input type="text" class="form-control" asp-for="Input.TaxId" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Contact Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" asp-for="Input.ContactEmail" />
+                            <span asp-validation-for="Input.ContactEmail" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" asp-for="Input.ContactPhone" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" asp-for="Input.ContactPerson" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Address</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Street Address</label>
+                            <textarea class="form-control" asp-for="Input.Address" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" asp-for="Input.City" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">State / Province</label>
+                            <input type="text" class="form-control" asp-for="Input.State" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Country</label>
+                            <input type="text" class="form-control" asp-for="Input.Country" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" asp-for="Input.PostalCode" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Database Settings -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary bg-opacity-10">
+                    <h6 class="mb-0"><i class="bi bi-database me-2"></i>Database Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Database Name</label>
+                        <input type="text" class="form-control" asp-for="Input.DatabaseName" readonly />
+                        <small class="text-muted">Database name cannot be changed</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regional Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-globe me-2"></i>Regional Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Currency</label>
+                        <select class="form-select" asp-for="Input.CurrencyCode">
+                            <option value="INR">INR - Indian Rupee</option>
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="AED">AED - UAE Dirham</option>
+                            <option value="SGD">SGD - Singapore Dollar</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Timezone</label>
+                        <select class="form-select" asp-for="Input.TimeZone">
+                            <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                            <option value="America/New_York">America/New_York (EST)</option>
+                            <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                            <option value="Europe/London">Europe/London (GMT)</option>
+                            <option value="Europe/Paris">Europe/Paris (CET)</option>
+                            <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                            <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+                            <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Limits -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-sliders me-2"></i>Limits</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Maximum Users</label>
+                        <input type="number" class="form-control" asp-for="Input.MaxUsers" min="1" />
+                        <small class="text-muted">Enter -1 for unlimited</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-gradient btn-lg">
+                    <i class="bi bi-check-lg me-2"></i>Save Changes
+                </button>
+                <a href="/Tenants/Details/@Model.Tenant.Id" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -74,6 +74,7 @@ public class Tenant
     public ICollection<TenantSubscription> Subscriptions { get; set; } = new List<TenantSubscription>();
     public ICollection<TenantBillingInvoice> Invoices { get; set; } = new List<TenantBillingInvoice>();
     public ICollection<TenantUser> Users { get; set; } = new List<TenantUser>();
+    public ICollection<DatabaseBackup> Backups { get; set; } = new List<DatabaseBackup>();
 }
 
 public enum TenantStatus

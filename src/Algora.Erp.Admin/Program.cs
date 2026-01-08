@@ -47,6 +47,10 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<IBackupService, BackupService>();
+
+// Background Services
+builder.Services.AddHostedService<BackupCleanupService>();
 
 // HTMX support
 builder.Services.AddAntiforgery(options =>

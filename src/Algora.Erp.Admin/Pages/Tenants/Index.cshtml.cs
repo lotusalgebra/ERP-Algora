@@ -83,6 +83,7 @@ public class IndexModel : PageModel
             {
                 Name = CreateInput.Name,
                 Subdomain = CreateInput.Subdomain,
+                DatabaseName = CreateInput.DatabaseName,
                 ContactEmail = CreateInput.ContactEmail,
                 ContactPhone = CreateInput.ContactPhone,
                 Country = CreateInput.Country,
@@ -228,6 +229,10 @@ public class CreateTenantInput
     [StringLength(50, MinimumLength = 3)]
     [RegularExpression(@"^[a-z0-9-]+$", ErrorMessage = "Subdomain can only contain lowercase letters, numbers, and hyphens")]
     public string Subdomain { get; set; } = string.Empty;
+
+    [StringLength(100, MinimumLength = 3)]
+    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Database name can only contain letters, numbers, and underscores")]
+    public string? DatabaseName { get; set; }
 
     [Required(ErrorMessage = "Contact email is required")]
     [EmailAddress(ErrorMessage = "Invalid email format")]

@@ -105,7 +105,9 @@ public class TenantService : ITenantService
             TimeZone = request.TimeZone ?? "Asia/Kolkata",
             Status = TenantStatus.Pending,
             CreatedBy = createdBy,
-            DatabaseName = $"AlgoraErp_{request.Subdomain}"
+            DatabaseName = !string.IsNullOrWhiteSpace(request.DatabaseName)
+                ? request.DatabaseName
+                : $"AlgoraErp_{request.Subdomain}"
         };
 
         // Set trial period
@@ -311,6 +313,7 @@ public class CreateTenantRequest
 {
     public string Name { get; set; } = string.Empty;
     public string Subdomain { get; set; } = string.Empty;
+    public string? DatabaseName { get; set; }
     public string ContactEmail { get; set; } = string.Empty;
     public string? ContactPhone { get; set; }
     public string? ContactPerson { get; set; }

@@ -118,6 +118,7 @@
                     <tr>
                         <th class="ps-4">Tenant</th>
                         <th>Subdomain</th>
+                        <th>Database</th>
                         <th>Contact</th>
                         <th>Plan</th>
                         <th>Status</th>
@@ -142,6 +143,16 @@
                             </td>
                             <td>
                                 <code>@(tenant.Subdomain).algora.app</code>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(tenant.DatabaseName))
+                                {
+                                    <code class="text-primary">@tenant.DatabaseName</code>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
                             </td>
                             <td>
                                 <div>@tenant.ContactEmail</div>
@@ -247,7 +258,7 @@
                     @if (!Model.Tenants.Any())
                     {
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
+                            <td colspan="8" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                 No tenants found
                             </td>
@@ -277,9 +288,20 @@
                         <div class="col-md-6">
                             <label class="form-label">Subdomain <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="Subdomain" required pattern="[a-z0-9-]+" />
+                                <input type="text" class="form-control" name="Subdomain" required pattern="[a-z0-9-]+" id="subdomainInput" />
                                 <span class="input-group-text">.algora.app</span>
                             </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Database Name</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="DatabaseName" id="databaseNameInput"
+                                       pattern="[a-zA-Z0-9_]+" placeholder="Auto-generated if empty" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="generateDbName()" title="Generate from subdomain">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Leave empty to auto-generate from subdomain</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Contact Email <span class="text-danger">*</span></label>
@@ -399,6 +421,14 @@
             document.getElementById('suspendId').value = id;
             document.getElementById('suspendName').textContent = name;
             new bootstrap.Modal(document.getElementById('suspendModal')).show();
+        }
+
+        function generateDbName() {
+            const subdomain = document.getElementById('subdomainInput').value;
+            if (subdomain) {
+                const dbName = 'AlgoraErp_' + subdomain.replace(/-/g, '_');
+                document.getElementById('databaseNameInput').value = dbName;
+            }
         }
     </script>
 }
