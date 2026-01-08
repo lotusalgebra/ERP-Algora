@@ -403,41 +403,45 @@
             document.getElementById('planId').value = '';
             document.getElementById('planIsActive').checked = true;
 
-            // Check only core modules
+            // Check only core modules (use PascalCase - matches JSON serialization)
             document.querySelectorAll('.module-checkbox').forEach(checkbox => {
-                const module = modulesData.find(m => m.id === checkbox.value);
-                checkbox.checked = module && module.isCore;
+                const module = modulesData.find(m => m.Id.toLowerCase() === checkbox.value.toLowerCase());
+                checkbox.checked = module && module.IsCore;
             });
 
             updatePricing();
         }
 
         function openEditModal(planId) {
-            const plan = plansData.find(p => p.id === planId);
-            if (!plan) return;
+            // Compare GUIDs case-insensitively (use PascalCase - matches JSON serialization)
+            const plan = plansData.find(p => p.Id.toLowerCase() === planId.toLowerCase());
+            if (!plan) {
+                console.error('Plan not found:', planId, plansData);
+                return;
+            }
 
             document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Plan';
-            document.getElementById('planId').value = plan.id;
-            document.getElementById('planCode').value = plan.code;
-            document.getElementById('planName').value = plan.name;
-            document.getElementById('planDescription').value = plan.description || '';
-            document.getElementById('planMaxUsers').value = plan.maxUsers;
-            document.getElementById('planMaxWarehouses').value = plan.maxWarehouses;
-            document.getElementById('planMaxProducts').value = plan.maxProducts;
-            document.getElementById('planMaxTransactions').value = plan.maxMonthlyTransactions;
-            document.getElementById('planStorageLimit').value = plan.storageLimitMb;
-            document.getElementById('planSortOrder').value = plan.sortOrder;
-            document.getElementById('planIsActive').checked = plan.isActive;
-            document.getElementById('planIsFeatured').checked = plan.isFeatured;
+            document.getElementById('planId').value = plan.Id;
+            document.getElementById('planCode').value = plan.Code;
+            document.getElementById('planName').value = plan.Name;
+            document.getElementById('planDescription').value = plan.Description || '';
+            document.getElementById('planMaxUsers').value = plan.MaxUsers;
+            document.getElementById('planMaxWarehouses').value = plan.MaxWarehouses;
+            document.getElementById('planMaxProducts').value = plan.MaxProducts;
+            document.getElementById('planMaxTransactions').value = plan.MaxMonthlyTransactions;
+            document.getElementById('planStorageLimit').value = plan.StorageLimitMb;
+            document.getElementById('planSortOrder').value = plan.SortOrder;
+            document.getElementById('planIsActive').checked = plan.IsActive;
+            document.getElementById('planIsFeatured').checked = plan.IsFeatured;
 
-            // Parse and check included modules
+            // Parse and check included modules (compare case-insensitively)
             let includedModules = [];
             try {
-                includedModules = JSON.parse(plan.includedModules || '[]');
+                includedModules = JSON.parse(plan.IncludedModules || '[]').map(id => id.toLowerCase());
             } catch {}
 
             document.querySelectorAll('.module-checkbox').forEach(checkbox => {
-                checkbox.checked = includedModules.includes(checkbox.value);
+                checkbox.checked = includedModules.includes(checkbox.value.toLowerCase());
             });
 
             updatePricing();

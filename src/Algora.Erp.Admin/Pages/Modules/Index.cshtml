@@ -308,23 +308,27 @@
         }
 
         function openEditModal(moduleId) {
-            const module = modulesData.find(m => m.id === moduleId);
-            if (!module) return;
+            // Compare GUIDs case-insensitively (use PascalCase - matches JSON serialization)
+            const module = modulesData.find(m => m.Id.toLowerCase() === moduleId.toLowerCase());
+            if (!module) {
+                console.error('Module not found:', moduleId, modulesData);
+                return;
+            }
 
             document.getElementById('moduleModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Module';
-            document.getElementById('moduleId').value = module.id;
-            document.getElementById('moduleCode').value = module.code;
-            document.getElementById('moduleName').value = module.name;
-            document.getElementById('moduleDescription').value = module.description || '';
-            document.getElementById('moduleIcon').value = module.icon || 'bi-box';
-            document.getElementById('iconPreview').className = module.icon || 'bi-box';
-            document.getElementById('moduleMonthlyPrice').value = module.monthlyPrice;
-            document.getElementById('moduleAnnualPrice').value = module.annualPrice;
-            document.getElementById('moduleIsCore').checked = module.isCore;
-            document.getElementById('moduleRequiredModules').value = module.requiredModules || '';
-            document.getElementById('moduleDisplayOrder').value = module.displayOrder;
-            document.getElementById('moduleIsActive').checked = module.isActive;
-            document.getElementById('moduleCategory').value = module.category;
+            document.getElementById('moduleId').value = module.Id;
+            document.getElementById('moduleCode').value = module.Code;
+            document.getElementById('moduleName').value = module.Name;
+            document.getElementById('moduleDescription').value = module.Description || '';
+            document.getElementById('moduleIcon').value = module.Icon || 'bi-box';
+            document.getElementById('iconPreview').className = module.Icon || 'bi-box';
+            document.getElementById('moduleMonthlyPrice').value = module.MonthlyPrice;
+            document.getElementById('moduleAnnualPrice').value = module.AnnualPrice;
+            document.getElementById('moduleIsCore').checked = module.IsCore;
+            document.getElementById('moduleRequiredModules').value = module.RequiredModules || '';
+            document.getElementById('moduleDisplayOrder').value = module.DisplayOrder;
+            document.getElementById('moduleIsActive').checked = module.IsActive;
+            document.getElementById('moduleCategory').value = module.Category;
 
             const modal = new bootstrap.Modal(document.getElementById('moduleModal'));
             modal.show();

@@ -28,6 +28,9 @@ public class IndexModel : PageModel
     [BindProperty]
     public CreateUserInput CreateInput { get; set; } = new();
 
+    [BindProperty]
+    public EditUserInput EditInput { get; set; } = new();
+
     public async Task OnGetAsync()
     {
         Users = await _context.AdminUsers
@@ -162,6 +165,42 @@ public class IndexModel : PageModel
         return RedirectToPage();
     }
 
+    public async Task<IActionResult> OnPostEditAsync()
+    {
+        var user = await _context.AdminUsers.FindAsync(EditInput.Id);
+        if (user == null) return NotFound();
+
+        // Prevent self role change
+        if (user.Id == GetCurrentUserId() && user.RoleId != EditInput.RoleId)
+        {
+            TempData["ErrorMessage"] = "You cannot change your own role.";
+            return RedirectToPage();
+        }
+
+        // Check if email changed and already exists
+        if (user.Email.ToLower() != EditInput.Email.ToLower() &&
+            await _context.AdminUsers.AnyAsync(u => u.Email.ToLower() == EditInput.Email.ToLower() && u.Id != EditInput.Id))
+        {
+            TempData["ErrorMessage"] = "A user with this email already exists.";
+            return RedirectToPage();
+        }
+
+        user.Email = EditInput.Email;
+        user.FirstName = EditInput.FirstName;
+        user.LastName = EditInput.LastName;
+        user.Phone = EditInput.Phone;
+        user.RoleId = EditInput.RoleId;
+        user.ModifiedAt = DateTime.UtcNow;
+        user.ModifiedBy = GetCurrentUserId();
+
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Admin user {Email} updated by {UserId}", user.Email, GetCurrentUserId());
+        TempData["SuccessMessage"] = $"User '{user.FullName}' updated successfully.";
+
+        return RedirectToPage();
+    }
+
     private Guid GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -178,6 +217,29 @@ public class CreateUserInput
     [Required(ErrorMessage = "Password is required")]
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
     public string Password { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "First name is required")]
+    [StringLength(100)]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Last name is required")]
+    [StringLength(100)]
+    public string LastName { get; set; } = string.Empty;
+
+    [Phone]
+    public string? Phone { get; set; }
+
+    [Required(ErrorMessage = "Role is required")]
+    public Guid RoleId { get; set; }
+}
+
+public class EditUserInput
+{
+    public Guid Id { get; set; }
+
+    [Required(ErrorMessage = "Email is required")]
+    [EmailAddress(ErrorMessage = "Invalid email format")]
+    public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "First name is required")]
     [StringLength(100)]
