@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <ProjectReference Include="..\Algora.Erp.Auth\Algora.Erp.Auth.csproj" />
     <ProjectReference Include="..\Algora.Erp.Infrastructure\Algora.Erp.Infrastructure.csproj" />
     <ProjectReference Include="..\Algora.Erp.Integrations\Algora.Erp.Integrations.csproj" />
   </ItemGroup>

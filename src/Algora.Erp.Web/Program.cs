@@ -1,4 +1,5 @@
 using Algora.Erp.Application;
+using Algora.Erp.Auth;
 using Algora.Erp.Infrastructure;
 using Algora.Erp.Infrastructure.MultiTenancy;
 using Algora.Erp.Integrations;
@@ -33,18 +34,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Add authentication and authorization
-builder.Services.AddAuthentication("Cookies")
-    .AddCookie("Cookies", options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
-        options.SlidingExpiration = true;
-    });
-
+// Add authentication and authorization (Cookie + JWT)
+builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddAuthorization();
+builder.Services.AddControllers(); // For API endpoints
 
 var app = builder.Build();
 
@@ -70,6 +63,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapControllers(); // For API endpoints
 
 try
 {

@@ -3,6 +3,7 @@ using Algora.Erp.Domain.Entities.Finance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using FinanceAccount = Algora.Erp.Domain.Entities.Finance.Account;
 
 namespace Algora.Erp.Web.Pages.Finance.Accounts;
 
@@ -135,7 +136,7 @@ public class IndexModel : PageModel
             return BadRequest(ModelState);
         }
 
-        Account? account;
+        FinanceAccount? account;
 
         if (input.Id.HasValue)
         {
@@ -152,7 +153,7 @@ public class IndexModel : PageModel
                 return BadRequest("An account with this code already exists.");
             }
 
-            account = new Account
+            account = new FinanceAccount
             {
                 Id = Guid.NewGuid()
             };
@@ -208,7 +209,7 @@ public class IndexModel : PageModel
 
 public class AccountsTableViewModel
 {
-    public List<Account> Accounts { get; set; } = new();
+    public List<FinanceAccount> Accounts { get; set; } = new();
     public int Page { get; set; }
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
@@ -218,8 +219,8 @@ public class AccountsTableViewModel
 public class AccountFormViewModel
 {
     public bool IsEdit { get; set; }
-    public Account? Account { get; set; }
-    public List<Account> ParentAccounts { get; set; } = new();
+    public FinanceAccount? Account { get; set; }
+    public List<FinanceAccount> ParentAccounts { get; set; } = new();
 }
 
 public class AccountFormInput
