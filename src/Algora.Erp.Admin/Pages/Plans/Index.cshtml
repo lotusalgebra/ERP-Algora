@@ -1,0 +1,361 @@
+@page
+@model Algora.Erp.Admin.Pages.Plans.IndexModel
+@{
+    ViewData["Title"] = "Billing Plans";
+}
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-white-50">Total Plans</h6>
+                        <h3 class="mb-0">@Model.Plans.Count</h3>
+                    </div>
+                    <i class="bi bi-tags fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-white-50">Active Plans</h6>
+                        <h3 class="mb-0">@Model.Plans.Count(p => p.IsActive)</h3>
+                    </div>
+                    <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-white-50">Total MRR</h6>
+                        <h3 class="mb-0">$@Model.TotalMRR.ToString("N0")</h3>
+                    </div>
+                    <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-white-50">Active Subscriptions</h6>
+                        <h3 class="mb-0">@Model.TotalSubscriptions</h3>
+                    </div>
+                    <i class="bi bi-people fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Plans Card -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0">
+            <i class="bi bi-tags me-2"></i>Billing Plans
+        </h5>
+        <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#planModal" onclick="openCreateModal()">
+            <i class="bi bi-plus-lg me-1"></i>Add Plan
+        </button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Plan</th>
+                        <th>Pricing</th>
+                        <th>Limits</th>
+                        <th>Subscriptions</th>
+                        <th>Status</th>
+                        <th width="80">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var plan in Model.Plans)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-tag text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">
+                                            @plan.Name
+                                            @if (plan.IsPopular)
+                                            {
+                                                <span class="badge bg-warning text-dark ms-1">Featured</span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">@plan.Code</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-primary">$@plan.MonthlyPrice/mo</div>
+                                <small class="text-muted">$@plan.AnnualPrice/yr</small>
+                            </td>
+                            <td>
+                                <div><i class="bi bi-people me-1"></i>@(plan.MaxUsers == -1 ? "Unlimited" : plan.MaxUsers.ToString()) users</div>
+                                <small class="text-muted">
+                                    <i class="bi bi-box me-1"></i>@(plan.MaxProducts == -1 ? "Unlimited" : plan.MaxProducts.ToString()) products
+                                </small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@(Model.PlanSubscriptions.GetValueOrDefault(plan.Id, 0))</span>
+                            </td>
+                            <td>
+                                @if (plan.IsActive)
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button class="dropdown-item" onclick="openEditModal('@plan.Id')">
+                                                <i class="bi bi-pencil me-2"></i>Edit
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item"
+                                                    hx-post="/Plans?handler=Toggle&planId=@plan.Id"
+                                                    hx-swap="none">
+                                                @if (plan.IsActive)
+                                                {
+                                                    <i class="bi bi-x-circle me-2 text-warning"></i>
+                                                    <span>Deactivate</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-check-circle me-2 text-success"></i>
+                                                    <span>Activate</span>
+                                                }
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li>
+                                            <button class="dropdown-item text-danger"
+                                                    hx-post="/Plans?handler=Delete&planId=@plan.Id"
+                                                    hx-swap="none"
+                                                    hx-confirm="Are you sure you want to delete this plan? This cannot be undone.">
+                                                <i class="bi bi-trash me-2"></i>Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Plan Modal -->
+<div class="modal fade" id="planModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="planModalTitle">
+                    <i class="bi bi-tag me-2"></i>New Plan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="planForm" method="post" asp-page-handler="Save">
+                <div class="modal-body">
+                    <input type="hidden" id="planId" name="PlanId" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Plan Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="Input.Code" id="planCode" required
+                                   pattern="^[A-Z0-9_]+$" title="Uppercase letters, numbers, and underscores only" />
+                            <small class="text-muted">Unique identifier (e.g., STARTER, PROFESSIONAL)</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Plan Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="Input.Name" id="planName" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="Input.Description" id="planDescription" rows="2"></textarea>
+                    </div>
+
+                    <hr class="my-4" />
+                    <h6 class="mb-3"><i class="bi bi-currency-dollar me-2"></i>Pricing</h6>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Monthly Price ($) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="Input.MonthlyPrice" id="planMonthlyPrice" required min="0" step="0.01" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Annual Price ($) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="Input.AnnualPrice" id="planAnnualPrice" required min="0" step="0.01" />
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+                    <h6 class="mb-3"><i class="bi bi-speedometer2 me-2"></i>Limits</h6>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Max Users</label>
+                            <input type="number" class="form-control" name="Input.MaxUsers" id="planMaxUsers" min="-1" />
+                            <small class="text-muted">-1 for unlimited</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Max Warehouses</label>
+                            <input type="number" class="form-control" name="Input.MaxWarehouses" id="planMaxWarehouses" min="-1" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Max Products</label>
+                            <input type="number" class="form-control" name="Input.MaxProducts" id="planMaxProducts" min="-1" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Max Monthly Transactions</label>
+                            <input type="number" class="form-control" name="Input.MaxMonthlyTransactions" id="planMaxTransactions" min="-1" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Storage Limit (MB)</label>
+                            <input type="number" class="form-control" name="Input.StorageLimitMb" id="planStorageLimit" min="-1" />
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+                    <h6 class="mb-3"><i class="bi bi-gear me-2"></i>Options</h6>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Sort Order</label>
+                            <input type="number" class="form-control" name="Input.SortOrder" id="planSortOrder" value="1" min="1" />
+                        </div>
+                        <div class="col-md-4 mb-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="Input.IsActive" id="planIsActive" value="true" checked />
+                                <label class="form-check-label" for="planIsActive">Active</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3 d-flex align-items-end">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="Input.IsFeatured" id="planIsFeatured" value="true" />
+                                <label class="form-check-label" for="planIsFeatured">Featured</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-gradient">
+                        <i class="bi bi-check-lg me-1"></i>Save Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Store plans data for editing
+        const plansData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Plans.Select(p => new {
+            p.Id, p.Code, p.Name, p.Description,
+            p.MonthlyPrice, p.AnnualPrice,
+            p.MaxUsers, p.MaxWarehouses, p.MaxProducts,
+            MaxMonthlyTransactions = p.MaxTransactionsPerMonth, StorageLimitMb = p.StorageLimitMB,
+            SortOrder = p.DisplayOrder, p.IsActive, IsFeatured = p.IsPopular
+        })));
+
+        function openCreateModal() {
+            document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-tag me-2"></i>New Plan';
+            document.getElementById('planForm').reset();
+            document.getElementById('planId').value = '';
+            document.getElementById('planIsActive').checked = true;
+        }
+
+        function openEditModal(planId) {
+            const plan = plansData.find(p => p.id === planId);
+            if (!plan) return;
+
+            document.getElementById('planModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Edit Plan';
+            document.getElementById('planId').value = plan.id;
+            document.getElementById('planCode').value = plan.code;
+            document.getElementById('planName').value = plan.name;
+            document.getElementById('planDescription').value = plan.description || '';
+            document.getElementById('planMonthlyPrice').value = plan.monthlyPrice;
+            document.getElementById('planAnnualPrice').value = plan.annualPrice;
+            document.getElementById('planMaxUsers').value = plan.maxUsers;
+            document.getElementById('planMaxWarehouses').value = plan.maxWarehouses;
+            document.getElementById('planMaxProducts').value = plan.maxProducts;
+            document.getElementById('planMaxTransactions').value = plan.maxMonthlyTransactions;
+            document.getElementById('planStorageLimit').value = plan.storageLimitMb;
+            document.getElementById('planSortOrder').value = plan.sortOrder;
+            document.getElementById('planIsActive').checked = plan.isActive;
+            document.getElementById('planIsFeatured').checked = plan.isFeatured;
+
+            const modal = new bootstrap.Modal(document.getElementById('planModal'));
+            modal.show();
+        }
+
+        // Handle HTMX responses
+        document.body.addEventListener('htmx:afterRequest', function (event) {
+            if (event.detail.successful) {
+                window.location.reload();
+            } else {
+                const response = JSON.parse(event.detail.xhr.responseText);
+                alert(response.error || 'An error occurred');
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('planForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/Plans?handler=Save', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Failed to save plan');
+                }
+            } catch (error) {
+                alert('An error occurred while saving');
+            }
+        });
+    </script>
+}

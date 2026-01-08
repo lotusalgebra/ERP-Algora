@@ -1,0 +1,404 @@
+@page
+@model Algora.Erp.Admin.Pages.Tenants.IndexModel
+@{
+    ViewData["Title"] = Model.ShowDeleted ? "Deleted Tenants" : "Tenant Management";
+}
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-primary fs-2 mb-2"><i class="bi bi-building"></i></div>
+                <h3 class="mb-0">@Model.Stats.TotalTenants</h3>
+                <small class="text-muted">Total Tenants</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-success fs-2 mb-2"><i class="bi bi-check-circle"></i></div>
+                <h3 class="mb-0">@Model.Stats.ActiveTenants</h3>
+                <small class="text-muted">Active</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-warning fs-2 mb-2"><i class="bi bi-hourglass-split"></i></div>
+                <h3 class="mb-0">@Model.Stats.TrialTenants</h3>
+                <small class="text-muted">In Trial</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-danger fs-2 mb-2"><i class="bi bi-pause-circle"></i></div>
+                <h3 class="mb-0">@Model.Stats.SuspendedTenants</h3>
+                <small class="text-muted">Suspended</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-secondary fs-2 mb-2"><i class="bi bi-trash"></i></div>
+                <h3 class="mb-0">@Model.Stats.DeletedTenants</h3>
+                <small class="text-muted">Deleted</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-info fs-2 mb-2"><i class="bi bi-calendar-plus"></i></div>
+                <h3 class="mb-0">@Model.Stats.NewThisMonth</h3>
+                <small class="text-muted">New This Month</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tenants Table -->
+<div class="card">
+    <div class="card-header py-3">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search tenants..."
+                           id="searchInput" value="@Model.SearchTerm"
+                           hx-get="/Tenants?handler=Table"
+                           hx-trigger="keyup changed delay:300ms"
+                           hx-target="#tenantsTableBody"
+                           hx-include="#statusFilter, #showDeletedInput"
+                           name="search" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="statusFilter" name="status"
+                        hx-get="/Tenants?handler=Table"
+                        hx-trigger="change"
+                        hx-target="#tenantsTableBody"
+                        hx-include="#searchInput, #showDeletedInput">
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Suspended">Suspended</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-5 text-end">
+                <input type="hidden" id="showDeletedInput" name="showDeleted" value="@Model.ShowDeleted.ToString().ToLower()" />
+                @if (Model.ShowDeleted)
+                {
+                    <a href="/Tenants" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Active
+                    </a>
+                }
+                else
+                {
+                    <a href="/Tenants?showDeleted=true" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-trash me-1"></i>View Deleted
+                    </a>
+                }
+                <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#createTenantModal">
+                    <i class="bi bi-plus-lg me-1"></i>Add Tenant
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Tenant</th>
+                        <th>Subdomain</th>
+                        <th>Contact</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tenantsTableBody">
+                    @foreach (var tenant in Model.Tenants)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-building text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">@tenant.Name</div>
+                                        <small class="text-muted">@tenant.CompanyName</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <code>@(tenant.Subdomain).algora.app</code>
+                            </td>
+                            <td>
+                                <div>@tenant.ContactEmail</div>
+                                <small class="text-muted">@tenant.ContactPerson</small>
+                            </td>
+                            <td>
+                                @if (tenant.CurrentSubscription?.Plan != null)
+                                {
+                                    <span class="badge bg-primary">@tenant.CurrentSubscription.Plan.Name</span>
+                                    @if (tenant.IsInTrial)
+                                    {
+                                        <span class="badge bg-warning text-dark">Trial</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No Plan</span>
+                                }
+                            </td>
+                            <td>
+                                @switch (tenant.Status)
+                                {
+                                    case Algora.Erp.Admin.Entities.TenantStatus.Active:
+                                        <span class="badge bg-success">Active</span>
+                                        break;
+                                    case Algora.Erp.Admin.Entities.TenantStatus.Pending:
+                                        <span class="badge bg-info">Pending</span>
+                                        break;
+                                    case Algora.Erp.Admin.Entities.TenantStatus.Suspended:
+                                        <span class="badge bg-danger">Suspended</span>
+                                        break;
+                                    case Algora.Erp.Admin.Entities.TenantStatus.Cancelled:
+                                        <span class="badge bg-secondary">Cancelled</span>
+                                        break;
+                                    case Algora.Erp.Admin.Entities.TenantStatus.Deleted:
+                                        <span class="badge bg-dark">Deleted</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <div>@tenant.CreatedAt.ToString("MMM dd, yyyy")</div>
+                                <small class="text-muted">@tenant.CreatedAt.ToString("HH:mm")</small>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        @if (tenant.IsDeleted)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item text-success"
+                                                        hx-post="/Tenants?handler=Restore&id=@tenant.Id"
+                                                        hx-target="#tenantsTableBody"
+                                                        hx-confirm="Restore this tenant?">
+                                                    <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger"
+                                                        hx-delete="/Tenants?handler=PermanentDelete&id=@tenant.Id"
+                                                        hx-target="#tenantsTableBody"
+                                                        hx-confirm="PERMANENTLY delete this tenant? This cannot be undone!">
+                                                    <i class="bi bi-x-circle me-2"></i>Permanent Delete
+                                                </button>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li><a class="dropdown-item" href="/Tenants/Edit/@tenant.Id"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                            <li><a class="dropdown-item" href="/Tenants/Details/@tenant.Id"><i class="bi bi-eye me-2"></i>View Details</a></li>
+                                            <li><hr class="dropdown-divider" /></li>
+                                            @if (tenant.IsSuspended)
+                                            {
+                                                <li>
+                                                    <button class="dropdown-item text-success"
+                                                            hx-post="/Tenants?handler=Unsuspend&id=@tenant.Id"
+                                                            hx-target="#tenantsTableBody">
+                                                        <i class="bi bi-play-circle me-2"></i>Unsuspend
+                                                    </button>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <button class="dropdown-item text-warning" onclick="showSuspendModal('@tenant.Id', '@tenant.Name')">
+                                                        <i class="bi bi-pause-circle me-2"></i>Suspend
+                                                    </button>
+                                                </li>
+                                            }
+                                            <li>
+                                                <button class="dropdown-item text-danger" onclick="showDeleteModal('@tenant.Id', '@tenant.Name')">
+                                                    <i class="bi bi-trash me-2"></i>Delete
+                                                </button>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Tenants.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                No tenants found
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create Tenant Modal -->
+<div class="modal fade" id="createTenantModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add New Tenant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Organization Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="Name" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subdomain <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="Subdomain" required pattern="[a-z0-9-]+" />
+                                <span class="input-group-text">.algora.app</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="ContactEmail" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" name="ContactPerson" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" name="CompanyName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="ContactPhone" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Billing Plan</label>
+                            <select class="form-select" name="PlanId">
+                                <option value="">Select a plan...</option>
+                                @foreach (var plan in Model.Plans)
+                                {
+                                    <option value="@plan.Id">@plan.Name - @plan.MonthlyPrice.ToString("C0")/mo</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Trial Period</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="TrialDays" value="14" min="0" max="90" />
+                                <span class="input-group-text">days</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-gradient">
+                        <i class="bi bi-check-lg me-1"></i>Create Tenant
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger"><i class="bi bi-trash me-2"></i>Delete Tenant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="Delete">
+                <input type="hidden" name="id" id="deleteId" />
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong id="deleteName"></strong>?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Reason for deletion <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle me-2"></i>
+                        The tenant will be soft-deleted and can be restored later.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete Tenant</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Suspend Modal -->
+<div class="modal fade" id="suspendModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning"><i class="bi bi-pause-circle me-2"></i>Suspend Tenant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="Suspend">
+                <input type="hidden" name="id" id="suspendId" />
+                <div class="modal-body">
+                    <p>Are you sure you want to suspend <strong id="suspendName"></strong>?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Reason for suspension <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Suspended tenants cannot access the system until unsuspended.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Suspend Tenant</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showDeleteModal(id, name) {
+            document.getElementById('deleteId').value = id;
+            document.getElementById('deleteName').textContent = name;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        function showSuspendModal(id, name) {
+            document.getElementById('suspendId').value = id;
+            document.getElementById('suspendName').textContent = name;
+            new bootstrap.Modal(document.getElementById('suspendModal')).show();
+        }
+    </script>
+}

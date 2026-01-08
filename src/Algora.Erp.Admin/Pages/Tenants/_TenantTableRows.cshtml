@@ -1,0 +1,143 @@
+@model Algora.Erp.Admin.Pages.Tenants.IndexModel
+
+@if (!Model.Tenants.Any())
+{
+    <tr>
+        <td colspan="7" class="text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+            @if (Model.ShowDeleted)
+            {
+                <span>No deleted tenants found</span>
+            }
+            else
+            {
+                <span>No tenants found</span>
+            }
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var tenant in Model.Tenants)
+    {
+        <tr>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-building text-primary"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold">@tenant.Name</div>
+                        <small class="text-muted">@(tenant.Subdomain).erp.algora.com</small>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div>@tenant.ContactEmail</div>
+                @if (!string.IsNullOrEmpty(tenant.ContactPhone))
+                {
+                    <small class="text-muted">@tenant.ContactPhone</small>
+                }
+            </td>
+            <td>
+                @if (tenant.CurrentSubscription != null)
+                {
+                    <span class="badge bg-primary">@tenant.CurrentSubscription.Plan?.Name</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">No Plan</span>
+                }
+            </td>
+            <td>
+                @switch (tenant.Status)
+                {
+                    case Algora.Erp.Admin.Entities.TenantStatus.Active:
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active</span>
+                        break;
+                    case Algora.Erp.Admin.Entities.TenantStatus.Pending:
+                        <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pending</span>
+                        break;
+                    case Algora.Erp.Admin.Entities.TenantStatus.Suspended:
+                        <span class="badge bg-danger"><i class="bi bi-pause-circle me-1"></i>Suspended</span>
+                        break;
+                    case Algora.Erp.Admin.Entities.TenantStatus.Cancelled:
+                        <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Cancelled</span>
+                        break;
+                    case Algora.Erp.Admin.Entities.TenantStatus.Deleted:
+                        <span class="badge bg-dark"><i class="bi bi-trash me-1"></i>Deleted</span>
+                        break;
+                }
+            </td>
+            <td>
+                <span title="@tenant.Users.Count users">
+                    <i class="bi bi-people me-1"></i>@tenant.Users.Count
+                </span>
+            </td>
+            <td>
+                <small class="text-muted">@tenant.CreatedAt.ToString("MMM dd, yyyy")</small>
+            </td>
+            <td>
+                @if (Model.ShowDeleted)
+                {
+                    <!-- Deleted tenant actions -->
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-success"
+                                hx-post="/Tenants?handler=Restore&tenantId=@tenant.Id"
+                                hx-swap="none"
+                                hx-confirm="Are you sure you want to restore this tenant?"
+                                title="Restore">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                        <button class="btn btn-outline-danger"
+                                hx-post="/Tenants?handler=PermanentDelete&tenantId=@tenant.Id"
+                                hx-swap="none"
+                                hx-confirm="WARNING: This will permanently delete the tenant and all associated data. This action cannot be undone. Are you absolutely sure?"
+                                title="Permanent Delete">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <!-- Normal tenant actions -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/Tenants/Details/@tenant.Id"><i class="bi bi-eye me-2"></i>View Details</a></li>
+                            <li><a class="dropdown-item" href="/Tenants/Edit/@tenant.Id"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            @if (tenant.IsSuspended)
+                            {
+                                <li>
+                                    <button class="dropdown-item"
+                                            hx-post="/Tenants?handler=Unsuspend&tenantId=@tenant.Id"
+                                            hx-swap="none">
+                                        <i class="bi bi-play-circle me-2 text-success"></i>Unsuspend
+                                    </button>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <button class="dropdown-item"
+                                            onclick="openSuspendModal('@tenant.Id', '@tenant.Name')">
+                                        <i class="bi bi-pause-circle me-2 text-warning"></i>Suspend
+                                    </button>
+                                </li>
+                            }
+                            <li>
+                                <button class="dropdown-item text-danger"
+                                        onclick="openDeleteModal('@tenant.Id', '@tenant.Name')">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </td>
+        </tr>
+    }
+}
