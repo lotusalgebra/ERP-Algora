@@ -7,224 +7,220 @@
 <!-- Alerts -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="flex items-center p-4 mb-4 text-emerald-800 bg-emerald-50 rounded-lg" role="alert">
+        <i class="bi bi-check-circle mr-3"></i>
+        <span class="text-sm font-medium">@TempData["SuccessMessage"]</span>
     </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="flex items-center p-4 mb-4 text-red-800 bg-red-50 rounded-lg" role="alert">
+        <i class="bi bi-exclamation-triangle mr-3"></i>
+        <span class="text-sm font-medium">@TempData["ErrorMessage"]</span>
     </div>
 }
 
 <!-- Stats Cards -->
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card stat-card h-100">
-            <div class="card-body text-center">
-                <div class="text-primary fs-2 mb-2"><i class="bi bi-people"></i></div>
-                <h3 class="mb-0">@Model.Stats.TotalUsers</h3>
-                <small class="text-muted">Total Users</small>
-            </div>
-        </div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+        <div class="text-primary-600 text-3xl mb-2"><i class="bi bi-people"></i></div>
+        <h3 class="text-2xl font-bold text-gray-900">@Model.Stats.TotalUsers</h3>
+        <p class="text-sm text-gray-500">Total Users</p>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card h-100">
-            <div class="card-body text-center">
-                <div class="text-success fs-2 mb-2"><i class="bi bi-person-check"></i></div>
-                <h3 class="mb-0">@Model.Stats.ActiveUsers</h3>
-                <small class="text-muted">Active Users</small>
-            </div>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+        <div class="text-emerald-600 text-3xl mb-2"><i class="bi bi-person-check"></i></div>
+        <h3 class="text-2xl font-bold text-gray-900">@Model.Stats.ActiveUsers</h3>
+        <p class="text-sm text-gray-500">Active Users</p>
     </div>
-    <div class="col-md-4">
-        <div class="card stat-card h-100">
-            <div class="card-body text-center">
-                <div class="text-danger fs-2 mb-2"><i class="bi bi-person-lock"></i></div>
-                <h3 class="mb-0">@Model.Stats.LockedUsers</h3>
-                <small class="text-muted">Locked Users</small>
-            </div>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+        <div class="text-red-600 text-3xl mb-2"><i class="bi bi-person-lock"></i></div>
+        <h3 class="text-2xl font-bold text-gray-900">@Model.Stats.LockedUsers</h3>
+        <p class="text-sm text-gray-500">Locked Users</p>
     </div>
 </div>
 
 <!-- Users Table -->
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center py-3">
-        <h6 class="mb-0"><i class="bi bi-people me-2"></i>Admin Users</h6>
-        <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#createUserModal">
-            <i class="bi bi-plus-lg me-1"></i>Add User
+<div class="bg-white rounded-xl shadow-sm">
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+        <h6 class="font-semibold text-gray-800">
+            <i class="bi bi-people mr-2"></i>Admin Users
+        </h6>
+        <button data-modal-target="createUserModal" data-modal-toggle="createUserModal"
+                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+            <i class="bi bi-plus-lg mr-1"></i>Add User
         </button>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">User</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Last Login</th>
-                        <th>Created</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model.Users)
-                    {
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
-                                        <i class="bi bi-person text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">@user.FullName</div>
-                                        <small class="text-muted">@user.Phone</small>
-                                    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Last Login</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created</th>
+                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @foreach (var user in Model.Users)
+                {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="bi bi-person text-primary-600"></i>
                                 </div>
-                            </td>
-                            <td>@user.Email</td>
-                            <td>
-                                <span class="badge @(user.Role?.Name == "SuperAdmin" ? "bg-danger" : user.Role?.Name == "Admin" ? "bg-primary" : "bg-secondary")">
-                                    @user.Role?.Name
-                                </span>
-                            </td>
-                            <td>
-                                @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
-                                {
-                                    <span class="badge bg-danger">Locked</span>
-                                }
-                                else if (user.IsActive)
-                                {
-                                    <span class="badge bg-success">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Inactive</span>
-                                }
-                            </td>
-                            <td>
-                                @if (user.LastLoginAt.HasValue)
-                                {
-                                    <div>@user.LastLoginAt.Value.ToString("MMM dd, yyyy")</div>
-                                    <small class="text-muted">@user.LastLoginAt.Value.ToString("HH:mm")</small>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Never</span>
-                                }
-                            </td>
-                            <td>
-                                <div>@user.CreatedAt.ToString("MMM dd, yyyy")</div>
-                                <small class="text-muted">@user.CreatedAt.ToString("HH:mm")</small>
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
+                                <div>
+                                    <div class="font-semibold text-gray-900">@user.FullName</div>
+                                    <div class="text-sm text-gray-500">@user.Phone</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-700">@user.Email</td>
+                        <td class="px-6 py-4">
+                            @{
+                                var roleClass = user.Role?.Name == "SuperAdmin" ? "bg-red-100 text-red-800" :
+                                               user.Role?.Name == "Admin" ? "bg-primary-100 text-primary-800" : "bg-gray-100 text-gray-800";
+                            }
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @roleClass">
+                                @user.Role?.Name
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Locked</span>
+                            }
+                            else if (user.IsActive)
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>
+                            }
+                        </td>
+                        <td class="px-6 py-4">
+                            @if (user.LastLoginAt.HasValue)
+                            {
+                                <div class="text-sm text-gray-900">@user.LastLoginAt.Value.ToString("MMM dd, yyyy")</div>
+                                <div class="text-sm text-gray-500">@user.LastLoginAt.Value.ToString("HH:mm")</div>
+                            }
+                            else
+                            {
+                                <span class="text-gray-400">Never</span>
+                            }
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">@user.CreatedAt.ToString("MMM dd, yyyy")</div>
+                            <div class="text-sm text-gray-500">@user.CreatedAt.ToString("HH:mm")</div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button data-dropdown-toggle="userDropdown-@user.Id" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <div id="userDropdown-@user.Id" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-44 border border-gray-200">
+                                <ul class="py-2 text-sm text-gray-700">
+                                    <li>
+                                        <button class="w-full text-left px-4 py-2 hover:bg-gray-100" onclick="showEditModal('@user.Id')">
+                                            <i class="bi bi-pencil mr-2"></i>Edit
+                                        </button>
+                                    </li>
+                                    @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+                                    {
                                         <li>
-                                            <button class="dropdown-item" onclick="showEditModal('@user.Id')">
-                                                <i class="bi bi-pencil me-2"></i>Edit
-                                            </button>
-                                        </li>
-                                        @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
-                                        {
-                                            <li>
-                                                <form method="post" asp-page-handler="Unlock" class="d-inline">
-                                                    <input type="hidden" name="id" value="@user.Id" />
-                                                    <button type="submit" class="dropdown-item text-success">
-                                                        <i class="bi bi-unlock me-2"></i>Unlock
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        }
-                                        <li>
-                                            <form method="post" asp-page-handler="ToggleStatus" class="d-inline">
+                                            <form method="post" asp-page-handler="Unlock" class="inline">
                                                 <input type="hidden" name="id" value="@user.Id" />
-                                                <button type="submit" class="dropdown-item">
-                                                    @if (user.IsActive)
-                                                    {
-                                                        <i class="bi bi-person-x me-2 text-warning"></i><span>Deactivate</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="bi bi-person-check me-2 text-success"></i><span>Activate</span>
-                                                    }
+                                                <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-emerald-600">
+                                                    <i class="bi bi-unlock mr-2"></i>Unlock
                                                 </button>
                                             </form>
                                         </li>
-                                        <li>
-                                            <button class="dropdown-item" onclick="showResetPasswordModal('@user.Id', '@user.FullName')">
-                                                <i class="bi bi-key me-2"></i>Reset Password
+                                    }
+                                    <li>
+                                        <form method="post" asp-page-handler="ToggleStatus" class="inline">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                                                @if (user.IsActive)
+                                                {
+                                                    <i class="bi bi-person-x mr-2 text-amber-600"></i><span>Deactivate</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-person-check mr-2 text-emerald-600"></i><span>Activate</span>
+                                                }
                                             </button>
-                                        </li>
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li>
-                                            <button class="dropdown-item text-danger" onclick="showDeleteModal('@user.Id', '@user.FullName')">
-                                                <i class="bi bi-trash me-2"></i>Delete
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.Users.Any())
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                No admin users found
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <button class="w-full text-left px-4 py-2 hover:bg-gray-100" onclick="showResetPasswordModal('@user.Id', '@user.FullName')">
+                                            <i class="bi bi-key mr-2"></i>Reset Password
+                                        </button>
+                                    </li>
+                                </ul>
+                                <ul class="py-2">
+                                    <li>
+                                        <button class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600" onclick="showDeleteModal('@user.Id', '@user.FullName')">
+                                            <i class="bi bi-trash mr-2"></i>Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Users.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <i class="bi bi-inbox text-5xl block mb-2"></i>
+                            No admin users found
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
 <!-- Create User Modal -->
-<div class="modal fade" id="createUserModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Add Admin User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="createUserModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900"><i class="bi bi-person-plus mr-2"></i>Add Admin User</h3>
+                <button type="button" data-modal-hide="createUserModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form method="post" asp-page-handler="Create">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="CreateInput.FirstName" required />
+                <div class="p-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="CreateInput.FirstName" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="CreateInput.LastName" required />
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="CreateInput.LastName" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="CreateInput.Email" required />
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                            <input type="email" name="CreateInput.Email" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" name="CreateInput.Password" required minlength="6" />
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+                            <input type="password" name="CreateInput.Password" required minlength="6" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-control" name="CreateInput.Phone" />
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                            <input type="tel" name="CreateInput.Phone" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Role <span class="text-danger">*</span></label>
-                            <select class="form-select" name="CreateInput.RoleId" required>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-red-500">*</span></label>
+                            <select name="CreateInput.RoleId" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
                                 <option value="">Select a role...</option>
                                 @foreach (var role in Model.Roles)
                                 {
@@ -234,66 +230,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-gradient">
-                        <i class="bi bi-plus-lg me-1"></i>Create User
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Reset Password Modal -->
-<div class="modal fade" id="resetPasswordModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-key me-2"></i>Reset Password</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" asp-page-handler="ResetPassword">
-                <input type="hidden" name="id" id="resetPasswordUserId" />
-                <div class="modal-body">
-                    <p>Reset password for <strong id="resetPasswordUserName"></strong>?</p>
-                    <div class="mb-3">
-                        <label class="form-label">New Password <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" name="newPassword" required minlength="6" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="bi bi-key me-1"></i>Reset Password
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger"><i class="bi bi-trash me-2"></i>Delete User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" asp-page-handler="Delete">
-                <input type="hidden" name="id" id="deleteUserId" />
-                <div class="modal-body">
-                    <p>Are you sure you want to delete <strong id="deleteUserName"></strong>?</p>
-                    <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        This action cannot be undone.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash me-1"></i>Delete User
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="createUserModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                        <i class="bi bi-plus-lg mr-1"></i>Create User
                     </button>
                 </div>
             </form>
@@ -302,36 +242,38 @@
 </div>
 
 <!-- Edit User Modal -->
-<div class="modal fade" id="editUserModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="editUserModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900"><i class="bi bi-pencil mr-2"></i>Edit User</h3>
+                <button type="button" data-modal-hide="editUserModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form method="post" asp-page-handler="Edit">
                 <input type="hidden" name="EditInput.Id" id="editUserId" />
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="EditInput.FirstName" id="editFirstName" required />
+                <div class="p-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="EditInput.FirstName" id="editFirstName" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="EditInput.LastName" id="editLastName" required />
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="EditInput.LastName" id="editLastName" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="EditInput.Email" id="editEmail" required />
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                            <input type="email" name="EditInput.Email" id="editEmail" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-control" name="EditInput.Phone" id="editPhone" />
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                            <input type="tel" name="EditInput.Phone" id="editPhone" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Role <span class="text-danger">*</span></label>
-                            <select class="form-select" name="EditInput.RoleId" id="editRoleId" required>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-red-500">*</span></label>
+                            <select name="EditInput.RoleId" id="editRoleId" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
                                 @foreach (var role in Model.Roles)
                                 {
                                     <option value="@role.Id">@role.Name - @role.Description</option>
@@ -340,10 +282,70 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-gradient">
-                        <i class="bi bi-check-lg me-1"></i>Save Changes
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="editUserModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                        <i class="bi bi-check-lg mr-1"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div id="resetPasswordModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900"><i class="bi bi-key mr-2"></i>Reset Password</h3>
+                <button type="button" data-modal-hide="resetPasswordModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <form method="post" asp-page-handler="ResetPassword">
+                <input type="hidden" name="id" id="resetPasswordUserId" />
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">Reset password for <strong id="resetPasswordUserName"></strong>?</p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">New Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="newPassword" required minlength="6" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" />
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="resetPasswordModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700">
+                        <i class="bi bi-key mr-1"></i>Reset Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-red-600"><i class="bi bi-trash mr-2"></i>Delete User</h3>
+                <button type="button" data-modal-hide="deleteModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <form method="post" asp-page-handler="Delete">
+                <input type="hidden" name="id" id="deleteUserId" />
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">Are you sure you want to delete <strong id="deleteUserName"></strong>?</p>
+                    <div class="flex items-center p-4 text-red-800 bg-red-50 rounded-lg">
+                        <i class="bi bi-exclamation-triangle mr-3"></i>
+                        <span class="text-sm">This action cannot be undone.</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="deleteModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">
+                        <i class="bi bi-trash mr-1"></i>Delete User
                     </button>
                 </div>
             </form>
@@ -353,18 +355,13 @@
 
 @section Scripts {
     <script>
-        // Store users data for editing
         const usersData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Users.Select(u => new {
             u.Id, u.Email, u.FirstName, u.LastName, u.Phone, u.RoleId
         })));
 
         function showEditModal(userId) {
-            // Compare GUIDs case-insensitively (use PascalCase - matches JSON serialization)
             const user = usersData.find(u => u.Id.toLowerCase() === userId.toLowerCase());
-            if (!user) {
-                console.error('User not found:', userId, usersData);
-                return;
-            }
+            if (!user) return;
 
             document.getElementById('editUserId').value = user.Id;
             document.getElementById('editEmail').value = user.Email;
@@ -372,7 +369,6 @@
             document.getElementById('editLastName').value = user.LastName;
             document.getElementById('editPhone').value = user.Phone || '';
 
-            // Set role dropdown (case-insensitive match)
             const roleSelect = document.getElementById('editRoleId');
             for (let i = 0; i < roleSelect.options.length; i++) {
                 if (roleSelect.options[i].value.toLowerCase() === user.RoleId.toLowerCase()) {
@@ -381,19 +377,22 @@
                 }
             }
 
-            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'editUserModal');
+            if (modal) modal.show();
         }
 
         function showResetPasswordModal(id, name) {
             document.getElementById('resetPasswordUserId').value = id;
             document.getElementById('resetPasswordUserName').textContent = name;
-            new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'resetPasswordModal');
+            if (modal) modal.show();
         }
 
         function showDeleteModal(id, name) {
             document.getElementById('deleteUserId').value = id;
             document.getElementById('deleteUserName').textContent = name;
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
+            if (modal) modal.show();
         }
     </script>
 }

@@ -5,403 +5,355 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
     <div>
-        <h4 class="mb-1">Dashboard</h4>
-        <p class="text-muted mb-0">Welcome back! Here's what's happening with your business today.</p>
+        <h4 class="text-2xl font-bold text-gray-900 mb-1">Dashboard</h4>
+        <p class="text-gray-500">Welcome back! Here's what's happening with your business today.</p>
     </div>
-    <div>
-        <span class="text-muted me-3"><i class="bi bi-clock me-1"></i> @DateTime.Now.ToString("dddd, MMMM dd, yyyy")</span>
-        <button class="btn btn-primary" onclick="location.reload()">
-            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+    <div class="flex items-center gap-3 mt-4 md:mt-0">
+        <span class="text-gray-500 text-sm"><i class="bi bi-clock mr-1"></i>@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</span>
+        <button onclick="location.reload()" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+            <i class="bi bi-arrow-clockwise mr-1"></i>Refresh
         </button>
     </div>
 </div>
 
 <!-- Main Stats Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <p class="stat-label mb-1">Total Revenue</p>
-                    <h3 class="stat-value mb-0">@Model.TotalRevenue.ToString("C")</h3>
-                    <small class="text-muted">From @Model.TotalOrders orders</small>
-                </div>
-                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                    <i class="bi bi-currency-dollar"></i>
-                </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Total Revenue</p>
+                <h3 class="text-2xl font-bold text-gray-900">@Model.TotalRevenue.ToString("C")</h3>
+                <p class="text-sm text-gray-500 mt-1">From @Model.TotalOrders orders</p>
+            </div>
+            <div class="p-3 bg-primary-100 rounded-lg">
+                <i class="bi bi-currency-dollar text-2xl text-primary-600"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <p class="stat-label mb-1">Customers</p>
-                    <h3 class="stat-value mb-0">@Model.TotalCustomers</h3>
-                    <small class="text-muted">@Model.TotalSuppliers suppliers</small>
-                </div>
-                <div class="stat-icon bg-success bg-opacity-10 text-success">
-                    <i class="bi bi-people"></i>
-                </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Customers</p>
+                <h3 class="text-2xl font-bold text-gray-900">@Model.TotalCustomers</h3>
+                <p class="text-sm text-gray-500 mt-1">@Model.TotalSuppliers suppliers</p>
+            </div>
+            <div class="p-3 bg-emerald-100 rounded-lg">
+                <i class="bi bi-people text-2xl text-emerald-600"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <p class="stat-label mb-1">Products</p>
-                    <h3 class="stat-value mb-0">@Model.TotalProducts</h3>
-                    @if (Model.LowStockProducts > 0)
-                    {
-                        <small class="text-danger"><i class="bi bi-exclamation-triangle"></i> @Model.LowStockProducts low stock</small>
-                    }
-                    else
-                    {
-                        <small class="text-success"><i class="bi bi-check-circle"></i> Stock OK</small>
-                    }
-                </div>
-                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                    <i class="bi bi-box"></i>
-                </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Products</p>
+                <h3 class="text-2xl font-bold text-gray-900">@Model.TotalProducts</h3>
+                @if (Model.LowStockProducts > 0)
+                {
+                    <p class="text-sm text-red-600 mt-1"><i class="bi bi-exclamation-triangle mr-1"></i>@Model.LowStockProducts low stock</p>
+                }
+                else
+                {
+                    <p class="text-sm text-emerald-600 mt-1"><i class="bi bi-check-circle mr-1"></i>Stock OK</p>
+                }
+            </div>
+            <div class="p-3 bg-amber-100 rounded-lg">
+                <i class="bi bi-box text-2xl text-amber-600"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card stat-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <p class="stat-label mb-1">Employees</p>
-                    <h3 class="stat-value mb-0">@Model.TotalEmployees</h3>
-                    <small class="text-muted">Active employees</small>
-                </div>
-                <div class="stat-icon bg-info bg-opacity-10 text-info">
-                    <i class="bi bi-person-badge"></i>
-                </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Employees</p>
+                <h3 class="text-2xl font-bold text-gray-900">@Model.TotalEmployees</h3>
+                <p class="text-sm text-gray-500 mt-1">Active employees</p>
+            </div>
+            <div class="p-3 bg-blue-100 rounded-lg">
+                <i class="bi bi-person-badge text-2xl text-blue-600"></i>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Module Stats -->
-<div class="row g-4 mb-4">
-    <div class="col-sm-6 col-lg-3">
-        <div class="card border-start border-primary border-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                        <div class="rounded bg-primary bg-opacity-10 p-3">
-                            <i class="bi bi-kanban fs-4 text-primary"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-0">@Model.ActiveProjects</h5>
-                        <small class="text-muted">Active Projects</small>
-                    </div>
-                </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-primary-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-primary-100 rounded-lg mr-4">
+                <i class="bi bi-kanban text-xl text-primary-600"></i>
+            </div>
+            <div>
+                <h5 class="text-xl font-bold text-gray-900">@Model.ActiveProjects</h5>
+                <p class="text-sm text-gray-500">Active Projects</p>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card border-start border-warning border-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                        <div class="rounded bg-warning bg-opacity-10 p-3">
-                            <i class="bi bi-cart-check fs-4 text-warning"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-0">@Model.PendingPurchaseOrders</h5>
-                        <small class="text-muted">Pending POs</small>
-                    </div>
-                </div>
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-amber-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-amber-100 rounded-lg mr-4">
+                <i class="bi bi-cart-check text-xl text-amber-600"></i>
+            </div>
+            <div>
+                <h5 class="text-xl font-bold text-gray-900">@Model.PendingPurchaseOrders</h5>
+                <p class="text-sm text-gray-500">Pending POs</p>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card border-start border-success border-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                        <div class="rounded bg-success bg-opacity-10 p-3">
-                            <i class="bi bi-gear fs-4 text-success"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-0">@Model.OpenWorkOrders</h5>
-                        <small class="text-muted">Open Work Orders</small>
-                    </div>
-                </div>
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-emerald-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-emerald-100 rounded-lg mr-4">
+                <i class="bi bi-gear text-xl text-emerald-600"></i>
+            </div>
+            <div>
+                <h5 class="text-xl font-bold text-gray-900">@Model.OpenWorkOrders</h5>
+                <p class="text-sm text-gray-500">Open Work Orders</p>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card border-start border-info border-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                        <div class="rounded bg-info bg-opacity-10 p-3">
-                            <i class="bi bi-clock-history fs-4 text-info"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-0">@Model.TotalBillableHours.ToString("N1")</h5>
-                        <small class="text-muted">Billable Hours</small>
-                    </div>
-                </div>
+    <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                <i class="bi bi-clock-history text-xl text-blue-600"></i>
+            </div>
+            <div>
+                <h5 class="text-xl font-bold text-gray-900">@Model.TotalBillableHours.ToString("N1")</h5>
+                <p class="text-sm text-gray-500">Billable Hours</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <!-- Recent Orders -->
-    <div class="col-lg-6">
-        <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center py-3">
-                <h6 class="mb-0"><i class="bi bi-bag-check me-2"></i>Recent Sales Orders</h6>
-                <a href="/Sales/Orders" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Order #</th>
-                                <th>Customer</th>
-                                <th>Amount</th>
-                                <th>Status</th>
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+            <h6 class="font-semibold text-gray-800"><i class="bi bi-bag-check mr-2"></i>Recent Sales Orders</h6>
+            <a href="/Sales/Orders" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View All</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Order #</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @if (Model.RecentOrders.Any())
+                    {
+                        @foreach (var order in Model.RecentOrders)
+                        {
+                            var statusClass = order.Status switch
+                            {
+                                SalesOrderStatus.Draft => "bg-gray-100 text-gray-800",
+                                SalesOrderStatus.Confirmed => "bg-primary-100 text-primary-800",
+                                SalesOrderStatus.PartiallyShipped => "bg-blue-100 text-blue-800",
+                                SalesOrderStatus.Shipped => "bg-emerald-100 text-emerald-800",
+                                SalesOrderStatus.Delivered => "bg-emerald-100 text-emerald-800",
+                                SalesOrderStatus.Cancelled => "bg-red-100 text-red-800",
+                                _ => "bg-gray-100 text-gray-800"
+                            };
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <a href="/Sales/Orders/@order.Id" class="text-primary-600 hover:text-primary-700 font-medium">@order.OrderNumber</a>
+                                </td>
+                                <td class="px-6 py-4 text-gray-700">@(order.Customer?.Name ?? "-")</td>
+                                <td class="px-6 py-4 font-semibold text-gray-900">@order.TotalAmount.ToString("C")</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @statusClass">@order.Status</span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.RecentOrders.Any())
-                            {
-                                @foreach (var order in Model.RecentOrders)
-                                {
-                                    var statusClass = order.Status switch
-                                    {
-                                        SalesOrderStatus.Draft => "bg-secondary",
-                                        SalesOrderStatus.Confirmed => "bg-primary",
-                                        SalesOrderStatus.PartiallyShipped => "bg-info",
-                                        SalesOrderStatus.Shipped => "bg-success",
-                                        SalesOrderStatus.Delivered => "bg-success",
-                                        SalesOrderStatus.Cancelled => "bg-danger",
-                                        _ => "bg-secondary"
-                                    };
-                                    <tr>
-                                        <td><a href="/Sales/Orders/@order.Id">@order.OrderNumber</a></td>
-                                        <td>@(order.Customer?.Name ?? "-")</td>
-                                        <td class="fw-medium">@order.TotalAmount.ToString("C")</td>
-                                        <td><span class="badge @statusClass">@order.Status</span></td>
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">No orders yet</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">No orders yet</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
     <!-- Active Projects -->
-    <div class="col-lg-6">
-        <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center py-3">
-                <h6 class="mb-0"><i class="bi bi-kanban me-2"></i>Active Projects</h6>
-                <a href="/Projects" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Project</th>
-                                <th>Customer</th>
-                                <th>Progress</th>
-                                <th>Manager</th>
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+            <h6 class="font-semibold text-gray-800"><i class="bi bi-kanban mr-2"></i>Active Projects</h6>
+            <a href="/Projects" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View All</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Project</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Progress</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Manager</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @if (Model.ActiveProjectsList.Any())
+                    {
+                        @foreach (var project in Model.ActiveProjectsList)
+                        {
+                            var progressClass = project.Progress >= 75 ? "bg-emerald-500" : project.Progress >= 50 ? "bg-blue-500" : project.Progress >= 25 ? "bg-amber-500" : "bg-gray-400";
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <a href="/Projects/@project.Id" class="text-primary-600 hover:text-primary-700 font-medium">@project.Name</a>
+                                    <p class="text-sm text-gray-500">@project.ProjectCode</p>
+                                </td>
+                                <td class="px-6 py-4 text-gray-700">@(project.Customer?.Name ?? "-")</td>
+                                <td class="px-6 py-4">
+                                    <div class="w-20 h-2 bg-gray-200 rounded-full">
+                                        <div class="h-2 @progressClass rounded-full" style="width: @project.Progress%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-500">@project.Progress%</span>
+                                </td>
+                                <td class="px-6 py-4 text-gray-700">
+                                    @if (project.ProjectManager != null)
+                                    {
+                                        @($"{project.ProjectManager.FirstName} {project.ProjectManager.LastName.Substring(0, 1)}.")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-400">-</span>
+                                    }
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.ActiveProjectsList.Any())
-                            {
-                                @foreach (var project in Model.ActiveProjectsList)
-                                {
-                                    var progressClass = project.Progress >= 75 ? "bg-success" : project.Progress >= 50 ? "bg-info" : project.Progress >= 25 ? "bg-warning" : "bg-secondary";
-                                    <tr>
-                                        <td>
-                                            <a href="/Projects/@project.Id">@project.Name</a>
-                                            <br><small class="text-muted">@project.ProjectCode</small>
-                                        </td>
-                                        <td>@(project.Customer?.Name ?? "-")</td>
-                                        <td>
-                                            <div class="progress" style="height: 6px; width: 80px;">
-                                                <div class="progress-bar @progressClass" style="width: @project.Progress%"></div>
-                                            </div>
-                                            <small class="text-muted">@project.Progress%</small>
-                                        </td>
-                                        <td>
-                                            @if (project.ProjectManager != null)
-                                            {
-                                                @($"{project.ProjectManager.FirstName} {project.ProjectManager.LastName.Substring(0, 1)}.")
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">-</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">No active projects</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">No active projects</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<div class="row g-4 mt-2">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Quick Actions -->
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header py-3">
-                <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="/Sales/Customers" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-person-plus me-2"></i> Add Customer
-                    </a>
-                    <a href="/Inventory/Products" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-box-seam me-2"></i> Add Product
-                    </a>
-                    <a href="/Projects" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-kanban me-2"></i> Create Project
-                    </a>
-                    <a href="/Procurement/Suppliers" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-truck me-2"></i> Add Supplier
-                    </a>
-                    <a href="/HR/Employees" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-person-badge me-2"></i> Add Employee
-                    </a>
-                </div>
-            </div>
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h6 class="font-semibold text-gray-800"><i class="bi bi-lightning mr-2"></i>Quick Actions</h6>
+        </div>
+        <div class="p-6 space-y-3">
+            <a href="/Sales/Customers" class="flex items-center w-full px-4 py-3 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="bi bi-person-plus mr-3"></i>Add Customer
+            </a>
+            <a href="/Inventory/Products" class="flex items-center w-full px-4 py-3 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="bi bi-box-seam mr-3"></i>Add Product
+            </a>
+            <a href="/Projects" class="flex items-center w-full px-4 py-3 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="bi bi-kanban mr-3"></i>Create Project
+            </a>
+            <a href="/Procurement/Suppliers" class="flex items-center w-full px-4 py-3 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="bi bi-truck mr-3"></i>Add Supplier
+            </a>
+            <a href="/HR/Employees" class="flex items-center w-full px-4 py-3 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                <i class="bi bi-person-badge mr-3"></i>Add Employee
+            </a>
         </div>
     </div>
 
     <!-- Alerts & Notifications -->
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header py-3">
-                <h6 class="mb-0"><i class="bi bi-bell me-2"></i>Alerts</h6>
-            </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    @if (Model.LowStockProducts > 0)
-                    {
-                        <div class="list-group-item d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-danger bg-opacity-10 p-2">
-                                <i class="bi bi-exclamation-triangle text-danger"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-medium">Low Stock Alert</p>
-                                <small class="text-muted">@Model.LowStockProducts products below threshold</small>
-                            </div>
-                        </div>
-                    }
-                    @if (Model.PendingLeaveRequests > 0)
-                    {
-                        <div class="list-group-item d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-warning bg-opacity-10 p-2">
-                                <i class="bi bi-clock text-warning"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-medium">Pending Approvals</p>
-                                <small class="text-muted">@Model.PendingLeaveRequests leave requests waiting</small>
-                            </div>
-                        </div>
-                    }
-                    @if (Model.UpcomingMilestones > 0)
-                    {
-                        <div class="list-group-item d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-info bg-opacity-10 p-2">
-                                <i class="bi bi-flag text-info"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-medium">Upcoming Milestones</p>
-                                <small class="text-muted">@Model.UpcomingMilestones due this week</small>
-                            </div>
-                        </div>
-                    }
-                    @if (Model.PendingPayrollRuns > 0)
-                    {
-                        <div class="list-group-item d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-primary bg-opacity-10 p-2">
-                                <i class="bi bi-cash-stack text-primary"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-medium">Pending Payroll</p>
-                                <small class="text-muted">@Model.PendingPayrollRuns payroll runs to process</small>
-                            </div>
-                        </div>
-                    }
-                    @if (Model.LowStockProducts == 0 && Model.PendingLeaveRequests == 0 && Model.UpcomingMilestones == 0 && Model.PendingPayrollRuns == 0)
-                    {
-                        <div class="list-group-item text-center py-4">
-                            <i class="bi bi-check-circle text-success fs-1"></i>
-                            <p class="mb-0 mt-2 text-muted">All caught up!</p>
-                        </div>
-                    }
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h6 class="font-semibold text-gray-800"><i class="bi bi-bell mr-2"></i>Alerts</h6>
+        </div>
+        <div class="divide-y divide-gray-200">
+            @if (Model.LowStockProducts > 0)
+            {
+                <div class="flex items-center gap-3 px-6 py-4">
+                    <div class="p-2 bg-red-100 rounded-full">
+                        <i class="bi bi-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">Low Stock Alert</p>
+                        <p class="text-sm text-gray-500">@Model.LowStockProducts products below threshold</p>
+                    </div>
                 </div>
-            </div>
+            }
+            @if (Model.PendingLeaveRequests > 0)
+            {
+                <div class="flex items-center gap-3 px-6 py-4">
+                    <div class="p-2 bg-amber-100 rounded-full">
+                        <i class="bi bi-clock text-amber-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">Pending Approvals</p>
+                        <p class="text-sm text-gray-500">@Model.PendingLeaveRequests leave requests waiting</p>
+                    </div>
+                </div>
+            }
+            @if (Model.UpcomingMilestones > 0)
+            {
+                <div class="flex items-center gap-3 px-6 py-4">
+                    <div class="p-2 bg-blue-100 rounded-full">
+                        <i class="bi bi-flag text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">Upcoming Milestones</p>
+                        <p class="text-sm text-gray-500">@Model.UpcomingMilestones due this week</p>
+                    </div>
+                </div>
+            }
+            @if (Model.PendingPayrollRuns > 0)
+            {
+                <div class="flex items-center gap-3 px-6 py-4">
+                    <div class="p-2 bg-primary-100 rounded-full">
+                        <i class="bi bi-cash-stack text-primary-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">Pending Payroll</p>
+                        <p class="text-sm text-gray-500">@Model.PendingPayrollRuns payroll runs to process</p>
+                    </div>
+                </div>
+            }
+            @if (Model.LowStockProducts == 0 && Model.PendingLeaveRequests == 0 && Model.UpcomingMilestones == 0 && Model.PendingPayrollRuns == 0)
+            {
+                <div class="px-6 py-8 text-center">
+                    <i class="bi bi-check-circle text-emerald-500 text-4xl"></i>
+                    <p class="text-gray-500 mt-2">All caught up!</p>
+                </div>
+            }
         </div>
     </div>
 
     <!-- Module Summary -->
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header py-3">
-                <h6 class="mb-0"><i class="bi bi-grid me-2"></i>Module Summary</h6>
-            </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    <a href="/HR/Employees" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-people me-2"></i> HR & Employees</span>
-                        <span class="badge bg-primary rounded-pill">@Model.TotalEmployees</span>
-                    </a>
-                    <a href="/Finance/Accounts" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-bank me-2"></i> Finance</span>
-                        <span class="badge bg-success rounded-pill">@Model.TotalRevenue.ToString("C0")</span>
-                    </a>
-                    <a href="/Inventory/Products" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-box me-2"></i> Inventory</span>
-                        <span class="badge bg-warning rounded-pill">@Model.TotalProducts</span>
-                    </a>
-                    <a href="/Sales/Customers" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-bag me-2"></i> Sales & CRM</span>
-                        <span class="badge bg-info rounded-pill">@Model.TotalCustomers</span>
-                    </a>
-                    <a href="/Manufacturing/WorkOrders" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-gear me-2"></i> Manufacturing</span>
-                        <span class="badge bg-secondary rounded-pill">@Model.OpenWorkOrders WO</span>
-                    </a>
-                </div>
-            </div>
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h6 class="font-semibold text-gray-800"><i class="bi bi-grid mr-2"></i>Module Summary</h6>
+        </div>
+        <div class="divide-y divide-gray-200">
+            <a href="/HR/Employees" class="flex justify-between items-center px-6 py-4 hover:bg-gray-50 transition-colors">
+                <span class="text-gray-700"><i class="bi bi-people mr-2"></i>HR & Employees</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">@Model.TotalEmployees</span>
+            </a>
+            <a href="/Finance/Accounts" class="flex justify-between items-center px-6 py-4 hover:bg-gray-50 transition-colors">
+                <span class="text-gray-700"><i class="bi bi-bank mr-2"></i>Finance</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">@Model.TotalRevenue.ToString("C0")</span>
+            </a>
+            <a href="/Inventory/Products" class="flex justify-between items-center px-6 py-4 hover:bg-gray-50 transition-colors">
+                <span class="text-gray-700"><i class="bi bi-box mr-2"></i>Inventory</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">@Model.TotalProducts</span>
+            </a>
+            <a href="/Sales/Customers" class="flex justify-between items-center px-6 py-4 hover:bg-gray-50 transition-colors">
+                <span class="text-gray-700"><i class="bi bi-bag mr-2"></i>Sales & CRM</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">@Model.TotalCustomers</span>
+            </a>
+            <a href="/Manufacturing/WorkOrders" class="flex justify-between items-center px-6 py-4 hover:bg-gray-50 transition-colors">
+                <span class="text-gray-700"><i class="bi bi-gear mr-2"></i>Manufacturing</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">@Model.OpenWorkOrders WO</span>
+            </a>
         </div>
     </div>
 </div>

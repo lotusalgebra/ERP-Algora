@@ -5,74 +5,61 @@
     ViewData["Title"] = "Chart of Accounts";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-1">Chart of Accounts</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item active">Chart of Accounts</li>
+            <h1 class="text-2xl font-bold text-gray-900">Chart of Accounts</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Chart of Accounts</li>
                 </ol>
             </nav>
         </div>
-        <button type="button" class="btn btn-primary"
+        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                 hx-get="/Finance/Accounts?handler=CreateForm"
                 hx-target="#formContainer"
-                data-bs-toggle="modal"
-                data-bs-target="#accountModal">
-            <i class="bi bi-plus-lg me-1"></i> Add Account
+                data-modal-target="accountModal"
+                data-modal-toggle="accountModal">
+            <i class="bi bi-plus-lg me-2"></i> Add Account
         </button>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-primary border-4">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Total Assets</h6>
-                    <h3 class="mb-0 text-primary">@Model.TotalAssets.ToString("C2")</h3>
-                </div>
-            </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-primary-500">
+            <p class="text-sm text-gray-500 mb-1">Total Assets</p>
+            <h3 class="text-2xl font-bold text-primary-600">@Model.TotalAssets.ToString("C2")</h3>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-danger border-4">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Total Liabilities</h6>
-                    <h3 class="mb-0 text-danger">@Model.TotalLiabilities.ToString("C2")</h3>
-                </div>
-            </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-red-500">
+            <p class="text-sm text-gray-500 mb-1">Total Liabilities</p>
+            <h3 class="text-2xl font-bold text-red-600">@Model.TotalLiabilities.ToString("C2")</h3>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-success border-4">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Total Equity</h6>
-                    <h3 class="mb-0 text-success">@Model.TotalEquity.ToString("C2")</h3>
-                </div>
-            </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-emerald-500">
+            <p class="text-sm text-gray-500 mb-1">Total Equity</p>
+            <h3 class="text-2xl font-bold text-emerald-600">@Model.TotalEquity.ToString("C2")</h3>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-info border-4">
-                <div class="card-body">
-                    <h6 class="text-muted mb-1">Net Income</h6>
-                    <h3 class="mb-0 text-info">@Model.NetIncome.ToString("C2")</h3>
-                </div>
-            </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+            <p class="text-sm text-gray-500 mb-1">Net Income</p>
+            <h3 class="text-2xl font-bold text-blue-600">@Model.NetIncome.ToString("C2")</h3>
         </div>
     </div>
 
     <!-- Accounts Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 ps-0"
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                <div class="md:col-span-5">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-400"></i>
+                        </div>
+                        <input type="text"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5"
                                placeholder="Search accounts..."
                                id="searchInput"
                                hx-get="/Finance/Accounts?handler=Table"
@@ -82,8 +69,9 @@
                                name="search">
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="typeFilter" name="typeFilter"
+                <div class="md:col-span-3">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                            id="typeFilter" name="typeFilter"
                             hx-get="/Finance/Accounts?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
@@ -95,8 +83,9 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="statusFilter" name="statusFilter"
+                <div class="md:col-span-2">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                            id="statusFilter" name="statusFilter"
                             hx-get="/Finance/Accounts?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
@@ -106,51 +95,49 @@
                         <option value="false">Inactive</option>
                     </select>
                 </div>
-                <div class="col-md-2 text-end">
-                    <div class="btn-group">
-                        <button class="btn btn-outline-secondary btn-sm" id="viewList" onclick="setView('list')">
+                <div class="md:col-span-2 flex justify-end">
+                    <div class="inline-flex rounded-lg shadow-sm" role="group">
+                        <button type="button" id="viewList" onclick="setView('list')"
+                                class="px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500">
                             <i class="bi bi-list"></i>
                         </button>
-                        <button class="btn btn-outline-secondary btn-sm" id="viewTree" onclick="setView('tree')">
+                        <button type="button" id="viewTree" onclick="setView('tree')"
+                                class="px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500">
                             <i class="bi bi-diagram-3"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4" style="width: 120px;">Code</th>
-                            <th>Account Name</th>
-                            <th>Type</th>
-                            <th>Sub-Type</th>
-                            <th class="text-end">Balance</th>
-                            <th>Status</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableContent" hx-get="/Finance/Accounts?handler=Table" hx-trigger="load">
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3" style="width: 120px;">Code</th>
+                        <th scope="col" class="px-6 py-3">Account Name</th>
+                        <th scope="col" class="px-6 py-3">Type</th>
+                        <th scope="col" class="px-6 py-3">Sub-Type</th>
+                        <th scope="col" class="px-6 py-3 text-right">Balance</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableContent" hx-get="/Finance/Accounts?handler=Table" hx-trigger="load">
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small" id="paginationInfo">
+        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="text-sm text-gray-500" id="paginationInfo">
                     Showing 0 entries
                 </div>
                 <nav id="paginationNav">
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="inline-flex -space-x-px text-sm">
                     </ul>
                 </nav>
             </div>
@@ -159,18 +146,18 @@
 </div>
 
 <!-- Account Modal -->
-<div class="modal fade" id="accountModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Account</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="accountModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">Account</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="accountModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-            <div class="modal-body" id="formContainer">
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+            <div class="p-4 md:p-5" id="formContainer">
+                <div class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                 </div>
             </div>
         </div>
@@ -184,10 +171,8 @@
         });
 
         function setView(view) {
-            // Toggle button states
-            document.getElementById('viewList').classList.toggle('active', view === 'list');
-            document.getElementById('viewTree').classList.toggle('active', view === 'tree');
-            // TODO: Implement tree view
+            document.getElementById('viewList').classList.toggle('bg-primary-100', view === 'list');
+            document.getElementById('viewTree').classList.toggle('bg-primary-100', view === 'tree');
         }
     </script>
 }

@@ -4,110 +4,89 @@
     ViewData["Title"] = "Departments";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-1">Departments</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/HR">HR</a></li>
-                    <li class="breadcrumb-item active">Departments</li>
+            <h1 class="text-2xl font-bold text-gray-900">Departments</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/HR" class="hover:text-primary-600">HR</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Departments</li>
                 </ol>
             </nav>
         </div>
-        <button type="button" class="btn btn-primary"
+        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                 hx-get="/HR/Departments?handler=CreateForm"
                 hx-target="#formContainer"
-                data-bs-toggle="modal"
-                data-bs-target="#departmentModal">
-            <i class="bi bi-plus-lg me-1"></i> Add Department
+                data-modal-target="departmentModal"
+                data-modal-toggle="departmentModal">
+            <i class="bi bi-plus-lg me-2"></i> Add Department
         </button>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-building text-primary fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Total Departments</h6>
-                            <h3 class="mb-0">@Model.TotalDepartments</h3>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
+                    <i class="bi bi-building text-xl text-primary-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Total Departments</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.TotalDepartments</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-check-circle text-success fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Active</h6>
-                            <h3 class="mb-0">@Model.ActiveDepartments</h3>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-emerald-100 rounded-lg">
+                    <i class="bi bi-check-circle text-xl text-emerald-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Active</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.ActiveDepartments</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-people text-info fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Total Employees</h6>
-                            <h3 class="mb-0">@Model.TotalEmployeesInDepartments</h3>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
+                    <i class="bi bi-people text-xl text-blue-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Total Employees</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.TotalEmployeesInDepartments</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-diagram-3 text-warning fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Sub-Departments</h6>
-                            <h3 class="mb-0">@Model.SubDepartments</h3>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-amber-100 rounded-lg">
+                    <i class="bi bi-diagram-3 text-xl text-amber-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Sub-Departments</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.SubDepartments</h3>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Departments Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 ps-0"
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                <div class="md:col-span-6">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-400"></i>
+                        </div>
+                        <input type="text"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5"
                                placeholder="Search departments..."
                                id="searchInput"
                                hx-get="/HR/Departments?handler=Table"
@@ -117,8 +96,9 @@
                                name="search">
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="statusFilter" name="statusFilter"
+                <div class="md:col-span-3">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                            id="statusFilter" name="statusFilter"
                             hx-get="/HR/Departments?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
@@ -130,39 +110,35 @@
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">Department</th>
-                            <th>Code</th>
-                            <th>Manager</th>
-                            <th>Parent</th>
-                            <th>Employees</th>
-                            <th>Status</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableContent" hx-get="/HR/Departments?handler=Table" hx-trigger="load">
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Department</th>
+                        <th scope="col" class="px-6 py-3">Code</th>
+                        <th scope="col" class="px-6 py-3">Manager</th>
+                        <th scope="col" class="px-6 py-3">Parent</th>
+                        <th scope="col" class="px-6 py-3 text-center">Employees</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableContent" hx-get="/HR/Departments?handler=Table" hx-trigger="load">
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small" id="paginationInfo">
+        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="text-sm text-gray-500" id="paginationInfo">
                     Showing 0 entries
                 </div>
                 <nav id="paginationNav">
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="inline-flex -space-x-px text-sm">
                     </ul>
                 </nav>
             </div>
@@ -171,18 +147,18 @@
 </div>
 
 <!-- Department Modal -->
-<div class="modal fade" id="departmentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Department</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="departmentModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">Department</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="departmentModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-            <div class="modal-body" id="formContainer">
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+            <div class="p-4 md:p-5" id="formContainer">
+                <div class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                 </div>
             </div>
         </div>
@@ -192,7 +168,7 @@
 @section Scripts {
     <script>
         // Refresh table after modal closes
-        document.getElementById('departmentModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('departmentModal')?.addEventListener('hidden.bs.modal', function () {
             htmx.trigger('#tableContent', 'load');
         });
     </script>

@@ -7,327 +7,204 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Algora Shop</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Flowbite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --primary-color: #4f46e5;
-            --secondary-color: #6366f1;
-            --dark-color: #1e293b;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #fff;
-        }
-
-        /* Header */
-        .shop-header {
-            background: #fff;
-            border-bottom: 1px solid #e5e7eb;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .shop-header .nav-link {
-            color: var(--dark-color);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-        }
-
-        .shop-header .nav-link:hover {
-            color: var(--primary-color);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .logo:hover {
-            color: var(--secondary-color);
-        }
-
-        /* Product Cards */
-        .product-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-
-        .product-card:hover {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transform: translateY(-4px);
-        }
-
-        .product-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .product-card .card-body {
-            padding: 1rem;
-        }
-
-        .product-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .product-price .original-price {
-            text-decoration: line-through;
-            color: #9ca3af;
-            font-size: 0.9rem;
-            font-weight: 400;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-
-        .btn-outline-primary {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        /* Cart Badge */
-        .cart-btn {
-            position: relative;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--primary-color);
-            color: #fff;
-            font-size: 0.7rem;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Category Pills */
-        .category-pill {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: #f3f4f6;
-            border-radius: 2rem;
-            color: var(--dark-color);
-            text-decoration: none;
-            margin: 0.25rem;
-            transition: all 0.2s ease;
-        }
-
-        .category-pill:hover, .category-pill.active {
-            background: var(--primary-color);
-            color: #fff;
-        }
-
-        /* Footer */
-        .shop-footer {
-            background: var(--dark-color);
-            color: #94a3b8;
-            padding: 3rem 0;
-        }
-
-        .shop-footer h6 {
-            color: #fff;
-            margin-bottom: 1rem;
-        }
-
-        .shop-footer a {
-            color: #94a3b8;
-            text-decoration: none;
-        }
-
-        .shop-footer a:hover {
-            color: #fff;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: #fff;
-            padding: 4rem 0;
-        }
-
-        /* Quick View Modal */
-        .quick-view-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
-        }
-
-        /* Rating Stars */
-        .rating {
-            color: #fbbf24;
-        }
+        [x-cloak] { display: none !important; }
 
         /* HTMX loading indicator */
-        .htmx-indicator {
-            display: none;
-        }
-        .htmx-request .htmx-indicator {
-            display: inline-block;
-        }
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: inline-block; }
     </style>
 </head>
-<body>
+<body class="bg-white font-sans">
     <!-- Header -->
-    <header class="shop-header py-3">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="/Shop" class="logo">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <a href="/Shop" class="flex items-center text-xl font-bold text-primary-600 hover:text-primary-700">
                     <i class="bi bi-box-seam me-2"></i>Algora Shop
                 </a>
 
-                <nav class="d-none d-md-flex align-items-center gap-1">
-                    <a class="nav-link" href="/Shop">Shop</a>
-                    <a class="nav-link" href="/Shop/Categories">Categories</a>
-                    <a class="nav-link" href="/Shop/Deals">Deals</a>
-                    <a class="nav-link" href="/Shop/About">About</a>
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="/Shop" class="px-4 py-2 text-gray-700 font-medium hover:text-primary-600 rounded-lg transition-colors">Shop</a>
+                    <a href="/Shop/Categories" class="px-4 py-2 text-gray-700 font-medium hover:text-primary-600 rounded-lg transition-colors">Categories</a>
+                    <a href="/Shop/Deals" class="px-4 py-2 text-gray-700 font-medium hover:text-primary-600 rounded-lg transition-colors">Deals</a>
+                    <a href="/Shop/About" class="px-4 py-2 text-gray-700 font-medium hover:text-primary-600 rounded-lg transition-colors">About</a>
                 </nav>
 
-                <div class="d-flex align-items-center gap-3">
-                    <form class="d-none d-lg-block">
-                        <div class="input-group">
-                            <input type="search" class="form-control" placeholder="Search products..." style="width: 200px;">
-                            <button class="btn btn-outline-secondary" type="submit">
-                                <i class="bi bi-search"></i>
-                            </button>
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <!-- Search -->
+                    <div class="hidden lg:block">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <i class="bi bi-search text-gray-400"></i>
+                            </div>
+                            <input type="search"
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-48 ps-10 p-2.5"
+                                   placeholder="Search products...">
                         </div>
-                    </form>
+                    </div>
 
-                    <a href="/Shop/Account" class="btn btn-link text-dark">
-                        <i class="bi bi-person fs-5"></i>
+                    <!-- Account -->
+                    <a href="/Shop/Account" class="p-2 text-gray-600 hover:text-primary-600 transition-colors">
+                        <i class="bi bi-person text-xl"></i>
                     </a>
 
-                    <a href="/Shop/Cart" class="btn btn-link text-dark cart-btn">
-                        <i class="bi bi-bag fs-5"></i>
-                        <span class="cart-count" id="cartCount">0</span>
+                    <!-- Cart -->
+                    <a href="/Shop/Cart" class="relative p-2 text-gray-600 hover:text-primary-600 transition-colors">
+                        <i class="bi bi-bag text-xl"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-primary-600 rounded-full">0</span>
                     </a>
 
-                    <button class="btn btn-link text-dark d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
-                        <i class="bi bi-list fs-4"></i>
+                    <!-- Mobile Menu Button -->
+                    <button type="button" class="md:hidden p-2 text-gray-600 hover:text-primary-600"
+                            data-drawer-target="mobileMenu" data-drawer-toggle="mobileMenu">
+                        <i class="bi bi-list text-2xl"></i>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Mobile Menu Offcanvas -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Menu</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    <!-- Mobile Menu Drawer -->
+    <div id="mobileMenu" class="fixed top-0 right-0 z-50 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80" tabindex="-1" aria-labelledby="drawer-right-label">
+        <div class="flex justify-between items-center mb-4">
+            <h5 id="drawer-right-label" class="text-lg font-semibold text-gray-900">Menu</h5>
+            <button type="button" data-drawer-hide="mobileMenu" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
-        <div class="offcanvas-body">
-            <nav class="nav flex-column">
-                <a class="nav-link" href="/Shop">Shop</a>
-                <a class="nav-link" href="/Shop/Categories">Categories</a>
-                <a class="nav-link" href="/Shop/Deals">Deals</a>
-                <a class="nav-link" href="/Shop/About">About</a>
-                <hr>
-                <a class="nav-link" href="/Shop/Account">My Account</a>
-                <a class="nav-link" href="/Shop/Cart">Cart</a>
-            </nav>
-            <form class="mt-3">
-                <input type="search" class="form-control" placeholder="Search products...">
-            </form>
+        <nav class="space-y-2">
+            <a href="/Shop" class="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-100 rounded-lg">Shop</a>
+            <a href="/Shop/Categories" class="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-100 rounded-lg">Categories</a>
+            <a href="/Shop/Deals" class="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-100 rounded-lg">Deals</a>
+            <a href="/Shop/About" class="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-100 rounded-lg">About</a>
+            <hr class="my-4 border-gray-200">
+            <a href="/Shop/Account" class="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-100 rounded-lg">My Account</a>
+            <a href="/Shop/Cart" class="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-100 rounded-lg">Cart</a>
+        </nav>
+        <div class="mt-4">
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <i class="bi bi-search text-gray-400"></i>
+                </div>
+                <input type="search"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5"
+                       placeholder="Search products...">
+            </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <main>
+    <main class="min-h-screen">
         @RenderBody()
     </main>
 
     <!-- Footer -->
-    <footer class="shop-footer mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h6><i class="bi bi-box-seam me-2"></i>Algora Shop</h6>
-                    <p class="small">Your one-stop shop for quality products at great prices.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#"><i class="bi bi-facebook fs-5"></i></a>
-                        <a href="#"><i class="bi bi-twitter-x fs-5"></i></a>
-                        <a href="#"><i class="bi bi-instagram fs-5"></i></a>
+    <footer class="bg-gray-900 text-gray-400 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+                <!-- Brand -->
+                <div class="lg:col-span-1">
+                    <h6 class="flex items-center text-white font-bold text-lg mb-4">
+                        <i class="bi bi-box-seam me-2"></i>Algora Shop
+                    </h6>
+                    <p class="text-sm mb-4">Your one-stop shop for quality products at great prices.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="bi bi-facebook text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="bi bi-twitter-x text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="bi bi-instagram text-xl"></i></a>
                     </div>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Shop</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="/Shop">All Products</a></li>
-                        <li class="mb-2"><a href="/Shop/Categories">Categories</a></li>
-                        <li class="mb-2"><a href="/Shop/Deals">Deals</a></li>
-                        <li class="mb-2"><a href="/Shop?new=true">New Arrivals</a></li>
+
+                <!-- Shop Links -->
+                <div>
+                    <h6 class="text-white font-semibold mb-4">Shop</h6>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/Shop" class="hover:text-white transition-colors">All Products</a></li>
+                        <li><a href="/Shop/Categories" class="hover:text-white transition-colors">Categories</a></li>
+                        <li><a href="/Shop/Deals" class="hover:text-white transition-colors">Deals</a></li>
+                        <li><a href="/Shop?new=true" class="hover:text-white transition-colors">New Arrivals</a></li>
                     </ul>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Account</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="/Shop/Account">My Account</a></li>
-                        <li class="mb-2"><a href="/Shop/Account/Orders">Orders</a></li>
-                        <li class="mb-2"><a href="/Shop/Account/Wishlist">Wishlist</a></li>
-                        <li class="mb-2"><a href="/Shop/Cart">Cart</a></li>
+
+                <!-- Account Links -->
+                <div>
+                    <h6 class="text-white font-semibold mb-4">Account</h6>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/Shop/Account" class="hover:text-white transition-colors">My Account</a></li>
+                        <li><a href="/Shop/Account/Orders" class="hover:text-white transition-colors">Orders</a></li>
+                        <li><a href="/Shop/Account/Wishlist" class="hover:text-white transition-colors">Wishlist</a></li>
+                        <li><a href="/Shop/Cart" class="hover:text-white transition-colors">Cart</a></li>
                     </ul>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Support</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="/Shop/Contact">Contact Us</a></li>
-                        <li class="mb-2"><a href="/Shop/FAQ">FAQ</a></li>
-                        <li class="mb-2"><a href="/Shop/Shipping">Shipping</a></li>
-                        <li class="mb-2"><a href="/Shop/Returns">Returns</a></li>
+
+                <!-- Support Links -->
+                <div>
+                    <h6 class="text-white font-semibold mb-4">Support</h6>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/Shop/Contact" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="/Shop/FAQ" class="hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="/Shop/Shipping" class="hover:text-white transition-colors">Shipping</a></li>
+                        <li><a href="/Shop/Returns" class="hover:text-white transition-colors">Returns</a></li>
                     </ul>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h6>Legal</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="/Shop/Privacy">Privacy Policy</a></li>
-                        <li class="mb-2"><a href="/Shop/Terms">Terms of Service</a></li>
+
+                <!-- Legal Links -->
+                <div>
+                    <h6 class="text-white font-semibold mb-4">Legal</h6>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/Shop/Privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/Shop/Terms" class="hover:text-white transition-colors">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
-            <hr class="border-secondary">
-            <div class="text-center small">
-                <p class="mb-0">&copy; @DateTime.Now.Year Algora Shop. All rights reserved.</p>
+
+            <hr class="my-8 border-gray-700">
+
+            <div class="text-center text-sm">
+                <p>&copy; @DateTime.Now.Year Algora Shop. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Flowbite JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <!-- Custom JS -->
@@ -355,8 +232,13 @@
             updateCartCount();
 
             // Show toast
-            const toast = new bootstrap.Toast(document.getElementById('cartToast'));
-            toast.show();
+            const toast = document.getElementById('cartToast');
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
         }
 
         // Initialize cart count on page load
@@ -364,20 +246,18 @@
     </script>
 
     <!-- Cart Toast -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="cartToast" class="toast" role="alert">
-            <div class="toast-header">
-                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                <strong class="me-auto">Added to Cart</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body">
-                Item has been added to your cart.
-                <div class="mt-2 pt-2 border-top">
-                    <a href="/Shop/Cart" class="btn btn-primary btn-sm">View Cart</a>
-                </div>
-            </div>
+    <div id="cartToast" class="hidden fixed bottom-4 right-4 items-center p-4 text-gray-500 bg-white rounded-lg shadow-lg border border-gray-200 z-50" role="alert">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-emerald-500 bg-emerald-100 rounded-lg">
+            <i class="bi bi-check-circle-fill"></i>
         </div>
+        <div class="ms-3">
+            <div class="text-sm font-medium text-gray-900">Added to Cart</div>
+            <div class="text-sm text-gray-500">Item has been added to your cart.</div>
+        </div>
+        <a href="/Shop/Cart" class="ms-4 text-sm font-medium text-primary-600 hover:text-primary-700">View Cart</a>
+        <button type="button" class="ms-2 -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg p-1.5" onclick="this.parentElement.classList.add('hidden'); this.parentElement.classList.remove('flex');">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     @await RenderSectionAsync("Scripts", required: false)

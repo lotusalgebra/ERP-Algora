@@ -5,65 +5,72 @@
     Layout = "_LayoutShop";
 }
 
-<div class="container py-5">
-    <h1 class="h3 mb-4">Shopping Cart</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Shopping Cart</h1>
 
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Cart Items -->
-        <div class="col-lg-8">
-            <div class="card border">
-                <div class="card-body p-0">
-                    <div id="cartItems">
-                        <div class="text-center py-5 text-muted" id="emptyCart">
-                            <i class="bi bi-cart fs-1 d-block mb-3"></i>
-                            <h5>Your cart is empty</h5>
-                            <p>Looks like you haven't added anything to your cart yet.</p>
-                            <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
-                        </div>
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div id="cartItems">
+                    <div class="text-center py-16 text-gray-500" id="emptyCart">
+                        <i class="bi bi-cart text-6xl text-gray-300 mb-4"></i>
+                        <h5 class="text-lg font-semibold text-gray-700 mb-2">Your cart is empty</h5>
+                        <p class="text-gray-500 mb-4">Looks like you haven't added anything to your cart yet.</p>
+                        <a href="/Shop" class="inline-flex items-center px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-lg font-medium">
+                            Continue Shopping
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Order Summary -->
-        <div class="col-lg-4">
-            <div class="card border" id="orderSummaryCard" style="display: none;">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Order Summary</h5>
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden" id="orderSummaryCard" style="display: none;">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h5 class="font-semibold text-gray-900">Order Summary</h5>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal</span>
-                        <span id="subtotal">$0.00</span>
+                <div class="p-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span class="text-gray-900" id="subtotal">$0.00</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping</span>
-                        <span id="shipping">Calculated at checkout</span>
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-600">Shipping</span>
+                        <span class="text-gray-500 text-sm" id="shipping">Calculated at checkout</span>
                     </div>
 
                     <!-- Coupon -->
-                    <div class="mb-3 mt-3">
-                        <label class="form-label small">Have a coupon?</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control form-control-sm" id="couponCode" placeholder="Enter code">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="applyCoupon()">Apply</button>
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-600 mb-2">Have a coupon?</label>
+                        <div class="flex">
+                            <input type="text"
+                                   class="flex-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-primary-500 focus:border-primary-500 p-2.5"
+                                   id="couponCode"
+                                   placeholder="Enter code">
+                            <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 border-s-0 rounded-e-lg hover:bg-gray-200"
+                                    type="button"
+                                    onclick="applyCoupon()">
+                                Apply
+                            </button>
                         </div>
-                        <div id="couponMessage" class="small mt-1"></div>
+                        <div id="couponMessage" class="text-sm mt-1"></div>
                     </div>
 
-                    <hr>
+                    <hr class="my-4 border-gray-200">
 
-                    <div class="d-flex justify-content-between mb-3 fw-bold">
-                        <span>Total</span>
-                        <span class="h5 mb-0" id="total">$0.00</span>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-semibold text-gray-900">Total</span>
+                        <span class="text-xl font-bold text-gray-900" id="total">$0.00</span>
                     </div>
 
-                    <a href="/Shop/Checkout" class="btn btn-primary w-100" id="checkoutBtn">
+                    <a href="/Shop/Checkout" class="flex items-center justify-center w-full px-4 py-3 text-white bg-primary-600 hover:bg-primary-700 rounded-lg font-medium" id="checkoutBtn">
                         <i class="bi bi-lock me-2"></i>Proceed to Checkout
                     </a>
 
-                    <div class="text-center mt-3">
-                        <a href="/Shop" class="text-muted small">
+                    <div class="text-center mt-4">
+                        <a href="/Shop" class="text-sm text-gray-500 hover:text-primary-600">
                             <i class="bi bi-arrow-left me-1"></i>Continue Shopping
                         </a>
                     </div>
@@ -71,17 +78,17 @@
             </div>
 
             <!-- Trust Badges -->
-            <div class="mt-4">
-                <div class="d-flex align-items-center gap-3 text-muted small mb-2">
-                    <i class="bi bi-shield-check fs-4"></i>
+            <div class="mt-6 space-y-3">
+                <div class="flex items-center gap-3 text-gray-500 text-sm">
+                    <i class="bi bi-shield-check text-2xl text-gray-400"></i>
                     <span>Secure checkout with SSL encryption</span>
                 </div>
-                <div class="d-flex align-items-center gap-3 text-muted small mb-2">
-                    <i class="bi bi-truck fs-4"></i>
+                <div class="flex items-center gap-3 text-gray-500 text-sm">
+                    <i class="bi bi-truck text-2xl text-gray-400"></i>
                     <span>Free shipping on orders over $50</span>
                 </div>
-                <div class="d-flex align-items-center gap-3 text-muted small">
-                    <i class="bi bi-arrow-repeat fs-4"></i>
+                <div class="flex items-center gap-3 text-gray-500 text-sm">
+                    <i class="bi bi-arrow-repeat text-2xl text-gray-400"></i>
                     <span>30-day money-back guarantee</span>
                 </div>
             </div>
@@ -94,16 +101,17 @@
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const cartItemsDiv = document.getElementById('cartItems');
-            const emptyCart = document.getElementById('emptyCart');
             const summaryCard = document.getElementById('orderSummaryCard');
 
             if (cart.length === 0) {
                 cartItemsDiv.innerHTML = `
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-cart fs-1 d-block mb-3"></i>
-                        <h5>Your cart is empty</h5>
-                        <p>Looks like you haven't added anything to your cart yet.</p>
-                        <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+                    <div class="text-center py-16 text-gray-500">
+                        <i class="bi bi-cart text-6xl text-gray-300 block mb-4"></i>
+                        <h5 class="text-lg font-semibold text-gray-700 mb-2">Your cart is empty</h5>
+                        <p class="text-gray-500 mb-4">Looks like you haven't added anything to your cart yet.</p>
+                        <a href="/Shop" class="inline-flex items-center px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-lg font-medium">
+                            Continue Shopping
+                        </a>
                     </div>`;
                 summaryCard.style.display = 'none';
                 return;
@@ -111,9 +119,9 @@
 
             summaryCard.style.display = 'block';
 
-            let html = '<table class="table mb-0">';
-            html += '<thead class="bg-light"><tr><th class="ps-4">Product</th><th class="text-center">Quantity</th><th class="text-end">Price</th><th></th></tr></thead>';
-            html += '<tbody>';
+            let html = '<table class="w-full">';
+            html += '<thead class="bg-gray-50 text-xs text-gray-700 uppercase"><tr><th class="px-6 py-3 text-left">Product</th><th class="px-6 py-3 text-center">Quantity</th><th class="px-6 py-3 text-right">Price</th><th class="px-6 py-3"></th></tr></thead>';
+            html += '<tbody class="divide-y divide-gray-200">';
 
             let subtotal = 0;
 
@@ -123,31 +131,31 @@
 
                 html += `
                     <tr>
-                        <td class="ps-4">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3" style="width: 60px; height: 60px;">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="w-16 h-16 flex-shrink-0 me-4">
                                     ${item.image
-                                        ? `<img src="${item.image}" alt="${item.name}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">`
-                                        : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="bi bi-image text-muted"></i></div>`
+                                        ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover">`
+                                        : `<div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center"><i class="bi bi-image text-gray-400"></i></div>`
                                     }
                                 </div>
                                 <div>
-                                    <div class="fw-semibold">${item.name}</div>
-                                    <small class="text-muted">$${item.price.toFixed(2)} each</small>
+                                    <div class="font-semibold text-gray-900">${item.name}</div>
+                                    <div class="text-sm text-gray-500">$${item.price.toFixed(2)} each</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="text-center align-middle">
-                            <div class="input-group justify-content-center" style="width: 120px; margin: 0 auto;">
-                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateCartItem(${index}, -1)">-</button>
-                                <input type="number" class="form-control form-control-sm text-center" value="${item.quantity}" min="1"
-                                       onchange="setCartItemQuantity(${index}, this.value)" style="max-width: 50px;">
-                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateCartItem(${index}, 1)">+</button>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-center">
+                                <button class="px-3 py-1 text-gray-600 bg-gray-100 rounded-s-lg hover:bg-gray-200" onclick="updateCartItem(${index}, -1)">-</button>
+                                <input type="number" class="w-12 text-center border-y border-gray-200 py-1 text-sm" value="${item.quantity}" min="1"
+                                       onchange="setCartItemQuantity(${index}, this.value)">
+                                <button class="px-3 py-1 text-gray-600 bg-gray-100 rounded-e-lg hover:bg-gray-200" onclick="updateCartItem(${index}, 1)">+</button>
                             </div>
                         </td>
-                        <td class="text-end align-middle fw-semibold">$${itemTotal.toFixed(2)}</td>
-                        <td class="text-end align-middle pe-4">
-                            <button class="btn btn-link text-danger p-0" onclick="removeCartItem(${index})">
+                        <td class="px-6 py-4 text-right font-semibold text-gray-900">$${itemTotal.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="text-red-500 hover:text-red-700" onclick="removeCartItem(${index})">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -203,26 +211,24 @@
             const msgDiv = document.getElementById('couponMessage');
 
             if (!code) {
-                msgDiv.innerHTML = '<span class="text-danger">Please enter a coupon code</span>';
+                msgDiv.innerHTML = '<span class="text-red-500">Please enter a coupon code</span>';
                 return;
             }
 
-            // For demo purposes - validate via API in production
             fetch(`/Shop/Cart?handler=ValidateCoupon&code=${code}`)
                 .then(r => r.json())
                 .then(result => {
                     if (result.valid) {
                         localStorage.setItem('couponCode', code);
                         localStorage.setItem('couponDiscount', result.discount);
-                        msgDiv.innerHTML = `<span class="text-success">Coupon applied! ${result.message}</span>`;
-                        // Recalculate totals
+                        msgDiv.innerHTML = `<span class="text-emerald-600">Coupon applied! ${result.message}</span>`;
                         renderCart();
                     } else {
-                        msgDiv.innerHTML = `<span class="text-danger">${result.message}</span>`;
+                        msgDiv.innerHTML = `<span class="text-red-500">${result.message}</span>`;
                     }
                 })
                 .catch(() => {
-                    msgDiv.innerHTML = '<span class="text-danger">Error validating coupon</span>';
+                    msgDiv.innerHTML = '<span class="text-red-500">Error validating coupon</span>';
                 });
         }
 

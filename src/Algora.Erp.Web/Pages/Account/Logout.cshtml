@@ -1,5 +1,58 @@
 @page
 @model Algora.Erp.Web.Pages.Account.LogoutModel
 @{
+    Layout = null;
     ViewData["Title"] = "Logout";
 }
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Logged Out - Algora ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eef2ff","100":"#e0e7ff","200":"#c7d2fe","300":"#a5b4fc","400":"#818cf8","500":"#6366f1","600":"#4f46e5","700":"#4338ca","800":"#3730a3","900":"#312e81","950":"#1e1b4b"}
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Card -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-10 text-center">
+                <!-- Success Icon -->
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6">
+                    <i class="bi bi-check-circle text-5xl text-green-600"></i>
+                </div>
+
+                <h1 class="text-2xl font-bold text-gray-900 mb-3">You've been logged out</h1>
+                <p class="text-gray-600 mb-8">
+                    Thank you for using Algora ERP. You have been successfully signed out of your account.
+                </p>
+
+                <a href="/Account/Login" class="w-full inline-flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-6 py-3 transition-colors">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In Again
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-primary-200 text-sm mt-6">
+            &copy; @DateTime.Now.Year Algora ERP. All rights reserved.
+        </p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+</body>
+</html>

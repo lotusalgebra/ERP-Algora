@@ -5,106 +5,85 @@
     ViewData["Title"] = "Journal Entries";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-1">Journal Entries</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item active">Journal Entries</li>
+            <h1 class="text-2xl font-bold text-gray-900">Journal Entries</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Journal Entries</li>
                 </ol>
             </nav>
         </div>
-        <a href="/Finance/JournalEntries/Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i> New Journal Entry
+        <a href="/Finance/JournalEntries/Create" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+            <i class="bi bi-plus-lg me-2"></i> New Journal Entry
         </a>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-hourglass-split text-warning fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Draft</h6>
-                            <h3 class="mb-0">@Model.DraftEntries</h3>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-amber-100 rounded-lg">
+                    <i class="bi bi-hourglass-split text-xl text-amber-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Draft</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.DraftEntries</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-info bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-clock text-info fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Pending</h6>
-                            <h3 class="mb-0">@Model.PendingEntries</h3>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
+                    <i class="bi bi-clock text-xl text-blue-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Pending</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.PendingEntries</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-check-circle text-success fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Posted</h6>
-                            <h3 class="mb-0">@Model.PostedEntries</h3>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-emerald-100 rounded-lg">
+                    <i class="bi bi-check-circle text-xl text-emerald-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Posted</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.PostedEntries</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
-                                <i class="bi bi-currency-dollar text-primary fs-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">This Month</h6>
-                            <h3 class="mb-0">@Model.TotalThisMonth.ToString("C0")</h3>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
+                    <i class="bi bi-currency-dollar text-xl text-primary-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">This Month</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.TotalThisMonth.ToString("C0")</h3>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Journal Entries Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 ps-0"
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+                <div class="md:col-span-2">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-400"></i>
+                        </div>
+                        <input type="text"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5"
                                placeholder="Search entries..."
                                id="searchInput"
                                hx-get="/Finance/JournalEntries?handler=Table"
@@ -114,8 +93,9 @@
                                name="search">
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="statusFilter" name="statusFilter"
+                <div>
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                            id="statusFilter" name="statusFilter"
                             hx-get="/Finance/JournalEntries?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
@@ -127,8 +107,9 @@
                         <option value="3">Reversed</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="typeFilter" name="typeFilter"
+                <div>
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                            id="typeFilter" name="typeFilter"
                             hx-get="/Finance/JournalEntries?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
@@ -140,16 +121,18 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="dateFrom" name="dateFrom"
+                <div>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                           id="dateFrom" name="dateFrom"
                            hx-get="/Finance/JournalEntries?handler=Table"
                            hx-trigger="change"
                            hx-target="#tableContent"
                            hx-include="#searchInput,#statusFilter,#typeFilter,#dateTo"
                            placeholder="From">
                 </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" id="dateTo" name="dateTo"
+                <div>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                           id="dateTo" name="dateTo"
                            hx-get="/Finance/JournalEntries?handler=Table"
                            hx-trigger="change"
                            hx-target="#tableContent"
@@ -158,40 +141,36 @@
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">Entry #</th>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th class="text-end">Debit</th>
-                            <th class="text-end">Credit</th>
-                            <th>Status</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableContent" hx-get="/Finance/JournalEntries?handler=Table" hx-trigger="load">
-                        <tr>
-                            <td colspan="8" class="text-center py-4">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Entry #</th>
+                        <th scope="col" class="px-6 py-3">Date</th>
+                        <th scope="col" class="px-6 py-3">Description</th>
+                        <th scope="col" class="px-6 py-3">Type</th>
+                        <th scope="col" class="px-6 py-3 text-right">Debit</th>
+                        <th scope="col" class="px-6 py-3 text-right">Credit</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableContent" hx-get="/Finance/JournalEntries?handler=Table" hx-trigger="load">
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small" id="paginationInfo">
+        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="text-sm text-gray-500" id="paginationInfo">
                     Showing 0 entries
                 </div>
                 <nav id="paginationNav">
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="inline-flex -space-x-px text-sm">
                     </ul>
                 </nav>
             </div>

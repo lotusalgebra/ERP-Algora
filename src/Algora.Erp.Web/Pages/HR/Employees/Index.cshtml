@@ -4,168 +4,186 @@
     ViewData["Title"] = "Employees";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h4 class="mb-1">Employees</h4>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="/HR">HR</a></li>
-                <li class="breadcrumb-item active">Employees</li>
-            </ol>
-        </nav>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Employees</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/Dashboard" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/HR" class="hover:text-primary-600">HR</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Employees</li>
+                </ol>
+            </nav>
+        </div>
+        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+                data-modal-target="employeeModal" data-modal-toggle="employeeModal"
+                hx-get="/HR/Employees?handler=CreateForm" hx-target="#employeeModalContent" hx-swap="innerHTML">
+            <i class="bi bi-plus-lg me-2"></i> Add Employee
+        </button>
     </div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal"
-            hx-get="/HR/Employees?handler=CreateForm" hx-target="#employeeModalContent" hx-swap="innerHTML">
-        <i class="bi bi-plus-lg me-1"></i> Add Employee
-    </button>
-</div>
 
-<!-- Stats Cards -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                    <i class="bi bi-people-fill"></i>
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
+                    <i class="bi bi-people-fill text-xl text-primary-600"></i>
                 </div>
-                <div>
-                    <div class="stat-value" id="totalEmployees">@Model.TotalEmployees</div>
-                    <div class="stat-label">Total Employees</div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Total Employees</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="totalEmployees">@Model.TotalEmployees</h3>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-emerald-100 rounded-lg">
+                    <i class="bi bi-person-check-fill text-xl text-emerald-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">Active</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="activeEmployees">@Model.ActiveEmployees</h3>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-amber-100 rounded-lg">
+                    <i class="bi bi-person-dash-fill text-xl text-amber-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">On Leave</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="onLeaveEmployees">@Model.OnLeaveEmployees</h3>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
+                    <i class="bi bi-calendar-event text-xl text-blue-600"></i>
+                </div>
+                <div class="ms-4">
+                    <p class="text-sm text-gray-500 mb-1">New This Month</p>
+                    <h3 class="text-2xl font-bold text-gray-900" id="newThisMonth">@Model.NewThisMonth</h3>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon bg-success bg-opacity-10 text-success">
-                    <i class="bi bi-person-check-fill"></i>
-                </div>
-                <div>
-                    <div class="stat-value" id="activeEmployees">@Model.ActiveEmployees</div>
-                    <div class="stat-label">Active</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                    <i class="bi bi-person-dash-fill"></i>
-                </div>
-                <div>
-                    <div class="stat-value" id="onLeaveEmployees">@Model.OnLeaveEmployees</div>
-                    <div class="stat-label">On Leave</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon bg-info bg-opacity-10 text-info">
-                    <i class="bi bi-calendar-event"></i>
-                </div>
-                <div>
-                    <div class="stat-value" id="newThisMonth">@Model.NewThisMonth</div>
-                    <div class="stat-label">New This Month</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Employees Table -->
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center py-3">
-        <div class="d-flex align-items-center gap-3">
-            <div class="input-group" style="width: 300px;">
-                <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
-                <input type="search" class="form-control" id="searchInput" placeholder="Search employees..."
-                       hx-get="/HR/Employees?handler=Table" hx-trigger="keyup changed delay:300ms"
-                       hx-target="#employeesTableBody" hx-include="[name='statusFilter']" name="search">
-            </div>
-            <select class="form-select" style="width: 150px;" name="statusFilter" id="statusFilter"
-                    hx-get="/HR/Employees?handler=Table" hx-trigger="change"
-                    hx-target="#employeesTableBody" hx-include="#searchInput">
-                <option value="">All Status</option>
-                <option value="Active">Active</option>
-                <option value="OnLeave">On Leave</option>
-                <option value="Suspended">Suspended</option>
-                <option value="Terminated">Terminated</option>
-            </select>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-download me-1"></i> Export
-            </button>
-        </div>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
-                <tr>
-                    <th style="width: 40px;">
-                        <input type="checkbox" class="form-check-input" id="selectAll">
-                    </th>
-                    <th>Employee</th>
-                    <th>Department</th>
-                    <th>Position</th>
-                    <th>Employment Type</th>
-                    <th>Hire Date</th>
-                    <th>Status</th>
-                    <th style="width: 100px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="employeesTableBody" hx-get="/HR/Employees?handler=Table" hx-trigger="load">
-                <tr>
-                    <td colspan="8" class="text-center py-4">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+    <!-- Employees Table -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-400"></i>
                         </div>
-                        <span class="ms-2">Loading employees...</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="card-footer d-flex justify-content-between align-items-center py-3">
-        <div class="text-muted small">
-            Showing <span id="showingFrom">0</span> to <span id="showingTo">0</span> of <span id="totalRecords">0</span> entries
+                        <input type="search" id="searchInput" name="search"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5"
+                               placeholder="Search employees..."
+                               hx-get="/HR/Employees?handler=Table"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#employeesTableBody"
+                               hx-include="[name='statusFilter']">
+                    </div>
+                    <select name="statusFilter" id="statusFilter"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5"
+                            hx-get="/HR/Employees?handler=Table"
+                            hx-trigger="change"
+                            hx-target="#employeesTableBody"
+                            hx-include="#searchInput">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="OnLeave">On Leave</option>
+                        <option value="Suspended">Suspended</option>
+                        <option value="Terminated">Terminated</option>
+                    </select>
+                </div>
+                <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="bi bi-download me-2"></i> Export
+                </button>
+            </div>
         </div>
-        <nav id="pagination">
-            <!-- Pagination will be loaded via HTMX -->
-        </nav>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="p-4" style="width: 40px;">
+                            <input type="checkbox" id="selectAll" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500">
+                        </th>
+                        <th scope="col" class="px-6 py-3">Employee</th>
+                        <th scope="col" class="px-6 py-3">Department</th>
+                        <th scope="col" class="px-6 py-3">Position</th>
+                        <th scope="col" class="px-6 py-3">Employment Type</th>
+                        <th scope="col" class="px-6 py-3">Hire Date</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="employeesTableBody" hx-get="/HR/Employees?handler=Table" hx-trigger="load">
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                            <span class="ms-2 text-gray-500">Loading employees...</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="text-sm text-gray-500">
+                    Showing <span id="showingFrom">0</span> to <span id="showingTo">0</span> of <span id="totalRecords">0</span> entries
+                </div>
+                <nav id="pagination">
+                    <ul class="inline-flex -space-x-px text-sm"></ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Employee Modal -->
-<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content" id="employeeModalContent">
-            <!-- Content loaded via HTMX -->
+<div id="employeeModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-4xl max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">Employee</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="employeeModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="p-4 md:p-5" id="employeeModalContent">
+                <div class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
-                <p class="mt-3 mb-0">Are you sure you want to delete this employee?</p>
-                <p class="text-muted small">This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer border-0 justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+<div id="deleteModal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="deleteModal">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="p-4 md:p-5 text-center">
+                <i class="bi bi-exclamation-triangle text-amber-500 text-5xl mb-4"></i>
+                <h3 class="mb-5 text-lg font-normal text-gray-500">Are you sure you want to delete this employee?</h3>
+                <p class="mb-5 text-sm text-gray-400">This action cannot be undone.</p>
+                <button data-modal-hide="deleteModal" type="button" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center me-2" id="confirmDelete">
+                    Yes, delete
+                </button>
+                <button data-modal-hide="deleteModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
@@ -184,7 +202,8 @@
         let deleteEmployeeId = null;
         window.confirmDelete = function(id) {
             deleteEmployeeId = id;
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
+            if (modal) modal.show();
         };
 
         document.getElementById('confirmDelete')?.addEventListener('click', function() {
@@ -193,9 +212,8 @@
                     target: '#employeesTableBody',
                     swap: 'innerHTML'
                 }).then(() => {
-                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-                    // Refresh stats
-                    htmx.ajax('GET', '/HR/Employees?handler=Stats', {target: '#statsContainer'});
+                    const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
+                    if (modal) modal.hide();
                 });
             }
         });
@@ -203,15 +221,7 @@
         // Close modal on successful form submission
         document.body.addEventListener('htmx:afterSwap', function(evt) {
             if (evt.detail.target.id === 'employeesTableBody') {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('employeeModal'));
-                if (modal) modal.hide();
-            }
-        });
-
-        // Handle form submission success
-        document.body.addEventListener('htmx:afterRequest', function(evt) {
-            if (evt.detail.successful && evt.detail.requestConfig.verb === 'post') {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('employeeModal'));
+                const modal = FlowbiteInstances.getInstance('Modal', 'employeeModal');
                 if (modal) modal.hide();
             }
         });

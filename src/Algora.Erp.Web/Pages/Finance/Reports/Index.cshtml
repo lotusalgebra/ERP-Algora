@@ -5,437 +5,404 @@
     ViewData["Title"] = "Financial Reports";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-0">Financial Reports</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item active">Reports</li>
+            <h1 class="text-2xl font-bold text-gray-900">Financial Reports</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Reports</li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <select class="form-select" style="width: auto;" onchange="window.location.href='?Period=' + this.value">
-                <option value="thismonth" selected="@(Model.Period == "thismonth")">This Month</option>
-                <option value="lastmonth" selected="@(Model.Period == "lastmonth")">Last Month</option>
-                <option value="thisquarter" selected="@(Model.Period == "thisquarter")">This Quarter</option>
-                <option value="thisyear" selected="@(Model.Period == "thisyear")">This Year</option>
-                <option value="lastyear" selected="@(Model.Period == "lastyear")">Last Year</option>
-            </select>
-        </div>
+        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2.5 w-auto"
+                onchange="window.location.href='?Period=' + this.value">
+            <option value="thismonth" selected="@(Model.Period == "thismonth")">This Month</option>
+            <option value="lastmonth" selected="@(Model.Period == "lastmonth")">Last Month</option>
+            <option value="thisquarter" selected="@(Model.Period == "thisquarter")">This Quarter</option>
+            <option value="thisyear" selected="@(Model.Period == "thisyear")">This Year</option>
+            <option value="lastyear" selected="@(Model.Period == "lastyear")">Last Year</option>
+        </select>
     </div>
 
     <!-- Quick Links -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <a href="/Finance/Reports/Invoices" class="card border-0 shadow-sm h-100 text-decoration-none">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-file-earmark-text text-primary fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Invoice Reports</h6>
-                        <small class="text-muted">Detailed invoice analysis</small>
-                    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/Finance/Reports/Invoices" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-primary-100 rounded-lg me-4">
+                    <i class="bi bi-file-earmark-text text-xl text-primary-600"></i>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/Payments" class="card border-0 shadow-sm h-100 text-decoration-none">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-success bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-cash-stack text-success fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Payment Reports</h6>
-                        <small class="text-muted">Payment collection analysis</small>
-                    </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Invoice Reports</h6>
+                    <p class="text-sm text-gray-500">Detailed invoice analysis</p>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/Aging" class="card border-0 shadow-sm h-100 text-decoration-none">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-clock-history text-warning fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Aging Report</h6>
-                        <small class="text-muted">Accounts receivable aging</small>
-                    </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/Payments" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-emerald-100 rounded-lg me-4">
+                    <i class="bi bi-cash-stack text-xl text-emerald-600"></i>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/Customers" class="card border-0 shadow-sm h-100 text-decoration-none">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-info bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-people text-info fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Customer Revenue</h6>
-                        <small class="text-muted">Revenue by customer</small>
-                    </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Payment Reports</h6>
+                    <p class="text-sm text-gray-500">Payment collection analysis</p>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/ProfitLoss" class="card border-0 shadow-sm h-100 text-decoration-none border-success" style="border-width: 2px !important;">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-success bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-graph-up-arrow text-success fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Profit & Loss</h6>
-                        <small class="text-muted">Income statement</small>
-                    </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/Aging" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-amber-100 rounded-lg me-4">
+                    <i class="bi bi-clock-history text-xl text-amber-600"></i>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/BalanceSheet" class="card border-0 shadow-sm h-100 text-decoration-none border-primary" style="border-width: 2px !important;">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-balance-scale text-primary fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Balance Sheet</h6>
-                        <small class="text-muted">Financial position</small>
-                    </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Aging Report</h6>
+                    <p class="text-sm text-gray-500">Accounts receivable aging</p>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/CashFlowStatement" class="card border-0 shadow-sm h-100 text-decoration-none border-info" style="border-width: 2px !important;">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-info bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-water text-info fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Cash Flow Statement</h6>
-                        <small class="text-muted">Cash movements</small>
-                    </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/Customers" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg me-4">
+                    <i class="bi bi-people text-xl text-blue-600"></i>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/TrialBalance" class="card border-0 shadow-sm h-100 text-decoration-none border-secondary" style="border-width: 2px !important;">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-secondary bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-list-columns-reverse text-secondary fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">Trial Balance</h6>
-                        <small class="text-muted">Debits & credits</small>
-                    </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Customer Revenue</h6>
+                    <p class="text-sm text-gray-500">Revenue by customer</p>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/Finance/Reports/GeneralLedger" class="card border-0 shadow-sm h-100 text-decoration-none border-dark" style="border-width: 2px !important;">
-                <div class="card-body d-flex align-items-center">
-                    <div class="bg-dark bg-opacity-10 p-3 rounded me-3">
-                        <i class="bi bi-journal-bookmark text-dark fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">General Ledger</h6>
-                        <small class="text-muted">Account transactions</small>
-                    </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/ProfitLoss" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border-2 border-emerald-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-emerald-100 rounded-lg me-4">
+                    <i class="bi bi-graph-up-arrow text-xl text-emerald-600"></i>
                 </div>
-            </a>
-        </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Profit & Loss</h6>
+                    <p class="text-sm text-gray-500">Income statement</p>
+                </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/BalanceSheet" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border-2 border-primary-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-primary-100 rounded-lg me-4">
+                    <i class="bi bi-balance-scale text-xl text-primary-600"></i>
+                </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Balance Sheet</h6>
+                    <p class="text-sm text-gray-500">Financial position</p>
+                </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/CashFlowStatement" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border-2 border-blue-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg me-4">
+                    <i class="bi bi-water text-xl text-blue-600"></i>
+                </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Cash Flow Statement</h6>
+                    <p class="text-sm text-gray-500">Cash movements</p>
+                </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/TrialBalance" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border-2 border-gray-400">
+            <div class="flex items-center">
+                <div class="p-3 bg-gray-100 rounded-lg me-4">
+                    <i class="bi bi-list-columns-reverse text-xl text-gray-600"></i>
+                </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">Trial Balance</h6>
+                    <p class="text-sm text-gray-500">Debits & credits</p>
+                </div>
+            </div>
+        </a>
+        <a href="/Finance/Reports/GeneralLedger" class="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow border-2 border-gray-800">
+            <div class="flex items-center">
+                <div class="p-3 bg-gray-200 rounded-lg me-4">
+                    <i class="bi bi-journal-bookmark text-xl text-gray-800"></i>
+                </div>
+                <div>
+                    <h6 class="font-semibold text-gray-900">General Ledger</h6>
+                    <p class="text-sm text-gray-500">Account transactions</p>
+                </div>
+            </div>
+        </a>
     </div>
 
     <!-- Summary Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Total Invoiced</h6>
-                            <h3 class="mb-0">@Model.InvoiceSummary.TotalInvoiced.ToString("C0")</h3>
-                            <small class="text-muted">@Model.InvoiceSummary.TotalInvoices invoices</small>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-file-earmark-text text-primary fs-4"></i>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Total Invoiced</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.InvoiceSummary.TotalInvoiced.ToString("C0")</h3>
+                    <p class="text-sm text-gray-500">@Model.InvoiceSummary.TotalInvoices invoices</p>
+                </div>
+                <div class="p-2 bg-primary-100 rounded-lg">
+                    <i class="bi bi-file-earmark-text text-xl text-primary-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Total Collected</h6>
-                            <h3 class="mb-0 text-success">@Model.PaymentSummary.TotalReceived.ToString("C0")</h3>
-                            <small class="text-muted">@Model.PaymentSummary.TotalPayments payments</small>
-                        </div>
-                        <div class="bg-success bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-cash-stack text-success fs-4"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Total Collected</p>
+                    <h3 class="text-2xl font-bold text-emerald-600">@Model.PaymentSummary.TotalReceived.ToString("C0")</h3>
+                    <p class="text-sm text-gray-500">@Model.PaymentSummary.TotalPayments payments</p>
+                </div>
+                <div class="p-2 bg-emerald-100 rounded-lg">
+                    <i class="bi bi-cash-stack text-xl text-emerald-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Outstanding</h6>
-                            <h3 class="mb-0 text-warning">@Model.InvoiceSummary.TotalOutstanding.ToString("C0")</h3>
-                            <small class="text-muted">Balance due</small>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-hourglass-split text-warning fs-4"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Outstanding</p>
+                    <h3 class="text-2xl font-bold text-amber-600">@Model.InvoiceSummary.TotalOutstanding.ToString("C0")</h3>
+                    <p class="text-sm text-gray-500">Balance due</p>
+                </div>
+                <div class="p-2 bg-amber-100 rounded-lg">
+                    <i class="bi bi-hourglass-split text-xl text-amber-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Overdue</h6>
-                            <h3 class="mb-0 text-danger">@Model.InvoiceSummary.TotalOverdue.ToString("C0")</h3>
-                            <small class="text-muted">@Model.InvoiceSummary.OverdueInvoices invoices overdue</small>
-                        </div>
-                        <div class="bg-danger bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Overdue</p>
+                    <h3 class="text-2xl font-bold text-red-600">@Model.InvoiceSummary.TotalOverdue.ToString("C0")</h3>
+                    <p class="text-sm text-gray-500">@Model.InvoiceSummary.OverdueInvoices invoices overdue</p>
+                </div>
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <i class="bi bi-exclamation-triangle text-xl text-red-600"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Revenue Trend Chart -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Revenue Trend (12 Months)</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueTrendChart" height="300"></canvas>
-                </div>
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-graph-up me-2"></i>Revenue Trend (12 Months)
+                </h5>
+            </div>
+            <div class="p-6">
+                <canvas id="revenueTrendChart" height="300"></canvas>
             </div>
         </div>
 
         <!-- Aging Summary -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Aging Summary</h5>
-                    <a href="/Finance/Reports/Aging" class="btn btn-sm btn-outline-primary">View Details</a>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h5 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-pie-chart me-2"></i>Aging Summary
+                </h5>
+                <a href="/Finance/Reports/Aging" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View Details</a>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Current</span>
+                        <span class="text-sm font-medium text-gray-900">@Model.Aging.Current.Amount.ToString("C0")</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-emerald-500 h-2 rounded-full" style="width: @Model.Aging.Current.Percentage%"></div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Current</span>
-                            <span class="fw-medium">@Model.Aging.Current.Amount.ToString("C0")</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" style="width: @Model.Aging.Current.Percentage%"></div>
-                        </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">1-30 Days</span>
+                        <span class="text-sm font-medium text-gray-900">@Model.Aging.Days1To30.Amount.ToString("C0")</span>
                     </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>1-30 Days</span>
-                            <span class="fw-medium">@Model.Aging.Days1To30.Amount.ToString("C0")</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-info" style="width: @Model.Aging.Days1To30.Percentage%"></div>
-                        </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: @Model.Aging.Days1To30.Percentage%"></div>
                     </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>31-60 Days</span>
-                            <span class="fw-medium">@Model.Aging.Days31To60.Amount.ToString("C0")</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-warning" style="width: @Model.Aging.Days31To60.Percentage%"></div>
-                        </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">31-60 Days</span>
+                        <span class="text-sm font-medium text-gray-900">@Model.Aging.Days31To60.Amount.ToString("C0")</span>
                     </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>61-90 Days</span>
-                            <span class="fw-medium">@Model.Aging.Days61To90.Amount.ToString("C0")</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-orange" style="width: @Model.Aging.Days61To90.Percentage%; background-color: #fd7e14;"></div>
-                        </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-amber-500 h-2 rounded-full" style="width: @Model.Aging.Days31To60.Percentage%"></div>
                     </div>
-                    <div class="mb-0">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Over 90 Days</span>
-                            <span class="fw-medium text-danger">@Model.Aging.Over90Days.Amount.ToString("C0")</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-danger" style="width: @Model.Aging.Over90Days.Percentage%"></div>
-                        </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">61-90 Days</span>
+                        <span class="text-sm font-medium text-gray-900">@Model.Aging.Days61To90.Amount.ToString("C0")</span>
                     </div>
-                    <hr>
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-bold">Total Outstanding</span>
-                        <span class="fw-bold">@Model.Aging.TotalOutstanding.ToString("C0")</span>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-orange-500 h-2 rounded-full" style="width: @Model.Aging.Days61To90.Percentage%"></div>
                     </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Over 90 Days</span>
+                        <span class="text-sm font-medium text-red-600">@Model.Aging.Over90Days.Amount.ToString("C0")</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width: @Model.Aging.Over90Days.Percentage%"></div>
+                    </div>
+                </div>
+                <hr class="border-gray-200">
+                <div class="flex justify-between">
+                    <span class="font-bold text-gray-900">Total Outstanding</span>
+                    <span class="font-bold text-gray-900">@Model.Aging.TotalOutstanding.ToString("C0")</span>
                 </div>
             </div>
         </div>
 
         <!-- Invoice Status Breakdown -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Invoice Status</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="invoiceStatusChart" height="250"></canvas>
-                </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-bar-chart me-2"></i>Invoice Status
+                </h5>
+            </div>
+            <div class="p-6">
+                <canvas id="invoiceStatusChart" height="250"></canvas>
             </div>
         </div>
 
         <!-- Top Customers -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Top 5 Customers</h5>
-                    <a href="/Finance/Reports/Customers" class="btn btn-sm btn-outline-primary">View All</a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Customer</th>
-                                    <th class="text-center">Invoices</th>
-                                    <th class="text-end">Revenue</th>
-                                    <th class="text-end pe-4">%</th>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h5 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-trophy me-2"></i>Top 5 Customers
+                </h5>
+                <a href="/Finance/Reports/Customers" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View All</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Customer</th>
+                            <th scope="col" class="px-6 py-3 text-center">Invoices</th>
+                            <th scope="col" class="px-6 py-3 text-right">Revenue</th>
+                            <th scope="col" class="px-6 py-3 text-right">%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TopCustomers.Any())
+                        {
+                            foreach (var customer in Model.TopCustomers)
+                            {
+                                <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-primary-600 hover:underline">
+                                            @customer.CustomerName
+                                        </a>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">@customer.InvoiceCount</td>
+                                    <td class="px-6 py-4 text-right font-medium">@customer.TotalRevenue.ToString("C0")</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800">
+                                            @customer.Percentage.ToString("F1")%
+                                        </span>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.TopCustomers.Any())
-                                {
-                                    foreach (var customer in Model.TopCustomers)
-                                    {
-                                        <tr>
-                                            <td class="ps-4">
-                                                <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-decoration-none">
-                                                    @customer.CustomerName
-                                                </a>
-                                            </td>
-                                            <td class="text-center">@customer.InvoiceCount</td>
-                                            <td class="text-end fw-medium">@customer.TotalRevenue.ToString("C0")</td>
-                                            <td class="text-end pe-4">
-                                                <span class="badge bg-primary">@customer.Percentage.ToString("F1")%</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">No customer data</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-gray-500">No customer data</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Payment Methods -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment Methods</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.PaymentSummary.ByMethod.Any())
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-credit-card me-2"></i>Payment Methods
+                </h5>
+            </div>
+            <div class="p-6 space-y-4">
+                @if (Model.PaymentSummary.ByMethod.Any())
+                {
+                    foreach (var method in Model.PaymentSummary.ByMethod)
                     {
-                        foreach (var method in Model.PaymentSummary.ByMethod)
+                        var badgeClass = method.Method switch
                         {
-                            var badgeClass = method.Method switch
-                            {
-                                PaymentMethod.Cash => "bg-success",
-                                PaymentMethod.BankTransfer => "bg-primary",
-                                PaymentMethod.CreditCard => "bg-info",
-                                PaymentMethod.Check => "bg-warning text-dark",
-                                _ => "bg-secondary"
-                            };
+                            PaymentMethod.Cash => "bg-emerald-100 text-emerald-800",
+                            PaymentMethod.BankTransfer => "bg-primary-100 text-primary-800",
+                            PaymentMethod.CreditCard => "bg-blue-100 text-blue-800",
+                            PaymentMethod.Check => "bg-amber-100 text-amber-800",
+                            _ => "bg-gray-100 text-gray-800"
+                        };
 
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>
-                                        <span class="badge @badgeClass me-2">@method.Method</span>
-                                        <small class="text-muted">@method.Count payments</small>
-                                    </span>
-                                    <span class="fw-medium">@method.Amount.ToString("C0")</span>
-                                </div>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar @badgeClass" style="width: @method.Percentage%"></div>
-                                </div>
+                        var progressClass = method.Method switch
+                        {
+                            PaymentMethod.Cash => "bg-emerald-500",
+                            PaymentMethod.BankTransfer => "bg-primary-500",
+                            PaymentMethod.CreditCard => "bg-blue-500",
+                            PaymentMethod.Check => "bg-amber-500",
+                            _ => "bg-gray-500"
+                        };
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span>
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-full @badgeClass me-2">@method.Method</span>
+                                    <span class="text-sm text-gray-500">@method.Count payments</span>
+                                </span>
+                                <span class="text-sm font-medium text-gray-900">@method.Amount.ToString("C0")</span>
                             </div>
-                        }
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="@progressClass h-1.5 rounded-full" style="width: @method.Percentage%"></div>
+                            </div>
+                        </div>
                     }
-                    else
-                    {
-                        <div class="text-center text-muted py-4">No payment data</div>
-                    }
-                </div>
+                }
+                else
+                {
+                    <div class="text-center text-gray-500 py-8">No payment data</div>
+                }
             </div>
         </div>
 
         <!-- Quick Stats -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Key Metrics</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-4">
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h4 class="mb-1">@Model.InvoiceSummary.AverageInvoiceAmount.ToString("C0")</h4>
-                                <small class="text-muted">Avg Invoice Amount</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h4 class="mb-1">@Model.PaymentSummary.AveragePayment.ToString("C0")</h4>
-                                <small class="text-muted">Avg Payment Amount</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                @{
-                                    var collectionRate = Model.InvoiceSummary.TotalInvoiced > 0
-                                        ? (Model.InvoiceSummary.TotalPaid / Model.InvoiceSummary.TotalInvoiced) * 100
-                                        : 0;
-                                }
-                                <h4 class="mb-1 @(collectionRate >= 80 ? "text-success" : collectionRate >= 50 ? "text-warning" : "text-danger")">
-                                    @collectionRate.ToString("F1")%
-                                </h4>
-                                <small class="text-muted">Collection Rate</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h4 class="mb-1">@Model.PaymentSummary.LargestPayment.ToString("C0")</h4>
-                                <small class="text-muted">Largest Payment</small>
-                            </div>
-                        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-speedometer2 me-2"></i>Key Metrics
+                </h5>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-gray-900 mb-1">@Model.InvoiceSummary.AverageInvoiceAmount.ToString("C0")</h4>
+                        <p class="text-sm text-gray-500">Avg Invoice Amount</p>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-gray-900 mb-1">@Model.PaymentSummary.AveragePayment.ToString("C0")</h4>
+                        <p class="text-sm text-gray-500">Avg Payment Amount</p>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        @{
+                            var collectionRate = Model.InvoiceSummary.TotalInvoiced > 0
+                                ? (Model.InvoiceSummary.TotalPaid / Model.InvoiceSummary.TotalInvoiced) * 100
+                                : 0;
+                            var rateColor = collectionRate >= 80 ? "text-emerald-600" : collectionRate >= 50 ? "text-amber-600" : "text-red-600";
+                        }
+                        <h4 class="text-xl font-bold @rateColor mb-1">@collectionRate.ToString("F1")%</h4>
+                        <p class="text-sm text-gray-500">Collection Rate</p>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-xl font-bold text-gray-900 mb-1">@Model.PaymentSummary.LargestPayment.ToString("C0")</h4>
+                        <p class="text-sm text-gray-500">Largest Payment</p>
                     </div>
                 </div>
             </div>
@@ -456,16 +423,16 @@
                     {
                         label: 'Invoiced',
                         data: [@string.Join(",", Model.RevenueTrend.Select(r => r.Invoiced.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: 'rgb(99, 102, 241)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
                         fill: true,
                         tension: 0.4
                     },
                     {
                         label: 'Collected',
                         data: [@string.Join(",", Model.RevenueTrend.Select(r => r.Collected.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
-                        borderColor: 'rgb(34, 197, 94)',
-                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         fill: true,
                         tension: 0.4
                     }
@@ -497,14 +464,14 @@
                 datasets: [{
                     data: [@string.Join(",", Model.InvoiceSummary.ByStatus.Select(s => s.Count))],
                     backgroundColor: [
-                        '#6c757d', // Draft
-                        '#ffc107', // Pending
-                        '#17a2b8', // Sent
-                        '#007bff', // PartiallyPaid
-                        '#28a745', // Paid
-                        '#dc3545', // Overdue
-                        '#343a40', // Void
-                        '#adb5bd'  // Cancelled
+                        '#6b7280', // Draft
+                        '#f59e0b', // Pending
+                        '#3b82f6', // Sent
+                        '#6366f1', // PartiallyPaid
+                        '#10b981', // Paid
+                        '#ef4444', // Overdue
+                        '#1f2937', // Void
+                        '#9ca3af'  // Cancelled
                     ]
                 }]
             },
