@@ -63,7 +63,7 @@ public class IdentityService : IIdentityService
                 ValidateAudience = true,
                 ValidAudience = _settings.Jwt.Audience,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromMinutes(1) // Allow 1 minute clock skew for minor timing differences
             }, out _);
 
             return Task.FromResult(true);
@@ -76,30 +76,36 @@ public class IdentityService : IIdentityService
 
     private string GenerateAccessToken(Guid userId, string email, IEnumerable<string> roles)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.Key));
+        var jwtSettings = _settings.Jwt ?? throw new InvalidOperationException("JWT settings not configured");
+        if (string.IsNullOrEmpty(jwtSettings.Key))
+            throw new InvalidOperationException("JWT Key not configured");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        var now = DateTime.UtcNow;
+        var expires = now.AddMinutes(jwtSettings.AccessTokenExpiryMinutes);
+
+        // Build claims for the token
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, userId.ToString()),
-            new(ClaimTypes.Email, email),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new("sub", userId.ToString()),
+            new("email", email),
+            new("jti", Guid.NewGuid().ToString()),
+            new("role", string.Join(",", roles))
         };
 
-        // Add role claims
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
-
+        // Create token with all necessary parameters
         var token = new JwtSecurityToken(
-            issuer: _settings.Jwt.Issuer,
-            audience: _settings.Jwt.Audience,
+            issuer: jwtSettings.Issuer,
+            audience: jwtSettings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_settings.Jwt.AccessTokenExpiryMinutes),
+            notBefore: now,
+            expires: expires,
             signingCredentials: credentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(token);
     }
 }
