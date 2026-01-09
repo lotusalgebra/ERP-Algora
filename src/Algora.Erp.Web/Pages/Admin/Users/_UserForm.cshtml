@@ -4,7 +4,7 @@
 <form hx-post="/Admin/Users" hx-target="#usersTableBody" hx-swap="innerHTML">
     <div class="modal-header">
         <h5 class="modal-title">@(Model.IsEdit ? "Edit User" : "New User")</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-modal-hide="userModal"></button>
     </div>
     <div class="modal-body">
         @if (Model.IsEdit)
@@ -64,7 +64,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-modal-hide="userModal">Cancel</button>
         <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Update" : "Create") User</button>
     </div>
 </form>

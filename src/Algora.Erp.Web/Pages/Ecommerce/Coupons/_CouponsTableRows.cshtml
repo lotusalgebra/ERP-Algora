@@ -108,16 +108,15 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownCoupon@(coupon.Id)" data-dropdown-toggle="dropdownMenuCoupon@(coupon.Id)">
                         <i class="bi bi-gear"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuCoupon@(coupon.Id)">
                         <li>
                             <a class="dropdown-item" href="#"
                                hx-get="?handler=EditForm&id=@coupon.Id"
                                hx-target="#couponModalBody"
-                               data-bs-toggle="modal"
-                               data-bs-target="#couponModal">
+                               data-modal-target="couponModal" data-modal-toggle="couponModal">
                                 <i class="bi bi-pencil me-2"></i>Edit
                             </a>
                         </li>

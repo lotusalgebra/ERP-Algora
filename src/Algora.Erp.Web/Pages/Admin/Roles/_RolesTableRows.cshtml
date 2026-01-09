@@ -45,8 +45,7 @@
                             hx-get="/Admin/Roles?handler=EditForm&id=@role.Id"
                             hx-target="#formContainer"
                             hx-swap="innerHTML"
-                            data-bs-toggle="modal"
-                            data-bs-target="#roleModal">
+                            data-modal-target="roleModal" data-modal-toggle="roleModal">
                         <i class="bi bi-pencil"></i>
                     </button>
                     @if (!role.IsSystemRole)

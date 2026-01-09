@@ -38,10 +38,10 @@
                 <i class="bi bi-printer me-1"></i> Print Receipt
             </a>
             <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownActions" data-dropdown-toggle="dropdownMenuActions">
                     <i class="bi bi-three-dots"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
+                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuActions">
                     <li>
                         <a class="dropdown-item" href="/Finance/Invoices/Details/@Model.Payment.InvoiceId">
                             <i class="bi bi-file-text me-2"></i>View Invoice
@@ -73,7 +73,7 @@
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
         </div>
     }
 
@@ -81,7 +81,7 @@
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
         </div>
     }
 

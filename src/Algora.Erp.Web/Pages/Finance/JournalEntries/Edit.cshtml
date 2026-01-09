@@ -44,7 +44,7 @@
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
         </div>
     }
 
@@ -62,7 +62,7 @@
                 {
                     <span>@error.ErrorMessage</span><br />
                 }
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
             </div>
         }
 
@@ -192,7 +192,7 @@
                                         <i class="bi bi-check-lg me-2"></i>Submit for Approval
                                     </button>
                                 }
-                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <button type="button" class="btn btn-outline-danger" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
                                     <i class="bi bi-trash me-2"></i>Delete Entry
                                 </button>
                             }
@@ -343,14 +343,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Delete Journal Entry</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="deleteModal"></button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete journal entry <strong>@Model.Input.EntryNumber</strong>?</p>
                 <p class="text-muted small">This action cannot be undone.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-modal-hide="deleteModal">Cancel</button>
                 <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Input.Id" class="d-inline">
                     <button type="submit" class="btn btn-danger">
                         <i class="bi bi-trash me-1"></i>Delete

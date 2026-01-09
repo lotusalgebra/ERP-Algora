@@ -8,8 +8,7 @@
     <button class="btn btn-sm btn-primary"
             hx-get="?handler=LocationForm&warehouseId=@Model.Warehouse.Id"
             hx-target="#locationFormModalBody"
-            data-bs-toggle="modal"
-            data-bs-target="#locationFormModal">
+            data-modal-target="locationFormModal" data-modal-toggle="locationFormModal">
         <i class="bi bi-plus-lg me-1"></i>Add Location
     </button>
 </div>
@@ -69,8 +68,7 @@
                                             class="btn btn-outline-primary"
                                             hx-get="?handler=LocationForm&warehouseId=@Model.Warehouse.Id&locationId=@location.Id"
                                             hx-target="#locationFormModalBody"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#locationFormModal"
+                                            data-modal-target="locationFormModal" data-modal-toggle="locationFormModal"
                                             title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </button>

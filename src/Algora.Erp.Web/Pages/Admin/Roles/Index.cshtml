@@ -16,7 +16,7 @@
                 </ol>
             </nav>
         </div>
-        <button type="button" class="btn btn-primary" hx-get="/Admin/Roles?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-bs-toggle="modal" data-bs-target="#roleModal">
+        <button type="button" class="btn btn-primary" hx-get="/Admin/Roles?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-modal-target="roleModal" data-modal-toggle="roleModal">
             <i class="bi bi-plus-lg me-1"></i> New Role
         </button>
     </div>
@@ -138,13 +138,10 @@
             searchTimeout = setTimeout(() => loadTable(), 300);
         });
 
-        document.getElementById('roleModal').addEventListener('hidden.bs.modal', () => {
-            document.getElementById('formContainer').innerHTML = '';
-        });
-
         document.body.addEventListener('htmx:afterRequest', (e) => {
-            if (e.detail.elt.closest('#roleModal')) {
-                bootstrap.Modal.getInstance(document.getElementById('roleModal'))?.hide();
+            if (e.detail.elt.closest('#roleModal') && e.detail.successful) {
+                const modal = FlowbiteInstances.getInstance('Modal', 'roleModal');
+                if (modal) modal.hide();
             }
         });
     </script>

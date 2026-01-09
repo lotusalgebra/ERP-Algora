@@ -85,14 +85,15 @@ else
             </td>
             <td>
                 <div class="dropdown">
-                    <button class="btn btn-link btn-sm text-muted" data-bs-toggle="dropdown">
+                    <button class="btn btn-link btn-sm text-muted" id="dropdownEmployee@(employee.Id)" data-dropdown-toggle="dropdownMenuEmployee@(employee.Id)">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuEmployee@(employee.Id)">
                         <li>
-                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#employeeModal"
+                            <a class="dropdown-item" href="#"
                                hx-get="/HR/Employees?handler=EditForm&id=@employee.Id"
-                               hx-target="#employeeModalContent" hx-swap="innerHTML">
+                               hx-target="#employeeModalContent" hx-swap="innerHTML"
+                               data-modal-target="employeeModal" data-modal-toggle="employeeModal">
                                 <i class="bi bi-pencil me-2"></i>Edit
                             </a>
                         </li>

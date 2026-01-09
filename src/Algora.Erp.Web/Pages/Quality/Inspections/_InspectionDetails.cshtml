@@ -265,15 +265,15 @@
 <div class="modal-footer mt-4 px-0 pb-0">
     @if (Model.Status == InspectionStatus.Pending || Model.Status == InspectionStatus.InProgress)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editInspection('@Model.Id')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-outline-primary" onclick="editInspection('@Model.Id')" data-modal-hide="detailsModal">
             <i class="bi bi-pencil me-2"></i>Edit / Record Results
         </button>
     }
     @if (Model.Status == InspectionStatus.Completed)
     {
-        <button type="button" class="btn btn-success" onclick="approveInspection('@Model.Id')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-success" onclick="approveInspection('@Model.Id')" data-modal-hide="detailsModal">
             <i class="bi bi-check-circle me-2"></i>Approve
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
 </div>

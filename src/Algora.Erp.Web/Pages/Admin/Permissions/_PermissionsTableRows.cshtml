@@ -24,8 +24,7 @@
                             hx-get="/Admin/Permissions?handler=EditForm&id=@perm.Id"
                             hx-target="#formContainer"
                             hx-swap="innerHTML"
-                            data-bs-toggle="modal"
-                            data-bs-target="#permissionModal">
+                            data-modal-target="permissionModal" data-modal-toggle="permissionModal">
                         <i class="bi bi-pencil"></i>
                     </button>
                     @if (!perm.RolePermissions.Any())

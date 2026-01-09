@@ -22,7 +22,7 @@
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
         </div>
     }
 
@@ -30,7 +30,7 @@
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
         </div>
     }
 
@@ -40,25 +40,25 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
                     <div class="nav flex-column nav-pills" id="settingsTabs" role="tablist">
-                        <button class="nav-link active text-start rounded-0 border-bottom" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button">
+                        <button class="nav-link active text-start rounded-0 border-bottom" id="general-tab" data-tabs-target="#general" type="button" role="tab">
                             <i class="bi bi-building me-2"></i>General & Company
                         </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="currency-tab" data-bs-toggle="pill" data-bs-target="#currency" type="button">
+                        <button class="nav-link text-start rounded-0 border-bottom" id="currency-tab" data-tabs-target="#currency" type="button" role="tab">
                             <i class="bi bi-currency-exchange me-2"></i>Currency
                         </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="tax-tab" data-bs-toggle="pill" data-bs-target="#tax" type="button">
+                        <button class="nav-link text-start rounded-0 border-bottom" id="tax-tab" data-tabs-target="#tax" type="button" role="tab">
                             <i class="bi bi-percent me-2"></i>Tax Settings
                         </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="invoice-tab" data-bs-toggle="pill" data-bs-target="#invoice" type="button">
+                        <button class="nav-link text-start rounded-0 border-bottom" id="invoice-tab" data-tabs-target="#invoice" type="button" role="tab">
                             <i class="bi bi-receipt me-2"></i>Invoice Settings
                         </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="email-tab" data-bs-toggle="pill" data-bs-target="#email" type="button">
+                        <button class="nav-link text-start rounded-0 border-bottom" id="email-tab" data-tabs-target="#email" type="button" role="tab">
                             <i class="bi bi-envelope me-2"></i>Email (SMTP)
                         </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button">
+                        <button class="nav-link text-start rounded-0 border-bottom" id="security-tab" data-tabs-target="#security" type="button" role="tab">
                             <i class="bi bi-shield-lock me-2"></i>Security
                         </button>
-                        <button class="nav-link text-start rounded-0" id="about-tab" data-bs-toggle="pill" data-bs-target="#about" type="button">
+                        <button class="nav-link text-start rounded-0" id="about-tab" data-tabs-target="#about" type="button" role="tab">
                             <i class="bi bi-info-circle me-2"></i>About
                         </button>
                     </div>

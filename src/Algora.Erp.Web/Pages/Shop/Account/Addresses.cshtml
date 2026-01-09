@@ -54,7 +54,7 @@
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
                 </div>
             }
 
@@ -62,7 +62,7 @@
             <div class="card border mb-4">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Saved Addresses</h5>
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#addAddressForm">
+                    <button class="btn btn-sm btn-primary" data-collapse-toggle="addAddressForm">
                         <i class="bi bi-plus me-1"></i>Add New
                     </button>
                 </div>
@@ -195,7 +195,7 @@
 
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-primary">Save Address</button>
-                                <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="collapse" data-bs-target="#addAddressForm">Cancel</button>
+                                <button type="button" class="btn btn-outline-secondary ms-2" data-collapse-toggle="addAddressForm">Cancel</button>
                             </div>
                         </form>
                     </div>

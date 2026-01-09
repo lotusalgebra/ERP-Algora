@@ -274,15 +274,15 @@
 <div class="modal-footer mt-4 px-0 pb-0">
     @if (Model.Status == InvoiceStatus.Draft || Model.Status == InvoiceStatus.Pending)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editInvoice('@Model.Id')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-outline-primary" onclick="editInvoice('@Model.Id')" data-modal-hide="detailsModal">
             <i class="bi bi-pencil me-2"></i>Edit
         </button>
     }
     @if (Model.BalanceDue > 0 && Model.Status != InvoiceStatus.Draft && Model.Status != InvoiceStatus.Void && Model.Status != InvoiceStatus.Cancelled)
     {
-        <button type="button" class="btn btn-success" onclick="showPaymentModal('@Model.Id', '@Model.BalanceDue.ToString("C2")')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-success" onclick="showPaymentModal('@Model.Id', '@Model.BalanceDue.ToString("C2")')" data-modal-hide="detailsModal">
             <i class="bi bi-cash me-2"></i>Record Payment
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
 </div>

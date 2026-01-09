@@ -33,7 +33,7 @@
     <h5 class="modal-title">
         <i class="bi bi-clipboard-check me-2"></i>@Model.WorkOrderNumber
     </h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" data-modal-hide="detailsModal" aria-label="Close"></button>
 </div>
 <div class="modal-body">
     <!-- Header Info -->
@@ -260,15 +260,15 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
     @if (Model.Status == WorkOrderStatus.Draft || Model.Status == WorkOrderStatus.Released)
     {
         <button type="button"
-                class="btn btn-primary"
+                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                 hx-get="/Manufacturing/WorkOrders?handler=EditForm&id=@Model.Id"
                 hx-target="#formModalContent"
-                data-bs-dismiss="modal"
-                onclick="setTimeout(() => new bootstrap.Modal(document.getElementById('formModal')).show(), 300)">
+                data-modal-hide="detailsModal"
+                onclick="setTimeout(() => { const modal = FlowbiteInstances.getInstance('Modal', 'formModal'); if(modal) modal.show(); }, 300)">
             <i class="bi bi-pencil me-1"></i> Edit
         </button>
     }

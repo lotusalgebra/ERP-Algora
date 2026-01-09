@@ -164,7 +164,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Stock Adjustment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="adjustmentModal"></button>
             </div>
             <form hx-post="/Inventory/Stock?handler=Adjust" hx-target="#stockTableBody" hx-swap="innerHTML">
                 <div class="modal-body">
@@ -188,7 +188,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-modal-hide="adjustmentModal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Apply Adjustment</button>
                 </div>
             </form>
@@ -231,16 +231,14 @@
             document.getElementById('adjustStockLevelId').value = id;
             document.getElementById('adjustProductName').value = productName;
             document.getElementById('adjustCurrentQty').value = currentQty;
-            new bootstrap.Modal(document.getElementById('adjustmentModal')).show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'adjustmentModal');
+            if (modal) modal.show();
         }
 
-        document.getElementById('adjustmentModal').addEventListener('hidden.bs.modal', () => {
-            document.querySelector('#adjustmentModal form').reset();
-        });
-
         document.body.addEventListener('htmx:afterRequest', (e) => {
-            if (e.detail.elt.closest('#adjustmentModal')) {
-                bootstrap.Modal.getInstance(document.getElementById('adjustmentModal'))?.hide();
+            if (e.detail.elt.closest('#adjustmentModal') && e.detail.successful) {
+                const modal = FlowbiteInstances.getInstance('Modal', 'adjustmentModal');
+                if (modal) modal.hide();
             }
         });
     </script>

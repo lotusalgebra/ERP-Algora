@@ -95,8 +95,7 @@ else
                                 class="btn btn-sm btn-outline-primary"
                                 hx-get="/Projects/TimeTracking?handler=EditForm&id=@entry.Id"
                                 hx-target="#formModalContent"
-                                data-bs-toggle="modal"
-                                data-bs-target="#formModal"
+                                data-modal-target="formModal" data-modal-toggle="formModal"
                                 title="Edit">
                             <i class="bi bi-pencil"></i>
                         </button>
@@ -142,8 +141,7 @@ else
                                 class="btn btn-sm btn-outline-primary"
                                 hx-get="/Projects/TimeTracking?handler=EditForm&id=@entry.Id"
                                 hx-target="#formModalContent"
-                                data-bs-toggle="modal"
-                                data-bs-target="#formModal"
+                                data-modal-target="formModal" data-modal-toggle="formModal"
                                 title="Edit and Resubmit">
                             <i class="bi bi-pencil"></i>
                         </button>

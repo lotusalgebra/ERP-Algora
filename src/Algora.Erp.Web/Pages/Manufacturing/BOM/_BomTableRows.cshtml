@@ -30,8 +30,7 @@ else
                    class="text-decoration-none fw-semibold"
                    hx-get="/Manufacturing/BOM?handler=Details&id=@bom.Id"
                    hx-target="#detailsModalContent"
-                   data-bs-toggle="modal"
-                   data-bs-target="#detailsModal">
+                   data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @bom.BomNumber
                 </a>
             </td>
@@ -69,8 +68,7 @@ else
                             class="btn btn-sm btn-outline-secondary"
                             hx-get="/Manufacturing/BOM?handler=Details&id=@bom.Id"
                             hx-target="#detailsModalContent"
-                            data-bs-toggle="modal"
-                            data-bs-target="#detailsModal"
+                            data-modal-target="detailsModal" data-modal-toggle="detailsModal"
                             title="View Details">
                         <i class="bi bi-eye"></i>
                     </button>
@@ -78,8 +76,7 @@ else
                             class="btn btn-sm btn-outline-primary"
                             hx-get="/Manufacturing/BOM?handler=EditForm&id=@bom.Id"
                             hx-target="#formModalContent"
-                            data-bs-toggle="modal"
-                            data-bs-target="#formModal"
+                            data-modal-target="formModal" data-modal-toggle="formModal"
                             title="Edit">
                         <i class="bi bi-pencil"></i>
                     </button>

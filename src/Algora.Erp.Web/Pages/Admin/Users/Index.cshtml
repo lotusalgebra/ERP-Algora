@@ -17,7 +17,7 @@
                 </ol>
             </nav>
         </div>
-        <button type="button" class="btn btn-primary" hx-get="/Admin/Users?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-bs-toggle="modal" data-bs-target="#userModal">
+        <button type="button" class="btn btn-primary" hx-get="/Admin/Users?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-modal-target="userModal" data-modal-toggle="userModal">
             <i class="bi bi-plus-lg me-1"></i> New User
         </button>
     </div>
@@ -165,13 +165,10 @@
         statusFilter.addEventListener('change', () => loadTable());
         roleFilter.addEventListener('change', () => loadTable());
 
-        document.getElementById('userModal').addEventListener('hidden.bs.modal', () => {
-            document.getElementById('formContainer').innerHTML = '';
-        });
-
         document.body.addEventListener('htmx:afterRequest', (e) => {
-            if (e.detail.elt.closest('#userModal')) {
-                bootstrap.Modal.getInstance(document.getElementById('userModal'))?.hide();
+            if (e.detail.elt.closest('#userModal') && e.detail.successful) {
+                const modal = FlowbiteInstances.getInstance('Modal', 'userModal');
+                if (modal) modal.hide();
             }
         });
     </script>

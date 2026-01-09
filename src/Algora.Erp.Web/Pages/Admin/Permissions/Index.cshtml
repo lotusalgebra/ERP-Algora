@@ -16,7 +16,7 @@
                 </ol>
             </nav>
         </div>
-        <button type="button" class="btn btn-primary" hx-get="/Admin/Permissions?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-bs-toggle="modal" data-bs-target="#permissionModal">
+        <button type="button" class="btn btn-primary" hx-get="/Admin/Permissions?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-modal-target="permissionModal" data-modal-toggle="permissionModal">
             <i class="bi bi-plus-lg me-1"></i> New Permission
         </button>
     </div>
@@ -151,13 +151,10 @@
 
         moduleFilter.addEventListener('change', () => loadTable());
 
-        document.getElementById('permissionModal').addEventListener('hidden.bs.modal', () => {
-            document.getElementById('formContainer').innerHTML = '';
-        });
-
         document.body.addEventListener('htmx:afterRequest', (e) => {
-            if (e.detail.elt.closest('#permissionModal')) {
-                bootstrap.Modal.getInstance(document.getElementById('permissionModal'))?.hide();
+            if (e.detail.elt.closest('#permissionModal') && e.detail.successful) {
+                const modal = FlowbiteInstances.getInstance('Modal', 'permissionModal');
+                if (modal) modal.hide();
             }
         });
     </script>

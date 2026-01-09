@@ -20,8 +20,7 @@
         <button type="button" class="btn btn-primary"
                 hx-get="/HR/Positions?handler=CreateForm"
                 hx-target="#formContainer"
-                data-bs-toggle="modal"
-                data-bs-target="#positionModal">
+                data-modal-target="positionModal" data-modal-toggle="positionModal">
             <i class="bi bi-plus-lg me-1"></i> Add Position
         </button>
     </div>
@@ -189,7 +188,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Position</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="positionModal"></button>
             </div>
             <div class="modal-body" id="formContainer">
                 <div class="text-center py-4">

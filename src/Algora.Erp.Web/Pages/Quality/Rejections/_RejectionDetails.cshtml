@@ -278,12 +278,12 @@
 <div class="modal-footer mt-4 px-0 pb-0">
     @if (Model.DispositionStatus == RejectionDisposition.Pending || Model.DispositionStatus == RejectionDisposition.HoldForReview)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editRejection('@Model.Id')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-outline-primary" onclick="editRejection('@Model.Id')" data-modal-hide="detailsModal">
             <i class="bi bi-pencil me-2"></i>Edit
         </button>
-        <button type="button" class="btn btn-primary" onclick="showDispositionModal('@Model.Id', '@Model.DispositionStatus')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-primary" onclick="showDispositionModal('@Model.Id', '@Model.DispositionStatus')" data-modal-hide="detailsModal">
             <i class="bi bi-arrow-right-circle me-2"></i>Update Disposition
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
 </div>

@@ -59,10 +59,10 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-light" id="dropdownGst@(slab.Id)" data-dropdown-toggle="dropdownMenuGst@(slab.Id)">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuGst@(slab.Id)">
                         <li>
                             <a class="dropdown-item" href="#"
                                onclick='editSlab(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {

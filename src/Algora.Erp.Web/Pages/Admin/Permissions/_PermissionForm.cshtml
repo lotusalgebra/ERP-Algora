@@ -3,7 +3,7 @@
 <form hx-post="/Admin/Permissions" hx-target="#permissionsTableBody" hx-swap="innerHTML">
     <div class="modal-header">
         <h5 class="modal-title">@(Model.IsEdit ? "Edit Permission" : "New Permission")</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-modal-hide="permissionModal"></button>
     </div>
     <div class="modal-body">
         @if (Model.IsEdit)
@@ -46,7 +46,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-modal-hide="permissionModal">Cancel</button>
         <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Update" : "Create") Permission</button>
     </div>
 </form>

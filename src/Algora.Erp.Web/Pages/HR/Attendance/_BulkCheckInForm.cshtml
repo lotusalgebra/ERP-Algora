@@ -2,50 +2,50 @@
 @using Algora.Erp.Domain.Entities.HR
 
 <form hx-post="/HR/Attendance?handler=BulkCheckIn" hx-target="#tableContent" hx-swap="innerHTML"
-      hx-on::after-request="if(event.detail.successful) bootstrap.Modal.getInstance(document.getElementById('attendanceModal')).hide()">
+      hx-on::after-request="if(event.detail.successful) { const modal = FlowbiteInstances.getInstance('Modal', 'attendanceModal'); if(modal) modal.hide(); }">
 
     <input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" />
 
-    <div class="alert alert-info mb-4">
+    <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
         <i class="bi bi-info-circle me-2"></i>
         Select employees to mark attendance for <strong>@Model.Date.ToString("MMMM dd, yyyy")</strong>
     </div>
 
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label">Check-In Time <span class="text-danger">*</span></label>
-            <input type="time" class="form-control" name="CheckInTime" value="09:00" required>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Check-In Time <span class="text-red-500">*</span></label>
+            <input type="time" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="CheckInTime" value="09:00" required>
         </div>
-        <div class="col-md-6">
-            <label class="form-label">Status <span class="text-danger">*</span></label>
-            <select class="form-select" name="Status" required>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Status" required>
                 <option value="0" selected>Present</option>
                 <option value="2">Late</option>
                 <option value="7">Work From Home</option>
             </select>
         </div>
-        <div class="col-12">
-            <label class="form-label">Select Employees</label>
-            <div class="mb-2">
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll()">
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Employees</label>
+            <div class="mb-2 flex gap-2">
+                <button type="button" class="px-3 py-1.5 text-xs font-medium text-primary-700 bg-primary-50 border border-primary-200 rounded-lg hover:bg-primary-100" onclick="selectAll()">
                     Select All
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">
+                <button type="button" class="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100" onclick="deselectAll()">
                     Deselect All
                 </button>
             </div>
 
             @if (Model.Employees.Any())
             {
-                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                <div class="border border-gray-200 rounded-lg p-3 max-h-72 overflow-y-auto">
                     @foreach (var emp in Model.Employees)
                     {
-                        <div class="form-check mb-2">
-                            <input class="form-check-input employee-check" type="checkbox"
+                        <div class="flex items-center mb-2">
+                            <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 employee-check" type="checkbox"
                                    name="EmployeeIds" value="@emp.Id" id="emp_@emp.Id">
-                            <label class="form-check-label" for="emp_@emp.Id">
+                            <label class="ms-2 text-sm font-medium text-gray-900" for="emp_@emp.Id">
                                 @emp.FirstName @emp.LastName
-                                <small class="text-muted">(@emp.EmployeeCode)</small>
+                                <span class="text-gray-500">(@emp.EmployeeCode)</span>
                             </label>
                         </div>
                     }
@@ -53,7 +53,7 @@
             }
             else
             {
-                <div class="alert alert-warning mb-0">
+                <div class="p-4 text-sm text-amber-800 rounded-lg bg-amber-50" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     All employees already have attendance records for today.
                 </div>
@@ -61,9 +61,9 @@
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary" @(Model.Employees.Any() ? "" : "disabled")>
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+        <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" data-modal-hide="attendanceModal">Cancel</button>
+        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 @(Model.Employees.Any() ? "" : "opacity-50 cursor-not-allowed")" @(Model.Employees.Any() ? "" : "disabled")>
             <i class="bi bi-clock me-1"></i> Bulk Check-In
         </button>
     </div>

@@ -43,8 +43,7 @@ else
                    class="text-decoration-none fw-semibold"
                    hx-get="/Projects?handler=Details&id=@project.Id"
                    hx-target="#detailsModalContent"
-                   data-bs-toggle="modal"
-                   data-bs-target="#detailsModal">
+                   data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @project.ProjectCode
                 </a>
                 <div class="small text-muted">@project.Name</div>
@@ -97,8 +96,7 @@ else
                             class="btn btn-sm btn-outline-secondary"
                             hx-get="/Projects?handler=Details&id=@project.Id"
                             hx-target="#detailsModalContent"
-                            data-bs-toggle="modal"
-                            data-bs-target="#detailsModal"
+                            data-modal-target="detailsModal" data-modal-toggle="detailsModal"
                             title="View Details">
                         <i class="bi bi-eye"></i>
                     </button>
@@ -108,8 +106,7 @@ else
                                 class="btn btn-sm btn-outline-primary"
                                 hx-get="/Projects?handler=EditForm&id=@project.Id"
                                 hx-target="#formModalContent"
-                                data-bs-toggle="modal"
-                                data-bs-target="#formModal"
+                                data-modal-target="formModal" data-modal-toggle="formModal"
                                 title="Edit">
                             <i class="bi bi-pencil"></i>
                         </button>

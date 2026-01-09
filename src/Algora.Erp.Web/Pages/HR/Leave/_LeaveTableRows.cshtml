@@ -86,10 +86,10 @@
         </td>
         <td class="text-end pe-4">
             <div class="dropdown">
-                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                <button class="btn btn-sm btn-light" id="dropdownLeave@(leave.Id)" data-dropdown-toggle="dropdownMenuLeave@(leave.Id)">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
+                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuLeave@(leave.Id)">
                     @if (leave.Status == LeaveStatus.Pending)
                     {
                         <li>
@@ -113,8 +113,7 @@
                             <a class="dropdown-item" href="#"
                                hx-get="/HR/Leave?handler=EditForm&id=@leave.Id"
                                hx-target="#formContainer"
-                               data-bs-toggle="modal"
-                               data-bs-target="#leaveModal">
+                               data-modal-target="leaveModal" data-modal-toggle="leaveModal">
                                 <i class="bi bi-pencil me-2"></i> Edit
                             </a>
                         </li>

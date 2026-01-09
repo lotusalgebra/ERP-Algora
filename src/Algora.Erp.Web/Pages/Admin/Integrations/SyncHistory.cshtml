@@ -222,7 +222,7 @@
                                         @if (!string.IsNullOrEmpty(log.ErrorMessage))
                                         {
                                             <button type="button" class="btn btn-sm btn-outline-danger"
-                                                    data-bs-toggle="modal" data-bs-target="#errorModal"
+                                                    data-modal-target="errorModal" data-modal-toggle="errorModal"
                                                     data-error="@log.ErrorMessage">
                                                 <i class="bi bi-eye"></i>
                                             </button>
@@ -273,7 +273,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Error Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="errorModal"></button>
             </div>
             <div class="modal-body">
                 <pre id="errorContent" class="bg-light p-3 rounded" style="white-space: pre-wrap;"></pre>
@@ -284,10 +284,12 @@
 
 @section Scripts {
     <script>
-        document.getElementById('errorModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var error = button.getAttribute('data-error');
-            document.getElementById('errorContent').textContent = error;
+        // Handle error modal content population for Flowbite
+        document.querySelectorAll('[data-modal-target="errorModal"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var error = this.getAttribute('data-error');
+                document.getElementById('errorContent').textContent = error;
+            });
         });
     </script>
 }

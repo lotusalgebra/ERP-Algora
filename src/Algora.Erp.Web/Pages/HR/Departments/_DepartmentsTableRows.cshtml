@@ -56,16 +56,15 @@
         </td>
         <td class="text-end pe-4">
             <div class="dropdown">
-                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                <button class="btn btn-sm btn-light" id="dropdownDept@(dept.Id)" data-dropdown-toggle="dropdownMenuDept@(dept.Id)">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
+                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuDept@(dept.Id)">
                     <li>
                         <a class="dropdown-item" href="#"
                            hx-get="/HR/Departments?handler=EditForm&id=@dept.Id"
                            hx-target="#formContainer"
-                           data-bs-toggle="modal"
-                           data-bs-target="#departmentModal">
+                           data-modal-target="departmentModal" data-modal-toggle="departmentModal">
                             <i class="bi bi-pencil me-2"></i> Edit
                         </a>
                     </li>

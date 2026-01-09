@@ -14,8 +14,7 @@
         <button class="btn btn-primary"
                 hx-get="?handler=CreateForm"
                 hx-target="#formModalBody"
-                data-bs-toggle="modal"
-                data-bs-target="#formModal">
+                data-modal-target="formModal" data-modal-toggle="formModal">
             <i class="bi bi-plus-lg me-2"></i>Add Warehouse
         </button>
     </div>
@@ -179,7 +178,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Warehouse</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="formModal"></button>
             </div>
             <div class="modal-body" id="formModalBody">
                 <div class="text-center py-5">
@@ -198,7 +197,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Warehouse Locations</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="locationsModal"></button>
             </div>
             <div class="modal-body" id="locationsModalBody">
                 <div class="text-center py-5">
@@ -212,12 +211,12 @@
 </div>
 
 <!-- Location Form Modal -->
-<div class="modal fade" id="locationFormModal" tabindex="-1" data-bs-backdrop="static">
+<div class="modal fade" id="locationFormModal" tabindex="-1" data-modal-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Location</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="locationFormModal"></button>
             </div>
             <div class="modal-body" id="locationFormModalBody">
                 <div class="text-center py-5">
@@ -236,13 +235,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="deleteModal"></button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete this warehouse? This action cannot be undone.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-modal-hide="deleteModal">Cancel</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
             </div>
         </div>
@@ -252,11 +251,11 @@
 @section Scripts {
     <script>
         let deleteId = null;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 
         function confirmDelete(id) {
             deleteId = id;
-            deleteModal.show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
+            if (modal) modal.show();
         }
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
@@ -265,7 +264,8 @@
                     target: '#warehousesTableBody',
                     swap: 'innerHTML'
                 }).then(() => {
-                    deleteModal.hide();
+                    const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
+                    if (modal) modal.hide();
                     deleteId = null;
                 });
             }
@@ -276,15 +276,18 @@
                 target: '#locationsModalBody',
                 swap: 'innerHTML'
             });
-            new bootstrap.Modal(document.getElementById('locationsModal')).show();
+            const modal = FlowbiteInstances.getInstance('Modal', 'locationsModal');
+            if (modal) modal.show();
         }
 
         document.body.addEventListener('formSubmitSuccess', function() {
-            bootstrap.Modal.getInstance(document.getElementById('formModal'))?.hide();
+            const modal = FlowbiteInstances.getInstance('Modal', 'formModal');
+            if (modal) modal.hide();
         });
 
         document.body.addEventListener('locationFormSuccess', function() {
-            bootstrap.Modal.getInstance(document.getElementById('locationFormModal'))?.hide();
+            const modal = FlowbiteInstances.getInstance('Modal', 'locationFormModal');
+            if (modal) modal.hide();
         });
     </script>
 }

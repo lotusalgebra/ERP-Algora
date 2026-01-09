@@ -20,8 +20,7 @@
         <button type="button" class="btn btn-primary"
                 hx-get="/Projects/TimeTracking?handler=CreateForm"
                 hx-target="#formModalContent"
-                data-bs-toggle="modal"
-                data-bs-target="#formModal">
+                data-modal-target="formModal" data-modal-toggle="formModal">
             <i class="bi bi-plus-lg me-1"></i> Log Time
         </button>
     </div>
@@ -206,10 +205,8 @@
         // Close modal after successful form submission
         document.body.addEventListener('htmx:afterSwap', function(event) {
             if (event.detail.target.id === 'timeEntriesTableContainer') {
-                var formModal = bootstrap.Modal.getInstance(document.getElementById('formModal'));
-                if (formModal) {
-                    formModal.hide();
-                }
+                const modal = FlowbiteInstances.getInstance('Modal', 'formModal');
+                if (modal) modal.hide();
             }
         });
     </script>

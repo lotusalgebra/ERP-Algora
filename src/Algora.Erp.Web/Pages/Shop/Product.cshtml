@@ -266,8 +266,14 @@ else
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
 
-            const toast = new bootstrap.Toast(document.getElementById('cartToast'));
-            toast.show();
+            // Show toast notification
+            const toast = document.getElementById('cartToast');
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
         }
     </script>
 }

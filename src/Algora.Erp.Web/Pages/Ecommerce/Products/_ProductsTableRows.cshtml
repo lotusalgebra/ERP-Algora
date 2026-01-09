@@ -91,8 +91,7 @@ else
                     <button class="btn btn-outline-primary"
                             hx-get="?handler=EditForm&id=@product.Id"
                             hx-target="#formModalBody"
-                            data-bs-toggle="modal"
-                            data-bs-target="#formModal">
+                            data-modal-target="formModal" data-modal-toggle="formModal">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-outline-danger" onclick="confirmDelete('@product.Id')">

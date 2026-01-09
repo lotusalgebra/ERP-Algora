@@ -22,15 +22,13 @@
             <button type="button" class="btn btn-outline-primary"
                     hx-get="/HR/Attendance?handler=BulkCheckIn"
                     hx-target="#formContainer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#attendanceModal">
+                    data-modal-target="attendanceModal" data-modal-toggle="attendanceModal">
                 <i class="bi bi-clock me-1"></i> Bulk Check-In
             </button>
             <button type="button" class="btn btn-primary"
                     hx-get="/HR/Attendance?handler=CreateForm"
                     hx-target="#formContainer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#attendanceModal">
+                    data-modal-target="attendanceModal" data-modal-toggle="attendanceModal">
                 <i class="bi bi-plus-lg me-1"></i> Add Attendance
             </button>
         </div>
@@ -204,7 +202,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Attendance</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="attendanceModal"></button>
             </div>
             <div class="modal-body" id="formContainer">
                 <div class="text-center py-4">

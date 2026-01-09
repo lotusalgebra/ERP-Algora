@@ -56,10 +56,10 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-light" id="dropdownCurr@(currency.Id)" data-dropdown-toggle="dropdownMenuCurr@(currency.Id)">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuCurr@(currency.Id)">
                         <li>
                             <a class="dropdown-item" href="#"
                                onclick='editCurrency(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {

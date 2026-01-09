@@ -67,10 +67,10 @@ else
                         </div>
                     </div>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                        <button class="btn btn-sm btn-light" id="dropdownLoc@(location.Id)" data-dropdown-toggle="dropdownMenuLoc@(location.Id)">
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuLoc@(location.Id)">
                             <li>
                                 <a class="dropdown-item" href="#"
                                    onclick='editLocation(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {

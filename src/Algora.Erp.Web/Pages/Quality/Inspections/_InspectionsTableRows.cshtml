@@ -85,10 +85,10 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" id="dropdownInsp@(inspection.Id)" data-dropdown-toggle="dropdownMenuInsp@(inspection.Id)">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuInsp@(inspection.Id)">
                         <li>
                             <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@inspection.Id')">
                                 <i class="bi bi-eye me-2"></i>View Details

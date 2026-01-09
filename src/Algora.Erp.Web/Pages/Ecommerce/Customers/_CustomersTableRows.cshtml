@@ -24,8 +24,7 @@ else
                         <a href="#" class="text-primary fw-semibold text-decoration-none"
                            hx-get="?handler=Details&id=@customer.Id"
                            hx-target="#detailsModalBody"
-                           data-bs-toggle="modal"
-                           data-bs-target="#detailsModal">
+                           data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                             @customer.FirstName @customer.LastName
                         </a>
                     </div>
@@ -52,16 +51,15 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownCust@(customer.Id)" data-dropdown-toggle="dropdownMenuCust@(customer.Id)">
                         <i class="bi bi-gear"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuCust@(customer.Id)">
                         <li>
                             <a class="dropdown-item" href="#"
                                hx-get="?handler=Details&id=@customer.Id"
                                hx-target="#detailsModalBody"
-                               data-bs-toggle="modal"
-                               data-bs-target="#detailsModal">
+                               data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                                 <i class="bi bi-eye me-2"></i>View Details
                             </a>
                         </li>
@@ -69,8 +67,7 @@ else
                             <a class="dropdown-item" href="#"
                                hx-get="?handler=EditForm&id=@customer.Id"
                                hx-target="#customerModalBody"
-                               data-bs-toggle="modal"
-                               data-bs-target="#customerModal">
+                               data-modal-target="customerModal" data-modal-toggle="customerModal">
                                 <i class="bi bi-pencil me-2"></i>Edit
                             </a>
                         </li>

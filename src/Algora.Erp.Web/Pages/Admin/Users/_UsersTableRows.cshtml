@@ -63,8 +63,7 @@
                             hx-get="/Admin/Users?handler=EditForm&id=@user.Id"
                             hx-target="#formContainer"
                             hx-swap="innerHTML"
-                            data-bs-toggle="modal"
-                            data-bs-target="#userModal">
+                            data-modal-target="userModal" data-modal-toggle="userModal">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button type="button" class="btn btn-outline-@(user.Status == UserStatus.Active ? "warning" : "success")"

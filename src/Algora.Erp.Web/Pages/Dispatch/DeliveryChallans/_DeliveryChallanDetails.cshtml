@@ -292,24 +292,24 @@
 <div class="modal-footer mt-4 px-0 pb-0">
     @if (Model.Status == DeliveryChallanStatus.Draft)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editChallan('@Model.Id')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-outline-primary" onclick="editChallan('@Model.Id')" data-modal-hide="detailsModal">
             <i class="bi bi-pencil me-2"></i>Edit
         </button>
-        <button type="button" class="btn btn-info" onclick="updateStatus('@Model.Id', 'Confirmed')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-info" onclick="updateStatus('@Model.Id', 'Confirmed')" data-modal-hide="detailsModal">
             <i class="bi bi-check-circle me-2"></i>Confirm
         </button>
     }
     @if (Model.Status == DeliveryChallanStatus.Confirmed)
     {
-        <button type="button" class="btn btn-primary" onclick="updateStatus('@Model.Id', 'Dispatched')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-primary" onclick="updateStatus('@Model.Id', 'Dispatched')" data-modal-hide="detailsModal">
             <i class="bi bi-truck me-2"></i>Mark Dispatched
         </button>
     }
     @if (Model.Status == DeliveryChallanStatus.Dispatched)
     {
-        <button type="button" class="btn btn-success" onclick="updateStatus('@Model.Id', 'Delivered')" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-success" onclick="updateStatus('@Model.Id', 'Delivered')" data-modal-hide="detailsModal">
             <i class="bi bi-check-all me-2"></i>Mark Delivered
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
 </div>

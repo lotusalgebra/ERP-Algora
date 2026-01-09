@@ -215,23 +215,23 @@
 
     <!-- Actions -->
     <div class="mt-4 d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+        <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" data-modal-hide="detailsModal">
             Close
         </button>
-        <div class="btn-group">
+        <div class="flex gap-2">
             @if (Model.Status == SalesOrderStatus.Draft)
             {
-                <button type="button" class="btn btn-primary" onclick="updateStatus('@Model.Id', 'Sent'); bootstrap.Modal.getInstance(document.getElementById('detailsModal')).hide();">
+                <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700" onclick="updateStatus('@Model.Id', 'Sent'); FlowbiteInstances.getInstance('Modal', 'detailsModal').hide();">
                     <i class="bi bi-send me-1"></i>Send to Customer
                 </button>
             }
             else if (Model.Status == SalesOrderStatus.Confirmed)
             {
-                <button type="button" class="btn btn-success" onclick="convertToOrder('@Model.Id'); bootstrap.Modal.getInstance(document.getElementById('detailsModal')).hide();">
+                <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700" onclick="convertToOrder('@Model.Id'); FlowbiteInstances.getInstance('Modal', 'detailsModal').hide();">
                     <i class="bi bi-bag-plus me-1"></i>Convert to Order
                 </button>
             }
-            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+            <button type="button" class="px-4 py-2 text-sm font-medium text-primary-700 bg-white border border-primary-300 rounded-lg hover:bg-primary-50" onclick="window.print()">
                 <i class="bi bi-printer me-1"></i>Print
             </button>
         </div>

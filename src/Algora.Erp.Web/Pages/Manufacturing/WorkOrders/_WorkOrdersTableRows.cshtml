@@ -50,8 +50,7 @@ else
                    class="text-decoration-none fw-semibold"
                    hx-get="/Manufacturing/WorkOrders?handler=Details&id=@wo.Id"
                    hx-target="#detailsModalContent"
-                   data-bs-toggle="modal"
-                   data-bs-target="#detailsModal">
+                   data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @wo.WorkOrderNumber
                 </a>
                 @if (isOverdue)
@@ -96,8 +95,7 @@ else
                             class="btn btn-sm btn-outline-secondary"
                             hx-get="/Manufacturing/WorkOrders?handler=Details&id=@wo.Id"
                             hx-target="#detailsModalContent"
-                            data-bs-toggle="modal"
-                            data-bs-target="#detailsModal"
+                            data-modal-target="detailsModal" data-modal-toggle="detailsModal"
                             title="View Details">
                         <i class="bi bi-eye"></i>
                     </button>
@@ -107,8 +105,7 @@ else
                                 class="btn btn-sm btn-outline-primary"
                                 hx-get="/Manufacturing/WorkOrders?handler=EditForm&id=@wo.Id"
                                 hx-target="#formModalContent"
-                                data-bs-toggle="modal"
-                                data-bs-target="#formModal"
+                                data-modal-target="formModal" data-modal-toggle="formModal"
                                 title="Edit">
                             <i class="bi bi-pencil"></i>
                         </button>

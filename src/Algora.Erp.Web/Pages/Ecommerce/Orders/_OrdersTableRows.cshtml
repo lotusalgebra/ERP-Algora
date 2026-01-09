@@ -19,8 +19,7 @@ else
                 <a href="#" class="text-primary fw-semibold"
                    hx-get="?handler=Details&id=@order.Id"
                    hx-target="#detailsModalBody"
-                   data-bs-toggle="modal"
-                   data-bs-target="#detailsModal">
+                   data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @order.OrderNumber
                 </a>
             </td>
@@ -81,16 +80,15 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownOrd@(order.Id)" data-dropdown-toggle="dropdownMenuOrd@(order.Id)">
                         <i class="bi bi-gear"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuOrd@(order.Id)">
                         <li>
                             <a class="dropdown-item" href="#"
                                hx-get="?handler=Details&id=@order.Id"
                                hx-target="#detailsModalBody"
-                               data-bs-toggle="modal"
-                               data-bs-target="#detailsModal">
+                               data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                                 <i class="bi bi-eye me-2"></i>View Details
                             </a>
                         </li>

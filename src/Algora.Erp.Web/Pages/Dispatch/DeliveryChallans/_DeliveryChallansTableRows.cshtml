@@ -57,10 +57,10 @@ else
             </td>
             <td class="text-end pe-4">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" id="dropdownChallan@(challan.Id)" data-dropdown-toggle="dropdownMenuChallan@(challan.Id)">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuChallan@(challan.Id)">
                         <li>
                             <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@challan.Id')">
                                 <i class="bi bi-eye me-2"></i>View Details

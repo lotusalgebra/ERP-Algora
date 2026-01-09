@@ -21,8 +21,7 @@
         <button type="button" class="btn btn-primary"
                 hx-get="/HR/Leave?handler=CreateForm"
                 hx-target="#formContainer"
-                data-bs-toggle="modal"
-                data-bs-target="#leaveModal">
+                data-modal-target="leaveModal" data-modal-toggle="leaveModal">
             <i class="bi bi-plus-lg me-1"></i> New Leave Request
         </button>
     </div>
@@ -192,7 +191,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Leave Request</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-modal-hide="leaveModal"></button>
             </div>
             <div class="modal-body" id="formContainer">
                 <div class="text-center py-4">
