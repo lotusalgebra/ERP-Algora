@@ -182,6 +182,6 @@ public class CancellationsTableViewModel
         PageUrl = "/Reports/Cancellations",
         Handler = "Table",
         HxTarget = "#cancellationsTableBody",
-        HxInclude = "#searchInput"
+        HxInclude = "#searchInput,#pageSizeSelect"
     };
 }

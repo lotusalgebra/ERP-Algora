@@ -512,7 +512,7 @@ public class PurchaseInvoicesTableViewModel
         PageUrl = "/Procurement/PurchaseInvoices",
         Handler = "Table",
         HxTarget = "#tableContent",
-        HxInclude = "#searchInput,#statusFilter,#supplierFilter"
+        HxInclude = "#searchInput,#statusFilter,#supplierFilter,#pageSizeSelect"
     };
 }
 

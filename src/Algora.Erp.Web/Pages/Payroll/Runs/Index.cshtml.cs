@@ -77,7 +77,7 @@ public class IndexModel : PageModel
                 TotalRecords = totalRecords,
                 PageUrl = "/Payroll/Runs",
                 HxTarget = "#runsTableBody",
-                HxInclude = "#searchInput,#statusFilter"
+                HxInclude = "#searchInput,#statusFilter,#pageSizeSelect"
             }
         });
     }

@@ -576,7 +576,7 @@ public class GrnTableViewModel
         PageUrl = "/Procurement/GoodsReceipt",
         Handler = "Table",
         HxTarget = "#tableContent",
-        HxInclude = "#searchInput,#statusFilter,#supplierFilter"
+        HxInclude = "#searchInput,#statusFilter,#supplierFilter,#pageSizeSelect"
     };
 }
 

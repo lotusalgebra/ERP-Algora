@@ -331,7 +331,7 @@ public class PurchaseOrdersTableViewModel
         PageUrl = "/Procurement/PurchaseOrders",
         Handler = "Table",
         HxTarget = "#tableContent",
-        HxInclude = "#searchInput,#supplierFilter,#statusFilter"
+        HxInclude = "#searchInput,#supplierFilter,#statusFilter,#pageSizeSelect"
     };
 }
 

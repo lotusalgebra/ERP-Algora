@@ -471,7 +471,7 @@ public class DeliveryChallansTableViewModel
         PageUrl = "/Dispatch/DeliveryChallans",
         Handler = "Table",
         HxTarget = "#challansTableBody",
-        HxInclude = "#searchInput,#statusFilter"
+        HxInclude = "#searchInput,#statusFilter,#pageSizeSelect"
     };
 }
 

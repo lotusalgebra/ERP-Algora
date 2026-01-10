@@ -88,7 +88,7 @@ public class IndexModel : PageModel
                 TotalRecords = totalRecords,
                 PageUrl = "/Quality/Rejections",
                 HxTarget = "#rejectionsTableBody",
-                HxInclude = "#searchInput,#statusFilter"
+                HxInclude = "#searchInput,#statusFilter,#pageSizeSelect"
             }
         });
     }

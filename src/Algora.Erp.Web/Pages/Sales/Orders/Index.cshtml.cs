@@ -330,7 +330,7 @@ public class SalesOrdersTableViewModel
         PageUrl = "/Sales/Orders",
         Handler = "Table",
         HxTarget = "#ordersTableBody",
-        HxInclude = "#searchInput,#customerFilter,#statusFilter"
+        HxInclude = "#searchInput,#customerFilter,#statusFilter,#pageSizeSelect"
     };
 }
 

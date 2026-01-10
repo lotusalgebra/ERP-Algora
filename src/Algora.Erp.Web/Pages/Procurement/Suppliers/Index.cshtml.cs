@@ -192,7 +192,7 @@ public class SuppliersTableViewModel
         PageUrl = "/Procurement/Suppliers",
         Handler = "Table",
         HxTarget = "#tableContent",
-        HxInclude = "#searchInput,#statusFilter"
+        HxInclude = "#searchInput,#statusFilter,#pageSizeSelect"
     };
 }
 

@@ -72,7 +72,7 @@ public class IndexModel : PageModel
                 TotalRecords = totalRecords,
                 PageUrl = "/Payroll/Components",
                 HxTarget = "#componentsTableBody",
-                HxInclude = "#searchInput,#typeFilter"
+                HxInclude = "#searchInput,#typeFilter,#pageSizeSelect"
             }
         });
     }

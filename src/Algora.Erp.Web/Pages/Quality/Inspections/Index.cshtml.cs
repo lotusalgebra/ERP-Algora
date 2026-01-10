@@ -93,7 +93,7 @@ public class IndexModel : PageModel
                 TotalRecords = totalRecords,
                 PageUrl = "/Quality/Inspections",
                 HxTarget = "#inspectionsTableBody",
-                HxInclude = "#searchInput,#statusFilter,#typeFilter"
+                HxInclude = "#searchInput,#statusFilter,#typeFilter,#pageSizeSelect"
             }
         });
     }
