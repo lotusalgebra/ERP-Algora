@@ -131,6 +131,6 @@ public class WebOrdersTableViewModel
         PageUrl = "/Ecommerce/Orders",
         Handler = "Table",
         HxTarget = "#ordersTableBody",
-        HxInclude = "#searchInput,#statusFilter,#customerFilter"
+        HxInclude = "#searchInput,#statusFilter,#customerFilter,#pageSizeSelect"
     };
 }
