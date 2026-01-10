@@ -217,7 +217,7 @@ public class EcommerceProductsTableViewModel
         PageUrl = "/Ecommerce/Products",
         Handler = "Table",
         HxTarget = "#productsTableBody",
-        HxInclude = "#searchInput,#categoryFilter,#statusFilter"
+        HxInclude = "#searchInput,#categoryFilter,#statusFilter,#pageSizeSelect"
     };
 }
 
