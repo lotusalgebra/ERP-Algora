@@ -1,6 +1,7 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Manufacturing;
+using Algora.Erp.Web.Pages.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -82,10 +83,15 @@ public class IndexModel : PageModel
         return Partial("_WorkOrdersTableRows", new WorkOrderTableViewModel
         {
             WorkOrders = workOrders,
-            Page = page,
-            PageSize = pageSize,
-            TotalRecords = totalRecords,
-            TotalPages = totalPages
+            Pagination = new PaginationViewModel
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                PageUrl = "/Manufacturing/WorkOrders",
+                HxTarget = "#workOrdersTableContainer",
+                HxInclude = "#searchInput,#statusFilter"
+            }
         });
     }
 
@@ -347,10 +353,7 @@ public class IndexModel : PageModel
 public class WorkOrderTableViewModel
 {
     public List<WorkOrder> WorkOrders { get; set; } = new();
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-    public int TotalRecords { get; set; }
-    public int TotalPages { get; set; }
+    public PaginationViewModel Pagination { get; set; } = new();
 }
 
 public class WorkOrderFormViewModel

@@ -36,7 +36,7 @@ public class IndexModel : PageModel
         TotalDiscountGiven = await _context.Coupons.SumAsync(c => c.TotalDiscountGiven);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
     {
         var now = _dateTime.UtcNow;
         var query = _context.Coupons.AsQueryable();
@@ -67,14 +67,14 @@ public class IndexModel : PageModel
 
         var coupons = await query
             .OrderByDescending(c => c.CreatedAt)
-            .Skip((pageNumber - 1) * pageSize)
+            .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_CouponsTableRows", new CouponsTableViewModel
         {
             Coupons = coupons,
-            Page = pageNumber,
+            Page = page,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages,
@@ -164,6 +164,17 @@ public class CouponsTableViewModel
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
     public DateTime Now { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Ecommerce/Coupons",
+        Handler = "Table",
+        HxTarget = "#couponsTableBody",
+        HxInclude = "#searchInput,#statusFilter"
+    };
 }
 
 public class CouponFormViewModel

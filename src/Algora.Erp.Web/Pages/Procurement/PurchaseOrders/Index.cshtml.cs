@@ -322,6 +322,17 @@ public class PurchaseOrdersTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Procurement/PurchaseOrders",
+        Handler = "Table",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#supplierFilter,#statusFilter"
+    };
 }
 
 public class PurchaseOrderFormViewModel

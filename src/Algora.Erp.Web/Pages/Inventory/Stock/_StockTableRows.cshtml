@@ -46,34 +46,7 @@
     <!-- Pagination -->
     <tr>
         <td colspan="11" class="px-6 py-3 bg-gray-50">
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500">
-                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
-                </span>
-                <nav class="flex items-center space-x-1">
-                    <a class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == 1 ? "pointer-events-none opacity-50" : "")"
-                       hx-get="?handler=Table&page=@(Model.Page - 1)"
-                       hx-target="#stockTableBody"
-                       hx-include="#searchInput, #warehouseFilter, #statusFilter, #pageSizeSelect">
-                        Previous
-                    </a>
-                    @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
-                    {
-                        <a class="px-3 py-2 text-sm font-medium border rounded-lg @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700")"
-                           hx-get="?handler=Table&page=@i"
-                           hx-target="#stockTableBody"
-                           hx-include="#searchInput, #warehouseFilter, #statusFilter, #pageSizeSelect">
-                            @i
-                        </a>
-                    }
-                    <a class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == Model.TotalPages ? "pointer-events-none opacity-50" : "")"
-                       hx-get="?handler=Table&page=@(Model.Page + 1)"
-                       hx-target="#stockTableBody"
-                       hx-include="#searchInput, #warehouseFilter, #statusFilter, #pageSizeSelect">
-                        Next
-                    </a>
-                </nav>
-            </div>
+            @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
         </td>
     </tr>
 }

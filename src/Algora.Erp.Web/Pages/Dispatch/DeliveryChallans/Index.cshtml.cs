@@ -462,6 +462,17 @@ public class DeliveryChallansTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Dispatch/DeliveryChallans",
+        Handler = "Table",
+        HxTarget = "#challansTableBody",
+        HxInclude = "#searchInput,#statusFilter"
+    };
 }
 
 public class DeliveryChallanFormViewModel

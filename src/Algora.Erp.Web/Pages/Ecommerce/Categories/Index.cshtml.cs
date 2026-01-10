@@ -16,17 +16,46 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    public async Task<IActionResult> OnGetTableAsync()
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
     {
-        var categories = await _context.WebCategories
+        var query = _context.WebCategories
             .Include(c => c.Parent)
             .Include(c => c.Products)
             .Where(c => !c.IsDeleted)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.ToLower();
+            query = query.Where(c =>
+                c.Name.ToLower().Contains(search) ||
+                c.Slug.ToLower().Contains(search) ||
+                (c.Description != null && c.Description.ToLower().Contains(search)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(statusFilter) && bool.TryParse(statusFilter, out var isActive))
+        {
+            query = query.Where(c => c.IsActive == isActive);
+        }
+
+        var totalRecords = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+        var categories = await query
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        return Partial("_CategoriesTableRows", categories);
+        return Partial("_CategoriesTableRows", new WebCategoriesTableViewModel
+        {
+            Categories = categories,
+            Page = page,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = totalPages
+        });
     }
 
     public async Task<IActionResult> OnGetCreateFormAsync()
@@ -94,7 +123,7 @@ public class IndexModel : PageModel
         category.MetaDescription = input.MetaDescription;
 
         await _context.SaveChangesAsync();
-        return await OnGetTableAsync();
+        return await OnGetTableAsync(null, null);
     }
 
     public async Task<IActionResult> OnDeleteAsync(Guid id)
@@ -114,7 +143,7 @@ public class IndexModel : PageModel
 
         category.IsDeleted = true;
         await _context.SaveChangesAsync();
-        return await OnGetTableAsync();
+        return await OnGetTableAsync(null, null);
     }
 
     private static string GenerateSlug(string name)
@@ -145,4 +174,24 @@ public class CategoryFormInput
     public int SortOrder { get; set; }
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
+}
+
+public class WebCategoriesTableViewModel
+{
+    public List<WebCategory> Categories { get; set; } = new();
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public int TotalRecords { get; set; }
+    public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Ecommerce/Categories",
+        Handler = "Table",
+        HxTarget = "#categoriesTableBody",
+        HxInclude = "#searchInput,#statusFilter"
+    };
 }

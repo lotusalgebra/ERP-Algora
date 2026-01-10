@@ -199,6 +199,17 @@ public class UsersTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Admin/Users",
+        Handler = "Table",
+        HxTarget = "#usersTableBody",
+        HxInclude = "#searchInput,#roleFilter,#statusFilter,#pageSizeSelect"
+    };
 }
 
 public class UserFormViewModel

@@ -241,6 +241,17 @@ public class LeaveTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/HR/Leave",
+        Handler = "Table",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#statusFilter,#typeFilter"
+    };
 }
 
 public class LeaveFormViewModel

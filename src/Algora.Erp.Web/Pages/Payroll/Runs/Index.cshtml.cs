@@ -2,6 +2,7 @@ using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.HR;
 using Algora.Erp.Domain.Entities.Payroll;
 using Algora.Erp.Domain.Enums;
+using Algora.Erp.Web.Pages.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -69,10 +70,15 @@ public class IndexModel : PageModel
         return Partial("_PayrollRunsTableRows", new PayrollRunsTableViewModel
         {
             Runs = runs,
-            Page = page,
-            PageSize = pageSize,
-            TotalRecords = totalRecords,
-            TotalPages = totalPages
+            Pagination = new PaginationViewModel
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                PageUrl = "/Payroll/Runs",
+                HxTarget = "#runsTableBody",
+                HxInclude = "#searchInput,#statusFilter"
+            }
         });
     }
 
@@ -348,10 +354,7 @@ public class IndexModel : PageModel
 public class PayrollRunsTableViewModel
 {
     public List<PayrollRun> Runs { get; set; } = new();
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-    public int TotalRecords { get; set; }
-    public int TotalPages { get; set; }
+    public PaginationViewModel Pagination { get; set; } = new();
 }
 
 public class PayrollRunFormViewModel

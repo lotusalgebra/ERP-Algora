@@ -212,4 +212,15 @@ public class RecurringTableData
     public int Page { get; set; }
     public int PageSize { get; set; }
     public int TotalPages => (int)Math.Ceiling((double)Total / PageSize);
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = Total,
+        PageUrl = "/Finance/Invoices/Recurring",
+        Handler = "Table",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#statusFilter"
+    };
 }

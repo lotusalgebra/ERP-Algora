@@ -153,47 +153,9 @@ else
     }
 
     <!-- Pagination -->
-    @if (Model.TotalPages > 1)
-    {
-        <tr>
-            <td colspan="8" class="px-6 py-3">
-                <div class="flex justify-between items-center">
-                    <small class="text-gray-500">
-                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
-                    </small>
-                    <nav>
-                        <ul class="inline-flex -space-x-px text-sm">
-                            <li>
-                                <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == 1 ? "pointer-events-none opacity-50" : "")" href="javascript:void(0)"
-                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
-                                   hx-target="#invoicesTableBody"
-                                   hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
-                                    <i class="bi bi-chevron-left"></i>
-                                </a>
-                            </li>
-                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
-                            {
-                                <li>
-                                    <a class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
-                                       hx-get="?handler=Table&page=@i"
-                                       hx-target="#invoicesTableBody"
-                                       hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
-                                        @i
-                                    </a>
-                                </li>
-                            }
-                            <li>
-                                <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == Model.TotalPages ? "pointer-events-none opacity-50" : "")" href="javascript:void(0)"
-                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
-                                   hx-target="#invoicesTableBody"
-                                   hx-include="#searchInput, #statusFilter, #supplierFilter, #pageSizeSelect">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </td>
-        </tr>
-    }
+    <tr>
+        <td colspan="8" class="px-6 py-3">
+            @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
+        </td>
+    </tr>
 }

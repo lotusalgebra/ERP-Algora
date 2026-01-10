@@ -1,0 +1,129 @@
+@using Algora.Erp.Web.Pages.Shared
+@model PaginationViewModel
+
+@{
+    var (startPage, endPage) = Model.GetPageRange();
+    var hxIncludeAttr = string.IsNullOrEmpty(Model.HxInclude) ? "" : $"hx-include=\"{Model.HxInclude}\"";
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Pagination">
+        <ul class="inline-flex -space-x-px text-sm">
+            @* First Page Button *@
+            @if (Model.Page > 2 && Model.TotalPages > Model.MaxVisiblePages)
+            {
+                <li>
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-l-lg"
+                       href="#"
+                       hx-get="@Model.GetPageUrl(1)"
+                       hx-target="@Model.HxTarget"
+                       @Html.Raw(hxIncludeAttr)
+                       hx-swap="innerHTML"
+                       title="First page">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+            }
+
+            @* Previous Button *@
+            <li>
+                @if (Model.HasPreviousPage)
+                {
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 @(Model.Page <= 2 || Model.TotalPages <= Model.MaxVisiblePages ? "rounded-l-lg" : "")"
+                       href="#"
+                       hx-get="@Model.GetPageUrl(Model.Page - 1)"
+                       hx-target="@Model.HxTarget"
+                       @Html.Raw(hxIncludeAttr)
+                       hx-swap="innerHTML">
+                        <i class="bi bi-chevron-left mr-1"></i>Prev
+                    </a>
+                }
+                else
+                {
+                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-300 bg-gray-50 border border-gray-300 cursor-not-allowed @(Model.Page <= 2 || Model.TotalPages <= Model.MaxVisiblePages ? "rounded-l-lg" : "")">
+                        <i class="bi bi-chevron-left mr-1"></i>Prev
+                    </span>
+                }
+            </li>
+
+            @* Ellipsis before page numbers *@
+            @if (startPage > 1)
+            {
+                <li>
+                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+                </li>
+            }
+
+            @* Page Number Buttons *@
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                var isActive = i == Model.Page;
+                <li>
+                    @if (isActive)
+                    {
+                        <span class="flex items-center justify-center px-3 h-8 leading-tight text-primary-600 border border-primary-300 bg-primary-50 font-medium" aria-current="page">
+                            @i
+                        </span>
+                    }
+                    else
+                    {
+                        <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                           href="#"
+                           hx-get="@Model.GetPageUrl(i)"
+                           hx-target="@Model.HxTarget"
+                           @Html.Raw(hxIncludeAttr)
+                           hx-swap="innerHTML">
+                            @i
+                        </a>
+                    }
+                </li>
+            }
+
+            @* Ellipsis after page numbers *@
+            @if (endPage < Model.TotalPages)
+            {
+                <li>
+                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+                </li>
+            }
+
+            @* Next Button *@
+            <li>
+                @if (Model.HasNextPage)
+                {
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 @(Model.Page >= Model.TotalPages - 1 || Model.TotalPages <= Model.MaxVisiblePages ? "rounded-r-lg" : "")"
+                       href="#"
+                       hx-get="@Model.GetPageUrl(Model.Page + 1)"
+                       hx-target="@Model.HxTarget"
+                       @Html.Raw(hxIncludeAttr)
+                       hx-swap="innerHTML">
+                        Next<i class="bi bi-chevron-right ml-1"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-300 bg-gray-50 border border-gray-300 cursor-not-allowed @(Model.Page >= Model.TotalPages - 1 || Model.TotalPages <= Model.MaxVisiblePages ? "rounded-r-lg" : "")">
+                        Next<i class="bi bi-chevron-right ml-1"></i>
+                    </span>
+                }
+            </li>
+
+            @* Last Page Button *@
+            @if (Model.Page < Model.TotalPages - 1 && Model.TotalPages > Model.MaxVisiblePages)
+            {
+                <li>
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-r-lg"
+                       href="#"
+                       hx-get="@Model.GetPageUrl(Model.TotalPages)"
+                       hx-target="@Model.HxTarget"
+                       @Html.Raw(hxIncludeAttr)
+                       hx-swap="innerHTML"
+                       title="Last page">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

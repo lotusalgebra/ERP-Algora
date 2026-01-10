@@ -160,63 +160,9 @@ else
     }
 
     <!-- Pagination -->
-    @if (Model.TotalPages > 1)
-    {
-        <tr>
-            <td colspan="8" class="px-6 py-3">
-                <div class="flex justify-between items-center">
-                    <div class="text-gray-500 text-sm">
-                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
-                    </div>
-                    <nav>
-                        <ul class="inline-flex -space-x-px text-sm">
-                            @if (Model.Page > 1)
-                            {
-                                <li>
-                                    <button type="button" class="flex items-center justify-center px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700"
-                                            hx-get="?handler=Table&pageNumber=@(Model.Page - 1)&pageSize=@Model.PageSize"
-                                            hx-target="#quotationsTableBody"
-                                            hx-include="#searchInput, #customerFilter, #statusFilter">
-                                        Previous
-                                    </button>
-                                </li>
-                            }
-                            @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
-                            {
-                                <li>
-                                    <button type="button" class="flex items-center justify-center px-3 py-2 leading-tight @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700") border border-gray-300"
-                                            hx-get="?handler=Table&pageNumber=@i&pageSize=@Model.PageSize"
-                                            hx-target="#quotationsTableBody"
-                                            hx-include="#searchInput, #customerFilter, #statusFilter">
-                                        @i
-                                    </button>
-                                </li>
-                            }
-                            @if (Model.Page < Model.TotalPages)
-                            {
-                                <li>
-                                    <button type="button" class="flex items-center justify-center px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700"
-                                            hx-get="?handler=Table&pageNumber=@(Model.Page + 1)&pageSize=@Model.PageSize"
-                                            hx-target="#quotationsTableBody"
-                                            hx-include="#searchInput, #customerFilter, #statusFilter">
-                                        Next
-                                    </button>
-                                </li>
-                            }
-                        </ul>
-                    </nav>
-                </div>
-            </td>
-        </tr>
-    }
-    else if (Model.TotalRecords > 0)
-    {
-        <tr>
-            <td colspan="8" class="px-6 py-3">
-                <div class="text-gray-500 text-sm">
-                    Showing @Model.TotalRecords entries
-                </div>
-            </td>
-        </tr>
-    }
+    <tr>
+        <td colspan="8" class="px-6 py-3">
+            @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
+        </td>
+    </tr>
 }

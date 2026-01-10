@@ -34,7 +34,7 @@ public class IndexModel : PageModel
         NewThisMonth = await _context.WebCustomers.CountAsync(c => c.CreatedAt >= monthStart);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
     {
         var query = _context.WebCustomers.AsQueryable();
 
@@ -58,14 +58,14 @@ public class IndexModel : PageModel
 
         var customers = await query
             .OrderByDescending(c => c.CreatedAt)
-            .Skip((pageNumber - 1) * pageSize)
+            .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_CustomersTableRows", new WebCustomersTableViewModel
         {
             Customers = customers,
-            Page = pageNumber,
+            Page = page,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages
@@ -195,6 +195,17 @@ public class WebCustomersTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Ecommerce/Customers",
+        Handler = "Table",
+        HxTarget = "#customersTableBody",
+        HxInclude = "#searchInput,#statusFilter"
+    };
 }
 
 public class WebCustomerFormViewModel

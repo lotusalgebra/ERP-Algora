@@ -121,42 +121,7 @@ else
     <!-- Pagination -->
     <tr>
         <td colspan="8" class="px-6 py-3">
-            <div class="flex justify-between items-center">
-                <div class="text-gray-500 text-sm">
-                    Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
-                </div>
-                <nav>
-                    <ul class="inline-flex -space-x-px text-sm">
-                        <li>
-                            <a class="flex items-center justify-center px-3 py-2 leading-tight @(Model.Page <= 1 ? "text-gray-300 pointer-events-none" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700") bg-white border border-gray-300 rounded-l-lg"
-                               hx-get="?handler=Table&page=@(Model.Page - 1)"
-                               hx-target="#customersTableBody"
-                               hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
-                                Previous
-                            </a>
-                        </li>
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li>
-                                <a class="flex items-center justify-center px-3 py-2 leading-tight @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700") border border-gray-300"
-                                   hx-get="?handler=Table&page=@i"
-                                   hx-target="#customersTableBody"
-                                   hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                        <li>
-                            <a class="flex items-center justify-center px-3 py-2 leading-tight @(Model.Page >= Model.TotalPages ? "text-gray-300 pointer-events-none" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700") bg-white border border-gray-300 rounded-r-lg"
-                               hx-get="?handler=Table&page=@(Model.Page + 1)"
-                               hx-target="#customersTableBody"
-                               hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
-                                Next
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+            @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
         </td>
     </tr>
 }

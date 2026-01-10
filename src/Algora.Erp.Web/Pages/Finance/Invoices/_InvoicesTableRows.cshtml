@@ -156,25 +156,18 @@ else
     }
 }
 
-<script>
-    document.getElementById('paginationInfo').textContent =
-        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
+@* Out-of-band swap for pagination info *@
+<div id="paginationInfo" hx-swap-oob="true">
+    @await Html.PartialAsync("~/Pages/Shared/_PaginationInfo.cshtml", Model.Pagination)
+</div>
 
-    var paginationHtml = '';
-    @if (Model.TotalPages > 1)
-    {
-        @:paginationHtml = '<ul class="inline-flex -space-x-px text-sm">';
-        @:paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == 1 ? "opacity-50 pointer-events-none" : "")" href="#" hx-get="/Finance/Invoices?handler=Table&page=@(Model.Page - 1)" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">Previous</a></li>';
-        for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            var activeClass = i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
-            @:paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight @activeClass" href="#" hx-get="/Finance/Invoices?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">@i</a></li>';
-        }
-        @:paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == Model.TotalPages ? "opacity-50 pointer-events-none" : "")" href="#" hx-get="/Finance/Invoices?handler=Table&page=@(Model.Page + 1)" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">Next</a></li>';
-        @:paginationHtml += '</ul>';
-    }
-    document.querySelector('#paginationNav').innerHTML = paginationHtml;
-    htmx.process(document.getElementById('paginationNav'));
+@* Out-of-band swap for pagination navigation *@
+<nav id="paginationNav" hx-swap-oob="true">
+    @await Html.PartialAsync("~/Pages/Shared/_Pagination.cshtml", Model.Pagination)
+</nav>
+
+<script>
     // Re-initialize Flowbite dropdowns after HTMX content swap
     if (typeof initFlowbite === 'function') { initFlowbite(); }
+    if (typeof htmx !== 'undefined') { htmx.process(document.body); }
 </script>

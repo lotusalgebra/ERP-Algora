@@ -306,6 +306,17 @@ public class WarehousesTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Inventory/Warehouses",
+        Handler = "Table",
+        HxTarget = "#warehousesTableBody",
+        HxInclude = "#searchInput,#statusFilter,#pageSizeSelect"
+    };
 }
 
 public class WarehouseFormViewModel

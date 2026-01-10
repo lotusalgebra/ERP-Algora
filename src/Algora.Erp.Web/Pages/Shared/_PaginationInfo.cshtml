@@ -1,0 +1,13 @@
+@using Algora.Erp.Web.Pages.Shared
+@model PaginationViewModel
+
+<div class="text-sm text-gray-500">
+    @if (Model.TotalRecords == 0)
+    {
+        <span>No entries found</span>
+    }
+    else
+    {
+        <span>Showing <strong>@Model.FirstRecord</strong> to <strong>@Model.LastRecord</strong> of <strong>@Model.TotalRecords</strong> entries</span>
+    }
+</div>

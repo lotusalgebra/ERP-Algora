@@ -45,25 +45,25 @@
         <div class="lg:col-span-1">
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <nav class="flex flex-col" id="settingsTabs" role="tablist">
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors active:bg-primary-50 active:text-primary-700" id="general-tab" data-tabs-target="#general" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left border-b border-gray-200 transition-colors bg-primary-50 text-primary-700 font-medium" data-tab-target="general" type="button" role="tab" aria-selected="true">
                         <i class="bi bi-building mr-3"></i>General & Company
                     </button>
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="currency-tab" data-tabs-target="#currency" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" data-tab-target="currency" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-currency-exchange mr-3"></i>Currency
                     </button>
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="tax-tab" data-tabs-target="#tax" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" data-tab-target="tax" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-percent mr-3"></i>Tax Settings
                     </button>
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="invoice-tab" data-tabs-target="#invoice" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" data-tab-target="invoice" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-receipt mr-3"></i>Invoice Settings
                     </button>
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="email-tab" data-tabs-target="#email" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" data-tab-target="email" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-envelope mr-3"></i>Email (SMTP)
                     </button>
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="security-tab" data-tabs-target="#security" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" data-tab-target="security" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-shield-lock mr-3"></i>Security
                     </button>
-                    <button class="flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors" id="about-tab" data-tabs-target="#about" type="button" role="tab">
+                    <button class="settings-tab-btn flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors" data-tab-target="about" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-info-circle mr-3"></i>About
                     </button>
                 </nav>
@@ -72,9 +72,9 @@
 
         <!-- Settings Content -->
         <div class="lg:col-span-3">
-            <div class="tab-content" id="settingsTabContent">
+            <div id="settingsTabContent">
                 <!-- General & Company Settings -->
-                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                <div class="settings-tab-panel" id="general-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-building mr-2"></i>General & Company Settings</h5>
@@ -213,7 +213,7 @@
                 </div>
 
                 <!-- Currency Settings -->
-                <div class="tab-pane fade" id="currency" role="tabpanel">
+                <div class="settings-tab-panel hidden" id="currency-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-currency-exchange mr-2"></i>Currency Settings</h5>
@@ -295,7 +295,7 @@
                 </div>
 
                 <!-- Tax Settings -->
-                <div class="tab-pane fade" id="tax" role="tabpanel">
+                <div class="settings-tab-panel hidden" id="tax-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-percent mr-2"></i>Tax Settings</h5>
@@ -339,7 +339,7 @@
                 </div>
 
                 <!-- Invoice Settings -->
-                <div class="tab-pane fade" id="invoice" role="tabpanel">
+                <div class="settings-tab-panel hidden" id="invoice-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-receipt mr-2"></i>Invoice Settings</h5>
@@ -430,7 +430,7 @@
                 </div>
 
                 <!-- Email Settings -->
-                <div class="tab-pane fade" id="email" role="tabpanel">
+                <div class="settings-tab-panel hidden" id="email-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-envelope mr-2"></i>Email (SMTP) Settings</h5>
@@ -484,7 +484,7 @@
                 </div>
 
                 <!-- Security Settings -->
-                <div class="tab-pane fade" id="security" role="tabpanel">
+                <div class="settings-tab-panel hidden" id="security-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-shield-lock mr-2"></i>Security Settings</h5>
@@ -556,7 +556,7 @@
                 </div>
 
                 <!-- About -->
-                <div class="tab-pane fade" id="about" role="tabpanel">
+                <div class="settings-tab-panel hidden" id="about-panel" role="tabpanel">
                     <div class="bg-white rounded-xl shadow-sm">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-info-circle mr-2"></i>About</h5>
@@ -625,6 +625,57 @@
 
 @section Scripts {
     <script>
+        // Settings Tab Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.settings-tab-btn');
+            const tabPanels = document.querySelectorAll('.settings-tab-panel');
+
+            function switchTab(targetId) {
+                // Hide all panels
+                tabPanels.forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+
+                // Reset all button styles
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('bg-primary-50', 'text-primary-700', 'font-medium');
+                    btn.classList.add('text-gray-700', 'hover:bg-gray-50');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+
+                // Show target panel
+                const targetPanel = document.getElementById(targetId + '-panel');
+                if (targetPanel) {
+                    targetPanel.classList.remove('hidden');
+                }
+
+                // Activate clicked button
+                const activeBtn = document.querySelector(`[data-tab-target="${targetId}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.remove('text-gray-700', 'hover:bg-gray-50');
+                    activeBtn.classList.add('bg-primary-50', 'text-primary-700', 'font-medium');
+                    activeBtn.setAttribute('aria-selected', 'true');
+                }
+
+                // Save to localStorage for persistence
+                localStorage.setItem('settingsActiveTab', targetId);
+            }
+
+            // Add click handlers to all tab buttons
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-tab-target');
+                    switchTab(targetId);
+                });
+            });
+
+            // Restore last active tab from localStorage
+            const savedTab = localStorage.getItem('settingsActiveTab');
+            if (savedTab) {
+                switchTab(savedTab);
+            }
+        });
+
         // Update country code when country changes
         document.getElementById('countrySelect')?.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];

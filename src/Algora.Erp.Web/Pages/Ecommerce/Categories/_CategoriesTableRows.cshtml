@@ -1,6 +1,6 @@
-@model List<Algora.Erp.Domain.Entities.Ecommerce.WebCategory>
+@model Algora.Erp.Web.Pages.Ecommerce.Categories.WebCategoriesTableViewModel
 
-@if (!Model.Any())
+@if (!Model.Categories.Any())
 {
     <tr>
         <td colspan="6" class="text-center py-12 text-gray-500">
@@ -11,7 +11,7 @@
 }
 else
 {
-    @foreach (var category in Model)
+    @foreach (var category in Model.Categories)
     {
         <tr class="bg-white border-b hover:bg-gray-50">
             <td class="px-6 py-4">
@@ -79,4 +79,23 @@ else
             </td>
         </tr>
     }
+
+    <!-- Pagination -->
+    <tr>
+        <td colspan="6" class="bg-gray-50 px-6 py-3">
+            <div class="flex justify-between items-center">
+                <small class="text-gray-500">
+                    @if (Model.TotalRecords > 0)
+                    {
+                        @:Showing @Model.Pagination.FirstRecord to @Model.Pagination.LastRecord of @Model.TotalRecords entries
+                    }
+                    else
+                    {
+                        @:No entries
+                    }
+                </small>
+                <partial name="/Pages/Shared/_Pagination.cshtml" model="Model.Pagination" />
+            </div>
+        </td>
+    </tr>
 }

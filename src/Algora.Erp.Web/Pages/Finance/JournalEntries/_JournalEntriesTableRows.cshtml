@@ -119,20 +119,8 @@
     </tr>
 }
 
-<script>
-    document.getElementById('paginationInfo').textContent =
-        'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
-
-    var paginationHtml = '';
-    @if (Model.TotalPages > 1)
-    {
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            var activeClass = i == Model.Page ? "bg-primary-600 text-white" : "text-gray-500 bg-white hover:bg-gray-100";
-            <text>
-            paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 @activeClass" href="#" hx-get="/Finance/JournalEntries?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">@i</a></li>';
-            </text>
-        }
-    }
-    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
-</script>
+<tr>
+    <td colspan="8" class="px-6 py-3">
+        @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
+    </td>
+</tr>

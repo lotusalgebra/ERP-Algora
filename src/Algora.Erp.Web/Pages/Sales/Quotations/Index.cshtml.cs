@@ -420,6 +420,17 @@ public class QuotationsTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Sales/Quotations",
+        Handler = "Table",
+        HxTarget = "#quotationsTableBody",
+        HxInclude = "#searchInput,#customerFilter,#statusFilter"
+    };
 }
 
 public class QuotationFormViewModel

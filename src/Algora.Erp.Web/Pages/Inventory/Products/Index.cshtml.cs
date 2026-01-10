@@ -225,6 +225,17 @@ public class ProductsTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Inventory/Products",
+        Handler = "Table",
+        HxTarget = "#productsTableBody",
+        HxInclude = "#searchInput,#categoryFilter,#typeFilter,#pageSizeSelect"
+    };
 }
 
 public class ProductFormViewModel

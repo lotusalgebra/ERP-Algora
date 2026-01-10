@@ -44,6 +44,17 @@ public class IndexModel : PageModel
 
     public List<SelectListItem> PaymentMethodOptions { get; set; } = new();
 
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = PaymentResult.TotalCount,
+        PageUrl = "/Finance/Payments",
+        Handler = "TableRows",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#statusFilter"
+    };
+
     public async Task OnGetAsync()
     {
         // Get payments

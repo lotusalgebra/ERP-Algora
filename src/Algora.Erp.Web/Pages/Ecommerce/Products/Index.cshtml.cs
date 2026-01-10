@@ -35,7 +35,7 @@ public class IndexModel : PageModel
         Categories = await _context.WebCategories.Where(c => c.IsActive && !c.IsDeleted).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? categoryFilter, string? statusFilter, int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? categoryFilter, string? statusFilter, int page = 1, int pageSize = 10)
     {
         var query = _context.EcommerceProducts
             .Include(p => p.Category)
@@ -67,14 +67,14 @@ public class IndexModel : PageModel
 
         var products = await query
             .OrderByDescending(p => p.CreatedAt)
-            .Skip((pageNumber - 1) * pageSize)
+            .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_ProductsTableRows", new EcommerceProductsTableViewModel
         {
             Products = products,
-            Page = pageNumber,
+            Page = page,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages
@@ -208,6 +208,17 @@ public class EcommerceProductsTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Ecommerce/Products",
+        Handler = "Table",
+        HxTarget = "#productsTableBody",
+        HxInclude = "#searchInput,#categoryFilter,#statusFilter"
+    };
 }
 
 public class EcommerceProductFormViewModel

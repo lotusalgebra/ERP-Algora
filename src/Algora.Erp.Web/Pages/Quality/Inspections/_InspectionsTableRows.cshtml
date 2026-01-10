@@ -139,47 +139,9 @@ else
     }
 
     <!-- Pagination -->
-    @if (Model.TotalPages > 1)
-    {
-        <tr>
-            <td colspan="9" class="py-3 border-0">
-                <div class="flex justify-between items-center px-4">
-                    <small class="text-gray-500">
-                        Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
-                    </small>
-                    <nav>
-                        <ul class="inline-flex -space-x-px text-sm">
-                            <li>
-                                <a class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg @(Model.Page == 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
-                                   @(Model.Page > 1 ? $"hx-get=?handler=Table&page={Model.Page - 1}" : "")
-                                   hx-target="#inspectionsTableBody"
-                                   hx-include="#searchInput, #statusFilter, #typeFilter, #pageSizeSelect">
-                                    <i class="bi bi-chevron-left"></i>
-                                </a>
-                            </li>
-                            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
-                            {
-                                <li>
-                                    <a class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
-                                       hx-get="?handler=Table&page=@i"
-                                       hx-target="#inspectionsTableBody"
-                                       hx-include="#searchInput, #statusFilter, #typeFilter, #pageSizeSelect">
-                                        @i
-                                    </a>
-                                </li>
-                            }
-                            <li>
-                                <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg @(Model.Page == Model.TotalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
-                                   @(Model.Page < Model.TotalPages ? $"hx-get=?handler=Table&page={Model.Page + 1}" : "")
-                                   hx-target="#inspectionsTableBody"
-                                   hx-include="#searchInput, #statusFilter, #typeFilter, #pageSizeSelect">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </td>
-        </tr>
-    }
+    <tr>
+        <td colspan="9" class="px-6 py-3">
+            @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
+        </td>
+    </tr>
 }

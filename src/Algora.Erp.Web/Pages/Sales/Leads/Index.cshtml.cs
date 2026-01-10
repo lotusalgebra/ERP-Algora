@@ -163,6 +163,17 @@ public class LeadsTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Sales/Leads",
+        Handler = "Table",
+        HxTarget = "#leadsTableBody",
+        HxInclude = "#searchInput,#statusFilter,#sourceFilter,#ratingFilter"
+    };
 }
 
 public class LeadFormViewModel

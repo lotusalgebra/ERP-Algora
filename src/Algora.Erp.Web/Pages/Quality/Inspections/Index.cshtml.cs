@@ -2,6 +2,7 @@ using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Procurement;
 using Algora.Erp.Domain.Entities.Quality;
+using Algora.Erp.Web.Pages.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -85,10 +86,15 @@ public class IndexModel : PageModel
         return Partial("_InspectionsTableRows", new InspectionsTableViewModel
         {
             Inspections = inspections,
-            Page = page,
-            PageSize = pageSize,
-            TotalRecords = totalRecords,
-            TotalPages = totalPages
+            Pagination = new PaginationViewModel
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                PageUrl = "/Quality/Inspections",
+                HxTarget = "#inspectionsTableBody",
+                HxInclude = "#searchInput,#statusFilter,#typeFilter"
+            }
         });
     }
 
@@ -402,10 +408,7 @@ public class IndexModel : PageModel
 public class InspectionsTableViewModel
 {
     public List<QualityInspection> Inspections { get; set; } = new();
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-    public int TotalRecords { get; set; }
-    public int TotalPages { get; set; }
+    public PaginationViewModel Pagination { get; set; } = new();
 }
 
 public class InspectionFormViewModel

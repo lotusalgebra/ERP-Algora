@@ -104,3 +104,9 @@ else
         </td>
     </tr>
 }
+
+<tr>
+    <td colspan="8" class="px-6 py-3">
+        @await Html.PartialAsync("~/Pages/Shared/_PaginationFooter.cshtml", Model.Pagination)
+    </td>
+</tr>

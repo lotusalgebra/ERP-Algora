@@ -285,4 +285,15 @@ public class InvoicesTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Finance/Invoices",
+        Handler = "Table",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo"
+    };
 }

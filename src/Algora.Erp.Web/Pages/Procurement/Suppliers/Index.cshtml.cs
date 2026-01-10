@@ -183,6 +183,17 @@ public class SuppliersTableViewModel
     public int PageSize { get; set; }
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/Procurement/Suppliers",
+        Handler = "Table",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#statusFilter"
+    };
 }
 
 public class SupplierFormViewModel

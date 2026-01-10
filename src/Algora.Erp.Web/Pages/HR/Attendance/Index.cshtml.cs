@@ -246,6 +246,17 @@ public class AttendanceTableViewModel
     public int TotalRecords { get; set; }
     public int TotalPages { get; set; }
     public string DateFilter { get; set; } = string.Empty;
+
+    public Shared.PaginationViewModel Pagination => new()
+    {
+        Page = Page,
+        PageSize = PageSize,
+        TotalRecords = TotalRecords,
+        PageUrl = "/HR/Attendance",
+        Handler = "Table",
+        HxTarget = "#tableContent",
+        HxInclude = "#searchInput,#statusFilter,#dateFilter"
+    };
 }
 
 public class AttendanceFormViewModel
