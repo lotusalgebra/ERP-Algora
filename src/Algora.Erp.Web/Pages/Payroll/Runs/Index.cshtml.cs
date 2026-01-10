@@ -39,7 +39,7 @@ public class IndexModel : PageModel
             .CountAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.PayrollRuns
             .Include(r => r.Payslips)
@@ -63,7 +63,7 @@ public class IndexModel : PageModel
 
         var runs = await query
             .OrderByDescending(r => r.PeriodStart)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
@@ -72,7 +72,7 @@ public class IndexModel : PageModel
             Runs = runs,
             Pagination = new PaginationViewModel
             {
-                Page = page,
+                Page = pageNumber,
                 PageSize = pageSize,
                 TotalRecords = totalRecords,
                 PageUrl = "/Payroll/Runs",

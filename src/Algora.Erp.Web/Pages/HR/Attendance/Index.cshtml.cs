@@ -35,7 +35,7 @@ public class IndexModel : PageModel
         AbsentToday = totalActiveEmployees - recordedToday;
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? dateFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? dateFilter, int pageNumber = 1, int pageSize = 10)
     {
         var date = string.IsNullOrEmpty(dateFilter) ? DateTime.UtcNow.Date : DateTime.Parse(dateFilter).Date;
 
@@ -65,14 +65,14 @@ public class IndexModel : PageModel
         var attendances = await query
             .OrderBy(a => a.Employee.FirstName)
             .ThenBy(a => a.Employee.LastName)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_AttendanceTableRows", new AttendanceTableViewModel
         {
             Attendances = attendances,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages,

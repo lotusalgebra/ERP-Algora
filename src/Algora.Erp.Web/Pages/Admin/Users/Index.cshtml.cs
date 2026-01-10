@@ -33,7 +33,7 @@ public class IndexModel : PageModel
         Roles = await _context.Roles.ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, Guid? roleFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, Guid? roleFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Users
             .Include(u => u.UserRoles)
@@ -65,14 +65,14 @@ public class IndexModel : PageModel
         var users = await query
             .OrderBy(u => u.LastName)
             .ThenBy(u => u.FirstName)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_UsersTableRows", new UsersTableViewModel
         {
             Users = users,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

@@ -47,7 +47,7 @@ public class IndexModel : PageModel
         NetIncome = totalRevenue - totalExpenses;
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? typeFilter, string? statusFilter, int page = 1, int pageSize = 15)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? typeFilter, string? statusFilter, int pageNumber = 1, int pageSize = 15)
     {
         var query = _context.Accounts
             .Include(a => a.ParentAccount)
@@ -77,14 +77,14 @@ public class IndexModel : PageModel
         var accounts = await query
             .OrderBy(a => a.AccountType)
             .ThenBy(a => a.Code)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_AccountsTableRows", new AccountsTableViewModel
         {
             Accounts = accounts,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

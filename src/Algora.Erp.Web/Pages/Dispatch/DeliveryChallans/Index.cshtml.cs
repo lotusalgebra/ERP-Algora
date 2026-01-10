@@ -43,7 +43,7 @@ public class IndexModel : PageModel
         Warehouses = await _context.Warehouses.Where(w => w.IsActive).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, Guid? customerFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, Guid? customerFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.DeliveryChallans
             .Include(d => d.Lines)
@@ -74,14 +74,14 @@ public class IndexModel : PageModel
         var challans = await query
             .OrderByDescending(d => d.ChallanDate)
             .ThenByDescending(d => d.ChallanNumber)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_DeliveryChallansTableRows", new DeliveryChallansTableViewModel
         {
             DeliveryChallans = challans,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

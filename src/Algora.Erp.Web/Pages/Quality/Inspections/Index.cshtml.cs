@@ -48,7 +48,7 @@ public class IndexModel : PageModel
         }
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? typeFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? typeFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.QualityInspections
             .Include(q => q.Parameters)
@@ -79,7 +79,7 @@ public class IndexModel : PageModel
         var inspections = await query
             .OrderByDescending(q => q.InspectionDate)
             .ThenByDescending(q => q.InspectionNumber)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
@@ -88,7 +88,7 @@ public class IndexModel : PageModel
             Inspections = inspections,
             Pagination = new PaginationViewModel
             {
-                Page = page,
+                Page = pageNumber,
                 PageSize = pageSize,
                 TotalRecords = totalRecords,
                 PageUrl = "/Quality/Inspections",

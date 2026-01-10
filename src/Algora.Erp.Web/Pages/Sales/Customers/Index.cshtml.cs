@@ -29,7 +29,7 @@ public class IndexModel : PageModel
         TotalSalesOrders = await _context.SalesOrders.CountAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? typeFilter, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? typeFilter, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Customers
             .Include(c => c.SalesOrders)
@@ -59,14 +59,14 @@ public class IndexModel : PageModel
 
         var customers = await query
             .OrderBy(c => c.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_CustomersTableRows", new CustomersTableViewModel
         {
             Customers = customers,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

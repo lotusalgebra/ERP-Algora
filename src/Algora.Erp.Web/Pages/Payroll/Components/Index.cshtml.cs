@@ -30,7 +30,7 @@ public class IndexModel : PageModel
         ActiveCount = await _context.SalaryComponents.CountAsync(c => c.IsActive);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? typeFilter, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? typeFilter, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.SalaryComponents.AsQueryable();
 
@@ -58,7 +58,7 @@ public class IndexModel : PageModel
 
         var components = await query
             .OrderBy(c => c.ComponentType).ThenBy(c => c.SortOrder)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
@@ -67,7 +67,7 @@ public class IndexModel : PageModel
             Components = components,
             Pagination = new PaginationViewModel
             {
-                Page = page,
+                Page = pageNumber,
                 PageSize = pageSize,
                 TotalRecords = totalRecords,
                 PageUrl = "/Payroll/Components",

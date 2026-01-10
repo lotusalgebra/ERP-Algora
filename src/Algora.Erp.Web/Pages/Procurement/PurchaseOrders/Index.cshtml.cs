@@ -40,7 +40,7 @@ public class IndexModel : PageModel
         Suppliers = await _context.Suppliers.Where(s => s.IsActive).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? supplierFilter, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? supplierFilter, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.PurchaseOrders
             .Include(p => p.Supplier)
@@ -71,14 +71,14 @@ public class IndexModel : PageModel
 
         var orders = await query
             .OrderByDescending(p => p.OrderDate)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_PurchaseOrdersTableRows", new PurchaseOrdersTableViewModel
         {
             PurchaseOrders = orders,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

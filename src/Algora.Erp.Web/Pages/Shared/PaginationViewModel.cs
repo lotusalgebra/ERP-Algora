@@ -98,9 +98,9 @@ public class PaginationViewModel
     /// <summary>
     /// Build the HTMX URL for a specific page
     /// </summary>
-    public string GetPageUrl(int pageNumber)
+    public string GetPageUrl(int targetPage)
     {
-        var url = $"{PageUrl}?handler={Handler}&page={pageNumber}&pageSize={PageSize}";
+        var url = $"{PageUrl}?handler={Handler}&pageNumber={targetPage}&pageSize={PageSize}";
         return url;
     }
 }
@@ -112,3 +112,4 @@ public interface IPaginatedViewModel
 {
     PaginationViewModel Pagination { get; }
 }
+

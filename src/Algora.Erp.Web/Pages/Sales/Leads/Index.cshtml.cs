@@ -31,7 +31,7 @@ public class IndexModel : PageModel
             .SumAsync(l => l.EstimatedValue!.Value);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? sourceFilter, string? ratingFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? sourceFilter, string? ratingFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Leads.AsQueryable();
 
@@ -64,14 +64,14 @@ public class IndexModel : PageModel
 
         var leads = await query
             .OrderByDescending(l => l.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_LeadsTableRows", new LeadsTableViewModel
         {
             Leads = leads,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

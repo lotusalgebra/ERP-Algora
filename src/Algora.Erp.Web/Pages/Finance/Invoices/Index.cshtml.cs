@@ -48,7 +48,7 @@ public class IndexModel : PageModel
         string? typeFilter,
         string? dateFrom,
         string? dateTo,
-        int page = 1,
+        int pageNumber = 1,
         int pageSize = 15)
     {
         var query = _context.Invoices
@@ -91,14 +91,14 @@ public class IndexModel : PageModel
         var invoices = await query
             .OrderByDescending(i => i.InvoiceDate)
             .ThenByDescending(i => i.InvoiceNumber)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_InvoicesTableRows", new InvoicesTableViewModel
         {
             Invoices = invoices,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

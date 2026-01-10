@@ -35,7 +35,7 @@ public class IndexModel : PageModel
             .SumAsync(o => o.Total);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.WebOrders
             .Include(o => o.Customer)
@@ -65,14 +65,14 @@ public class IndexModel : PageModel
 
         var orders = await query
             .OrderByDescending(o => o.OrderDate)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_OrdersTableRows", new WebOrdersTableViewModel
         {
             Orders = orders,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

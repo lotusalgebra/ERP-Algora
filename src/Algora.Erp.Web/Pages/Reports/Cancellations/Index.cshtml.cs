@@ -45,7 +45,7 @@ public class IndexModel : PageModel
         int? reasonCategoryFilter,
         DateTime? fromDate,
         DateTime? toDate,
-        int page = 1,
+        int pageNumber = 1,
         int pageSize = 10)
     {
         var query = _context.CancellationLogs
@@ -83,14 +83,14 @@ public class IndexModel : PageModel
         var totalRecords = await query.CountAsync();
         var cancellations = await query
             .OrderByDescending(c => c.CancelledAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         var viewModel = new CancellationsTableViewModel
         {
             Cancellations = cancellations,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)

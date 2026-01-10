@@ -24,11 +24,11 @@ public class IndexModel : PageModel
     public int TotalProducts { get; set; }
     public int TotalPages { get; set; }
 
-    public async Task OnGetAsync(string? category, string? sort, int page = 1, string? search = null)
+    public async Task OnGetAsync(string? category, string? sort, int pageNumber = 1, string? search = null)
     {
         CategorySlug = category;
         SortBy = sort ?? "newest";
-        Page = page;
+        Page = pageNumber;
 
         // Get categories for navigation
         Categories = await _context.WebCategories
@@ -73,7 +73,7 @@ public class IndexModel : PageModel
 
         // Paginate
         Products = await query
-            .Skip((Page - 1) * PageSize)
+            .Skip((pageNumber - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
 

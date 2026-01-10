@@ -49,7 +49,7 @@ public class IndexModel : PageModel
         Categories = await _context.ProductCategories.Where(c => c.IsActive).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? warehouseFilter, Guid? categoryFilter, string? stockFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? warehouseFilter, Guid? categoryFilter, string? stockFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.StockLevels
             .Include(s => s.Product)
@@ -94,14 +94,14 @@ public class IndexModel : PageModel
         var stockLevels = await query
             .OrderBy(s => s.Product.Name)
             .ThenBy(s => s.Warehouse.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_StockTableRows", new StockTableViewModel
         {
             StockLevels = stockLevels,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

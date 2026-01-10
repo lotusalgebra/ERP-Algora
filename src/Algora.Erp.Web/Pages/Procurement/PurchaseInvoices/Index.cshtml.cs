@@ -50,7 +50,7 @@ public class IndexModel : PageModel
         string? search,
         string? statusFilter,
         Guid? supplierFilter,
-        int page = 1,
+        int pageNumber = 1,
         int pageSize = 10)
     {
         var query = _context.Invoices
@@ -79,7 +79,7 @@ public class IndexModel : PageModel
         var totalRecords = await query.CountAsync();
         var invoices = await query
             .OrderByDescending(i => i.InvoiceDate)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
@@ -93,7 +93,7 @@ public class IndexModel : PageModel
         {
             Invoices = invoices,
             SupplierNames = suppliers,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)

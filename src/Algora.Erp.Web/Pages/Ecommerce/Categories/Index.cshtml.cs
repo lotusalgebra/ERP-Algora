@@ -16,7 +16,7 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.WebCategories
             .Include(c => c.Parent)
@@ -44,14 +44,14 @@ public class IndexModel : PageModel
         var categories = await query
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_CategoriesTableRows", new WebCategoriesTableViewModel
         {
             Categories = categories,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

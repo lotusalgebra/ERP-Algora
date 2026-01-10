@@ -29,7 +29,7 @@ public class IndexModel : PageModel
         SubDepartments = await _context.Departments.CountAsync(d => d.ParentDepartmentId != null);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Departments
             .Include(d => d.Manager)
@@ -55,14 +55,14 @@ public class IndexModel : PageModel
 
         var departments = await query
             .OrderBy(d => d.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_DepartmentsTableRows", new DepartmentsTableViewModel
         {
             Departments = departments,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

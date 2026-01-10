@@ -38,7 +38,7 @@ public class IndexModel : PageModel
         Employees = await _context.Employees.Where(e => e.EmploymentStatus == EmploymentStatus.Active).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? projectId, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? projectId, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.TimeEntries
             .Include(t => t.Project)
@@ -71,14 +71,14 @@ public class IndexModel : PageModel
         var entries = await query
             .OrderByDescending(t => t.Date)
             .ThenByDescending(t => t.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_TimeEntriesTableRows", new TimeEntryTableViewModel
         {
             TimeEntries = entries,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

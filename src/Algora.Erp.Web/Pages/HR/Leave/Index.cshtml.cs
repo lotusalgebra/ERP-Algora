@@ -35,7 +35,7 @@ public class IndexModel : PageModel
             l.EndDate >= today);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? typeFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, string? typeFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.LeaveRequests
             .Include(l => l.Employee)
@@ -67,14 +67,14 @@ public class IndexModel : PageModel
 
         var leaveRequests = await query
             .OrderByDescending(l => l.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_LeaveTableRows", new LeaveTableViewModel
         {
             LeaveRequests = leaveRequests,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

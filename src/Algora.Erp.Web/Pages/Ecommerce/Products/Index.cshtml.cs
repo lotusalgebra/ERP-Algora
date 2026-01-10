@@ -35,7 +35,7 @@ public class IndexModel : PageModel
         Categories = await _context.WebCategories.Where(c => c.IsActive && !c.IsDeleted).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? categoryFilter, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? categoryFilter, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.EcommerceProducts
             .Include(p => p.Category)
@@ -67,14 +67,14 @@ public class IndexModel : PageModel
 
         var products = await query
             .OrderByDescending(p => p.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_ProductsTableRows", new EcommerceProductsTableViewModel
         {
             Products = products,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

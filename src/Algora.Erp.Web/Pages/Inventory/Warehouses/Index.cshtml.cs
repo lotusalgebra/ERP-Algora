@@ -34,7 +34,7 @@ public class IndexModel : PageModel
         TotalStockValue = stockLevels.Sum(s => s.QuantityOnHand * s.Product.CostPrice);
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, string? statusFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Warehouses
             .Include(w => w.Locations)
@@ -60,14 +60,14 @@ public class IndexModel : PageModel
 
         var warehouses = await query
             .OrderBy(w => w.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_WarehousesTableRows", new WarehousesTableViewModel
         {
             Warehouses = warehouses,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

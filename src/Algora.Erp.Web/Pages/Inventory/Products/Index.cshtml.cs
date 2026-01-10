@@ -51,7 +51,7 @@ public class IndexModel : PageModel
         Categories = await _context.ProductCategories.Where(c => c.IsActive).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? categoryFilter, string? typeFilter, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, Guid? categoryFilter, string? typeFilter, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Products
             .Include(p => p.Category)
@@ -81,7 +81,7 @@ public class IndexModel : PageModel
 
         var products = await query
             .OrderBy(p => p.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
@@ -97,7 +97,7 @@ public class IndexModel : PageModel
         {
             Products = products,
             StockLevels = stockLevels,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

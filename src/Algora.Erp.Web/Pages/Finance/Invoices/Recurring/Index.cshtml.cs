@@ -60,7 +60,7 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnGetTableAsync(
         string? search,
         int? statusFilter,
-        int page = 1,
+        int pageNumber = 1,
         int pageSize = 10)
     {
         var query = _context.RecurringInvoices
@@ -85,7 +85,7 @@ public class IndexModel : PageModel
         var total = await query.CountAsync();
         var items = await query
             .OrderByDescending(r => r.CreatedAt)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(r => new RecurringInvoiceListItem
             {
@@ -107,7 +107,7 @@ public class IndexModel : PageModel
         {
             Items = items,
             Total = total,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize
         });
     }

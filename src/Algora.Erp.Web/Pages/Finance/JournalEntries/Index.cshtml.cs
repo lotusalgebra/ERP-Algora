@@ -39,7 +39,7 @@ public class IndexModel : PageModel
         string? typeFilter,
         string? dateFrom,
         string? dateTo,
-        int page = 1,
+        int pageNumber = 1,
         int pageSize = 15)
     {
         var query = _context.JournalEntries
@@ -82,14 +82,14 @@ public class IndexModel : PageModel
         var entries = await query
             .OrderByDescending(j => j.EntryDate)
             .ThenByDescending(j => j.EntryNumber)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_JournalEntriesTableRows", new JournalEntriesTableViewModel
         {
             Entries = entries,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages

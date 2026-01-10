@@ -29,7 +29,7 @@ public class IndexModel : PageModel
         Permissions = await _context.Permissions.OrderBy(p => p.Module).ThenBy(p => p.Name).ToListAsync();
     }
 
-    public async Task<IActionResult> OnGetTableAsync(string? search, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> OnGetTableAsync(string? search, int pageNumber = 1, int pageSize = 10)
     {
         var query = _context.Roles
             .Include(r => r.RolePermissions)
@@ -50,14 +50,14 @@ public class IndexModel : PageModel
 
         var roles = await query
             .OrderBy(r => r.Name)
-            .Skip((page - 1) * pageSize)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return Partial("_RolesTableRows", new RolesTableViewModel
         {
             Roles = roles,
-            Page = page,
+            Page = pageNumber,
             PageSize = pageSize,
             TotalRecords = totalRecords,
             TotalPages = totalPages
