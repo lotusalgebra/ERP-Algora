@@ -5,51 +5,51 @@
     ViewData["Title"] = "Invoice Reports";
 }
 
-<div class="container-fluid">
+<div class="p-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="h3 mb-0">Invoice Reports</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
-                    <li class="breadcrumb-item active">Invoices</li>
+            <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">Invoice Reports</h4>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance/Reports" class="hover:text-primary-600">Reports</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><span class="text-gray-700 dark:text-gray-300">Invoices</span></li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-danger">
-                <i class="bi bi-file-pdf me-1"></i>Export PDF
+        <div class="flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white">
+                <i class="bi bi-file-pdf mr-1"></i>Export PDF
             </a>
-            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">
-                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="text-emerald-700 border border-emerald-700 hover:bg-emerald-700 hover:text-white focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-emerald-500 dark:text-emerald-500 dark:hover:bg-emerald-600 dark:hover:text-white">
+                <i class="bi bi-file-earmark-excel mr-1"></i>Export CSV
             </a>
         </div>
     </div>
 
     <!-- Date Filter -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+    <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+        <div class="p-6">
+            <form method="get" class="grid grid-cols-12 gap-4 items-end">
+                <div class="col-span-12 md:col-span-3">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                <div class="col-span-12 md:col-span-3">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End Date</label>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                <div class="col-span-12 md:col-span-3">
+                    <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700">
+                        <i class="bi bi-funnel mr-1"></i>Apply Filter
                     </button>
-                    <a href="/Finance/Reports/Invoices" class="btn btn-outline-secondary">Reset</a>
+                    <a href="/Finance/Reports/Invoices" class="text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 ml-2">Reset</a>
                 </div>
-                <div class="col-md-3 text-end">
-                    <span class="text-muted">
-                        <i class="bi bi-calendar me-1"></i>
+                <div class="col-span-12 md:col-span-3 text-right">
+                    <span class="text-gray-500 dark:text-gray-400">
+                        <i class="bi bi-calendar mr-1"></i>
                         @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
                     </span>
                 </div>
@@ -58,157 +58,135 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Report.TotalInvoices</h3>
-                    <small class="text-muted">Total Invoices</small>
-                </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.Report.TotalInvoices</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Invoices</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-primary">@Model.Report.TotalInvoiced.ToString("C0")</h3>
-                    <small class="text-muted">Total Invoiced</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-primary-600 dark:text-primary-400 mb-1">@Model.Report.TotalInvoiced.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Invoiced</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-success">@Model.Report.TotalPaid.ToString("C0")</h3>
-                    <small class="text-muted">Total Paid</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mb-1">@Model.Report.TotalPaid.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Paid</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-warning">@Model.Report.TotalOutstanding.ToString("C0")</h3>
-                    <small class="text-muted">Outstanding</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-amber-600 dark:text-amber-400 mb-1">@Model.Report.TotalOutstanding.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Outstanding</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-danger">@Model.Report.TotalOverdue.ToString("C0")</h3>
-                    <small class="text-muted">Overdue</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-red-600 dark:text-red-400 mb-1">@Model.Report.TotalOverdue.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Overdue</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Report.AverageInvoiceAmount.ToString("C0")</h3>
-                    <small class="text-muted">Average Amount</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.Report.AverageInvoiceAmount.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Average Amount</small>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-12 gap-6">
         <!-- Invoice Count by Status -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Invoice Count by Status</h5>
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-bar-chart mr-2"></i>Invoice Count by Status</h5>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Status</th>
-                                    <th class="text-center">Count</th>
-                                    <th class="text-end">Amount</th>
-                                    <th class="text-end pe-4">%</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var status in Model.Report.ByStatus)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3 text-center">Count</th>
+                                <th scope="col" class="px-6 py-3 text-right">Amount</th>
+                                <th scope="col" class="px-6 py-3 text-right">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var status in Model.Report.ByStatus)
+                            {
+                                var badgeClass = status.Status switch
                                 {
-                                    var badgeClass = status.Status switch
-                                    {
-                                        InvoiceStatus.Draft => "bg-secondary",
-                                        InvoiceStatus.Pending => "bg-warning text-dark",
-                                        InvoiceStatus.Sent => "bg-info",
-                                        InvoiceStatus.PartiallyPaid => "bg-primary",
-                                        InvoiceStatus.Paid => "bg-success",
-                                        InvoiceStatus.Overdue => "bg-danger",
-                                        InvoiceStatus.Void => "bg-dark",
-                                        _ => "bg-secondary"
-                                    };
+                                    InvoiceStatus.Draft => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+                                    InvoiceStatus.Pending => "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+                                    InvoiceStatus.Sent => "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400",
+                                    InvoiceStatus.PartiallyPaid => "bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400",
+                                    InvoiceStatus.Paid => "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+                                    InvoiceStatus.Overdue => "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+                                    InvoiceStatus.Void => "bg-gray-800 text-white dark:bg-gray-900 dark:text-gray-200",
+                                    _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                                };
 
-                                    <tr>
-                                        <td class="ps-4">
-                                            <span class="badge @badgeClass">@status.Status</span>
-                                        </td>
-                                        <td class="text-center fw-medium">@status.Count</td>
-                                        <td class="text-end">@status.Amount.ToString("C0")</td>
-                                        <td class="text-end pe-4">@status.Percentage.ToString("F1")%</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold">Total</td>
-                                    <td class="text-center fw-bold">@Model.Report.TotalInvoices</td>
-                                    <td class="text-end fw-bold">@Model.Report.TotalInvoiced.ToString("C0")</td>
-                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @badgeClass">@status.Status</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center font-medium">@status.Count</td>
+                                    <td class="px-6 py-4 text-right">@status.Amount.ToString("C0")</td>
+                                    <td class="px-6 py-4 text-right">@status.Percentage.ToString("F1")%</td>
                                 </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr class="font-bold">
+                                <td class="px-6 py-4">Total</td>
+                                <td class="px-6 py-4 text-center">@Model.Report.TotalInvoices</td>
+                                <td class="px-6 py-4 text-right">@Model.Report.TotalInvoiced.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right">100%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
 
         <!-- Collection Efficiency -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Collection Efficiency</h5>
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-speedometer2 mr-2"></i>Collection Efficiency</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row g-4 mb-4">
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h3 class="mb-1 @(Model.CollectionReport.CollectionRate >= 80 ? "text-success" : Model.CollectionReport.CollectionRate >= 50 ? "text-warning" : "text-danger")">
-                                    @Model.CollectionReport.CollectionRate.ToString("F1")%
-                                </h3>
-                                <small class="text-muted">Collection Rate</small>
-                            </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <h3 class="text-2xl font-semibold mb-1 @(Model.CollectionReport.CollectionRate >= 80 ? "text-emerald-600 dark:text-emerald-400" : Model.CollectionReport.CollectionRate >= 50 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400")">
+                                @Model.CollectionReport.CollectionRate.ToString("F1")%
+                            </h3>
+                            <small class="text-gray-500 dark:text-gray-400">Collection Rate</small>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h3 class="mb-1">@Model.CollectionReport.AverageDaysToPayment.ToString("F1")</h3>
-                                <small class="text-muted">Avg Days to Payment</small>
-                            </div>
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.CollectionReport.AverageDaysToPayment.ToString("F1")</h3>
+                            <small class="text-gray-500 dark:text-gray-400">Avg Days to Payment</small>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h3 class="mb-1 text-success">@Model.CollectionReport.InvoicesPaidOnTime</h3>
-                                <small class="text-muted">Paid On Time</small>
-                            </div>
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <h3 class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mb-1">@Model.CollectionReport.InvoicesPaidOnTime</h3>
+                            <small class="text-gray-500 dark:text-gray-400">Paid On Time</small>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h3 class="mb-1 text-danger">@Model.CollectionReport.InvoicesPaidLate</h3>
-                                <small class="text-muted">Paid Late</small>
-                            </div>
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <h3 class="text-2xl font-semibold text-red-600 dark:text-red-400 mb-1">@Model.CollectionReport.InvoicesPaidLate</h3>
+                            <small class="text-gray-500 dark:text-gray-400">Paid Late</small>
                         </div>
                     </div>
 
                     <div>
-                        <h6 class="text-muted mb-3">On-Time Payment Rate</h6>
-                        <div class="progress mb-2" style="height: 25px;">
-                            <div class="progress-bar bg-success" style="width: @Model.CollectionReport.OnTimePaymentRate%">
+                        <h6 class="text-gray-500 dark:text-gray-400 mb-3 text-sm font-medium">On-Time Payment Rate</h6>
+                        <div class="w-full bg-gray-200 rounded-full h-6 dark:bg-gray-700 flex overflow-hidden">
+                            <div class="bg-emerald-600 h-6 flex items-center justify-center text-xs font-medium text-white" style="width: @Model.CollectionReport.OnTimePaymentRate%">
                                 @Model.CollectionReport.OnTimePaymentRate.ToString("F1")% On Time
                             </div>
-                            <div class="progress-bar bg-danger" style="width: @(100 - Model.CollectionReport.OnTimePaymentRate)%">
+                            <div class="bg-red-600 h-6 flex items-center justify-center text-xs font-medium text-white" style="width: @(100 - Model.CollectionReport.OnTimePaymentRate)%">
                                 @((100 - Model.CollectionReport.OnTimePaymentRate).ToString("F1"))% Late
                             </div>
                         </div>
@@ -218,12 +196,12 @@
         </div>
 
         <!-- Daily Trend Chart -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Daily Invoice Trend</h5>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-graph-up mr-2"></i>Daily Invoice Trend</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <canvas id="dailyTrendChart" height="100"></canvas>
                 </div>
             </div>

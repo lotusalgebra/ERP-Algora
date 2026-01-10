@@ -3,9 +3,9 @@
 @if (Model.Products.Count == 0)
 {
     <tr>
-        <td colspan="9" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+        <td colspan="9" class="px-6 py-12 text-center">
+            <div class="text-gray-500">
+                <i class="bi bi-box-seam text-4xl block mb-3"></i>
                 <p class="mb-0">No products found</p>
             </div>
         </td>
@@ -18,84 +18,99 @@ else
         var stockLevel = Model.StockLevels.GetValueOrDefault(product.Id, 0);
         var isLowStock = stockLevel <= product.ReorderLevel && product.ReorderLevel > 0;
 
-        <tr>
-            <td class="ps-4">
-                <code class="bg-light px-2 py-1 rounded">@product.Sku</code>
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <code class="bg-gray-100 px-2 py-1 rounded text-sm">@product.Sku</code>
             </td>
-            <td>
-                <div class="d-flex align-items-center">
-                    <div class="bg-light rounded-2 p-2 me-3">
+            <td class="px-6 py-4">
+                <div class="flex items-center">
+                    <div class="bg-gray-100 rounded-lg p-2 mr-3">
                         @if (!string.IsNullOrEmpty(product.ImageUrl))
                         {
-                            <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;">
+                            <img src="@product.ImageUrl" alt="@product.Name" class="w-10 h-10 object-cover rounded">
                         }
                         else
                         {
-                            <i class="bi bi-box text-muted fs-5"></i>
+                            <i class="bi bi-box text-gray-400 text-xl"></i>
                         }
                     </div>
                     <div>
-                        <div class="fw-medium">@product.Name</div>
+                        <div class="font-medium text-gray-900">@product.Name</div>
                         @if (!string.IsNullOrEmpty(product.Barcode))
                         {
-                            <small class="text-muted"><i class="bi bi-upc me-1"></i>@product.Barcode</small>
+                            <small class="text-gray-500"><i class="bi bi-upc mr-1"></i>@product.Barcode</small>
                         }
                     </div>
                 </div>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (product.Category != null)
                 {
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary">@product.Category.Name</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@product.Category.Name</span>
                 }
                 else
                 {
-                    <span class="text-muted">—</span>
+                    <span class="text-gray-400">—</span>
                 }
             </td>
-            <td>
-                <span class="badge bg-info bg-opacity-10 text-info">@product.ProductType</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">@product.ProductType</span>
             </td>
-            <td class="text-end">@product.CostPrice.ToString("C2")</td>
-            <td class="text-end">@product.SellingPrice.ToString("C2")</td>
-            <td class="text-end">
+            <td class="px-6 py-4 text-right text-gray-900">@product.CostPrice.ToString("C2")</td>
+            <td class="px-6 py-4 text-right text-gray-900">@product.SellingPrice.ToString("C2")</td>
+            <td class="px-6 py-4 text-right">
                 @if (isLowStock)
                 {
-                    <span class="badge bg-warning text-dark">
-                        <i class="bi bi-exclamation-triangle me-1"></i>@stockLevel.ToString("N0")
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        <i class="bi bi-exclamation-triangle mr-1"></i>@stockLevel.ToString("N0")
                     </span>
                 }
                 else
                 {
-                    <span class="fw-medium">@stockLevel.ToString("N0")</span>
+                    <span class="font-medium text-gray-900">@stockLevel.ToString("N0")</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (product.IsActive)
                 {
-                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                 }
                 else
                 {
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button"
-                            class="btn btn-outline-primary"
-                            hx-get="?handler=EditForm&id=@product.Id"
-                            hx-target="#formModalBody"
-                            data-modal-target="formModal" data-modal-toggle="formModal"
-                            title="Edit">
-                        <i class="bi bi-pencil"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownProd@(product.Id)" data-dropdown-toggle="dropdownMenuProd@(product.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <button type="button"
-                            class="btn btn-outline-danger"
-                            onclick="confirmDelete('@product.Id')"
-                            title="Delete">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuProd@(product.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="?handler=EditForm&id=@product.Id"
+                                   hx-target="#formModalBody"
+                                   data-modal-target="formModal" data-modal-toggle="formModal">
+                                    <i class="bi bi-pencil mr-2"></i> Edit
+                                </a>
+                            </li>
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Inventory/Stock?productId=@product.Id">
+                                    <i class="bi bi-box-seam mr-2"></i> View Stock
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="py-2">
+                            <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                               hx-delete="?handler=Delete&id=@product.Id"
+                               hx-target="#productsTableBody"
+                               hx-swap="innerHTML"
+                               hx-confirm="Are you sure you want to delete this product?">
+                                <i class="bi bi-trash mr-2"></i> Delete
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -103,41 +118,33 @@ else
 
     <!-- Pagination -->
     <tr>
-        <td colspan="9" class="py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small">
+        <td colspan="9" class="px-6 py-3 bg-gray-50">
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-500">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </div>
-                <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link"
-                               hx-get="?handler=Table&page=@(Model.Page - 1)"
-                               hx-target="#productsTableBody"
-                               hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
-                                Previous
-                            </a>
-                        </li>
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link"
-                                   hx-get="?handler=Table&page=@i"
-                                   hx-target="#productsTableBody"
-                                   hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
-                               hx-get="?handler=Table&page=@(Model.Page + 1)"
-                               hx-target="#productsTableBody"
-                               hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
-                                Next
-                            </a>
-                        </li>
-                    </ul>
+                <nav class="flex items-center space-x-1">
+                    <a class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page <= 1 ? "pointer-events-none opacity-50" : "")"
+                       hx-get="?handler=Table&page=@(Model.Page - 1)"
+                       hx-target="#productsTableBody"
+                       hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
+                        Previous
+                    </a>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <a class="px-3 py-2 text-sm font-medium border rounded-lg @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700")"
+                           hx-get="?handler=Table&page=@i"
+                           hx-target="#productsTableBody"
+                           hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
+                            @i
+                        </a>
+                    }
+                    <a class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page >= Model.TotalPages ? "pointer-events-none opacity-50" : "")"
+                       hx-get="?handler=Table&page=@(Model.Page + 1)"
+                       hx-target="#productsTableBody"
+                       hx-include="#searchInput, #categoryFilter, #typeFilter, #pageSizeSelect">
+                        Next
+                    </a>
                 </nav>
             </div>
         </td>

@@ -4,96 +4,84 @@
     ViewData["Title"] = "Stock Levels";
 }
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-0">Stock Levels</h1>
+            <h1 class="text-2xl font-bold text-gray-900">Stock Levels</h1>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Inventory">Inventory</a></li>
-                    <li class="breadcrumb-item active">Stock</li>
+                <ol class="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-2">/</span></li>
+                    <li><a href="/Inventory" class="hover:text-primary-600">Inventory</a></li>
+                    <li><span class="mx-2">/</span></li>
+                    <li class="text-gray-900">Stock</li>
                 </ol>
             </nav>
         </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-muted mb-2">Total Products</h6>
-                            <h3 class="mb-0">@Model.TotalProducts</h3>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-box-seam text-primary fs-4"></i>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Total Products</p>
+                    <h3 class="text-2xl font-bold text-gray-900">@Model.TotalProducts</h3>
+                </div>
+                <div class="p-3 bg-primary-100 rounded-lg">
+                    <i class="bi bi-box-seam text-xl text-primary-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-muted mb-2">Low Stock</h6>
-                            <h3 class="mb-0 text-warning">@Model.LowStockItems</h3>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Low Stock</p>
+                    <h3 class="text-2xl font-bold text-amber-500">@Model.LowStockItems</h3>
+                </div>
+                <div class="p-3 bg-amber-100 rounded-lg">
+                    <i class="bi bi-exclamation-triangle text-xl text-amber-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-muted mb-2">Out of Stock</h6>
-                            <h3 class="mb-0 text-danger">@Model.OutOfStockItems</h3>
-                        </div>
-                        <div class="bg-danger bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-x-circle text-danger fs-4"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Out of Stock</p>
+                    <h3 class="text-2xl font-bold text-red-600">@Model.OutOfStockItems</h3>
+                </div>
+                <div class="p-3 bg-red-100 rounded-lg">
+                    <i class="bi bi-x-circle text-xl text-red-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-muted mb-2">Total Value</h6>
-                            <h3 class="mb-0 text-success">@Model.TotalStockValue.ToString("C0")</h3>
-                        </div>
-                        <div class="bg-success bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-currency-dollar text-success fs-4"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Total Value</p>
+                    <h3 class="text-2xl font-bold text-emerald-600">@Model.TotalStockValue.ToString("C0")</h3>
+                </div>
+                <div class="p-3 bg-emerald-100 rounded-lg">
+                    <i class="bi bi-currency-dollar text-xl text-emerald-600"></i>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Filters & Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search products...">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                <div class="md:col-span-3">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-400"></i>
+                        </div>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5" id="searchInput" placeholder="Search products...">
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="warehouseFilter">
+                <div class="md:col-span-2">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" id="warehouseFilter">
                         <option value="">All Warehouses</option>
                         @foreach (var warehouse in Model.Warehouses)
                         {
@@ -101,8 +89,8 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="categoryFilter">
+                <div class="md:col-span-2">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" id="categoryFilter">
                         <option value="">All Categories</option>
                         @foreach (var category in Model.Categories)
                         {
@@ -110,86 +98,84 @@
                         }
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="stockFilter">
+                <div class="md:col-span-2">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" id="stockFilter">
                         <option value="">All Stock Status</option>
                         <option value="low">Low Stock</option>
                         <option value="out">Out of Stock</option>
                         <option value="overstock">Overstock</option>
                     </select>
                 </div>
-                <div class="col-md-3 text-end">
-                    <a href="/Inventory/Warehouses" class="btn btn-outline-secondary">
-                        <i class="bi bi-building me-1"></i> Warehouses
+                <div class="md:col-span-3 text-right">
+                    <a href="/Inventory/Warehouses" class="text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center">
+                        <i class="bi bi-building mr-2"></i> Warehouses
                     </a>
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">Product</th>
-                            <th>SKU</th>
-                            <th>Category</th>
-                            <th>Warehouse</th>
-                            <th>Location</th>
-                            <th class="text-end">On Hand</th>
-                            <th class="text-end">Reserved</th>
-                            <th class="text-end">Available</th>
-                            <th class="text-end">Reorder Level</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stockTableBody" hx-get="/Inventory/Stock?handler=Table" hx-trigger="load" hx-swap="innerHTML">
-                        <tr>
-                            <td colspan="11" class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Product</th>
+                        <th scope="col" class="px-6 py-3">SKU</th>
+                        <th scope="col" class="px-6 py-3">Category</th>
+                        <th scope="col" class="px-6 py-3">Warehouse</th>
+                        <th scope="col" class="px-6 py-3">Location</th>
+                        <th scope="col" class="px-6 py-3 text-right">On Hand</th>
+                        <th scope="col" class="px-6 py-3 text-right">Reserved</th>
+                        <th scope="col" class="px-6 py-3 text-right">Available</th>
+                        <th scope="col" class="px-6 py-3 text-right">Reorder Level</th>
+                        <th scope="col" class="px-6 py-3 text-center">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody" hx-get="/Inventory/Stock?handler=Table" hx-trigger="load" hx-swap="innerHTML">
+                    <tr>
+                        <td colspan="11" class="px-6 py-8 text-center">
+                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <!-- Adjustment Modal -->
-<div class="modal fade" id="adjustmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Stock Adjustment</h5>
-                <button type="button" class="btn-close" data-modal-hide="adjustmentModal"></button>
+<div id="adjustmentModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">Stock Adjustment</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="adjustmentModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form hx-post="/Inventory/Stock?handler=Adjust" hx-target="#stockTableBody" hx-swap="innerHTML">
-                <div class="modal-body">
+                <div class="p-4 md:p-5 space-y-4">
                     <input type="hidden" name="stockLevelId" id="adjustStockLevelId">
-                    <div class="mb-3">
-                        <label class="form-label">Product</label>
-                        <input type="text" class="form-control" id="adjustProductName" readonly>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Product</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" id="adjustProductName" readonly>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Current Quantity</label>
-                        <input type="text" class="form-control" id="adjustCurrentQty" readonly>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Current Quantity</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" id="adjustCurrentQty" readonly>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adjustment (+/-)</label>
-                        <input type="number" step="0.01" name="adjustment" class="form-control" required placeholder="e.g., 10 or -5">
-                        <div class="form-text">Positive to add, negative to subtract</div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Adjustment (+/-)</label>
+                        <input type="number" step="0.01" name="adjustment" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required placeholder="e.g., 10 or -5">
+                        <p class="mt-1 text-sm text-gray-500">Positive to add, negative to subtract</p>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Reason</label>
-                        <textarea name="reason" class="form-control" rows="2" required placeholder="Reason for adjustment..."></textarea>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Reason</label>
+                        <textarea name="reason" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" rows="2" required placeholder="Reason for adjustment..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-hide="adjustmentModal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Apply Adjustment</button>
+                <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b gap-2">
+                    <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" data-modal-hide="adjustmentModal">Cancel</button>
+                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">Apply Adjustment</button>
                 </div>
             </form>
         </div>

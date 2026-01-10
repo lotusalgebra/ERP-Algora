@@ -5,21 +5,21 @@
 @{
     var statusClass = Model.Status switch
     {
-        ProjectStatus.Planning => "bg-secondary",
-        ProjectStatus.Active => "bg-primary",
-        ProjectStatus.OnHold => "bg-warning",
-        ProjectStatus.Completed => "bg-success",
-        ProjectStatus.Cancelled => "bg-danger",
-        _ => "bg-secondary"
+        ProjectStatus.Planning => "bg-gray-100 text-gray-800",
+        ProjectStatus.Active => "bg-primary-100 text-primary-800",
+        ProjectStatus.OnHold => "bg-amber-100 text-amber-800",
+        ProjectStatus.Completed => "bg-emerald-100 text-emerald-800",
+        ProjectStatus.Cancelled => "bg-red-100 text-red-800",
+        _ => "bg-gray-100 text-gray-800"
     };
 
     var priorityClass = Model.Priority switch
     {
-        ProjectPriority.Low => "bg-light text-dark",
-        ProjectPriority.Normal => "bg-info",
-        ProjectPriority.High => "bg-warning",
-        ProjectPriority.Critical => "bg-danger",
-        _ => "bg-info"
+        ProjectPriority.Low => "bg-gray-100 text-gray-800",
+        ProjectPriority.Normal => "bg-cyan-100 text-cyan-800",
+        ProjectPriority.High => "bg-amber-100 text-amber-800",
+        ProjectPriority.Critical => "bg-red-100 text-red-800",
+        _ => "bg-cyan-100 text-cyan-800"
     };
 
     var progressPercent = (int)Model.Progress;
@@ -28,57 +28,59 @@
     var totalTasks = Model.Tasks.Count;
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">
-        <i class="bi bi-kanban me-2"></i>@Model.ProjectCode
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h5 class="text-lg font-semibold text-gray-900">
+        <i class="bi bi-kanban mr-2"></i>@Model.ProjectCode
     </h5>
-    <button type="button" class="btn-close" data-modal-hide="detailsModal" aria-label="Close"></button>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="detailsModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
-<div class="modal-body">
+<div class="p-6">
     <!-- Header Info -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h4 class="mb-1">@Model.Name</h4>
+    <div class="grid grid-cols-12 gap-4 mb-6">
+        <div class="col-span-12 md:col-span-8">
+            <h4 class="text-xl font-bold text-gray-900 mb-1">@Model.Name</h4>
             @if (!string.IsNullOrEmpty(Model.Description))
             {
-                <p class="text-muted mb-0">@Model.Description</p>
+                <p class="text-gray-500 mb-0">@Model.Description</p>
             }
         </div>
-        <div class="col-md-4 text-end">
-            <span class="badge @statusClass fs-6 me-2">@Model.Status</span>
-            <span class="badge @priorityClass">@Model.Priority</span>
+        <div class="col-span-12 md:col-span-4 text-right">
+            <span class="text-xs font-medium px-3 py-1 rounded-full @statusClass mr-2">@Model.Status</span>
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @priorityClass">@Model.Priority</span>
         </div>
     </div>
 
     <!-- Progress -->
-    <div class="card border mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="text-muted mb-3">Overall Progress</h6>
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="progress flex-grow-1" style="height: 20px;">
-                            <div class="progress-bar @(progressPercent >= 100 ? "bg-success" : "bg-primary")"
+    <div class="bg-white rounded-lg border border-gray-200 mb-6">
+        <div class="p-6">
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-12 md:col-span-6">
+                    <h6 class="text-gray-500 mb-3">Overall Progress</h6>
+                    <div class="flex items-center mb-2">
+                        <div class="flex-1 bg-gray-200 rounded-full h-5">
+                            <div class="@(progressPercent >= 100 ? "bg-emerald-500" : "bg-primary-600") h-5 rounded-full flex items-center justify-center text-xs text-white font-medium"
                                  style="width: @progressPercent%">
                                 @progressPercent%
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <h6 class="text-muted mb-3">Statistics</h6>
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="fs-4 fw-bold text-primary">@totalTasks</div>
-                            <small class="text-muted">Tasks</small>
+                <div class="col-span-12 md:col-span-6">
+                    <h6 class="text-gray-500 mb-3">Statistics</h6>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-primary-600">@totalTasks</div>
+                            <small class="text-gray-500">Tasks</small>
                         </div>
-                        <div class="col-4">
-                            <div class="fs-4 fw-bold text-success">@completedTasks</div>
-                            <small class="text-muted">Completed</small>
+                        <div>
+                            <div class="text-2xl font-bold text-emerald-600">@completedTasks</div>
+                            <small class="text-gray-500">Completed</small>
                         </div>
-                        <div class="col-4">
-                            <div class="fs-4 fw-bold text-info">@totalHours.ToString("N1")</div>
-                            <small class="text-muted">Hours</small>
+                        <div>
+                            <div class="text-2xl font-bold text-cyan-600">@totalHours.ToString("N1")</div>
+                            <small class="text-gray-500">Hours</small>
                         </div>
                     </div>
                 </div>
@@ -87,46 +89,62 @@
     </div>
 
     <!-- Details -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <h6 class="text-muted mb-3">Project Details</h6>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5">Customer</dt>
-                        <dd class="col-sm-7">@(Model.Customer?.Name ?? "-")</dd>
-                        <dt class="col-sm-5">Manager</dt>
-                        <dd class="col-sm-7">
-                            @if (Model.ProjectManager != null)
-                            {
-                                @($"{Model.ProjectManager.FirstName} {Model.ProjectManager.LastName}")
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
-                        </dd>
-                        <dt class="col-sm-5">Budget</dt>
-                        <dd class="col-sm-7 fw-bold text-primary">@Model.BudgetAmount.ToString("C")</dd>
-                        <dt class="col-sm-5">Actual Cost</dt>
-                        <dd class="col-sm-7">@Model.ActualCost.ToString("C")</dd>
+    <div class="grid grid-cols-12 gap-4 mb-6">
+        <div class="col-span-12 md:col-span-6">
+            <div class="bg-white rounded-lg border border-gray-200 h-full">
+                <div class="p-6">
+                    <h6 class="text-gray-500 mb-3">Project Details</h6>
+                    <dl class="space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Customer</dt>
+                            <dd class="text-gray-900">@(Model.Customer?.Name ?? "-")</dd>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Manager</dt>
+                            <dd class="text-gray-900">
+                                @if (Model.ProjectManager != null)
+                                {
+                                    @($"{Model.ProjectManager.FirstName} {Model.ProjectManager.LastName}")
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </dd>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Budget</dt>
+                            <dd class="text-primary-600 font-bold">@Model.BudgetAmount.ToString("C")</dd>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Actual Cost</dt>
+                            <dd class="text-gray-900">@Model.ActualCost.ToString("C")</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <h6 class="text-muted mb-3">Schedule</h6>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5">Planned Start</dt>
-                        <dd class="col-sm-7">@Model.StartDate.ToString("MMM dd, yyyy")</dd>
-                        <dt class="col-sm-5">Planned End</dt>
-                        <dd class="col-sm-7">@(Model.EndDate?.ToString("MMM dd, yyyy") ?? "-")</dd>
-                        <dt class="col-sm-5">Actual Start</dt>
-                        <dd class="col-sm-7">@(Model.ActualStartDate?.ToString("MMM dd, yyyy") ?? "-")</dd>
-                        <dt class="col-sm-5">Actual End</dt>
-                        <dd class="col-sm-7">@(Model.ActualEndDate?.ToString("MMM dd, yyyy") ?? "-")</dd>
+        <div class="col-span-12 md:col-span-6">
+            <div class="bg-white rounded-lg border border-gray-200 h-full">
+                <div class="p-6">
+                    <h6 class="text-gray-500 mb-3">Schedule</h6>
+                    <dl class="space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Planned Start</dt>
+                            <dd class="text-gray-900">@Model.StartDate.ToString("MMM dd, yyyy")</dd>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Planned End</dt>
+                            <dd class="text-gray-900">@(Model.EndDate?.ToString("MMM dd, yyyy") ?? "-")</dd>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Actual Start</dt>
+                            <dd class="text-gray-900">@(Model.ActualStartDate?.ToString("MMM dd, yyyy") ?? "-")</dd>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Actual End</dt>
+                            <dd class="text-gray-900">@(Model.ActualEndDate?.ToString("MMM dd, yyyy") ?? "-")</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -136,46 +154,44 @@
     <!-- Team Members -->
     @if (Model.Members.Any())
     {
-        <div class="card border mb-4">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">
-                    <i class="bi bi-people me-2"></i>Team Members
-                    <span class="badge bg-primary ms-2">@Model.Members.Count</span>
+        <div class="bg-white rounded-lg border border-gray-200 mb-6">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0">
+                    <i class="bi bi-people mr-2"></i>Team Members
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-2">@Model.Members.Count</span>
                 </h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">Name</th>
-                                <th>Role</th>
-                                <th>Hourly Rate</th>
-                                <th>Joined</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var member in Model.Members.Where(m => m.IsActive))
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Name</th>
+                            <th scope="col" class="px-6 py-3">Role</th>
+                            <th scope="col" class="px-6 py-3">Hourly Rate</th>
+                            <th scope="col" class="px-6 py-3">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in Model.Members.Where(m => m.IsActive))
+                        {
+                            var roleClass = member.Role switch
                             {
-                                var roleClass = member.Role switch
-                                {
-                                    ProjectRole.Manager => "bg-primary",
-                                    ProjectRole.Lead => "bg-info",
-                                    ProjectRole.Member => "bg-secondary",
-                                    ProjectRole.Stakeholder => "bg-warning",
-                                    _ => "bg-secondary"
-                                };
+                                ProjectRole.Manager => "bg-primary-100 text-primary-800",
+                                ProjectRole.Lead => "bg-cyan-100 text-cyan-800",
+                                ProjectRole.Member => "bg-gray-100 text-gray-800",
+                                ProjectRole.Stakeholder => "bg-amber-100 text-amber-800",
+                                _ => "bg-gray-100 text-gray-800"
+                            };
 
-                                <tr>
-                                    <td class="ps-3">@member.Employee?.FirstName @member.Employee?.LastName</td>
-                                    <td><span class="badge @roleClass">@member.Role</span></td>
-                                    <td>@member.HourlyRate.ToString("C")/hr</td>
-                                    <td>@member.JoinedAt.ToString("MMM dd, yyyy")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-6 py-4">@member.Employee?.FirstName @member.Employee?.LastName</td>
+                                <td class="px-6 py-4"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full @roleClass">@member.Role</span></td>
+                                <td class="px-6 py-4">@member.HourlyRate.ToString("C")/hr</td>
+                                <td class="px-6 py-4">@member.JoinedAt.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     }
@@ -183,166 +199,162 @@
     <!-- Tasks -->
     @if (Model.Tasks.Any())
     {
-        <div class="card border mb-4">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">
-                    <i class="bi bi-list-task me-2"></i>Tasks
-                    <span class="badge bg-primary ms-2">@Model.Tasks.Count</span>
+        <div class="bg-white rounded-lg border border-gray-200 mb-6">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0">
+                    <i class="bi bi-list-task mr-2"></i>Tasks
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-2">@Model.Tasks.Count</span>
                 </h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">#</th>
-                                <th>Title</th>
-                                <th>Assignee</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Due Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var task in Model.Tasks.OrderBy(t => t.SortOrder).Take(10))
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">#</th>
+                            <th scope="col" class="px-6 py-3">Title</th>
+                            <th scope="col" class="px-6 py-3">Assignee</th>
+                            <th scope="col" class="px-6 py-3">Priority</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in Model.Tasks.OrderBy(t => t.SortOrder).Take(10))
+                        {
+                            var taskStatusClass = task.Status switch
                             {
-                                var taskStatusClass = task.Status switch
-                                {
-                                    ProjectTaskStatus.Todo => "bg-secondary",
-                                    ProjectTaskStatus.InProgress => "bg-primary",
-                                    ProjectTaskStatus.InReview => "bg-info",
-                                    ProjectTaskStatus.Completed => "bg-success",
-                                    ProjectTaskStatus.Cancelled => "bg-danger",
-                                    _ => "bg-secondary"
-                                };
+                                ProjectTaskStatus.Todo => "bg-gray-100 text-gray-800",
+                                ProjectTaskStatus.InProgress => "bg-primary-100 text-primary-800",
+                                ProjectTaskStatus.InReview => "bg-cyan-100 text-cyan-800",
+                                ProjectTaskStatus.Completed => "bg-emerald-100 text-emerald-800",
+                                ProjectTaskStatus.Cancelled => "bg-red-100 text-red-800",
+                                _ => "bg-gray-100 text-gray-800"
+                            };
 
-                                var taskPriorityClass = task.Priority switch
-                                {
-                                    TaskPriority.Low => "text-muted",
-                                    TaskPriority.Normal => "text-dark",
-                                    TaskPriority.High => "text-warning",
-                                    TaskPriority.Urgent => "text-danger",
-                                    _ => "text-dark"
-                                };
+                            var taskPriorityClass = task.Priority switch
+                            {
+                                TaskPriority.Low => "text-gray-500",
+                                TaskPriority.Normal => "text-gray-900",
+                                TaskPriority.High => "text-amber-600",
+                                TaskPriority.Urgent => "text-red-600",
+                                _ => "text-gray-900"
+                            };
 
-                                <tr>
-                                    <td class="ps-3 text-muted small">@task.TaskNumber</td>
-                                    <td>@task.Title</td>
-                                    <td>
-                                        @if (task.Assignee != null)
-                                        {
-                                            @($"{task.Assignee.FirstName} {task.Assignee.LastName.Substring(0, 1)}.")
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
-                                    </td>
-                                    <td class="@taskPriorityClass">@task.Priority</td>
-                                    <td><span class="badge @taskStatusClass">@task.Status</span></td>
-                                    <td>@(task.DueDate?.ToString("MMM dd") ?? "-")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                @if (Model.Tasks.Count > 10)
-                {
-                    <div class="text-center py-2 bg-light">
-                        <small class="text-muted">Showing 10 of @Model.Tasks.Count tasks</small>
-                    </div>
-                }
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-6 py-4 text-gray-500 text-sm">@task.TaskNumber</td>
+                                <td class="px-6 py-4">@task.Title</td>
+                                <td class="px-6 py-4">
+                                    @if (task.Assignee != null)
+                                    {
+                                        @($"{task.Assignee.FirstName} {task.Assignee.LastName.Substring(0, 1)}.")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-500">-</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4 @taskPriorityClass">@task.Priority</td>
+                                <td class="px-6 py-4"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full @taskStatusClass">@task.Status</span></td>
+                                <td class="px-6 py-4">@(task.DueDate?.ToString("MMM dd") ?? "-")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
+            @if (Model.Tasks.Count > 10)
+            {
+                <div class="text-center py-2 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+                    <small class="text-gray-500">Showing 10 of @Model.Tasks.Count tasks</small>
+                </div>
+            }
         </div>
     }
 
     <!-- Milestones -->
     @if (Model.Milestones.Any())
     {
-        <div class="card border">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">
-                    <i class="bi bi-flag me-2"></i>Milestones
-                    <span class="badge bg-primary ms-2">@Model.Milestones.Count</span>
+        <div class="bg-white rounded-lg border border-gray-200">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0">
+                    <i class="bi bi-flag mr-2"></i>Milestones
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-2">@Model.Milestones.Count</span>
                 </h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3">Milestone</th>
-                                <th>Due Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var milestone in Model.Milestones.OrderBy(m => m.DueDate))
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Milestone</th>
+                            <th scope="col" class="px-6 py-3">Due Date</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var milestone in Model.Milestones.OrderBy(m => m.DueDate))
+                        {
+                            var msStatusClass = milestone.Status switch
                             {
-                                var msStatusClass = milestone.Status switch
-                                {
-                                    MilestoneStatus.Pending => "bg-secondary",
-                                    MilestoneStatus.InProgress => "bg-primary",
-                                    MilestoneStatus.Completed => "bg-success",
-                                    MilestoneStatus.Missed => "bg-danger",
-                                    _ => "bg-secondary"
-                                };
+                                MilestoneStatus.Pending => "bg-gray-100 text-gray-800",
+                                MilestoneStatus.InProgress => "bg-primary-100 text-primary-800",
+                                MilestoneStatus.Completed => "bg-emerald-100 text-emerald-800",
+                                MilestoneStatus.Missed => "bg-red-100 text-red-800",
+                                _ => "bg-gray-100 text-gray-800"
+                            };
 
-                                <tr class="@(milestone.IsOverdue ? "table-danger" : "")">
-                                    <td class="ps-3">
-                                        @milestone.Name
-                                        @if (milestone.IsOverdue)
-                                        {
-                                            <i class="bi bi-exclamation-triangle text-danger ms-1"></i>
-                                        }
-                                    </td>
-                                    <td>@milestone.DueDate.ToString("MMM dd, yyyy")</td>
-                                    <td><span class="badge @msStatusClass">@milestone.Status</span></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                            <tr class="border-b hover:bg-gray-50 @(milestone.IsOverdue ? "bg-red-50" : "")">
+                                <td class="px-6 py-4">
+                                    @milestone.Name
+                                    @if (milestone.IsOverdue)
+                                    {
+                                        <i class="bi bi-exclamation-triangle text-red-600 ml-1"></i>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">@milestone.DueDate.ToString("MMM dd, yyyy")</td>
+                                <td class="px-6 py-4"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full @msStatusClass">@milestone.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     }
 
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="card border mt-4">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-journal-text me-2"></i>Notes</h6>
+        <div class="bg-white rounded-lg border border-gray-200 mt-6">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0"><i class="bi bi-journal-text mr-2"></i>Notes</h6>
             </div>
-            <div class="card-body">
-                <p class="mb-0">@Model.Notes</p>
+            <div class="p-6">
+                <p class="mb-0 text-gray-700">@Model.Notes</p>
             </div>
         </div>
     }
 
     <!-- Timestamps -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <small class="text-muted">
+    <div class="grid grid-cols-12 mt-6">
+        <div class="col-span-12">
+            <small class="text-gray-500">
                 Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
                 @if (Model.ModifiedAt.HasValue)
                 {
-                    <span class="ms-3">Modified: @Model.ModifiedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+                    <span class="ml-3">Modified: @Model.ModifiedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
                 }
             </small>
         </div>
     </div>
 </div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+<div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
     @if (Model.Status == ProjectStatus.Planning || Model.Status == ProjectStatus.OnHold)
     {
         <button type="button"
-                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
+                class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5"
                 hx-get="/Projects?handler=EditForm&id=@Model.Id"
                 hx-target="#formModalContent"
                 data-modal-hide="detailsModal"
                 onclick="setTimeout(() => { const modal = FlowbiteInstances.getInstance('Modal', 'formModal'); if(modal) modal.show(); }, 300)">
-            <i class="bi bi-pencil me-1"></i> Edit
+            <i class="bi bi-pencil mr-1"></i> Edit
         </button>
     }
 </div>

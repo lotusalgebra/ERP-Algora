@@ -10,21 +10,21 @@
         <input type="hidden" name="Id" value="@Model.Product.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-4">
         <!-- Basic Information -->
-        <div class="col-12">
-            <h6 class="text-muted text-uppercase small mb-3">Basic Information</h6>
+        <div class="col-span-12">
+            <h6 class="text-gray-500 text-xs uppercase font-semibold mb-3">Basic Information</h6>
         </div>
 
-        <div class="col-md-12">
-            <label class="form-label">Product Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="Name"
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Product Name <span class="text-red-500">*</span></label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name"
                    value="@Model.Product?.Name" required>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Category</label>
-            <select class="form-select" name="CategoryId">
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Category</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="CategoryId">
                 <option value="">-- Select Category --</option>
                 @foreach (var category in Model.Categories)
                 {
@@ -35,9 +35,9 @@
             </select>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Product Type</label>
-            <select class="form-select" name="ProductType">
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Product Type</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ProductType">
                 @foreach (var type in Enum.GetValues<ProductType>())
                 {
                     <option value="@type" selected="@(Model.Product?.ProductType == type)">@type</option>
@@ -45,15 +45,15 @@
             </select>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Barcode</label>
-            <input type="text" class="form-control" name="Barcode"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Barcode</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Barcode"
                    value="@Model.Product?.Barcode">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Unit of Measure</label>
-            <select class="form-select" name="UnitOfMeasure">
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Unit of Measure</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="UnitOfMeasure">
                 <option value="">-- Select UoM --</option>
                 <option value="EA" selected="@(Model.Product?.UnitOfMeasure == "EA")">Each (EA)</option>
                 <option value="PCS" selected="@(Model.Product?.UnitOfMeasure == "PCS")">Pieces (PCS)</option>
@@ -65,128 +65,128 @@
             </select>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" name="Description" rows="2">@Model.Product?.Description</textarea>
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Description" rows="2">@Model.Product?.Description</textarea>
         </div>
 
         <!-- Branding -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Branding</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 text-xs uppercase font-semibold mb-3">Branding</h6>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Brand</label>
-            <input type="text" class="form-control" name="Brand"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Brand</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Brand"
                    value="@Model.Product?.Brand">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Manufacturer</label>
-            <input type="text" class="form-control" name="Manufacturer"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Manufacturer</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Manufacturer"
                    value="@Model.Product?.Manufacturer">
         </div>
 
         <!-- Pricing -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Pricing</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 text-xs uppercase font-semibold mb-3">Pricing</h6>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Cost Price</label>
-            <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input type="number" class="form-control" name="CostPrice" step="0.01" min="0"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Cost Price</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">$</span>
+                <input type="number" class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="CostPrice" step="0.01" min="0"
                        value="@(Model.Product?.CostPrice ?? 0)">
             </div>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Selling Price</label>
-            <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input type="number" class="form-control" name="SellingPrice" step="0.01" min="0"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Selling Price</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">$</span>
+                <input type="number" class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SellingPrice" step="0.01" min="0"
                        value="@(Model.Product?.SellingPrice ?? 0)">
             </div>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Tax Rate (%)</label>
-            <div class="input-group">
-                <input type="number" class="form-control" name="TaxRate" step="0.01" min="0" max="100"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Tax Rate (%)</label>
+            <div class="flex">
+                <input type="number" class="rounded-none rounded-s-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TaxRate" step="0.01" min="0" max="100"
                        value="@(Model.Product?.TaxRate ?? 0)">
-                <span class="input-group-text">%</span>
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-s-0 border-gray-300 border-s-0 rounded-e-md">%</span>
             </div>
         </div>
 
         <!-- Inventory -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Inventory Levels</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 text-xs uppercase font-semibold mb-3">Inventory Levels</h6>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Reorder Level</label>
-            <input type="number" class="form-control" name="ReorderLevel" step="1" min="0"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Reorder Level</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ReorderLevel" step="1" min="0"
                    value="@(Model.Product?.ReorderLevel ?? 0)">
-            <div class="form-text">Alert when stock falls below</div>
+            <p class="mt-1 text-xs text-gray-500">Alert when stock falls below</p>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Minimum Stock</label>
-            <input type="number" class="form-control" name="MinimumStock" step="1" min="0"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Minimum Stock</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MinimumStock" step="1" min="0"
                    value="@(Model.Product?.MinimumStock ?? 0)">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Maximum Stock</label>
-            <input type="number" class="form-control" name="MaximumStock" step="1" min="0"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Maximum Stock</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MaximumStock" step="1" min="0"
                    value="@(Model.Product?.MaximumStock ?? 0)">
         </div>
 
         <!-- Physical -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Physical Properties</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 text-xs uppercase font-semibold mb-3">Physical Properties</h6>
         </div>
 
-        <div class="col-md-12">
-            <label class="form-label">Weight (kg)</label>
-            <input type="number" class="form-control" name="Weight" step="0.001" min="0"
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Weight (kg)</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Weight" step="0.001" min="0"
                    value="@Model.Product?.Weight">
         </div>
 
         <!-- Options -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Options</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 text-xs uppercase font-semibold mb-3">Options</h6>
         </div>
 
-        <div class="col-md-4">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="IsSellable" value="true" id="isSellable"
+        <div class="col-span-12 md:col-span-4">
+            <div class="flex items-center">
+                <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2" type="checkbox" name="IsSellable" value="true" id="isSellable"
                        checked="@(Model.Product?.IsSellable ?? true)">
-                <label class="form-check-label" for="isSellable">Can be Sold</label>
+                <label class="ml-2 text-sm font-medium text-gray-900" for="isSellable">Can be Sold</label>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="IsPurchasable" value="true" id="isPurchasable"
+        <div class="col-span-12 md:col-span-4">
+            <div class="flex items-center">
+                <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2" type="checkbox" name="IsPurchasable" value="true" id="isPurchasable"
                        checked="@(Model.Product?.IsPurchasable ?? true)">
-                <label class="form-check-label" for="isPurchasable">Can be Purchased</label>
+                <label class="ml-2 text-sm font-medium text-gray-900" for="isPurchasable">Can be Purchased</label>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="IsActive" value="true" id="isActive"
+        <div class="col-span-12 md:col-span-4">
+            <div class="flex items-center">
+                <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2" type="checkbox" name="IsActive" value="true" id="isActive"
                        checked="@(Model.Product?.IsActive ?? true)">
-                <label class="form-check-label" for="isActive">Active</label>
+                <label class="ml-2 text-sm font-medium text-gray-900" for="isActive">Active</label>
             </div>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-modal-hide="productModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
+    <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b gap-2 mt-4 -mx-4 -mb-4">
+        <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
             @(Model.IsEdit ? "Update Product" : "Create Product")
         </button>
     </div>

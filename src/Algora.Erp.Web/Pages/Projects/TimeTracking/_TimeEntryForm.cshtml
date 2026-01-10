@@ -6,23 +6,25 @@
     var entry = Model.TimeEntry;
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">@title</h5>
-    <button type="button" class="btn-close" data-modal-hide="formModal" aria-label="Close"></button>
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h5 class="text-lg font-semibold text-gray-900">@title</h5>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="formModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 <form hx-post="/Projects/TimeTracking"
       hx-target="#timeEntriesTableContainer"
       hx-swap="innerHTML">
-    <div class="modal-body">
+    <div class="p-6">
         @if (Model.IsEdit && entry != null)
         {
             <input type="hidden" name="Id" value="@entry.Id" />
         }
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Project <span class="text-danger">*</span></label>
-                <select name="ProjectId" id="projectSelect" class="form-select" required onchange="loadProjectTasks()">
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Project <span class="text-red-500">*</span></label>
+                <select name="ProjectId" id="projectSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required onchange="loadProjectTasks()">
                     <option value="">Select Project...</option>
                     @foreach (var project in Model.Projects)
                     {
@@ -30,9 +32,9 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Task</label>
-                <select name="TaskId" id="taskSelect" class="form-select">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Task</label>
+                <select name="TaskId" id="taskSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     <option value="">No Task</option>
                     @if (Model.Tasks.Any())
                     {
@@ -45,10 +47,10 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Employee <span class="text-danger">*</span></label>
-                <select name="EmployeeId" class="form-select" required>
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Employee <span class="text-red-500">*</span></label>
+                <select name="EmployeeId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
                     <option value="">Select Employee...</option>
                     @foreach (var emp in Model.Employees)
                     {
@@ -56,41 +58,41 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Date <span class="text-danger">*</span></label>
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Date <span class="text-red-500">*</span></label>
                 <input type="date"
                        name="Date"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(entry?.Date.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
                        required />
             </div>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-4">
-                <label class="form-label">Start Time</label>
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Start Time</label>
                 <input type="time"
                        name="StartTime"
                        id="startTime"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@entry?.StartTime?.ToString("HH:mm")"
                        onchange="calculateHours()" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">End Time</label>
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">End Time</label>
                 <input type="time"
                        name="EndTime"
                        id="endTime"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@entry?.EndTime?.ToString("HH:mm")"
                        onchange="calculateHours()" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Hours <span class="text-danger">*</span></label>
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Hours <span class="text-red-500">*</span></label>
                 <input type="number"
                        name="Hours"
                        id="hoursInput"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(entry?.Hours ?? 0)"
                        step="0.25"
                        min="0.25"
@@ -99,18 +101,18 @@
             </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Description</label>
+        <div class="mb-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
             <textarea name="Description"
-                      class="form-control"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                       rows="3"
                       placeholder="What did you work on?">@entry?.Description</textarea>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Status</label>
-                <select name="Status" class="form-select">
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                <select name="Status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (TimeEntryStatus status in Enum.GetValues(typeof(TimeEntryStatus)))
                     {
                         if (status == TimeEntryStatus.Approved && !Model.IsEdit) continue;
@@ -118,30 +120,31 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Billable</label>
-                <div class="form-check form-switch mt-2">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Billable</label>
+                <label class="relative inline-flex items-center cursor-pointer mt-2">
                     <input type="checkbox"
                            name="IsBillable"
-                           class="form-check-input"
+                           class="sr-only peer"
                            value="true"
                            @(entry?.IsBillable != false ? "checked" : "") />
-                    <label class="form-check-label">Billable Hours</label>
-                </div>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">Billable Hours</span>
+                </label>
             </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Notes</label>
+        <div class="mb-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
             <textarea name="Notes"
-                      class="form-control"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                       rows="2">@entry?.Notes</textarea>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="formModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Log") Time
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-1"></i> @(Model.IsEdit ? "Update" : "Log") Time
         </button>
     </div>
 </form>

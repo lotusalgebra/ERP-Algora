@@ -4,8 +4,8 @@
 @if (Model.Invoices.Count == 0)
 {
     <tr>
-        <td colspan="8" class="text-center py-5 text-muted">
-            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+        <td colspan="8" class="text-center py-12 text-gray-500">
+            <i class="bi bi-inbox text-4xl block mb-3"></i>
             No invoices found
         </td>
     </tr>
@@ -16,15 +16,15 @@ else
     {
         var statusBadgeClass = invoice.Status switch
         {
-            InvoiceStatus.Draft => "bg-secondary",
-            InvoiceStatus.Pending => "bg-warning text-dark",
-            InvoiceStatus.Sent => "bg-info",
-            InvoiceStatus.PartiallyPaid => "bg-primary",
-            InvoiceStatus.Paid => "bg-success",
-            InvoiceStatus.Overdue => "bg-danger",
-            InvoiceStatus.Void => "bg-dark",
-            InvoiceStatus.Cancelled => "bg-secondary",
-            _ => "bg-secondary"
+            InvoiceStatus.Draft => "bg-gray-100 text-gray-800",
+            InvoiceStatus.Pending => "bg-amber-100 text-amber-800",
+            InvoiceStatus.Sent => "bg-blue-100 text-blue-800",
+            InvoiceStatus.PartiallyPaid => "bg-primary-100 text-primary-800",
+            InvoiceStatus.Paid => "bg-emerald-100 text-emerald-800",
+            InvoiceStatus.Overdue => "bg-red-100 text-red-800",
+            InvoiceStatus.Void => "bg-gray-700 text-white",
+            InvoiceStatus.Cancelled => "bg-gray-100 text-gray-800",
+            _ => "bg-gray-100 text-gray-800"
         };
 
         var isOverdue = invoice.DueDate < DateTime.UtcNow &&
@@ -32,119 +32,124 @@ else
             invoice.Status != InvoiceStatus.Void &&
             invoice.Status != InvoiceStatus.Cancelled;
 
-        <tr>
-            <td class="ps-4">
-                <a href="/Finance/Invoices/Details/@invoice.Id" class="text-decoration-none fw-medium">
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <td class="px-6 py-4">
+                <a href="/Finance/Invoices/Details/@invoice.Id" class="text-primary-600 hover:underline font-medium">
                     @invoice.InvoiceNumber
                 </a>
             </td>
-            <td>@invoice.InvoiceDate.ToString("MMM dd, yyyy")</td>
-            <td>
+            <td class="px-6 py-4">@invoice.InvoiceDate.ToString("MMM dd, yyyy")</td>
+            <td class="px-6 py-4">
                 @if (invoice.Customer != null)
                 {
                     <span>@invoice.Customer.Name</span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-500">-</span>
                 }
             </td>
-            <td>
-                <span class="@(isOverdue ? "text-danger fw-medium" : "")">
+            <td class="px-6 py-4">
+                <span class="@(isOverdue ? "text-red-600 font-medium" : "")">
                     @invoice.DueDate.ToString("MMM dd, yyyy")
                     @if (isOverdue && invoice.Status != InvoiceStatus.Overdue)
                     {
-                        <i class="bi bi-exclamation-circle text-danger ms-1" title="Overdue"></i>
+                        <i class="bi bi-exclamation-circle text-red-600 ml-1" title="Overdue"></i>
                     }
                 </span>
             </td>
-            <td class="text-end">@invoice.TotalAmount.ToString("C2")</td>
-            <td class="text-end">
+            <td class="px-6 py-4 text-right">@invoice.TotalAmount.ToString("C2")</td>
+            <td class="px-6 py-4 text-right">
                 @if (invoice.BalanceDue > 0)
                 {
-                    <span class="fw-medium">@invoice.BalanceDue.ToString("C2")</span>
+                    <span class="font-medium">@invoice.BalanceDue.ToString("C2")</span>
                 }
                 else
                 {
-                    <span class="text-muted">$0.00</span>
+                    <span class="text-gray-500">$0.00</span>
                 }
             </td>
-            <td>
-                <span class="badge @statusBadgeClass">@invoice.Status</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusBadgeClass">@invoice.Status</span>
             </td>
-            <td class="text-end pe-4">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                            id="dropdownInv@(invoice.Id)" data-dropdown-toggle="dropdownMenuInv@(invoice.Id)" aria-expanded="false">
-                        <i class="bi bi-three-dots"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            id="dropdownInv@(invoice.Id)" data-dropdown-toggle="dropdownMenuInv@(invoice.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuInv@(invoice.Id)">
-                        <li>
-                            <a class="dropdown-item" href="/Finance/Invoices/Details/@invoice.Id">
-                                <i class="bi bi-eye me-2"></i> View
-                            </a>
-                        </li>
-                        @if (invoice.Status == InvoiceStatus.Draft)
-                        {
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700" id="dropdownMenuInv@(invoice.Id)">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
                             <li>
-                                <a class="dropdown-item" href="/Finance/Invoices/Edit/@invoice.Id">
-                                    <i class="bi bi-pencil me-2"></i> Edit
+                                <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" href="/Finance/Invoices/Details/@invoice.Id">
+                                    <i class="bi bi-eye mr-2"></i> View
                                 </a>
                             </li>
+                            @if (invoice.Status == InvoiceStatus.Draft)
+                            {
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" href="/Finance/Invoices/Edit/@invoice.Id">
+                                        <i class="bi bi-pencil mr-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                            hx-post="/Finance/Invoices?handler=Send&id=@invoice.Id"
+                                            hx-target="#tableContent"
+                                            hx-confirm="Are you sure you want to send this invoice?">
+                                        <i class="bi bi-send mr-2"></i> Send
+                                    </button>
+                                </li>
+                            }
+                            @if (invoice.Status != InvoiceStatus.Paid && invoice.Status != InvoiceStatus.Void)
+                            {
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
+                                       hx-get="/Finance/Invoices?handler=PaymentForm&id=@invoice.Id"
+                                       hx-target="#paymentModalContent"
+                                       data-modal-target="paymentModal" data-modal-toggle="paymentModal">
+                                        <i class="bi bi-cash mr-2"></i> Record Payment
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                            hx-post="/Finance/Invoices?handler=MarkPaid&id=@invoice.Id"
+                                            hx-target="#tableContent"
+                                            hx-confirm="Mark this invoice as fully paid?">
+                                        <i class="bi bi-check-circle mr-2"></i> Mark as Paid
+                                    </button>
+                                </li>
+                            }
+                            <li class="border-t border-gray-100 dark:border-gray-600"></li>
                             <li>
-                                <button class="dropdown-item"
-                                        hx-post="/Finance/Invoices?handler=Send&id=@invoice.Id"
-                                        hx-target="#tableContent"
-                                        hx-confirm="Are you sure you want to send this invoice?">
-                                    <i class="bi bi-send me-2"></i> Send
-                                </button>
-                            </li>
-                        }
-                        @if (invoice.Status != InvoiceStatus.Paid && invoice.Status != InvoiceStatus.Void)
-                        {
-                            <li>
-                                <a class="dropdown-item" href="/Finance/Invoices/Payment/@invoice.Id">
-                                    <i class="bi bi-cash me-2"></i> Record Payment
+                                <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" href="/Finance/Invoices/Print/@invoice.Id" target="_blank">
+                                    <i class="bi bi-printer mr-2"></i> Print
                                 </a>
                             </li>
-                            <li>
-                                <button class="dropdown-item"
-                                        hx-post="/Finance/Invoices?handler=MarkPaid&id=@invoice.Id"
-                                        hx-target="#tableContent"
-                                        hx-confirm="Mark this invoice as fully paid?">
-                                    <i class="bi bi-check-circle me-2"></i> Mark as Paid
-                                </button>
-                            </li>
-                        }
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="/Finance/Invoices/Print/@invoice.Id" target="_blank">
-                                <i class="bi bi-printer me-2"></i> Print
-                            </a>
-                        </li>
-                        @if (invoice.Status != InvoiceStatus.Paid)
-                        {
-                            <li>
-                                <button class="dropdown-item text-danger"
-                                        hx-delete="/Finance/Invoices?id=@invoice.Id"
-                                        hx-target="#tableContent"
-                                        hx-confirm="Are you sure you want to delete this invoice?">
-                                    <i class="bi bi-trash me-2"></i> Delete
-                                </button>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <button class="dropdown-item text-warning"
-                                        hx-post="/Finance/Invoices?handler=Void&id=@invoice.Id"
-                                        hx-target="#tableContent"
-                                        hx-confirm="Are you sure you want to void this invoice?">
-                                    <i class="bi bi-x-circle me-2"></i> Void
-                                </button>
-                            </li>
-                        }
-                    </ul>
+                            @if (invoice.Status != InvoiceStatus.Paid)
+                            {
+                                <li>
+                                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 dark:text-red-400"
+                                            hx-delete="/Finance/Invoices?id=@invoice.Id"
+                                            hx-target="#tableContent"
+                                            hx-confirm="Are you sure you want to delete this invoice?">
+                                        <i class="bi bi-trash mr-2"></i> Delete
+                                    </button>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-amber-600 dark:text-amber-400"
+                                            hx-post="/Finance/Invoices?handler=Void&id=@invoice.Id"
+                                            hx-target="#tableContent"
+                                            hx-confirm="Are you sure you want to void this invoice?">
+                                        <i class="bi bi-x-circle mr-2"></i> Void
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -152,27 +157,24 @@ else
 }
 
 <script>
-    // Update pagination info
-    document.getElementById('paginationInfo').innerHTML =
+    document.getElementById('paginationInfo').textContent =
         'Showing @((Model.Page - 1) * Model.PageSize + 1) to @(Math.Min(Model.Page * Model.PageSize, Model.TotalRecords)) of @Model.TotalRecords entries';
 
-    // Update pagination nav
     var paginationHtml = '';
-    if (@Model.TotalPages > 1) {
-        paginationHtml += '<li class="page-item @(Model.Page <= 1 ? "disabled" : "")"><a class="page-link" href="#" hx-get="/Finance/Invoices?handler=Table&page=@(Model.Page - 1)" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">&laquo;</a></li>';
-
-        for (var i = 1; i <= @Model.TotalPages; i++) {
-            if (i === @Model.Page) {
-                paginationHtml += '<li class="page-item active"><span class="page-link">' + i + '</span></li>';
-            } else if (i <= 3 || i > @Model.TotalPages - 2 || Math.abs(i - @Model.Page) <= 1) {
-                paginationHtml += '<li class="page-item"><a class="page-link" href="#" hx-get="/Finance/Invoices?handler=Table&page=' + i + '" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">' + i + '</a></li>';
-            } else if (Math.abs(i - @Model.Page) === 2) {
-                paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
-            }
+    @if (Model.TotalPages > 1)
+    {
+        @:paginationHtml = '<ul class="inline-flex -space-x-px text-sm">';
+        @:paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == 1 ? "opacity-50 pointer-events-none" : "")" href="#" hx-get="/Finance/Invoices?handler=Table&page=@(Model.Page - 1)" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">Previous</a></li>';
+        for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            var activeClass = i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
+            @:paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight @activeClass" href="#" hx-get="/Finance/Invoices?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">@i</a></li>';
         }
-
-        paginationHtml += '<li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")"><a class="page-link" href="#" hx-get="/Finance/Invoices?handler=Table&page=@(Model.Page + 1)" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">&raquo;</a></li>';
+        @:paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page == Model.TotalPages ? "opacity-50 pointer-events-none" : "")" href="#" hx-get="/Finance/Invoices?handler=Table&page=@(Model.Page + 1)" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">Next</a></li>';
+        @:paginationHtml += '</ul>';
     }
-    document.querySelector('#paginationNav ul').innerHTML = paginationHtml;
+    document.querySelector('#paginationNav').innerHTML = paginationHtml;
     htmx.process(document.getElementById('paginationNav'));
+    // Re-initialize Flowbite dropdowns after HTMX content swap
+    if (typeof initFlowbite === 'function') { initFlowbite(); }
 </script>

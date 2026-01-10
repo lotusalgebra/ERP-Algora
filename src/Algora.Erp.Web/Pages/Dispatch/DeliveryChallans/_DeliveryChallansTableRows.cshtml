@@ -4,9 +4,9 @@
 @if (!Model.DeliveryChallans.Any())
 {
     <tr>
-        <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-truck fs-1 d-block mb-3"></i>
+        <td colspan="8" class="text-center py-8">
+            <div class="text-gray-500">
+                <i class="bi bi-truck text-4xl block mb-3"></i>
                 <p class="mb-0">No delivery challans found</p>
             </div>
         </td>
@@ -18,104 +18,118 @@ else
     {
         var statusClass = challan.Status switch
         {
-            DeliveryChallanStatus.Draft => "bg-secondary",
-            DeliveryChallanStatus.Confirmed => "bg-info",
-            DeliveryChallanStatus.Dispatched => "bg-primary",
-            DeliveryChallanStatus.Delivered => "bg-success",
-            DeliveryChallanStatus.Cancelled => "bg-dark",
-            _ => "bg-secondary"
+            DeliveryChallanStatus.Draft => "bg-gray-100 text-gray-800",
+            DeliveryChallanStatus.Confirmed => "bg-blue-100 text-blue-800",
+            DeliveryChallanStatus.Dispatched => "bg-primary-100 text-primary-800",
+            DeliveryChallanStatus.Delivered => "bg-emerald-100 text-emerald-800",
+            DeliveryChallanStatus.Cancelled => "bg-gray-700 text-white",
+            _ => "bg-gray-100 text-gray-800"
         };
 
-        <tr>
-            <td class="ps-4">
-                <a href="javascript:void(0)" onclick="viewDetails('@challan.Id')" class="text-decoration-none fw-medium">
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <a href="/Dispatch/DeliveryChallans/Details/@challan.Id" class="text-primary-600 hover:underline font-medium">
                     @challan.ChallanNumber
                 </a>
             </td>
-            <td>
-                <span class="text-truncate d-inline-block" style="max-width: 150px;">
+            <td class="px-6 py-4">
+                <span class="truncate inline-block max-w-[150px] text-gray-900">
                     @challan.CustomerName
                 </span>
             </td>
-            <td>@challan.ChallanDate.ToString("dd MMM yyyy")</td>
-            <td class="text-center">
-                <span class="badge bg-light text-dark">@challan.Lines.Count items</span>
+            <td class="px-6 py-4 text-gray-900">@challan.ChallanDate.ToString("dd MMM yyyy")</td>
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@challan.Lines.Count items</span>
             </td>
-            <td class="text-end">@challan.TotalQuantity.ToString("N2")</td>
-            <td>
+            <td class="px-6 py-4 text-right text-gray-900">@challan.TotalQuantity.ToString("N2")</td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(challan.VehicleNumber))
                 {
-                    <span class="badge bg-light text-dark">@challan.VehicleNumber</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@challan.VehicleNumber</span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-400">-</span>
                 }
             </td>
-            <td>
-                <span class="badge @statusClass">@challan.Status</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusClass">@challan.Status</span>
             </td>
-            <td class="text-end pe-4">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary" type="button" id="dropdownChallan@(challan.Id)" data-dropdown-toggle="dropdownMenuChallan@(challan.Id)">
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            id="dropdownChallan@(challan.Id)" data-dropdown-toggle="dropdownMenuChallan@(challan.Id)" data-dropdown-placement="bottom-end">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuChallan@(challan.Id)">
-                        <li>
-                            <a class="dropdown-item" href="javascript:void(0)" onclick="viewDetails('@challan.Id')">
-                                <i class="bi bi-eye me-2"></i>View Details
-                            </a>
-                        </li>
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuChallan@(challan.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Dispatch/DeliveryChallans/Details/@challan.Id">
+                                    <i class="bi bi-eye mr-2"></i> View Details
+                                </a>
+                            </li>
+                            @if (challan.Status == DeliveryChallanStatus.Draft)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Dispatch/DeliveryChallans/Edit/@challan.Id">
+                                        <i class="bi bi-pencil mr-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-blue-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@challan.Id&status=Confirmed"
+                                       hx-target="#challansTableBody"
+                                       hx-confirm="Confirm this delivery challan?">
+                                        <i class="bi bi-check-circle mr-2"></i> Confirm
+                                    </a>
+                                </li>
+                            }
+                            @if (challan.Status == DeliveryChallanStatus.Confirmed)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-primary-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@challan.Id&status=Dispatched"
+                                       hx-target="#challansTableBody"
+                                       hx-confirm="Mark as dispatched?">
+                                        <i class="bi bi-truck mr-2"></i> Mark Dispatched
+                                    </a>
+                                </li>
+                            }
+                            @if (challan.Status == DeliveryChallanStatus.Dispatched)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-emerald-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@challan.Id&status=Delivered"
+                                       hx-target="#challansTableBody"
+                                       hx-confirm="Mark as delivered?">
+                                        <i class="bi bi-check-all mr-2"></i> Mark Delivered
+                                    </a>
+                                </li>
+                            }
+                        </ul>
                         @if (challan.Status == DeliveryChallanStatus.Draft)
                         {
-                            <li>
-                                <a class="dropdown-item" href="javascript:void(0)" onclick="editChallan('@challan.Id')">
-                                    <i class="bi bi-pencil me-2"></i>Edit
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-delete="?handler=Delete&id=@challan.Id"
+                                   hx-target="#challansTableBody"
+                                   hx-confirm="Are you sure you want to delete this challan?">
+                                    <i class="bi bi-trash mr-2"></i> Delete
                                 </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-info" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Confirmed')">
-                                    <i class="bi bi-check-circle me-2"></i>Confirm
-                                </a>
-                            </li>
+                            </div>
                         }
-                        @if (challan.Status == DeliveryChallanStatus.Confirmed)
+                        @if (challan.Status != DeliveryChallanStatus.Delivered && challan.Status != DeliveryChallanStatus.Cancelled && challan.Status != DeliveryChallanStatus.Draft)
                         {
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-primary" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Dispatched')">
-                                    <i class="bi bi-truck me-2"></i>Mark as Dispatched
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@challan.Id&status=Cancelled"
+                                   hx-target="#challansTableBody"
+                                   hx-confirm="Cancel this delivery challan?">
+                                    <i class="bi bi-x-circle mr-2"></i> Cancel
                                 </a>
-                            </li>
+                            </div>
                         }
-                        @if (challan.Status == DeliveryChallanStatus.Dispatched)
-                        {
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-success" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Delivered')">
-                                    <i class="bi bi-check-all me-2"></i>Mark as Delivered
-                                </a>
-                            </li>
-                        }
-                        @if (challan.Status != DeliveryChallanStatus.Cancelled && challan.Status != DeliveryChallanStatus.Delivered)
-                        {
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="updateStatus('@challan.Id', 'Cancelled')">
-                                    <i class="bi bi-x-circle me-2"></i>Cancel
-                                </a>
-                            </li>
-                        }
-                        @if (challan.Status == DeliveryChallanStatus.Draft)
-                        {
-                            <li>
-                                <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete('@challan.Id')">
-                                    <i class="bi bi-trash me-2"></i>Delete
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -125,16 +139,16 @@ else
     @if (Model.TotalPages > 1)
     {
         <tr>
-            <td colspan="8" class="py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">
+            <td colspan="8" class="py-3 border-0">
+                <div class="flex justify-between items-center px-4">
+                    <small class="text-gray-500">
                         Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                     </small>
                     <nav>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)"
-                                   hx-get="?handler=Table&page=@(Model.Page - 1)"
+                        <ul class="inline-flex -space-x-px text-sm">
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg @(Model.Page == 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
+                                   @(Model.Page > 1 ? $"hx-get=?handler=Table&page={Model.Page - 1}" : "")
                                    hx-target="#challansTableBody"
                                    hx-include="#searchInput, #statusFilter, #customerFilter, #pageSizeSelect">
                                     <i class="bi bi-chevron-left"></i>
@@ -142,8 +156,8 @@ else
                             </li>
                             @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                             {
-                                <li class="page-item @(i == Model.Page ? "active" : "")">
-                                    <a class="page-link" href="javascript:void(0)"
+                                <li>
+                                    <a class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
                                        hx-get="?handler=Table&page=@i"
                                        hx-target="#challansTableBody"
                                        hx-include="#searchInput, #statusFilter, #customerFilter, #pageSizeSelect">
@@ -151,9 +165,9 @@ else
                                     </a>
                                 </li>
                             }
-                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)"
-                                   hx-get="?handler=Table&page=@(Model.Page + 1)"
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg @(Model.Page == Model.TotalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700")" href="javascript:void(0)"
+                                   @(Model.Page < Model.TotalPages ? $"hx-get=?handler=Table&page={Model.Page + 1}" : "")
                                    hx-target="#challansTableBody"
                                    hx-include="#searchInput, #statusFilter, #customerFilter, #pageSizeSelect">
                                     <i class="bi bi-chevron-right"></i>

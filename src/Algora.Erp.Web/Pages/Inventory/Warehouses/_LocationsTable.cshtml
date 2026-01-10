@@ -1,71 +1,71 @@
 @model Algora.Erp.Web.Pages.Inventory.Warehouses.LocationsViewModel
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="flex justify-between items-center mb-4">
     <div>
-        <h6 class="mb-1">@Model.Warehouse.Name</h6>
-        <small class="text-muted">@Model.Warehouse.Code - @Model.Locations.Count location(s)</small>
+        <h6 class="font-medium text-gray-900 mb-1">@Model.Warehouse.Name</h6>
+        <small class="text-gray-500">@Model.Warehouse.Code - @Model.Locations.Count location(s)</small>
     </div>
-    <button class="btn btn-sm btn-primary"
+    <button class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2"
             hx-get="?handler=LocationForm&warehouseId=@Model.Warehouse.Id"
             hx-target="#locationFormModalBody"
             data-modal-target="locationFormModal" data-modal-toggle="locationFormModal">
-        <i class="bi bi-plus-lg me-1"></i>Add Location
+        <i class="bi bi-plus-lg mr-1"></i>Add Location
     </button>
 </div>
 
 <div id="locationsTableContainer">
     @if (Model.Locations.Count == 0)
     {
-        <div class="text-center py-5 text-muted">
-            <i class="bi bi-geo-alt fs-1 d-block mb-3"></i>
+        <div class="text-center py-8 text-gray-500">
+            <i class="bi bi-geo-alt text-4xl block mb-3"></i>
             <p class="mb-0">No locations defined for this warehouse</p>
             <small>Create locations to organize your inventory storage</small>
         </div>
     }
     else
     {
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Zone</th>
-                        <th>Aisle</th>
-                        <th>Rack</th>
-                        <th>Shelf</th>
-                        <th>Bin</th>
-                        <th>Status</th>
-                        <th class="text-end">Actions</th>
+                        <th class="px-4 py-3">Code</th>
+                        <th class="px-4 py-3">Name</th>
+                        <th class="px-4 py-3">Zone</th>
+                        <th class="px-4 py-3">Aisle</th>
+                        <th class="px-4 py-3">Rack</th>
+                        <th class="px-4 py-3">Shelf</th>
+                        <th class="px-4 py-3">Bin</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var location in Model.Locations.OrderBy(l => l.Code))
                     {
-                        <tr>
-                            <td>
-                                <code class="bg-light px-2 py-1 rounded">@location.Code</code>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-3">
+                                <code class="bg-gray-100 px-2 py-1 rounded text-sm">@location.Code</code>
                             </td>
-                            <td class="fw-medium">@location.Name</td>
-                            <td>@(location.Zone ?? "—")</td>
-                            <td>@(location.Aisle ?? "—")</td>
-                            <td>@(location.Rack ?? "—")</td>
-                            <td>@(location.Shelf ?? "—")</td>
-                            <td>@(location.Bin ?? "—")</td>
-                            <td>
+                            <td class="px-4 py-3 font-medium text-gray-900">@location.Name</td>
+                            <td class="px-4 py-3 text-gray-600">@(location.Zone ?? "—")</td>
+                            <td class="px-4 py-3 text-gray-600">@(location.Aisle ?? "—")</td>
+                            <td class="px-4 py-3 text-gray-600">@(location.Rack ?? "—")</td>
+                            <td class="px-4 py-3 text-gray-600">@(location.Shelf ?? "—")</td>
+                            <td class="px-4 py-3 text-gray-600">@(location.Bin ?? "—")</td>
+                            <td class="px-4 py-3">
                                 @if (location.IsActive)
                                 {
-                                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
                                 }
                             </td>
-                            <td class="text-end">
-                                <div class="btn-group btn-group-sm">
+                            <td class="px-4 py-3 text-right">
+                                <div class="inline-flex rounded-lg shadow-sm">
                                     <button type="button"
-                                            class="btn btn-outline-primary"
+                                            class="text-primary-600 border border-gray-200 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 font-medium rounded-l-lg text-xs px-3 py-2"
                                             hx-get="?handler=LocationForm&warehouseId=@Model.Warehouse.Id&locationId=@location.Id"
                                             hx-target="#locationFormModalBody"
                                             data-modal-target="locationFormModal" data-modal-toggle="locationFormModal"
@@ -73,7 +73,7 @@
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button type="button"
-                                            class="btn btn-outline-danger"
+                                            class="text-red-600 border border-gray-200 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 font-medium rounded-r-lg text-xs px-3 py-2"
                                             hx-delete="?handler=Location&id=@location.Id"
                                             hx-target="#locationsModalBody"
                                             hx-confirm="Are you sure you want to delete this location?"
@@ -90,11 +90,11 @@
     }
 </div>
 
-<div class="mt-4 pt-3 border-top">
-    <div class="row text-center">
-        <div class="col">
-            <div class="text-muted small">Path Format</div>
-            <div class="fw-medium">Zone / Aisle / Rack / Shelf / Bin</div>
+<div class="mt-4 pt-3 border-t border-gray-200">
+    <div class="grid grid-cols-12 text-center">
+        <div class="col-span-12">
+            <div class="text-gray-500 text-sm">Path Format</div>
+            <div class="font-medium text-gray-900">Zone / Aisle / Rack / Shelf / Bin</div>
         </div>
     </div>
 </div>

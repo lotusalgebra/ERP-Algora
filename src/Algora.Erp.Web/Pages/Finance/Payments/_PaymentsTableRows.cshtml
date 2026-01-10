@@ -7,86 +7,85 @@
     {
         var methodBadgeClass = payment.PaymentMethod switch
         {
-            PaymentMethod.Cash => "bg-success",
-            PaymentMethod.BankTransfer => "bg-primary",
-            PaymentMethod.CreditCard => "bg-info",
-            PaymentMethod.DebitCard => "bg-info",
-            PaymentMethod.Check => "bg-warning text-dark",
-            PaymentMethod.PayPal => "bg-primary",
-            _ => "bg-secondary"
+            PaymentMethod.Cash => "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+            PaymentMethod.BankTransfer => "bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400",
+            PaymentMethod.CreditCard => "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400",
+            PaymentMethod.DebitCard => "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400",
+            PaymentMethod.Check => "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+            PaymentMethod.PayPal => "bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400",
+            _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
         };
 
-        <tr>
-            <td class="ps-4">
-                <a href="/Finance/Payments/Details/@payment.Id" class="text-decoration-none fw-medium">
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <td class="px-6 py-4">
+                <a href="/Finance/Payments/Details/@payment.Id" class="text-primary-600 hover:underline font-medium">
                     @payment.PaymentNumber
                 </a>
             </td>
-            <td>@payment.PaymentDate.ToString("MMM dd, yyyy")</td>
-            <td>
-                <a href="/Finance/Invoices/Details/@payment.InvoiceId" class="text-decoration-none">
+            <td class="px-6 py-4">@payment.PaymentDate.ToString("MMM dd, yyyy")</td>
+            <td class="px-6 py-4">
+                <a href="/Finance/Invoices/Details/@payment.InvoiceId" class="text-primary-600 hover:underline">
                     @payment.InvoiceNumber
                 </a>
                 <br />
-                <small class="text-muted">Total: @payment.InvoiceTotal.ToString("C2")</small>
+                <small class="text-gray-500 dark:text-gray-400">Total: @payment.InvoiceTotal.ToString("C2")</small>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(payment.CustomerName))
                 {
-                    <a href="/Sales/Customers/Details/@payment.CustomerId" class="text-decoration-none">
+                    <a href="/Sales/Customers/Details/@payment.CustomerId" class="text-primary-600 hover:underline">
                         @payment.CustomerName
                     </a>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-400">-</span>
                 }
             </td>
-            <td>
-                <span class="badge @methodBadgeClass">@payment.PaymentMethod</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @methodBadgeClass">@payment.PaymentMethod</span>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(payment.Reference))
                 {
-                    <span class="text-muted">@payment.Reference</span>
+                    <span class="text-gray-500 dark:text-gray-400">@payment.Reference</span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-400">-</span>
                 }
             </td>
-            <td class="text-end fw-medium text-success">@payment.Amount.ToString("C2")</td>
-            <td class="text-end pe-4">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary" id="dropdownPay@(payment.Id)" data-dropdown-toggle="dropdownMenuPay@(payment.Id)">
-                        <i class="bi bi-three-dots"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuPay@(payment.Id)">
+            <td class="px-6 py-4 text-right font-medium text-emerald-600 dark:text-emerald-400">@payment.Amount.ToString("C2")</td>
+            <td class="px-6 py-4 text-right">
+                <button type="button" class="text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700" id="dropdownPay@(payment.Id)" data-dropdown-toggle="dropdownMenuPay@(payment.Id)" data-dropdown-placement="bottom-end">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700" id="dropdownMenuPay@(payment.Id)">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
                         <li>
-                            <a class="dropdown-item" href="/Finance/Payments/Details/@payment.Id">
-                                <i class="bi bi-eye me-2"></i>View Details
+                            <a href="/Finance/Payments/Details/@payment.Id" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                <i class="bi bi-eye mr-2"></i>View Details
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/Finance/Payments/Receipt/@payment.Id" target="_blank">
-                                <i class="bi bi-receipt me-2"></i>Print Receipt
+                            <a href="/Finance/Payments/Receipt/@payment.Id" target="_blank" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                <i class="bi bi-receipt mr-2"></i>Print Receipt
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/Finance/Invoices/Details/@payment.InvoiceId">
-                                <i class="bi bi-file-text me-2"></i>View Invoice
+                            <a href="/Finance/Invoices/Details/@payment.InvoiceId" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                <i class="bi bi-file-text mr-2"></i>View Invoice
                             </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="post" asp-page-handler="Delete" asp-route-paymentId="@payment.Id">
-                                <button type="submit" class="dropdown-item text-danger"
-                                        onclick="return confirm('Delete this payment? This will restore the invoice balance.')">
-                                    <i class="bi bi-trash me-2"></i>Delete Payment
-                                </button>
-                            </form>
                         </li>
                     </ul>
+                    <div class="py-2">
+                        <form method="post" asp-page-handler="Delete" asp-route-paymentId="@payment.Id">
+                            <button type="submit" class="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-400"
+                                    onclick="return confirm('Delete this payment? This will restore the invoice balance.')">
+                                <i class="bi bi-trash mr-2"></i>Delete Payment
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -95,12 +94,12 @@
 else
 {
     <tr>
-        <td colspan="8" class="text-center py-5 text-muted">
-            <i class="bi bi-cash-stack fs-1 d-block mb-3"></i>
+        <td colspan="8" class="text-center py-12 text-gray-500 dark:text-gray-400">
+            <i class="bi bi-cash-stack text-4xl block mb-3"></i>
             <p class="mb-0">No payments found</p>
             @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.PaymentMethod.HasValue || Model.FromDate.HasValue || Model.ToDate.HasValue)
             {
-                <p class="mb-0"><small>Try adjusting your filters</small></p>
+                <p class="text-sm">Try adjusting your filters</p>
             }
         </td>
     </tr>

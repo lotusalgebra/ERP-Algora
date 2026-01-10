@@ -1,55 +1,60 @@
 @model Algora.Erp.Domain.Entities.Procurement.PurchaseOrder
 
-<div class="row g-4">
+@{
+    var statusClass = Model.Status switch
+    {
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Draft => "bg-gray-100 text-gray-800",
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Pending => "bg-amber-100 text-amber-800",
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Approved => "bg-blue-100 text-blue-800",
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Sent => "bg-primary-100 text-primary-800",
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Received => "bg-emerald-100 text-emerald-800",
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Paid => "bg-emerald-100 text-emerald-800",
+        Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Cancelled => "bg-red-100 text-red-800",
+        _ => "bg-gray-100 text-gray-800"
+    };
+}
+
+<div class="grid grid-cols-12 gap-4">
     <!-- Header -->
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-start">
+    <div class="col-span-12">
+        <div class="flex justify-between items-start">
             <div>
-                <h5 class="mb-1">@Model.OrderNumber</h5>
-                <p class="text-muted mb-0">
+                <h5 class="text-xl font-semibold text-gray-900 mb-1">@Model.OrderNumber</h5>
+                <p class="text-gray-500 mb-0">
                     @if (!string.IsNullOrEmpty(Model.Reference))
                     {
-                        <span class="me-3">Ref: @Model.Reference</span>
+                        <span class="mr-3">Ref: @Model.Reference</span>
                     }
                     <span>Created: @Model.OrderDate.ToString("MMM dd, yyyy")</span>
                 </p>
             </div>
-            <span class="badge fs-6 @(Model.Status switch {
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Draft => "bg-secondary",
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Pending => "bg-warning text-dark",
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Approved => "bg-info",
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Sent => "bg-primary",
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Received => "bg-success",
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Paid => "bg-success",
-                Algora.Erp.Domain.Entities.Procurement.PurchaseOrderStatus.Cancelled => "bg-danger",
-                _ => "bg-secondary"
-            })">
+            <span class="text-sm font-medium px-3 py-1 rounded-full @statusClass">
                 @Model.Status
             </span>
         </div>
     </div>
 
     <!-- Supplier Info -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Supplier</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Supplier</h6>
             </div>
-            <div class="card-body">
-                <h6 class="mb-1">@Model.Supplier?.Name</h6>
-                <p class="text-muted small mb-2">@Model.Supplier?.Code</p>
+            <div class="p-6">
+                <h6 class="font-semibold text-gray-900 mb-1">@Model.Supplier?.Name</h6>
+                <p class="text-gray-500 text-sm mb-2">@Model.Supplier?.Code</p>
                 @if (!string.IsNullOrEmpty(Model.Supplier?.Email))
                 {
-                    <p class="mb-1"><i class="bi bi-envelope me-2"></i>@Model.Supplier.Email</p>
+                    <p class="mb-1 text-gray-700"><i class="bi bi-envelope mr-2"></i>@Model.Supplier.Email</p>
                 }
                 @if (!string.IsNullOrEmpty(Model.Supplier?.Phone))
                 {
-                    <p class="mb-1"><i class="bi bi-telephone me-2"></i>@Model.Supplier.Phone</p>
+                    <p class="mb-1 text-gray-700"><i class="bi bi-telephone mr-2"></i>@Model.Supplier.Phone</p>
                 }
                 @if (!string.IsNullOrEmpty(Model.Supplier?.Address))
                 {
-                    <p class="mb-0 text-muted small">
-                        <i class="bi bi-geo-alt me-2"></i>
+                    <p class="mb-0 text-gray-500 text-sm">
+                        <i class="bi bi-geo-alt mr-2"></i>
                         @Model.Supplier.Address, @Model.Supplier.City @Model.Supplier.State @Model.Supplier.PostalCode
                     </p>
                 }
@@ -58,28 +63,28 @@
     </div>
 
     <!-- Order Details -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Order Details</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Order Details</h6>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-6 mb-2">
-                        <small class="text-muted d-block">Order Date</small>
-                        <span>@Model.OrderDate.ToString("MMM dd, yyyy")</span>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="mb-2">
+                        <small class="text-gray-500 block">Order Date</small>
+                        <span class="text-gray-900">@Model.OrderDate.ToString("MMM dd, yyyy")</span>
                     </div>
-                    <div class="col-6 mb-2">
-                        <small class="text-muted d-block">Due Date</small>
-                        <span>@(Model.DueDate?.ToString("MMM dd, yyyy") ?? "—")</span>
+                    <div class="mb-2">
+                        <small class="text-gray-500 block">Due Date</small>
+                        <span class="text-gray-900">@(Model.DueDate?.ToString("MMM dd, yyyy") ?? "—")</span>
                     </div>
-                    <div class="col-6 mb-2">
-                        <small class="text-muted d-block">Expected Delivery</small>
-                        <span>@(Model.ExpectedDeliveryDate?.ToString("MMM dd, yyyy") ?? "—")</span>
+                    <div class="mb-2">
+                        <small class="text-gray-500 block">Expected Delivery</small>
+                        <span class="text-gray-900">@(Model.ExpectedDeliveryDate?.ToString("MMM dd, yyyy") ?? "—")</span>
                     </div>
-                    <div class="col-6 mb-2">
-                        <small class="text-muted d-block">Currency</small>
-                        <span>@Model.Currency</span>
+                    <div class="mb-2">
+                        <small class="text-gray-500 block">Currency</small>
+                        <span class="text-gray-900">@Model.Currency</span>
                     </div>
                 </div>
             </div>
@@ -87,23 +92,23 @@
     </div>
 
     <!-- Order Lines -->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Order Items</h6>
+    <div class="col-span-12">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Order Items</h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm mb-0">
-                        <thead class="bg-light">
+            <div class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th>#</th>
-                                <th>Product</th>
-                                <th class="text-end">Qty</th>
-                                <th class="text-end">Unit Price</th>
-                                <th class="text-end">Discount</th>
-                                <th class="text-end">Tax</th>
-                                <th class="text-end">Total</th>
+                                <th class="px-4 py-3">#</th>
+                                <th class="px-4 py-3">Product</th>
+                                <th class="px-4 py-3 text-right">Qty</th>
+                                <th class="px-4 py-3 text-right">Unit Price</th>
+                                <th class="px-4 py-3 text-right">Discount</th>
+                                <th class="px-4 py-3 text-right">Tax</th>
+                                <th class="px-4 py-3 text-right">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,33 +116,33 @@
                             {
                                 foreach (var line in Model.Lines.OrderBy(l => l.LineNumber))
                                 {
-                                    <tr>
-                                        <td>@line.LineNumber</td>
-                                        <td>
-                                            <strong>@line.ProductName</strong>
-                                            <br><small class="text-muted">@line.ProductSku</small>
+                                    <tr class="border-b">
+                                        <td class="px-4 py-3">@line.LineNumber</td>
+                                        <td class="px-4 py-3">
+                                            <strong class="text-gray-900">@line.ProductName</strong>
+                                            <br><small class="text-gray-500">@line.ProductSku</small>
                                         </td>
-                                        <td class="text-end">@line.Quantity.ToString("N2") @line.UnitOfMeasure</td>
-                                        <td class="text-end">@line.UnitPrice.ToString("C2")</td>
-                                        <td class="text-end">
+                                        <td class="px-4 py-3 text-right">@line.Quantity.ToString("N2") @line.UnitOfMeasure</td>
+                                        <td class="px-4 py-3 text-right">@line.UnitPrice.ToString("C2")</td>
+                                        <td class="px-4 py-3 text-right">
                                             @if (line.DiscountPercent > 0)
                                             {
                                                 <span>@line.DiscountPercent.ToString("N1")%</span>
                                             }
                                             else
                                             {
-                                                <span class="text-muted">—</span>
+                                                <span class="text-gray-500">—</span>
                                             }
                                         </td>
-                                        <td class="text-end">@line.TaxAmount.ToString("C2")</td>
-                                        <td class="text-end fw-medium">@line.LineTotal.ToString("C2")</td>
+                                        <td class="px-4 py-3 text-right">@line.TaxAmount.ToString("C2")</td>
+                                        <td class="px-4 py-3 text-right font-medium">@line.LineTotal.ToString("C2")</td>
                                     </tr>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">No items</td>
+                                    <td colspan="7" class="text-center text-gray-500 py-4">No items</td>
                                 </tr>
                             }
                         </tbody>
@@ -148,43 +153,43 @@
     </div>
 
     <!-- Totals -->
-    <div class="col-md-6 offset-md-6">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
+    <div class="col-span-12 md:col-span-6 md:col-start-7">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-700">Subtotal:</span>
                     <span>@Model.SubTotal.ToString("C2")</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Tax:</span>
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-700">Tax:</span>
                     <span>@Model.TaxAmount.ToString("C2")</span>
                 </div>
                 @if (Model.ShippingAmount > 0)
                 {
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping:</span>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-700">Shipping:</span>
                         <span>@Model.ShippingAmount.ToString("C2")</span>
                     </div>
                 }
                 @if (Model.DiscountAmount > 0)
                 {
-                    <div class="d-flex justify-content-between mb-2 text-success">
+                    <div class="flex justify-between mb-2 text-emerald-600">
                         <span>Discount:</span>
                         <span>-@Model.DiscountAmount.ToString("C2")</span>
                     </div>
                 }
-                <hr>
-                <div class="d-flex justify-content-between fw-bold fs-5">
+                <hr class="my-2 border-gray-200">
+                <div class="flex justify-between font-bold text-lg">
                     <span>Total:</span>
                     <span>@Model.TotalAmount.ToString("C2")</span>
                 </div>
                 @if (Model.AmountPaid > 0)
                 {
-                    <div class="d-flex justify-content-between text-muted mt-2">
+                    <div class="flex justify-between text-gray-500 mt-2">
                         <span>Paid:</span>
                         <span>@Model.AmountPaid.ToString("C2")</span>
                     </div>
-                    <div class="d-flex justify-content-between text-danger fw-medium">
+                    <div class="flex justify-between text-red-600 font-medium">
                         <span>Balance Due:</span>
                         <span>@Model.AmountDue.ToString("C2")</span>
                     </div>
@@ -196,13 +201,13 @@
     <!-- Notes -->
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Notes</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="font-medium text-gray-900 mb-0">Notes</h6>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">@Model.Notes</p>
+                <div class="p-6">
+                    <p class="mb-0 text-gray-700">@Model.Notes</p>
                 </div>
             </div>
         </div>

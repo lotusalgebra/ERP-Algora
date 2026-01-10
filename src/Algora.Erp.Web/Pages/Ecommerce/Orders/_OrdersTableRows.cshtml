@@ -3,8 +3,8 @@
 @if (!Model.Orders.Any())
 {
     <tr>
-        <td colspan="8" class="text-center py-5 text-muted">
-            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+        <td colspan="8" class="text-center py-12 text-gray-500">
+            <i class="bi bi-inbox text-4xl block mb-3"></i>
             No orders found
         </td>
     </tr>
@@ -14,107 +14,142 @@ else
     @foreach (var order in Model.Orders)
     {
         var customerName = $"{order.ShippingFirstName} {order.ShippingLastName}".Trim();
-        <tr>
-            <td class="ps-4">
-                <a href="#" class="text-primary fw-semibold"
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <a href="#" class="text-primary-600 font-semibold hover:underline"
                    hx-get="?handler=Details&id=@order.Id"
                    hx-target="#detailsModalBody"
                    data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @order.OrderNumber
                 </a>
             </td>
-            <td>
-                <div class="fw-semibold">@customerName</div>
-                <small class="text-muted">@order.CustomerEmail</small>
+            <td class="px-6 py-4">
+                <div class="font-semibold text-gray-900">@customerName</div>
+                <small class="text-gray-500">@order.CustomerEmail</small>
             </td>
-            <td>
-                <span class="badge bg-secondary">@order.Items.Sum(i => i.Quantity) items</span>
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@order.Items.Sum(i => i.Quantity) items</span>
             </td>
-            <td class="text-end fw-semibold">@order.Total.ToString("C")</td>
-            <td>
+            <td class="px-6 py-4 text-right font-semibold text-gray-900">@order.Total.ToString("C")</td>
+            <td class="px-6 py-4">
                 @switch (order.PaymentStatus)
                 {
                     case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Paid:
-                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Paid</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800"><i class="bi bi-check-circle mr-1"></i>Paid</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Pending:
-                        <span class="badge bg-warning"><i class="bi bi-clock me-1"></i>Pending</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800"><i class="bi bi-clock mr-1"></i>Pending</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Failed:
-                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800"><i class="bi bi-x-circle mr-1"></i>Failed</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Refunded:
-                        <span class="badge bg-dark"><i class="bi bi-arrow-return-left me-1"></i>Refunded</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-700 text-white"><i class="bi bi-arrow-return-left mr-1"></i>Refunded</span>
                         break;
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @switch (order.Status)
                 {
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending:
-                        <span class="badge bg-warning">Pending</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Pending</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed:
-                        <span class="badge bg-info">Confirmed</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">Confirmed</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing:
-                        <span class="badge bg-primary">Processing</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800">Processing</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped:
-                        <span class="badge bg-info">Shipped</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">Shipped</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered:
-                        <span class="badge bg-success">Delivered</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Delivered</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled:
-                        <span class="badge bg-dark">Cancelled</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-700 text-white">Cancelled</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded:
-                        <span class="badge bg-secondary">Refunded</span>
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Refunded</span>
                         break;
                 }
             </td>
-            <td>
-                <div>@order.OrderDate.ToString("MMM dd, yyyy")</div>
-                <small class="text-muted">@order.OrderDate.ToString("hh:mm tt")</small>
+            <td class="px-6 py-4">
+                <div class="text-gray-900">@order.OrderDate.ToString("MMM dd, yyyy")</div>
+                <small class="text-gray-500">@order.OrderDate.ToString("hh:mm tt")</small>
             </td>
-            <td class="text-end pe-4">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownOrd@(order.Id)" data-dropdown-toggle="dropdownMenuOrd@(order.Id)">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuOrd@(order.Id)">
+            <td class="px-6 py-4 text-right">
+                <button class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-gray-200" type="button" id="dropdownOrd@(order.Id)" data-dropdown-toggle="dropdownMenuOrd@(order.Id)" data-dropdown-placement="bottom-end">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuOrd@(order.Id)">
+                    <ul class="py-2 text-sm text-gray-700">
                         <li>
-                            <a class="dropdown-item" href="#"
+                            <a class="block px-4 py-2 hover:bg-gray-100" href="#"
                                hx-get="?handler=Details&id=@order.Id"
                                hx-target="#detailsModalBody"
                                data-modal-target="detailsModal" data-modal-toggle="detailsModal">
-                                <i class="bi bi-eye me-2"></i>View Details
+                                <i class="bi bi-eye mr-2"></i>View Details
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><hr class="my-1 border-gray-200"></li>
                         @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending)
                         {
-                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Confirmed')"><i class="bi bi-check me-2"></i>Confirm Order</a></li>
+                            <li>
+                                <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@order.Id&status=Confirmed"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Confirm this order?">
+                                    <i class="bi bi-check mr-2"></i>Confirm Order
+                                </a>
+                            </li>
                         }
                         @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed)
                         {
-                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Processing')"><i class="bi bi-box me-2"></i>Start Processing</a></li>
+                            <li>
+                                <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@order.Id&status=Processing"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Start processing this order?">
+                                    <i class="bi bi-box mr-2"></i>Start Processing
+                                </a>
+                            </li>
                         }
                         @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing)
                         {
-                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Shipped')"><i class="bi bi-truck me-2"></i>Mark Shipped</a></li>
+                            <li>
+                                <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@order.Id&status=Shipped"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Mark this order as shipped?">
+                                    <i class="bi bi-truck mr-2"></i>Mark Shipped
+                                </a>
+                            </li>
                         }
                         @if (order.Status == Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped)
                         {
-                            <li><a class="dropdown-item" href="#" onclick="updateStatus('@order.Id', 'Delivered')"><i class="bi bi-check-circle me-2"></i>Mark Delivered</a></li>
+                            <li>
+                                <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@order.Id&status=Delivered"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Mark this order as delivered?">
+                                    <i class="bi bi-check-circle mr-2"></i>Mark Delivered
+                                </a>
+                            </li>
                         }
                         @if (order.Status != Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled &&
                              order.Status != Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered &&
                              order.Status != Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded)
                         {
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#" onclick="updateStatus('@order.Id', 'Cancelled')"><i class="bi bi-x-circle me-2"></i>Cancel Order</a></li>
+                            <li><hr class="my-1 border-gray-200"></li>
+                            <li>
+                                <a class="block px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@order.Id&status=Cancelled"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Cancel this order?">
+                                    <i class="bi bi-x-circle mr-2"></i>Cancel Order
+                                </a>
+                            </li>
                         }
                     </ul>
                 </div>
@@ -126,17 +161,17 @@ else
     @if (Model.TotalPages > 1)
     {
     <tr>
-        <td colspan="8" class="bg-light">
-            <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                <small class="text-muted">
+        <td colspan="8" class="bg-gray-50 px-6 py-3">
+            <div class="flex justify-between items-center">
+                <small class="text-gray-500">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </small>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="inline-flex -space-x-px text-sm">
                         @if (Model.Page > 1)
                         {
-                            <li class="page-item">
-                                <button type="button" class="page-link"
+                            <li>
+                                <button type="button" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700"
                                         hx-get="?handler=Table&pageNumber=@(Model.Page - 1)&pageSize=@Model.PageSize"
                                         hx-target="#ordersTableBody"
                                         hx-include="#searchInput, #statusFilter, #pageSizeSelect">
@@ -146,8 +181,8 @@ else
                         }
                         @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <button type="button" class="page-link"
+                            <li>
+                                <button type="button" class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")"
                                         hx-get="?handler=Table&pageNumber=@i&pageSize=@Model.PageSize"
                                         hx-target="#ordersTableBody"
                                         hx-include="#searchInput, #statusFilter, #pageSizeSelect">
@@ -157,8 +192,8 @@ else
                         }
                         @if (Model.Page < Model.TotalPages)
                         {
-                            <li class="page-item">
-                                <button type="button" class="page-link"
+                            <li>
+                                <button type="button" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
                                         hx-get="?handler=Table&pageNumber=@(Model.Page + 1)&pageSize=@Model.PageSize"
                                         hx-target="#ordersTableBody"
                                         hx-include="#searchInput, #statusFilter, #pageSizeSelect">
@@ -175,10 +210,8 @@ else
     else if (Model.TotalRecords > 0)
     {
     <tr>
-        <td colspan="8" class="bg-light">
-            <div class="px-3 py-2">
-                <small class="text-muted">Showing @Model.TotalRecords entries</small>
-            </div>
+        <td colspan="8" class="bg-gray-50 px-6 py-3">
+            <small class="text-gray-500">Showing @Model.TotalRecords entries</small>
         </td>
     </tr>
     }

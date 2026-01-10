@@ -10,27 +10,27 @@
         <input type="hidden" name="Id" value="@Model.Component.Id" />
     }
 
-    <div class="row g-3">
-        <div class="col-md-8">
-            <label class="form-label">Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="Name"
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Name <span class="text-red-500">*</span></label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name"
                    value="@Model.Component?.Name" required>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Sort Order</label>
-            <input type="number" class="form-control" name="SortOrder"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Sort Order</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SortOrder"
                    value="@(Model.Component?.SortOrder ?? 0)" min="0">
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" name="Description" rows="2">@Model.Component?.Description</textarea>
+        <div class="md:col-span-2">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Description" rows="2">@Model.Component?.Description</textarea>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Component Type</label>
-            <select class="form-select" name="ComponentType" id="componentType">
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Component Type</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ComponentType" id="componentType">
                 @foreach (var type in Enum.GetValues<SalaryComponentType>())
                 {
                     <option value="@type" selected="@(Model.Component?.ComponentType == type)">@type</option>
@@ -38,9 +38,9 @@
             </select>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Calculation Type</label>
-            <select class="form-select" name="CalculationType" id="calculationType" onchange="updateValueLabel()">
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Calculation Type</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="CalculationType" id="calculationType" onchange="updateValueLabel()">
                 @foreach (var type in Enum.GetValues<CalculationType>())
                 {
                     var label = type switch
@@ -56,58 +56,52 @@
             </select>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label" id="valueLabel">Default Value</label>
-            <div class="input-group">
-                <span class="input-group-text" id="valuePrefix">$</span>
-                <input type="number" class="form-control" name="DefaultValue"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900" id="valueLabel">Default Value</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-s-md" id="valuePrefix">$</span>
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-e-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DefaultValue"
                        value="@(Model.Component?.DefaultValue ?? 0)" step="0.01" min="0">
-                <span class="input-group-text d-none" id="valueSuffix">%</span>
+                <span class="hidden inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-s-0 border-gray-300 rounded-e-md" id="valueSuffix">%</span>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Min Value</label>
-            <input type="number" class="form-control" name="MinValue"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Min Value</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MinValue"
                    value="@Model.Component?.MinValue" step="0.01" min="0">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Max Value</label>
-            <input type="number" class="form-control" name="MaxValue"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Max Value</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MaxValue"
                    value="@Model.Component?.MaxValue" step="0.01" min="0">
         </div>
 
-        <div class="col-12">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="IsTaxable" value="true" id="isTaxable"
-                               checked="@(Model.Component?.IsTaxable ?? true)">
-                        <label class="form-check-label" for="isTaxable">Taxable</label>
-                    </div>
+        <div class="md:col-span-2">
+            <div class="grid grid-cols-3 gap-4">
+                <div class="flex items-center">
+                    <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" type="checkbox" name="IsTaxable" value="true" id="isTaxable"
+                           checked="@(Model.Component?.IsTaxable ?? true)">
+                    <label class="ms-2 text-sm font-medium text-gray-900" for="isTaxable">Taxable</label>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="IsRecurring" value="true" id="isRecurring"
-                               checked="@(Model.Component?.IsRecurring ?? true)">
-                        <label class="form-check-label" for="isRecurring">Recurring</label>
-                    </div>
+                <div class="flex items-center">
+                    <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" type="checkbox" name="IsRecurring" value="true" id="isRecurring"
+                           checked="@(Model.Component?.IsRecurring ?? true)">
+                    <label class="ms-2 text-sm font-medium text-gray-900" for="isRecurring">Recurring</label>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="IsActive" value="true" id="isActive"
-                               checked="@(Model.Component?.IsActive ?? true)">
-                        <label class="form-check-label" for="isActive">Active</label>
-                    </div>
+                <div class="flex items-center">
+                    <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" type="checkbox" name="IsActive" value="true" id="isActive"
+                           checked="@(Model.Component?.IsActive ?? true)">
+                    <label class="ms-2 text-sm font-medium text-gray-900" for="isActive">Active</label>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-modal-hide="componentModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
+    <div class="flex items-center pt-4 mt-4 border-t border-gray-200 gap-2">
+        <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" data-modal-hide="componentModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
             @(Model.IsEdit ? "Update Component" : "Create Component")
         </button>
     </div>
@@ -121,14 +115,14 @@
 
         if (calcType === 'Fixed') {
             prefix.textContent = '$';
-            prefix.classList.remove('d-none');
-            suffix.classList.add('d-none');
+            prefix.classList.remove('hidden');
+            suffix.classList.add('hidden');
         } else if (calcType === 'PercentageOfBasic' || calcType === 'PercentageOfGross') {
-            prefix.classList.add('d-none');
-            suffix.classList.remove('d-none');
+            prefix.classList.add('hidden');
+            suffix.classList.remove('hidden');
         } else {
-            prefix.classList.add('d-none');
-            suffix.classList.add('d-none');
+            prefix.classList.add('hidden');
+            suffix.classList.add('hidden');
         }
     }
 

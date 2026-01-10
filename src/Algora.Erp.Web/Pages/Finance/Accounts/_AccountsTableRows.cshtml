@@ -6,94 +6,93 @@
     var typeColor = account.AccountType switch
     {
         AccountType.Asset => "primary",
-        AccountType.Liability => "danger",
-        AccountType.Equity => "success",
-        AccountType.Revenue => "info",
-        AccountType.Expense => "warning",
-        _ => "secondary"
+        AccountType.Liability => "red",
+        AccountType.Equity => "emerald",
+        AccountType.Revenue => "sky",
+        AccountType.Expense => "amber",
+        _ => "gray"
     };
 
-    var balanceColor = account.CurrentBalance >= 0 ? "text-success" : "text-danger";
+    var balanceColor = account.CurrentBalance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400";
 
-    <tr>
-        <td class="ps-4">
-            <span class="badge bg-@typeColor bg-opacity-10 text-@typeColor">@account.Code</span>
+    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <td class="px-6 py-4">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded bg-@(typeColor)-100 text-@(typeColor)-800 dark:bg-@(typeColor)-900/30 dark:text-@(typeColor)-400">@account.Code</span>
         </td>
-        <td>
+        <td class="px-6 py-4">
             <div>
-                <h6 class="mb-0">@account.Name</h6>
+                <h6 class="font-medium text-gray-900 dark:text-white mb-0">@account.Name</h6>
                 @if (account.ParentAccount != null)
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-arrow-return-right me-1"></i>@account.ParentAccount.Name
+                    <small class="text-gray-500 dark:text-gray-400">
+                        <i class="bi bi-arrow-return-right mr-1"></i>@account.ParentAccount.Name
                     </small>
                 }
             </div>
         </td>
-        <td>
-            <span class="badge bg-@typeColor">@account.AccountType</span>
+        <td class="px-6 py-4">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-@(typeColor)-100 text-@(typeColor)-800 dark:bg-@(typeColor)-900/30 dark:text-@(typeColor)-400">@account.AccountType</span>
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (account.AccountSubType.HasValue)
             {
-                <span class="text-muted">@account.AccountSubType</span>
+                <span class="text-gray-500 dark:text-gray-400">@account.AccountSubType</span>
             }
             else
             {
-                <span class="text-muted">-</span>
+                <span class="text-gray-400">-</span>
             }
         </td>
-        <td class="text-end">
-            <span class="@balanceColor fw-semibold">
+        <td class="px-6 py-4 text-right">
+            <span class="@balanceColor font-semibold">
                 @account.CurrentBalance.ToString("C2")
             </span>
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (account.IsActive)
             {
-                <span class="badge bg-success">Active</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Active</span>
             }
             else
             {
-                <span class="badge bg-secondary">Inactive</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inactive</span>
             }
             @if (account.IsSystemAccount)
             {
-                <span class="badge bg-info ms-1">System</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400 ml-1">System</span>
             }
         </td>
-        <td class="text-end pe-4">
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light" id="dropdownAcct@(account.Id)" data-dropdown-toggle="dropdownMenuAcct@(account.Id)">
-                    <i class="bi bi-three-dots-vertical"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuAcct@(account.Id)">
+        <td class="px-6 py-4 text-right">
+            <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" id="dropdownAcct@(account.Id)" data-dropdown-toggle="dropdownMenuAcct@(account.Id)" data-dropdown-placement="bottom-end">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700" id="dropdownMenuAcct@(account.Id)">
+                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
                     <li>
-                        <a class="dropdown-item" href="#"
+                        <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                            hx-get="/Finance/Accounts?handler=EditForm&id=@account.Id"
                            hx-target="#formContainer"
                            data-modal-target="accountModal" data-modal-toggle="accountModal">
-                            <i class="bi bi-pencil me-2"></i> Edit
+                            <i class="bi bi-pencil mr-2"></i> Edit
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="/Finance/JournalEntries?accountId=@account.Id">
-                            <i class="bi bi-journal-text me-2"></i> View Transactions
+                        <a href="/Finance/JournalEntries?accountId=@account.Id" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                            <i class="bi bi-journal-text mr-2"></i> View Transactions
                         </a>
                     </li>
-                    @if (!account.IsSystemAccount)
-                    {
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" href="#"
-                               hx-delete="/Finance/Accounts?handler=&id=@account.Id"
-                               hx-target="#tableContent"
-                               hx-confirm="Are you sure you want to delete this account?">
-                                <i class="bi bi-trash me-2"></i> Delete
-                            </a>
-                        </li>
-                    }
                 </ul>
+                @if (!account.IsSystemAccount)
+                {
+                    <div class="py-2">
+                        <a href="#" class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-400"
+                           hx-delete="/Finance/Accounts?handler=&id=@account.Id"
+                           hx-target="#tableContent"
+                           hx-confirm="Are you sure you want to delete this account?">
+                            <i class="bi bi-trash mr-2"></i> Delete
+                        </a>
+                    </div>
+                }
             </div>
         </td>
     </tr>
@@ -102,11 +101,9 @@
 @if (!Model.Accounts.Any())
 {
     <tr>
-        <td colspan="7" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-journal-bookmark fs-1 d-block mb-2"></i>
-                <p class="mb-0">No accounts found</p>
-            </div>
+        <td colspan="7" class="text-center py-12 text-gray-500 dark:text-gray-400">
+            <i class="bi bi-journal-bookmark text-4xl block mb-2"></i>
+            <p class="mb-0">No accounts found</p>
         </td>
     </tr>
 }
@@ -120,11 +117,12 @@
     {
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            var activeClass = i == Model.Page ? "active" : "";
+            var activeClass = i == Model.Page ? "text-primary-600 bg-primary-50 dark:bg-gray-700 dark:text-white" : "text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400";
             <text>
-            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/Finance/Accounts?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#typeFilter,#statusFilter">@i</a></li>';
+            paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white @activeClass" href="#" hx-get="/Finance/Accounts?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#typeFilter,#statusFilter">@i</a></li>';
             </text>
         }
     }
-    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+    document.querySelector('#paginationNav ul').innerHTML = paginationHtml;
+    htmx.process(document.querySelector('#paginationNav'));
 </script>

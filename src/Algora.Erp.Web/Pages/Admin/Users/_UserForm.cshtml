@@ -2,60 +2,62 @@
 @using Algora.Erp.Domain.Enums
 
 <form hx-post="/Admin/Users" hx-target="#usersTableBody" hx-swap="innerHTML">
-    <div class="modal-header">
-        <h5 class="modal-title">@(Model.IsEdit ? "Edit User" : "New User")</h5>
-        <button type="button" class="btn-close" data-modal-hide="userModal"></button>
+    <div class="flex items-center justify-between p-4 border-b rounded-t">
+        <h5 class="text-lg font-semibold text-gray-900">@(Model.IsEdit ? "Edit User" : "New User")</h5>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="userModal">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
-    <div class="modal-body">
+    <div class="p-6">
         @if (Model.IsEdit)
         {
             <input type="hidden" name="Id" value="@Model.User?.Id" />
         }
 
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">First Name <span class="text-danger">*</span></label>
-                <input type="text" name="FirstName" class="form-control" value="@Model.User?.FirstName" required />
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">First Name <span class="text-red-500">*</span></label>
+                <input type="text" name="FirstName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" value="@Model.User?.FirstName" required />
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                <input type="text" name="LastName" class="form-control" value="@Model.User?.LastName" required />
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Last Name <span class="text-red-500">*</span></label>
+                <input type="text" name="LastName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" value="@Model.User?.LastName" required />
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Email <span class="text-danger">*</span></label>
-                <input type="email" name="Email" class="form-control" value="@Model.User?.Email" required @(Model.IsEdit ? "readonly" : "") />
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Email <span class="text-red-500">*</span></label>
+                <input type="email" name="Email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" value="@Model.User?.Email" required @(Model.IsEdit ? "readonly" : "") />
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Phone Number</label>
-                <input type="tel" name="PhoneNumber" class="form-control" value="@Model.User?.PhoneNumber" />
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Phone Number</label>
+                <input type="tel" name="PhoneNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" value="@Model.User?.PhoneNumber" />
             </div>
             @if (!Model.IsEdit)
             {
-                <div class="col-md-6">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="Password" class="form-control" placeholder="Leave blank for default" />
-                    <small class="text-muted">Default: Password123!</small>
+                <div class="col-span-12 md:col-span-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+                    <input type="password" name="Password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="Leave blank for default" />
+                    <small class="text-gray-500">Default: Password123!</small>
                 </div>
             }
-            <div class="col-md-6">
-                <label class="form-label">Status</label>
-                <select name="Status" class="form-select">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                <select name="Status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (UserStatus s in Enum.GetValues(typeof(UserStatus)))
                     {
                         <option value="@s" selected="@(Model.User?.Status == s)">@s</option>
                     }
                 </select>
             </div>
-            <div class="col-12">
-                <label class="form-label">Roles</label>
-                <div class="row g-2">
+            <div class="col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Roles</label>
+                <div class="grid grid-cols-12 gap-2">
                     @foreach (var role in Model.Roles)
                     {
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" name="RoleIds" value="@role.Id" class="form-check-input" id="role_@role.Id"
+                        <div class="col-span-12 md:col-span-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="RoleIds" value="@role.Id" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2" id="role_@role.Id"
                                        checked="@Model.SelectedRoleIds.Contains(role.Id)" />
-                                <label class="form-check-label" for="role_@role.Id">@role.Name</label>
+                                <label class="ms-2 text-sm font-medium text-gray-900" for="role_@role.Id">@role.Name</label>
                             </div>
                         </div>
                     }
@@ -63,8 +65,8 @@
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="userModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Update" : "Create") User</button>
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="userModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">@(Model.IsEdit ? "Update" : "Create") User</button>
     </div>
 </form>

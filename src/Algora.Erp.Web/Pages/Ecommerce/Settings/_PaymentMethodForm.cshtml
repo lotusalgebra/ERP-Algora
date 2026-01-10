@@ -9,19 +9,19 @@
         <input type="hidden" name="Id" value="@Model.Id" />
     }
 
-    <div class="mb-3">
-        <label class="form-label">Method Name <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" name="Name" value="@Model.Name" required placeholder="e.g., Credit Card" />
+    <div class="mb-4">
+        <label class="block mb-2 text-sm font-medium text-gray-900">Method Name <span class="text-red-500">*</span></label>
+        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name" value="@Model.Name" required placeholder="e.g., Credit Card" />
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Code <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" name="Code" value="@Model.Code" required placeholder="e.g., stripe, paypal, cod" />
+    <div class="mb-4">
+        <label class="block mb-2 text-sm font-medium text-gray-900">Code <span class="text-red-500">*</span></label>
+        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Code" value="@Model.Code" required placeholder="e.g., stripe, paypal, cod" />
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Gateway <span class="text-danger">*</span></label>
-        <select class="form-select" name="Gateway" required>
+    <div class="mb-4">
+        <label class="block mb-2 text-sm font-medium text-gray-900">Gateway <span class="text-red-500">*</span></label>
+        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Gateway" required>
             @if (gateway == "Manual") { <option value="Manual" selected>Manual</option> } else { <option value="Manual">Manual</option> }
             @if (gateway == "Stripe") { <option value="Stripe" selected>Stripe</option> } else { <option value="Stripe">Stripe</option> }
             @if (gateway == "PayPal") { <option value="PayPal" selected>PayPal</option> } else { <option value="PayPal">PayPal</option> }
@@ -30,46 +30,47 @@
         </select>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <input type="text" class="form-control" name="Description" value="@Model.Description" placeholder="Visa, Mastercard, Amex" />
+    <div class="mb-4">
+        <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Description" value="@Model.Description" placeholder="Visa, Mastercard, Amex" />
     </div>
 
-    <div class="row mb-3">
-        <div class="col-6">
-            <label class="form-label">Transaction Fee (%)</label>
-            <div class="input-group">
-                <input type="number" step="0.01" class="form-control" name="TransactionFeePercent" value="@Model.TransactionFeePercent?.ToString("F2")" />
-                <span class="input-group-text">%</span>
+    <div class="grid grid-cols-12 gap-4 mb-4">
+        <div class="col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Transaction Fee (%)</label>
+            <div class="flex">
+                <input type="number" step="0.01" class="rounded-none rounded-s-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TransactionFeePercent" value="@Model.TransactionFeePercent?.ToString("F2")" />
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-s-0 border-gray-300 rounded-e-md">%</span>
             </div>
         </div>
-        <div class="col-6">
-            <label class="form-label">Transaction Fee (Fixed)</label>
-            <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input type="number" step="0.01" class="form-control" name="TransactionFeeFixed" value="@Model.TransactionFeeFixed?.ToString("F2")" />
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-6">
-            <label class="form-label">Sort Order</label>
-            <input type="number" class="form-control" name="SortOrder" value="@Model.SortOrder" />
-        </div>
-        <div class="col-6 d-flex align-items-end">
-            <div class="form-check form-switch">
-                <input type="checkbox" class="form-check-input" name="IsActive" value="true"
-                       @(Model.IsActive ? "checked" : "") id="paymentActive" />
-                <label class="form-check-label" for="paymentActive">Active</label>
+        <div class="col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Transaction Fee (Fixed)</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-s-md">$</span>
+                <input type="number" step="0.01" class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TransactionFeeFixed" value="@Model.TransactionFeeFixed?.ToString("F2")" />
             </div>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0">
-        <button type="button" class="btn btn-secondary" data-modal-hide="paymentMethodModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>Save Method
+    <div class="grid grid-cols-12 gap-4 mb-4">
+        <div class="col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Sort Order</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SortOrder" value="@Model.SortOrder" />
+        </div>
+        <div class="col-span-6 flex items-end">
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" name="IsActive" value="true"
+                       @(Model.IsActive ? "checked" : "") id="paymentActive">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                <span class="ms-3 text-sm font-medium text-gray-900">Active</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="paymentModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>Save Method
         </button>
     </div>
 </form>

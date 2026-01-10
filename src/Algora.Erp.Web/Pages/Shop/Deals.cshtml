@@ -6,19 +6,19 @@
 }
 
 <!-- Hero Banner -->
-<section class="bg-danger text-white py-5">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-3">
-            <i class="bi bi-tag-fill me-2"></i>Hot Deals
+<section class="bg-gradient-to-r from-red-600 to-red-500 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl font-bold mb-3">
+            <i class="bi bi-tag-fill mr-2"></i>Hot Deals
         </h1>
-        <p class="lead mb-0">Don't miss out on our best offers!</p>
+        <p class="text-lg text-red-100">Don't miss out on our best offers!</p>
     </div>
 </section>
 
-<div class="container py-5">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     @if (Model.DealsProducts.Any())
     {
-        <div class="row g-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach (var product in Model.DealsProducts)
             {
                 var imageUrl = product.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? product.Images.FirstOrDefault()?.Url;
@@ -26,45 +26,43 @@
                     ? (int)Math.Round((1 - product.Price / product.CompareAtPrice.Value) * 100)
                     : 0;
 
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="product-card position-relative">
+                <div class="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <div class="relative">
                         @if (discount > 0)
                         {
-                            <span class="badge bg-danger position-absolute top-0 end-0 m-2 fs-6">
+                            <span class="absolute top-3 right-3 z-10 px-3 py-1 text-sm font-semibold text-white bg-red-500 rounded-full">
                                 -@discount% OFF
                             </span>
                         }
                         <a href="/Shop/Product/@product.Slug">
                             @if (!string.IsNullOrEmpty(imageUrl))
                             {
-                                <img src="@imageUrl" alt="@product.Name" class="card-img-top">
+                                <img src="@imageUrl" alt="@product.Name" class="w-full h-48 object-cover">
                             }
                             else
                             {
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                                    <i class="bi bi-image text-gray-300" style="font-size: 3rem;"></i>
                                 </div>
                             }
                         </a>
-                        <div class="card-body">
-                            <p class="text-muted small mb-1">@product.Category?.Name</p>
-                            <h6 class="card-title mb-2">
-                                <a href="/Shop/Product/@product.Slug" class="text-decoration-none text-dark">@product.Name</a>
-                            </h6>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="product-price">
-                                    @product.Price.ToString("C")
-                                    @if (product.CompareAtPrice.HasValue && product.CompareAtPrice > product.Price)
-                                    {
-                                        <span class="original-price ms-1">@product.CompareAtPrice.Value.ToString("C")</span>
-                                    }
-                                </div>
-                            </div>
-                            <button class="btn btn-danger btn-sm w-100 mt-2"
-                                    onclick="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price, '@imageUrl')">
-                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
-                            </button>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-xs text-gray-500 mb-1">@product.Category?.Name</p>
+                        <h6 class="font-semibold text-gray-900 mb-2 line-clamp-2">
+                            <a href="/Shop/Product/@product.Slug" class="hover:text-primary-600">@product.Name</a>
+                        </h6>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-lg font-bold text-red-600">@product.Price.ToString("C")</span>
+                            @if (product.CompareAtPrice.HasValue && product.CompareAtPrice > product.Price)
+                            {
+                                <span class="text-sm text-gray-400 line-through">@product.CompareAtPrice.Value.ToString("C")</span>
+                            }
                         </div>
+                        <button class="w-full inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 rounded-lg transition-colors"
+                                onclick="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price, '@imageUrl')">
+                            <i class="bi bi-cart-plus mr-1"></i>Add to Cart
+                        </button>
                     </div>
                 </div>
             }
@@ -72,29 +70,25 @@
     }
     else
     {
-        <div class="text-center py-5">
-            <i class="bi bi-tag fs-1 text-muted d-block mb-3"></i>
-            <h4>No deals available right now</h4>
-            <p class="text-muted mb-4">Check back soon for amazing offers!</p>
-            <a href="/Shop" class="btn btn-primary">
-                <i class="bi bi-shop me-2"></i>Continue Shopping
+        <div class="text-center py-16">
+            <i class="bi bi-tag text-6xl text-gray-300 block mb-3"></i>
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">No deals available right now</h4>
+            <p class="text-gray-500 mb-4">Check back soon for amazing offers!</p>
+            <a href="/Shop" class="inline-flex items-center px-5 py-2.5 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">
+                <i class="bi bi-shop mr-2"></i>Continue Shopping
             </a>
         </div>
     }
 </div>
 
 <!-- Newsletter Section -->
-<section class="bg-light py-5">
-    <div class="container text-center">
-        <h3 class="mb-3">Get Notified About Deals</h3>
-        <p class="text-muted mb-4">Subscribe to receive exclusive offers and discounts directly in your inbox.</p>
-        <form class="row g-2 justify-content-center">
-            <div class="col-auto">
-                <input type="email" class="form-control" placeholder="Enter your email" style="min-width: 300px;">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Subscribe</button>
-            </div>
+<section class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h3 class="text-xl font-bold text-gray-900 mb-3">Get Notified About Deals</h3>
+        <p class="text-gray-500 mb-6">Subscribe to receive exclusive offers and discounts directly in your inbox.</p>
+        <form class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+            <input type="email" class="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-3" placeholder="Enter your email">
+            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">Subscribe</button>
         </form>
     </div>
 </section>

@@ -4,15 +4,15 @@
 @{
     var statusClass = Model.Status switch
     {
-        InvoiceStatus.Draft => "bg-secondary",
-        InvoiceStatus.Pending => "bg-warning",
-        InvoiceStatus.Sent => "bg-info",
-        InvoiceStatus.PartiallyPaid => "bg-primary",
-        InvoiceStatus.Paid => "bg-success",
-        InvoiceStatus.Overdue => "bg-danger",
-        InvoiceStatus.Void => "bg-dark",
-        InvoiceStatus.Cancelled => "bg-dark",
-        _ => "bg-secondary"
+        InvoiceStatus.Draft => "bg-gray-100 text-gray-800",
+        InvoiceStatus.Pending => "bg-amber-100 text-amber-800",
+        InvoiceStatus.Sent => "bg-blue-100 text-blue-800",
+        InvoiceStatus.PartiallyPaid => "bg-primary-100 text-primary-800",
+        InvoiceStatus.Paid => "bg-emerald-100 text-emerald-800",
+        InvoiceStatus.Overdue => "bg-red-100 text-red-800",
+        InvoiceStatus.Void => "bg-gray-800 text-white",
+        InvoiceStatus.Cancelled => "bg-gray-800 text-white",
+        _ => "bg-gray-100 text-gray-800"
     };
 
     var isOverdue = Model.Status != InvoiceStatus.Paid &&
@@ -23,41 +23,41 @@
     var supplierName = ViewData["SupplierName"] as string ?? Model.BillingName ?? "-";
 }
 
-<div class="row g-4">
+<div class="grid grid-cols-12 gap-4">
     <!-- Header Info -->
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-start">
+    <div class="col-span-12">
+        <div class="flex justify-between items-start">
             <div>
-                <h5 class="mb-1">@Model.InvoiceNumber</h5>
-                <p class="text-muted mb-0">
+                <h5 class="text-xl font-semibold text-gray-900 mb-1">@Model.InvoiceNumber</h5>
+                <p class="text-gray-500 mb-0">
                     Invoice Date: @Model.InvoiceDate.ToString("dd MMM yyyy")
                     @if (!string.IsNullOrEmpty(Model.Reference))
                     {
-                        <span class="ms-2">| Ref: @Model.Reference</span>
+                        <span class="ml-2">| Ref: @Model.Reference</span>
                     }
                 </p>
             </div>
-            <div class="text-end">
-                <span class="badge @statusClass fs-6">@Model.Status</span>
+            <div class="text-right">
+                <span class="text-sm font-medium px-3 py-1 rounded-full @statusClass">@Model.Status</span>
                 @if (isOverdue)
                 {
-                    <span class="badge bg-danger fs-6 ms-1">Overdue</span>
+                    <span class="text-sm font-medium px-3 py-1 rounded-full bg-red-100 text-red-800 ml-1">Overdue</span>
                 }
             </div>
         </div>
     </div>
 
     <!-- Supplier & Dates -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Supplier Details</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Supplier Details</h6>
             </div>
-            <div class="card-body">
-                <p class="fw-medium mb-2">@supplierName</p>
+            <div class="p-6">
+                <p class="font-medium text-gray-900 mb-2">@supplierName</p>
                 @if (!string.IsNullOrEmpty(Model.BillingAddress))
                 {
-                    <address class="text-muted mb-0">
+                    <address class="text-gray-500 mb-0 not-italic">
                         @Model.BillingAddress<br />
                         @if (!string.IsNullOrEmpty(Model.BillingCity) || !string.IsNullOrEmpty(Model.BillingState))
                         {
@@ -70,36 +70,36 @@
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Payment Information</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Payment Information</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
+            <div class="p-6">
+                <table class="w-full text-sm">
                     <tr>
-                        <td class="text-muted" style="width: 40%;">Due Date:</td>
-                        <td class="fw-medium @(isOverdue ? "text-danger" : "")">
+                        <td class="text-gray-500 py-1" style="width: 40%;">Due Date:</td>
+                        <td class="font-medium py-1 @(isOverdue ? "text-red-600" : "text-gray-900")">
                             @Model.DueDate.ToString("dd MMM yyyy")
                             @if (isOverdue)
                             {
-                                <i class="bi bi-exclamation-triangle-fill text-danger ms-1"></i>
+                                <i class="bi bi-exclamation-triangle-fill text-red-600 ml-1"></i>
                             }
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Payment Terms:</td>
-                        <td class="fw-medium">@Model.PaymentTermDays days</td>
+                        <td class="text-gray-500 py-1">Payment Terms:</td>
+                        <td class="font-medium text-gray-900 py-1">@Model.PaymentTermDays days</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Currency:</td>
-                        <td class="fw-medium">@Model.Currency</td>
+                        <td class="text-gray-500 py-1">Currency:</td>
+                        <td class="font-medium text-gray-900 py-1">@Model.Currency</td>
                     </tr>
                     @if (Model.PaidDate.HasValue)
                     {
                         <tr>
-                            <td class="text-muted">Paid Date:</td>
-                            <td class="fw-medium text-success">@Model.PaidDate.Value.ToString("dd MMM yyyy")</td>
+                            <td class="text-gray-500 py-1">Paid Date:</td>
+                            <td class="font-medium text-emerald-600 py-1">@Model.PaidDate.Value.ToString("dd MMM yyyy")</td>
                         </tr>
                     }
                 </table>
@@ -108,23 +108,23 @@
     </div>
 
     <!-- Line Items -->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Line Items</h6>
+    <div class="col-span-12">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Line Items</h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead class="bg-light">
+            <div class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th style="width: 5%;">#</th>
-                                <th style="width: 35%;">Description</th>
-                                <th class="text-end" style="width: 12%;">Qty</th>
-                                <th class="text-end" style="width: 15%;">Unit Price</th>
-                                <th class="text-end" style="width: 10%;">Discount</th>
-                                <th class="text-end" style="width: 10%;">Tax</th>
-                                <th class="text-end" style="width: 13%;">Total</th>
+                                <th class="px-4 py-3" style="width: 5%;">#</th>
+                                <th class="px-4 py-3" style="width: 35%;">Description</th>
+                                <th class="px-4 py-3 text-right" style="width: 12%;">Qty</th>
+                                <th class="px-4 py-3 text-right" style="width: 15%;">Unit Price</th>
+                                <th class="px-4 py-3 text-right" style="width: 10%;">Discount</th>
+                                <th class="px-4 py-3 text-right" style="width: 10%;">Tax</th>
+                                <th class="px-4 py-3 text-right" style="width: 13%;">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -132,78 +132,78 @@
                             {
                                 foreach (var line in Model.Lines.Where(l => !l.IsDeleted).OrderBy(l => l.LineNumber))
                                 {
-                                    <tr>
-                                        <td>@line.LineNumber</td>
-                                        <td>
-                                            <div class="fw-medium">@line.Description</div>
+                                    <tr class="border-b">
+                                        <td class="px-4 py-3">@line.LineNumber</td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-medium text-gray-900">@line.Description</div>
                                             @if (!string.IsNullOrEmpty(line.ProductCode))
                                             {
-                                                <small class="text-muted">@line.ProductCode</small>
+                                                <small class="text-gray-500">@line.ProductCode</small>
                                             }
                                         </td>
-                                        <td class="text-end">@line.Quantity.ToString("N2") @line.UnitOfMeasure</td>
-                                        <td class="text-end">@line.UnitPrice.ToString("C2")</td>
-                                        <td class="text-end">
+                                        <td class="px-4 py-3 text-right">@line.Quantity.ToString("N2") @line.UnitOfMeasure</td>
+                                        <td class="px-4 py-3 text-right">@line.UnitPrice.ToString("C2")</td>
+                                        <td class="px-4 py-3 text-right">
                                             @if (line.DiscountPercent > 0)
                                             {
                                                 <span>@line.DiscountPercent.ToString("N1")%</span>
                                             }
                                             else
                                             {
-                                                <span class="text-muted">-</span>
+                                                <span class="text-gray-500">-</span>
                                             }
                                         </td>
-                                        <td class="text-end">
+                                        <td class="px-4 py-3 text-right">
                                             @if (line.TaxPercent > 0)
                                             {
                                                 <span>@line.TaxPercent.ToString("N1")%</span>
                                             }
                                             else
                                             {
-                                                <span class="text-muted">-</span>
+                                                <span class="text-gray-500">-</span>
                                             }
                                         </td>
-                                        <td class="text-end fw-medium">@line.LineTotal.ToString("C2")</td>
+                                        <td class="px-4 py-3 text-right font-medium">@line.LineTotal.ToString("C2")</td>
                                     </tr>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">No line items</td>
+                                    <td colspan="7" class="text-center text-gray-500 py-4">No line items</td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="bg-light">
+                        <tfoot class="bg-gray-50">
                             <tr>
-                                <td colspan="6" class="text-end">Subtotal:</td>
-                                <td class="text-end fw-medium">@Model.SubTotal.ToString("C2")</td>
+                                <td colspan="6" class="px-4 py-2 text-right">Subtotal:</td>
+                                <td class="px-4 py-2 text-right font-medium">@Model.SubTotal.ToString("C2")</td>
                             </tr>
                             @if (Model.DiscountAmount > 0)
                             {
                                 <tr>
-                                    <td colspan="6" class="text-end">Discount:</td>
-                                    <td class="text-end text-danger">-@Model.DiscountAmount.ToString("C2")</td>
+                                    <td colspan="6" class="px-4 py-2 text-right">Discount:</td>
+                                    <td class="px-4 py-2 text-right text-red-600">-@Model.DiscountAmount.ToString("C2")</td>
                                 </tr>
                             }
                             <tr>
-                                <td colspan="6" class="text-end">Tax:</td>
-                                <td class="text-end">@Model.TaxAmount.ToString("C2")</td>
+                                <td colspan="6" class="px-4 py-2 text-right">Tax:</td>
+                                <td class="px-4 py-2 text-right">@Model.TaxAmount.ToString("C2")</td>
                             </tr>
                             <tr>
-                                <td colspan="6" class="text-end fw-bold">Total:</td>
-                                <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("C2")</td>
+                                <td colspan="6" class="px-4 py-2 text-right font-bold">Total:</td>
+                                <td class="px-4 py-2 text-right font-bold text-lg">@Model.TotalAmount.ToString("C2")</td>
                             </tr>
                             @if (Model.PaidAmount > 0)
                             {
                                 <tr>
-                                    <td colspan="6" class="text-end text-success">Paid:</td>
-                                    <td class="text-end text-success">@Model.PaidAmount.ToString("C2")</td>
+                                    <td colspan="6" class="px-4 py-2 text-right text-emerald-600">Paid:</td>
+                                    <td class="px-4 py-2 text-right text-emerald-600">@Model.PaidAmount.ToString("C2")</td>
                                 </tr>
                             }
                             <tr>
-                                <td colspan="6" class="text-end fw-bold">Balance Due:</td>
-                                <td class="text-end fw-bold fs-5 @(Model.BalanceDue > 0 ? "text-danger" : "text-success")">
+                                <td colspan="6" class="px-4 py-2 text-right font-bold">Balance Due:</td>
+                                <td class="px-4 py-2 text-right font-bold text-lg @(Model.BalanceDue > 0 ? "text-red-600" : "text-emerald-600")">
                                     @Model.BalanceDue.ToString("C2")
                                 </td>
                             </tr>
@@ -217,34 +217,34 @@
     <!-- Payment History -->
     @if (Model.Payments?.Any() == true)
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Payment History</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="font-medium text-gray-900 mb-0">Payment History</h6>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead class="bg-light">
+                <div class="p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
-                                    <th>Payment #</th>
-                                    <th>Date</th>
-                                    <th>Method</th>
-                                    <th>Reference</th>
-                                    <th class="text-end">Amount</th>
+                                    <th class="px-4 py-3">Payment #</th>
+                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">Method</th>
+                                    <th class="px-4 py-3">Reference</th>
+                                    <th class="px-4 py-3 text-right">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var payment in Model.Payments.OrderBy(p => p.PaymentDate))
                                 {
-                                    <tr>
-                                        <td class="fw-medium">@payment.PaymentNumber</td>
-                                        <td>@payment.PaymentDate.ToString("dd MMM yyyy")</td>
-                                        <td>
-                                            <span class="badge bg-light text-dark">@payment.PaymentMethod</span>
+                                    <tr class="border-b">
+                                        <td class="px-4 py-3 font-medium text-gray-900">@payment.PaymentNumber</td>
+                                        <td class="px-4 py-3">@payment.PaymentDate.ToString("dd MMM yyyy")</td>
+                                        <td class="px-4 py-3">
+                                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-50 text-gray-800">@payment.PaymentMethod</span>
                                         </td>
-                                        <td>@(payment.Reference ?? "-")</td>
-                                        <td class="text-end fw-medium text-success">@payment.Amount.ToString("C2")</td>
+                                        <td class="px-4 py-3">@(payment.Reference ?? "-")</td>
+                                        <td class="px-4 py-3 text-right font-medium text-emerald-600">@payment.Amount.ToString("C2")</td>
                                     </tr>
                                 }
                             </tbody>
@@ -258,31 +258,31 @@
     <!-- Notes -->
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Notes</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="font-medium text-gray-900 mb-0">Notes</h6>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">@Model.Notes</p>
+                <div class="p-6">
+                    <p class="mb-0 text-gray-700">@Model.Notes</p>
                 </div>
             </div>
         </div>
     }
 </div>
 
-<div class="modal-footer mt-4 px-0 pb-0">
+<div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
     @if (Model.Status == InvoiceStatus.Draft || Model.Status == InvoiceStatus.Pending)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editInvoice('@Model.Id')" data-modal-hide="detailsModal">
-            <i class="bi bi-pencil me-2"></i>Edit
+        <button type="button" class="text-primary-700 hover:text-white border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="editInvoice('@Model.Id')" data-modal-hide="detailsModal">
+            <i class="bi bi-pencil mr-2"></i>Edit
         </button>
     }
     @if (Model.BalanceDue > 0 && Model.Status != InvoiceStatus.Draft && Model.Status != InvoiceStatus.Void && Model.Status != InvoiceStatus.Cancelled)
     {
-        <button type="button" class="btn btn-success" onclick="showPaymentModal('@Model.Id', '@Model.BalanceDue.ToString("C2")')" data-modal-hide="detailsModal">
-            <i class="bi bi-cash me-2"></i>Record Payment
+        <button type="button" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="showPaymentModal('@Model.Id', '@Model.BalanceDue.ToString("C2")')" data-modal-hide="detailsModal">
+            <i class="bi bi-cash mr-2"></i>Record Payment
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
 </div>

@@ -1,54 +1,56 @@
 @model Algora.Erp.Web.Pages.Admin.Roles.RoleFormViewModel
 
 <form hx-post="/Admin/Roles" hx-target="#rolesTableBody" hx-swap="innerHTML">
-    <div class="modal-header">
-        <h5 class="modal-title">@(Model.IsEdit ? "Edit Role" : "New Role")</h5>
-        <button type="button" class="btn-close" data-modal-hide="roleModal"></button>
+    <div class="flex items-center justify-between p-4 border-b rounded-t">
+        <h5 class="text-lg font-semibold text-gray-900">@(Model.IsEdit ? "Edit Role" : "New Role")</h5>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="roleModal">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
-    <div class="modal-body">
+    <div class="p-6">
         @if (Model.IsEdit)
         {
             <input type="hidden" name="Id" value="@Model.Role?.Id" />
         }
 
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Role Name <span class="text-danger">*</span></label>
-                <input type="text" name="Name" class="form-control" value="@Model.Role?.Name" required
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Role Name <span class="text-red-500">*</span></label>
+                <input type="text" name="Name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" value="@Model.Role?.Name" required
                        @(Model.IsEdit && Model.Role?.IsSystemRole == true ? "readonly" : "") />
                 @if (Model.IsEdit && Model.Role?.IsSystemRole == true)
                 {
-                    <small class="text-muted">System role names cannot be changed</small>
+                    <small class="text-gray-500">System role names cannot be changed</small>
                 }
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Description</label>
-                <input type="text" name="Description" class="form-control" value="@Model.Role?.Description" />
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+                <input type="text" name="Description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" value="@Model.Role?.Description" />
             </div>
-            <div class="col-12">
-                <label class="form-label">Permissions</label>
-                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+            <div class="col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Permissions</label>
+                <div class="border border-gray-200 rounded-lg p-4 max-h-[300px] overflow-y-auto">
                     @{
                         var groupedPermissions = Model.Permissions.GroupBy(p => p.Module).OrderBy(g => g.Key);
                     }
                     @foreach (var group in groupedPermissions)
                     {
-                        <div class="mb-3">
-                            <h6 class="text-muted border-bottom pb-1 mb-2">
-                                <i class="bi bi-folder me-1"></i>@group.Key
+                        <div class="mb-4">
+                            <h6 class="text-gray-500 border-b border-gray-200 pb-1 mb-2">
+                                <i class="bi bi-folder mr-1"></i>@group.Key
                             </h6>
-                            <div class="row g-2">
+                            <div class="grid grid-cols-12 gap-2">
                                 @foreach (var perm in group)
                                 {
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" name="PermissionIds" value="@perm.Id" class="form-check-input" id="perm_@perm.Id"
+                                    <div class="col-span-12 md:col-span-6">
+                                        <div class="flex items-start">
+                                            <input type="checkbox" name="PermissionIds" value="@perm.Id" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2 mt-1" id="perm_@perm.Id"
                                                    checked="@Model.SelectedPermissionIds.Contains(perm.Id)" />
-                                            <label class="form-check-label" for="perm_@perm.Id">
+                                            <label class="ms-2 text-sm font-medium text-gray-900" for="perm_@perm.Id">
                                                 @perm.Name
                                                 @if (!string.IsNullOrEmpty(perm.Description))
                                                 {
-                                                    <small class="text-muted d-block">@perm.Description</small>
+                                                    <small class="text-gray-500 block">@perm.Description</small>
                                                 }
                                             </label>
                                         </div>
@@ -59,14 +61,14 @@
                     }
                     @if (!Model.Permissions.Any())
                     {
-                        <p class="text-muted mb-0">No permissions available. Create permissions first.</p>
+                        <p class="text-gray-500 mb-0">No permissions available. Create permissions first.</p>
                     }
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="roleModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Update" : "Create") Role</button>
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="roleModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">@(Model.IsEdit ? "Update" : "Create") Role</button>
     </div>
 </form>

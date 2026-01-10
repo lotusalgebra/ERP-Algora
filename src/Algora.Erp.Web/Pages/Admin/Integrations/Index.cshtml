@@ -4,245 +4,243 @@
     ViewData["Title"] = "CRM Integrations";
 }
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h4 class="mb-1">CRM Integrations</h4>
-            <p class="text-muted mb-0">Connect your ERP with Salesforce and Microsoft Dynamics 365</p>
+            <h1 class="text-2xl font-bold text-gray-900">CRM Integrations</h1>
+            <p class="text-gray-500 mt-1">Connect your ERP with Salesforce and Microsoft Dynamics 365</p>
         </div>
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="flex items-center p-4 text-emerald-800 rounded-lg bg-emerald-50" role="alert">
+            <i class="bi bi-check-circle mr-2"></i>@TempData["Success"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-emerald-50 text-emerald-500 rounded-lg p-1.5 hover:bg-emerald-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="flex items-center p-4 text-red-800 rounded-lg bg-red-50" role="alert">
+            <i class="bi bi-exclamation-circle mr-2"></i>@TempData["Error"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
-    <div class="row g-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Salesforce Card -->
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-primary">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5 class="mb-0">Salesforce</h5>
-                            <small class="text-muted">Sync contacts, leads, opportunities, and accounts</small>
-                        </div>
-                        <div class="ms-auto">
-                            @if (Model.SalesforceEnabled)
-                            {
-                                <span class="badge bg-success">Connected</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Not Connected</span>
-                            }
-                        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-primary-100 rounded-full p-3 mr-3">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-primary-600">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
                     </div>
+                    <div>
+                        <h5 class="text-lg font-semibold text-gray-900">Salesforce</h5>
+                        <small class="text-gray-500">Sync contacts, leads, opportunities, and accounts</small>
+                    </div>
+                    <div class="ml-auto">
+                        @if (Model.SalesforceEnabled)
+                        {
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
+                        }
+                        else
+                        {
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
+                        }
+                    </div>
+                </div>
 
-                    @if (Model.SalesforceEnabled)
-                    {
-                        <div class="mb-3">
-                            <div class="row text-center">
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.SalesforceStats.Contacts</div>
-                                    <small class="text-muted">Contacts</small>
-                                </div>
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.SalesforceStats.Leads</div>
-                                    <small class="text-muted">Leads</small>
-                                </div>
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.SalesforceStats.Opportunities</div>
-                                    <small class="text-muted">Opportunities</small>
-                                </div>
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.SalesforceStats.Accounts</div>
-                                    <small class="text-muted">Accounts</small>
-                                </div>
+                @if (Model.SalesforceEnabled)
+                {
+                    <div class="mb-4">
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Contacts</div>
+                                <small class="text-gray-500">Contacts</small>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Leads</div>
+                                <small class="text-gray-500">Leads</small>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Opportunities</div>
+                                <small class="text-gray-500">Opportunities</small>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Accounts</div>
+                                <small class="text-gray-500">Accounts</small>
                             </div>
                         </div>
-                        <div class="d-flex gap-2">
-                            <a href="/Admin/Integrations/Salesforce" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-gear me-1"></i>Settings
-                            </a>
-                            <form method="post" asp-page-handler="SyncSalesforce" class="d-inline">
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-arrow-repeat me-1"></i>Sync Now
-                                </button>
-                            </form>
-                        </div>
-                    }
-                    else
-                    {
-                        <a href="/Admin/Integrations/Salesforce" class="btn btn-primary">
-                            <i class="bi bi-plug me-1"></i>Connect Salesforce
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="/Admin/Integrations/Salesforce" class="text-primary-700 border border-primary-300 hover:bg-primary-50 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-xs px-3 py-2">
+                            <i class="bi bi-gear mr-1"></i>Settings
                         </a>
-                    }
-                </div>
+                        <form method="post" asp-page-handler="SyncSalesforce" class="inline">
+                            <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2">
+                                <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a href="/Admin/Integrations/Salesforce" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                        <i class="bi bi-plug mr-1"></i>Connect Salesforce
+                    </a>
+                }
             </div>
         </div>
 
         <!-- Dynamics 365 Card -->
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-info">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h5 class="mb-0">Microsoft Dynamics 365</h5>
-                            <small class="text-muted">Sync contacts, leads, opportunities, and accounts</small>
-                        </div>
-                        <div class="ms-auto">
-                            @if (Model.Dynamics365Enabled)
-                            {
-                                <span class="badge bg-success">Connected</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Not Connected</span>
-                            }
-                        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-cyan-100 rounded-full p-3 mr-3">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-cyan-600">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
                     </div>
+                    <div>
+                        <h5 class="text-lg font-semibold text-gray-900">Microsoft Dynamics 365</h5>
+                        <small class="text-gray-500">Sync contacts, leads, opportunities, and accounts</small>
+                    </div>
+                    <div class="ml-auto">
+                        @if (Model.Dynamics365Enabled)
+                        {
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
+                        }
+                        else
+                        {
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
+                        }
+                    </div>
+                </div>
 
-                    @if (Model.Dynamics365Enabled)
-                    {
-                        <div class="mb-3">
-                            <div class="row text-center">
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.Dynamics365Stats.Contacts</div>
-                                    <small class="text-muted">Contacts</small>
-                                </div>
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.Dynamics365Stats.Leads</div>
-                                    <small class="text-muted">Leads</small>
-                                </div>
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.Dynamics365Stats.Opportunities</div>
-                                    <small class="text-muted">Opportunities</small>
-                                </div>
-                                <div class="col-3">
-                                    <div class="fw-bold">@Model.Dynamics365Stats.Accounts</div>
-                                    <small class="text-muted">Accounts</small>
-                                </div>
+                @if (Model.Dynamics365Enabled)
+                {
+                    <div class="mb-4">
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Contacts</div>
+                                <small class="text-gray-500">Contacts</small>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Leads</div>
+                                <small class="text-gray-500">Leads</small>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Opportunities</div>
+                                <small class="text-gray-500">Opportunities</small>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Accounts</div>
+                                <small class="text-gray-500">Accounts</small>
                             </div>
                         </div>
-                        <div class="d-flex gap-2">
-                            <a href="/Admin/Integrations/Dynamics365" class="btn btn-outline-info btn-sm">
-                                <i class="bi bi-gear me-1"></i>Settings
-                            </a>
-                            <form method="post" asp-page-handler="SyncDynamics365" class="d-inline">
-                                <button type="submit" class="btn btn-info btn-sm">
-                                    <i class="bi bi-arrow-repeat me-1"></i>Sync Now
-                                </button>
-                            </form>
-                        </div>
-                    }
-                    else
-                    {
-                        <a href="/Admin/Integrations/Dynamics365" class="btn btn-info">
-                            <i class="bi bi-plug me-1"></i>Connect Dynamics 365
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="/Admin/Integrations/Dynamics365" class="text-cyan-700 border border-cyan-300 hover:bg-cyan-50 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-xs px-3 py-2">
+                            <i class="bi bi-gear mr-1"></i>Settings
                         </a>
-                    }
-                </div>
+                        <form method="post" asp-page-handler="SyncDynamics365" class="inline">
+                            <button type="submit" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-xs px-3 py-2">
+                                <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a href="/Admin/Integrations/Dynamics365" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                        <i class="bi bi-plug mr-1"></i>Connect Dynamics 365
+                    </a>
+                }
             </div>
         </div>
     </div>
 
     <!-- Recent Sync History -->
-    <div class="card border mt-4">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Recent Sync History</h5>
-            <a href="/Admin/Integrations/SyncHistory" class="btn btn-sm btn-outline-secondary">View All</a>
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h5 class="text-lg font-semibold text-gray-900">Recent Sync History</h5>
+            <a href="/Admin/Integrations/SyncHistory" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-xs px-3 py-2">View All</a>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>CRM</th>
-                            <th>Entity Type</th>
-                            <th>Direction</th>
-                            <th>Records</th>
-                            <th>Status</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.RecentSyncLogs.Any())
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">CRM</th>
+                        <th scope="col" class="px-6 py-3">Entity Type</th>
+                        <th scope="col" class="px-6 py-3">Direction</th>
+                        <th scope="col" class="px-6 py-3">Records</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentSyncLogs.Any())
+                    {
+                        @foreach (var log in Model.RecentSyncLogs)
                         {
-                            @foreach (var log in Model.RecentSyncLogs)
-                            {
-                                <tr>
-                                    <td>
-                                        @if (log.CrmType == "Salesforce")
-                                        {
-                                            <span class="badge bg-primary">Salesforce</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-info">Dynamics 365</span>
-                                        }
-                                    </td>
-                                    <td>@(log.EntityType ?? "Full Sync")</td>
-                                    <td>
-                                        <i class="bi @(log.Direction == "ToCrm" ? "bi-arrow-up" : log.Direction == "ToErp" ? "bi-arrow-down" : "bi-arrow-left-right") me-1"></i>
-                                        @log.Direction
-                                    </td>
-                                    <td>
-                                        <span class="text-success">@log.RecordsSucceeded</span> /
-                                        <span class="text-danger">@log.RecordsFailed</span>
-                                    </td>
-                                    <td>
-                                        @if (log.RecordsFailed == 0)
-                                        {
-                                            <span class="badge bg-success">Success</span>
-                                        }
-                                        else if (log.RecordsSucceeded > 0)
-                                        {
-                                            <span class="badge bg-warning">Partial</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger">Failed</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <small class="text-muted">@log.StartedAt.ToString("MMM d, h:mm tt")</small>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">
-                                    No sync history yet. Connect a CRM to start syncing.
+                            <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    @if (log.CrmType == "Salesforce")
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800">Salesforce</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">Dynamics 365</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">@(log.EntityType ?? "Full Sync")</td>
+                                <td class="px-6 py-4">
+                                    <i class="bi @(log.Direction == "ToCrm" ? "bi-arrow-up" : log.Direction == "ToErp" ? "bi-arrow-down" : "bi-arrow-left-right") mr-1"></i>
+                                    @log.Direction
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-emerald-600">@log.RecordsSucceeded</span> /
+                                    <span class="text-red-600">@log.RecordsFailed</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if (log.RecordsFailed == 0)
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Success</span>
+                                    }
+                                    else if (log.RecordsSucceeded > 0)
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Partial</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Failed</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    <small class="text-gray-500">@log.StartedAt.ToString("MMM d, h:mm tt")</small>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-500">
+                                No sync history yet. Connect a CRM to start syncing.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

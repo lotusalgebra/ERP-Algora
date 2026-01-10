@@ -7,15 +7,15 @@
         <input type="hidden" name="Id" value="@Model.Rejection.Id" />
     }
 
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label">Rejection Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" name="RejectionDate"
+    <div class="grid grid-cols-12 gap-3">
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Rejection Date <span class="text-red-500">*</span></label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="RejectionDate"
                    value="@(Model.Rejection?.RejectionDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
         </div>
-        <div class="col-md-6">
-            <label class="form-label">Rejection Category <span class="text-danger">*</span></label>
-            <select class="form-select" name="RejectionCategory" required>
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Rejection Category <span class="text-red-500">*</span></label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="RejectionCategory" required>
                 @foreach (var category in Enum.GetValues<RejectionCategory>())
                 {
                     if (Model.Rejection?.RejectionCategory == category)
@@ -32,9 +32,9 @@
 
         @if (Model.FailedInspections?.Any() == true)
         {
-            <div class="col-12">
-                <label class="form-label">Link to QC Inspection (Optional)</label>
-                <select class="form-select" name="QualityInspectionId" id="qcSelect" onchange="loadQcDetails(this.value)">
+            <div class="col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Link to QC Inspection (Optional)</label>
+                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="QualityInspectionId" id="qcSelect" onchange="loadQcDetails(this.value)">
                     <option value="">-- Create Manual Rejection --</option>
                     @foreach (var qc in Model.FailedInspections)
                     {
@@ -61,21 +61,21 @@
             </div>
         }
 
-        <div class="col-md-6">
-            <label class="form-label">Source Document Type</label>
-            <input type="text" class="form-control" name="SourceDocumentType" id="sourceDocumentType"
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Source Document Type</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SourceDocumentType" id="sourceDocumentType"
                    value="@Model.Rejection?.SourceDocumentType" placeholder="e.g., GoodsReceipt, QualityInspection" />
         </div>
-        <div class="col-md-6">
-            <label class="form-label">Source Document Number</label>
-            <input type="text" class="form-control" name="SourceDocumentNumber" id="sourceDocumentNumber"
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Source Document Number</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SourceDocumentNumber" id="sourceDocumentNumber"
                    value="@Model.Rejection?.SourceDocumentNumber" />
             <input type="hidden" name="SourceDocumentId" id="sourceDocumentId" value="@Model.Rejection?.SourceDocumentId" />
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Product <span class="text-danger">*</span></label>
-            <select class="form-select" name="ProductId" id="productSelect" required>
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Product <span class="text-red-500">*</span></label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ProductId" id="productSelect" required>
                 <option value="">-- Select Product --</option>
                 @foreach (var product in Model.Products)
                 {
@@ -90,9 +90,9 @@
                 }
             </select>
         </div>
-        <div class="col-md-6">
-            <label class="form-label">Warehouse <span class="text-danger">*</span></label>
-            <select class="form-select" name="WarehouseId" id="warehouseSelect" required>
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Warehouse <span class="text-red-500">*</span></label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="WarehouseId" id="warehouseSelect" required>
                 <option value="">-- Select Warehouse --</option>
                 @foreach (var warehouse in Model.Warehouses)
                 {
@@ -108,9 +108,9 @@
             </select>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Supplier (if applicable)</label>
-            <select class="form-select" name="SupplierId" id="supplierSelect">
+        <div class="md:col-span-6 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Supplier (if applicable)</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SupplierId" id="supplierSelect">
                 <option value="">-- Select Supplier --</option>
                 @foreach (var supplier in Model.Suppliers)
                 {
@@ -125,55 +125,55 @@
                 }
             </select>
         </div>
-        <div class="col-md-6">
+        <div class="md:col-span-6 col-span-12">
             &nbsp;
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Rejected Quantity <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" name="RejectedQuantity" id="rejectedQty"
+        <div class="md:col-span-4 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Rejected Quantity <span class="text-red-500">*</span></label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="RejectedQuantity" id="rejectedQty"
                    value="@Model.Rejection?.RejectedQuantity" required step="0.01" min="0.01" onchange="calculateTotal()" />
         </div>
-        <div class="col-md-4">
-            <label class="form-label">Unit of Measure</label>
-            <input type="text" class="form-control" name="UnitOfMeasure"
+        <div class="md:col-span-4 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Unit of Measure</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="UnitOfMeasure"
                    value="@(Model.Rejection?.UnitOfMeasure ?? "EA")" />
         </div>
-        <div class="col-md-4">
-            <label class="form-label">Unit Cost</label>
-            <input type="number" class="form-control" name="UnitCost" id="unitCost"
+        <div class="md:col-span-4 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Unit Cost</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="UnitCost" id="unitCost"
                    value="@Model.Rejection?.UnitCost" step="0.01" min="0" onchange="calculateTotal()" />
         </div>
 
-        <div class="col-12">
-            <div class="alert alert-info mb-0">
-                <div class="d-flex justify-content-between">
-                    <span>Total Rejection Value:</span>
-                    <strong id="totalValue">@Model.Rejection?.TotalValue.ToString("C2")</strong>
+        <div class="col-span-12">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-blue-800 text-sm">Total Rejection Value:</span>
+                    <strong class="text-blue-800" id="totalValue">@Model.Rejection?.TotalValue.ToString("C2")</strong>
                 </div>
             </div>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
-            <textarea class="form-control" name="RejectionReason" rows="2" required>@Model.Rejection?.RejectionReason</textarea>
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Rejection Reason <span class="text-red-500">*</span></label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="RejectionReason" rows="2" required>@Model.Rejection?.RejectionReason</textarea>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Defect Description</label>
-            <textarea class="form-control" name="DefectDescription" rows="2">@Model.Rejection?.DefectDescription</textarea>
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Defect Description</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DefectDescription" rows="2">@Model.Rejection?.DefectDescription</textarea>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="2">@Model.Rejection?.Notes</textarea>
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.Rejection?.Notes</textarea>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-3">
-        <button type="button" class="btn btn-secondary" data-modal-hide="rejectionModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Rejection
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 px-0 pb-0 mt-3">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="rejectionModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>@(Model.IsEdit ? "Update" : "Create") Rejection
         </button>
     </div>
 </form>

@@ -197,6 +197,85 @@ public class IndexModel : PageModel
 
         return await OnGetTableAsync(null, null, null, null, null);
     }
+
+    public async Task<IActionResult> OnGetPaymentFormAsync(Guid id)
+    {
+        var invoice = await _context.Invoices
+            .Include(i => i.Customer)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (invoice == null)
+            return NotFound();
+
+        return Partial("_PaymentForm", new PaymentFormViewModel
+        {
+            InvoiceId = invoice.Id,
+            InvoiceNumber = invoice.InvoiceNumber,
+            CustomerName = invoice.Customer?.Name ?? invoice.BillingName ?? "Unknown",
+            TotalAmount = invoice.TotalAmount,
+            BalanceDue = invoice.BalanceDue,
+            Amount = invoice.BalanceDue
+        });
+    }
+
+    public async Task<IActionResult> OnPostRecordPaymentAsync([FromForm] RecordPaymentInput input)
+    {
+        var invoice = await _context.Invoices.FindAsync(input.InvoiceId);
+        if (invoice == null)
+            return NotFound();
+
+        if (input.Amount <= 0)
+            return BadRequest("Payment amount must be greater than zero.");
+
+        if (input.Amount > invoice.BalanceDue)
+            return BadRequest("Payment amount cannot exceed balance due.");
+
+        // Generate payment number
+        var paymentCount = await _context.InvoicePayments.CountAsync() + 1;
+        var paymentNumber = $"PAY-{paymentCount:D6}";
+
+        // Create payment record
+        var payment = new InvoicePayment
+        {
+            Id = Guid.NewGuid(),
+            InvoiceId = invoice.Id,
+            PaymentNumber = paymentNumber,
+            Amount = input.Amount,
+            PaymentDate = input.PaymentDate,
+            PaymentMethod = input.PaymentMethod,
+            Reference = input.Reference,
+            Notes = input.Notes
+        };
+        _context.InvoicePayments.Add(payment);
+
+        // Update invoice
+        invoice.PaidAmount += input.Amount;
+        invoice.BalanceDue -= input.Amount;
+
+        if (invoice.BalanceDue <= 0)
+        {
+            invoice.Status = InvoiceStatus.Paid;
+            invoice.PaidDate = input.PaymentDate;
+        }
+        else if (invoice.PaidAmount > 0)
+        {
+            invoice.Status = InvoiceStatus.PartiallyPaid;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return await OnGetTableAsync(null, null, null, null, null);
+    }
+}
+
+public class PaymentFormViewModel
+{
+    public Guid InvoiceId { get; set; }
+    public string InvoiceNumber { get; set; } = string.Empty;
+    public string CustomerName { get; set; } = string.Empty;
+    public decimal TotalAmount { get; set; }
+    public decimal BalanceDue { get; set; }
+    public decimal Amount { get; set; }
 }
 
 public class InvoicesTableViewModel

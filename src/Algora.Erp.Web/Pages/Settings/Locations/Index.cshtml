@@ -5,27 +5,29 @@
     ViewData["Title"] = "Office Locations";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-1">Office Locations</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Settings">Settings</a></li>
-                    <li class="breadcrumb-item active">Locations</li>
+            <h1 class="text-2xl font-bold text-gray-900">Office Locations</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Settings" class="hover:text-primary-600">Settings</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Locations</li>
                 </ol>
             </nav>
         </div>
-        <button class="btn btn-primary" data-modal-target="locationModal" data-modal-toggle="locationModal" onclick="openAddModal()">
-            <i class="bi bi-plus-lg me-1"></i> Add Location
+        <button class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" data-modal-target="locationModal" data-modal-toggle="locationModal" onclick="openAddModal()">
+            <i class="bi bi-plus-lg mr-2"></i> Add Location
         </button>
     </div>
 
     <!-- Info Card -->
-    <div class="alert alert-info d-flex align-items-center mb-4">
-        <i class="bi bi-info-circle me-2"></i>
+    <div class="flex items-center p-4 text-blue-800 rounded-lg bg-blue-50">
+        <i class="bi bi-info-circle mr-2"></i>
         <div>
             Configure your office locations with GST registration details. Each location can have its own default currency.
             GST type (CGST/SGST or IGST) is determined based on the source and destination states.
@@ -33,159 +35,172 @@
     </div>
 
     <!-- Locations Cards -->
-    <div class="row g-4" id="locationsContainer" hx-get="?handler=Table" hx-trigger="load">
-        <div class="col-12 text-center py-5">
-            <div class="spinner-border text-primary"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="locationsContainer" hx-get="?handler=Table" hx-trigger="load">
+        <div class="col-span-full text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
     </div>
 </div>
 
 <!-- Location Modal -->
-<div class="modal fade" id="locationModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Add Office Location</h5>
-                <button type="button" class="btn-close" data-modal-hide="locationModal"></button>
+<div id="locationModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+                <h5 class="text-lg font-semibold text-gray-900" id="modalTitle">Add Office Location</h5>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="locationModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form id="locationForm" hx-post="" hx-target="#locationsContainer">
-                <div class="modal-body">
+                <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                     <input type="hidden" name="Id" id="locationId" />
 
                     <!-- Basic Info -->
-                    <h6 class="text-muted mb-3"><i class="bi bi-building me-2"></i>Basic Information</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label">Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="Code" id="code" required maxlength="20"
-                                   placeholder="HO, BR01" style="text-transform: uppercase;" />
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="Name" id="name" required
-                                   placeholder="Head Office, Mumbai Branch" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Type</label>
-                            <select class="form-select" name="Type" id="type">
-                                <option value="0">Head Office</option>
-                                <option value="1" selected>Branch</option>
-                                <option value="2">Warehouse</option>
-                                <option value="3">Factory</option>
-                                <option value="4">Registered Office</option>
-                            </select>
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-500 mb-3"><i class="bi bi-building mr-2"></i>Basic Information</h6>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-3">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Code <span class="text-red-500">*</span></label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Code" id="code" required maxlength="20"
+                                       placeholder="HO, BR01" style="text-transform: uppercase;" />
+                            </div>
+                            <div class="col-span-5">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Name <span class="text-red-500">*</span></label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name" id="name" required
+                                       placeholder="Head Office, Mumbai Branch" />
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Type</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Type" id="type">
+                                    <option value="0">Head Office</option>
+                                    <option value="1" selected>Branch</option>
+                                    <option value="2">Warehouse</option>
+                                    <option value="3">Factory</option>
+                                    <option value="4">Registered Office</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Address -->
-                    <h6 class="text-muted mb-3"><i class="bi bi-geo-alt me-2"></i>Address</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-12">
-                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="AddressLine1" id="addressLine1" required />
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Address Line 2</label>
-                            <input type="text" class="form-control" name="AddressLine2" id="addressLine2" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="City" id="city" required />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">State <span class="text-danger">*</span></label>
-                            <select class="form-select" name="StateId" id="stateId" required>
-                                <option value="">Select State</option>
-                                @foreach (var state in Model.States)
-                                {
-                                    <option value="@state.Value">@state.Text</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">PIN Code</label>
-                            <input type="text" class="form-control" name="PostalCode" id="postalCode" maxlength="10" />
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-500 mb-3"><i class="bi bi-geo-alt mr-2"></i>Address</h6>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Address Line 1 <span class="text-red-500">*</span></label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="AddressLine1" id="addressLine1" required />
+                            </div>
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Address Line 2</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="AddressLine2" id="addressLine2" />
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">City <span class="text-red-500">*</span></label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="City" id="city" required />
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">State <span class="text-red-500">*</span></label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="StateId" id="stateId" required>
+                                    <option value="">Select State</option>
+                                    @foreach (var state in Model.States)
+                                    {
+                                        <option value="@state.Value">@state.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">PIN Code</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PostalCode" id="postalCode" maxlength="10" />
+                            </div>
                         </div>
                     </div>
 
                     <!-- GST Details -->
-                    <h6 class="text-muted mb-3"><i class="bi bi-receipt me-2"></i>GST Registration</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">GST Number</label>
-                            <input type="text" class="form-control" name="GstNumber" id="gstNumber" maxlength="20"
-                                   placeholder="22AAAAA0000A1Z5" style="text-transform: uppercase;" />
-                            <small class="text-muted">15-character GSTIN</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Registration Type</label>
-                            <select class="form-select" name="GstRegistrationType" id="gstRegistrationType">
-                                <option value="0">Regular</option>
-                                <option value="1">Composition</option>
-                                <option value="2">Unregistered</option>
-                                <option value="3">Input Service Distributor</option>
-                                <option value="8">SEZ</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="IsGstRegistered" id="isGstRegistered" checked />
-                                <label class="form-check-label" for="isGstRegistered">GST Registered</label>
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-500 mb-3"><i class="bi bi-receipt mr-2"></i>GST Registration</h6>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">GST Number</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="GstNumber" id="gstNumber" maxlength="20"
+                                       placeholder="22AAAAA0000A1Z5" style="text-transform: uppercase;" />
+                                <p class="mt-1 text-xs text-gray-500">15-character GSTIN</p>
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Registration Type</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="GstRegistrationType" id="gstRegistrationType">
+                                    <option value="0">Regular</option>
+                                    <option value="1">Composition</option>
+                                    <option value="2">Unregistered</option>
+                                    <option value="3">Input Service Distributor</option>
+                                    <option value="8">SEZ</option>
+                                </select>
+                            </div>
+                            <div class="col-span-12">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" name="IsGstRegistered" id="isGstRegistered" checked />
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">GST Registered</span>
+                                </label>
                             </div>
                         </div>
                     </div>
 
                     <!-- Default Currency -->
-                    <h6 class="text-muted mb-3"><i class="bi bi-currency-exchange me-2"></i>Currency & Contact</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Default Currency</label>
-                            <select class="form-select" name="DefaultCurrencyId" id="defaultCurrencyId">
-                                <option value="">Use Base Currency</option>
-                                @foreach (var currency in Model.Currencies)
-                                {
-                                    <option value="@currency.Value">@currency.Text</option>
-                                }
-                            </select>
-                            <small class="text-muted">Currency for transactions at this location</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Person</label>
-                            <input type="text" class="form-control" name="ContactPerson" id="contactPerson" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-control" name="Phone" id="phone" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="Email" id="email" />
+                    <div>
+                        <h6 class="text-sm font-medium text-gray-500 mb-3"><i class="bi bi-currency-exchange mr-2"></i>Currency & Contact</h6>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Default Currency</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DefaultCurrencyId" id="defaultCurrencyId">
+                                    <option value="">Use Base Currency</option>
+                                    @foreach (var currency in Model.Currencies)
+                                    {
+                                        <option value="@currency.Value">@currency.Text</option>
+                                    }
+                                </select>
+                                <p class="mt-1 text-xs text-gray-500">Currency for transactions at this location</p>
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Contact Person</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ContactPerson" id="contactPerson" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Phone</label>
+                                <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Phone" id="phone" />
+                            </div>
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                <input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Email" id="email" />
+                            </div>
                         </div>
                     </div>
 
                     <!-- Settings -->
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Display Order</label>
-                            <input type="number" class="form-control" name="DisplayOrder" id="displayOrder" min="0" value="0" />
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Display Order</label>
+                            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DisplayOrder" id="displayOrder" min="0" value="0" />
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="IsHeadOffice" id="isHeadOffice" />
-                                <label class="form-check-label" for="isHeadOffice">Head Office</label>
-                            </div>
+                        <div class="col-span-4 flex items-end">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" name="IsHeadOffice" id="isHeadOffice" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                <span class="ms-3 text-sm font-medium text-gray-900">Head Office</span>
+                            </label>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="IsActive" id="isActive" checked />
-                                <label class="form-check-label" for="isActive">Active</label>
-                            </div>
+                        <div class="col-span-4 flex items-end">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" name="IsActive" id="isActive" checked />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                <span class="ms-3 text-sm font-medium text-gray-900">Active</span>
+                            </label>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-hide="locationModal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Location</button>
+                <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="locationModal">Cancel</button>
+                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">Save Location</button>
                 </div>
             </form>
         </div>

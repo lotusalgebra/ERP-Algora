@@ -4,9 +4,9 @@
 @if (Model.Runs.Count == 0)
 {
     <tr>
-        <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+        <td colspan="8" class="text-center py-12">
+            <div class="text-gray-500">
+                <i class="bi bi-calendar-x text-4xl block mb-2"></i>
                 <p class="mb-0">No payroll runs found</p>
             </div>
         </td>
@@ -16,100 +16,124 @@ else
 {
     @foreach (var run in Model.Runs)
     {
-        var statusColor = run.Status switch
+        var statusBadge = run.Status switch
         {
-            PayrollRunStatus.Draft => "secondary",
-            PayrollRunStatus.Processing => "info",
-            PayrollRunStatus.Processed => "primary",
-            PayrollRunStatus.Approved => "warning",
-            PayrollRunStatus.Paid => "success",
-            PayrollRunStatus.Cancelled => "danger",
-            _ => "secondary"
+            PayrollRunStatus.Draft => "bg-gray-100 text-gray-800",
+            PayrollRunStatus.Processing => "bg-blue-100 text-blue-800",
+            PayrollRunStatus.Processed => "bg-primary-100 text-primary-800",
+            PayrollRunStatus.Approved => "bg-amber-100 text-amber-800",
+            PayrollRunStatus.Paid => "bg-emerald-100 text-emerald-800",
+            PayrollRunStatus.Cancelled => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-800"
         };
 
-        <tr>
-            <td class="ps-4">
-                <code class="bg-light px-2 py-1 rounded">@run.RunNumber</code>
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <code class="bg-gray-50 px-2 py-1 rounded text-sm">@run.RunNumber</code>
             </td>
-            <td>
-                <div class="fw-medium">@run.Name</div>
-                <small class="text-muted">@run.PayFrequency</small>
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@run.Name</div>
+                <small class="text-gray-500">@run.PayFrequency</small>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 <div>@run.PeriodStart.ToString("MMM dd") - @run.PeriodEnd.ToString("MMM dd, yyyy")</div>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @run.PayDate.ToString("MMM dd, yyyy")
             </td>
-            <td class="text-center">
-                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">
                     @run.EmployeeCount
                 </span>
             </td>
-            <td class="text-end">
-                <span class="fw-medium">@run.TotalNetPay.ToString("C2")</span>
+            <td class="px-6 py-4 text-right">
+                <span class="font-medium">@run.TotalNetPay.ToString("C2")</span>
             </td>
-            <td>
-                <span class="badge bg-@statusColor bg-opacity-10 text-@statusColor">
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusBadge">
                     @run.Status
                 </span>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button"
-                            class="btn btn-outline-info"
-                            onclick="viewDetails('@run.Id')"
-                            title="View Details">
-                        <i class="bi bi-eye"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            id="dropdownRun@(run.Id)" data-dropdown-toggle="dropdownMenuRun@(run.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-
-                    @if (run.Status == PayrollRunStatus.Draft)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                hx-get="?handler=EditForm&id=@run.Id"
-                                hx-target="#formModalBody"
-                                data-modal-target="formModal" data-modal-toggle="formModal"
-                                title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="processPayroll('@run.Id')"
-                                title="Process Payroll">
-                            <i class="bi bi-play-fill"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-danger"
-                                onclick="confirmDelete('@run.Id')"
-                                title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    }
-                    else if (run.Status == PayrollRunStatus.Processed)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="updateStatus('@run.Id', 'Approved')"
-                                title="Approve">
-                            <i class="bi bi-check-lg"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-secondary"
-                                onclick="updateStatus('@run.Id', 'Cancelled')"
-                                title="Cancel">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    }
-                    else if (run.Status == PayrollRunStatus.Approved)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="updateStatus('@run.Id', 'Paid')"
-                                title="Mark as Paid">
-                            <i class="bi bi-currency-dollar"></i>
-                        </button>
-                    }
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuRun@(run.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Payroll/Runs/Details/@run.Id">
+                                    <i class="bi bi-eye mr-2"></i>View Details
+                                </a>
+                            </li>
+                            @if (run.Status == PayrollRunStatus.Draft)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                       hx-get="?handler=EditForm&id=@run.Id"
+                                       hx-target="#formModalBody"
+                                       data-modal-target="formModal" data-modal-toggle="formModal">
+                                        <i class="bi bi-pencil mr-2"></i>Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 text-emerald-600 cursor-pointer"
+                                       hx-post="?handler=Process&id=@run.Id"
+                                       hx-target="#runsTableBody"
+                                       hx-swap="innerHTML"
+                                       hx-confirm="Are you sure you want to process this payroll run?">
+                                        <i class="bi bi-play-fill mr-2"></i>Process Payroll
+                                    </a>
+                                </li>
+                            }
+                            @if (run.Status == PayrollRunStatus.Processed)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 text-emerald-600 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@run.Id&status=Approved"
+                                       hx-target="#runsTableBody"
+                                       hx-swap="innerHTML"
+                                       hx-confirm="Are you sure you want to approve this payroll run?">
+                                        <i class="bi bi-check-lg mr-2"></i>Approve
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-600 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@run.Id&status=Cancelled"
+                                       hx-target="#runsTableBody"
+                                       hx-swap="innerHTML"
+                                       hx-confirm="Are you sure you want to cancel this payroll run?">
+                                        <i class="bi bi-x-lg mr-2"></i>Cancel
+                                    </a>
+                                </li>
+                            }
+                            @if (run.Status == PayrollRunStatus.Approved)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 text-emerald-600 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@run.Id&status=Paid"
+                                       hx-target="#runsTableBody"
+                                       hx-swap="innerHTML"
+                                       hx-confirm="Mark this payroll run as paid?">
+                                        <i class="bi bi-currency-dollar mr-2"></i>Mark as Paid
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        @if (run.Status == PayrollRunStatus.Draft)
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-delete="?handler=Delete&id=@run.Id"
+                                   hx-target="#runsTableBody"
+                                   hx-swap="innerHTML"
+                                   hx-confirm="Are you sure you want to delete this payroll run?">
+                                    <i class="bi bi-trash mr-2"></i>Delete
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </td>
         </tr>
@@ -117,25 +141,24 @@ else
 
     <!-- Pagination -->
     <tr>
-        <td colspan="8" class="py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small">
+        <td colspan="8" class="py-3 px-6">
+            <div class="flex justify-between items-center">
+                <div class="text-gray-500 text-sm">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </div>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link"
-                               hx-get="?handler=Table&page=@(Model.Page - 1)"
-                               hx-target="#runsTableBody"
-                               hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page <= 1 ? "cursor-not-allowed opacity-50" : "")"
+                               @(Model.Page > 1 ? $"hx-get=\"?handler=Table&page={Model.Page - 1}\" hx-target=\"#runsTableBody\" hx-include=\"#searchInput, #statusFilter, #pageSizeSelect\"" : "")>
                                 Previous
                             </a>
                         </li>
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link"
+                            var activeClass = i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight @activeClass"
                                    hx-get="?handler=Table&page=@i"
                                    hx-target="#runsTableBody"
                                    hx-include="#searchInput, #statusFilter, #pageSizeSelect">
@@ -143,11 +166,9 @@ else
                                 </a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
-                               hx-get="?handler=Table&page=@(Model.Page + 1)"
-                               hx-target="#runsTableBody"
-                               hx-include="#searchInput, #statusFilter, #pageSizeSelect">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page >= Model.TotalPages ? "cursor-not-allowed opacity-50" : "")"
+                               @(Model.Page < Model.TotalPages ? $"hx-get=\"?handler=Table&page={Model.Page + 1}\" hx-target=\"#runsTableBody\" hx-include=\"#searchInput, #statusFilter, #pageSizeSelect\"" : "")>
                                 Next
                             </a>
                         </li>

@@ -5,63 +5,37 @@
     Layout = "_LayoutShop";
 }
 
-<div class="container py-5">
-    <h1 class="mb-4">Shop by Category</h1>
-    <p class="text-muted mb-5">Browse our wide selection of products organized by category.</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Shop by Category</h1>
+    <p class="text-gray-500 mb-8">Browse our wide selection of products organized by category.</p>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach (var category in Model.Categories)
         {
             var productCount = Model.ProductCounts.ContainsKey(category.Id) ? Model.ProductCounts[category.Id] : 0;
-            <div class="col-6 col-md-4 col-lg-3">
-                <a href="/Shop?category=@category.Slug" class="text-decoration-none">
-                    <div class="card h-100 border-0 shadow-sm category-card">
-                        <div class="card-body text-center p-4">
-                            <div class="category-icon mb-3">
-                                <i class="bi @GetCategoryIcon(category.Name) fs-1 text-primary"></i>
-                            </div>
-                            <h5 class="card-title mb-2">@category.Name</h5>
-                            <p class="text-muted small mb-0">@productCount products</p>
+            <a href="/Shop?category=@category.Slug" class="group">
+                <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 h-full">
+                    <div class="text-center p-6">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center">
+                            <i class="bi @GetCategoryIcon(category.Name) text-3xl text-white"></i>
                         </div>
+                        <h5 class="font-semibold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">@category.Name</h5>
+                        <p class="text-gray-500 text-sm">@productCount products</p>
                     </div>
-                </a>
-            </div>
+                </div>
+            </a>
         }
     </div>
 
     @if (!Model.Categories.Any())
     {
-        <div class="text-center py-5">
-            <i class="bi bi-tags fs-1 text-muted d-block mb-3"></i>
-            <h5>No categories available</h5>
-            <p class="text-muted">Check back soon for our product categories.</p>
+        <div class="text-center py-16">
+            <i class="bi bi-tags text-6xl text-gray-300 block mb-3"></i>
+            <h5 class="text-lg font-semibold text-gray-700 mb-2">No categories available</h5>
+            <p class="text-gray-500">Check back soon for our product categories.</p>
         </div>
     }
 </div>
-
-<style>
-    .category-card {
-        transition: all 0.3s ease;
-        border-radius: 1rem;
-    }
-    .category-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-    }
-    .category-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-    }
-    .category-icon i {
-        color: #fff !important;
-    }
-</style>
 
 @functions {
     string GetCategoryIcon(string categoryName)

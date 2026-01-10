@@ -1,0 +1,112 @@
+@model Algora.Erp.Web.Pages.Finance.Invoices.PaymentFormViewModel
+@using Algora.Erp.Domain.Entities.Finance
+
+<!-- Modal Header -->
+<div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <i class="bi bi-cash-stack mr-2"></i>Record Payment
+    </h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            data-modal-hide="paymentModal">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+
+<!-- Modal Body -->
+<form hx-post="/Finance/Invoices?handler=RecordPayment" hx-target="#tableContent" hx-swap="innerHTML">
+    <div class="p-4 space-y-4">
+        <input type="hidden" name="InvoiceId" value="@Model.InvoiceId" />
+
+        <!-- Invoice Info -->
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                    <span class="text-gray-500 dark:text-gray-400">Invoice:</span>
+                    <span class="font-medium text-gray-900 dark:text-white ml-1">@Model.InvoiceNumber</span>
+                </div>
+                <div>
+                    <span class="text-gray-500 dark:text-gray-400">Customer:</span>
+                    <span class="font-medium text-gray-900 dark:text-white ml-1">@Model.CustomerName</span>
+                </div>
+                <div>
+                    <span class="text-gray-500 dark:text-gray-400">Total:</span>
+                    <span class="font-medium text-gray-900 dark:text-white ml-1">@Model.TotalAmount.ToString("C2")</span>
+                </div>
+                <div>
+                    <span class="text-gray-500 dark:text-gray-400">Balance Due:</span>
+                    <span class="font-medium text-primary-600 ml-1">@Model.BalanceDue.ToString("C2")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amount -->
+        <div>
+            <label for="Amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Payment Amount <span class="text-red-500">*</span>
+            </label>
+            <input type="number" name="Amount" id="Amount" step="0.01" min="0.01" max="@Model.BalanceDue"
+                   value="@Model.BalanceDue"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   required>
+        </div>
+
+        <!-- Payment Date -->
+        <div>
+            <label for="PaymentDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Payment Date <span class="text-red-500">*</span>
+            </label>
+            <input type="date" name="PaymentDate" id="PaymentDate"
+                   value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   required>
+        </div>
+
+        <!-- Payment Method -->
+        <div>
+            <label for="PaymentMethod" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Payment Method <span class="text-red-500">*</span>
+            </label>
+            <select name="PaymentMethod" id="PaymentMethod"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    required>
+                @foreach (PaymentMethod method in Enum.GetValues(typeof(PaymentMethod)))
+                {
+                    <option value="@((int)method)">@method</option>
+                }
+            </select>
+        </div>
+
+        <!-- Reference -->
+        <div>
+            <label for="Reference" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Reference / Transaction ID
+            </label>
+            <input type="text" name="Reference" id="Reference"
+                   placeholder="e.g., Check #1234, Transaction ID"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+
+        <!-- Notes -->
+        <div>
+            <label for="Notes" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Notes
+            </label>
+            <textarea name="Notes" id="Notes" rows="2"
+                      placeholder="Optional notes about this payment"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+        </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-200 rounded-b dark:border-gray-600">
+        <button type="button" data-modal-hide="paymentModal"
+                class="px-4 py-2.5 text-sm font-medium text-gray-500 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600">
+            Cancel
+        </button>
+        <button type="submit"
+                class="px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg"
+                onclick="FlowbiteInstances.getInstance('Modal', 'paymentModal')?.hide()">
+            <i class="bi bi-check-lg mr-1"></i> Record Payment
+        </button>
+    </div>
+</form>

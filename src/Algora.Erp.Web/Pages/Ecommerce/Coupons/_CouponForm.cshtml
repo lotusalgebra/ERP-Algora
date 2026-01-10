@@ -9,18 +9,18 @@
         <input type="hidden" name="Id" value="@Model.Coupon?.Id" />
     }
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Coupon Code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control text-uppercase" name="Code" value="@Model.Coupon?.Code"
+    <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-8">
+            <div class="grid grid-cols-12 gap-4 mb-4">
+                <div class="col-span-12 md:col-span-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Coupon Code <span class="text-red-500">*</span></label>
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 uppercase" name="Code" value="@Model.Coupon?.Code"
                            placeholder="e.g., SUMMER20" required style="text-transform: uppercase;" />
-                    <small class="text-muted">Customers will enter this code at checkout</small>
+                    <small class="text-gray-500 text-xs">Customers will enter this code at checkout</small>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Discount Type <span class="text-danger">*</span></label>
-                    <select class="form-select" name="DiscountType" id="discountType" onchange="updateDiscountLabel()">
+                <div class="col-span-12 md:col-span-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Discount Type <span class="text-red-500">*</span></label>
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DiscountType" id="discountType" onchange="updateDiscountLabel()">
                         @{
                             var discType = Model.Coupon?.DiscountType ?? Algora.Erp.Domain.Entities.Ecommerce.DiscountType.Percentage;
                         }
@@ -52,111 +52,108 @@
                 </div>
             </div>
 
-            <div class="row mb-3" id="discountValueRow">
-                <div class="col-md-6">
-                    <label class="form-label">Discount Value <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <span class="input-group-text" id="discountPrefix">%</span>
-                        <input type="number" step="0.01" class="form-control" name="DiscountValue"
+            <div class="grid grid-cols-12 gap-4 mb-4" id="discountValueRow">
+                <div class="col-span-12 md:col-span-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Discount Value <span class="text-red-500">*</span></label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md" id="discountPrefix">%</span>
+                        <input type="number" step="0.01" class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DiscountValue"
                                value="@(Model.Coupon?.DiscountValue.ToString("F2") ?? "0.00")" required />
                     </div>
                 </div>
-                <div class="col-md-6" id="maxDiscountCol">
-                    <label class="form-label">Maximum Discount</label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input type="number" step="0.01" class="form-control" name="MaxDiscountAmount"
+                <div class="col-span-12 md:col-span-6" id="maxDiscountCol">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Maximum Discount</label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">$</span>
+                        <input type="number" step="0.01" class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MaxDiscountAmount"
                                value="@Model.Coupon?.MaxDiscountAmount?.ToString("F2")" placeholder="No limit" />
                     </div>
-                    <small class="text-muted">For percentage discounts</small>
+                    <small class="text-gray-500 text-xs">For percentage discounts</small>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea class="form-control" name="Description" rows="2" placeholder="Internal description or promotion details">@Model.Coupon?.Description</textarea>
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Description" rows="2" placeholder="Internal description or promotion details">@Model.Coupon?.Description</textarea>
             </div>
 
-            <h6 class="border-bottom pb-2 mb-3 mt-4">Restrictions</h6>
+            <h6 class="border-b border-gray-200 pb-2 mb-4 mt-6 font-semibold text-gray-900">Restrictions</h6>
 
-            <div class="mb-3">
-                <label class="form-label">Minimum Order Amount</label>
-                <div class="input-group" style="max-width: 200px;">
-                    <span class="input-group-text">$</span>
-                    <input type="number" step="0.01" class="form-control" name="MinOrderAmount"
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Minimum Order Amount</label>
+                <div class="flex" style="max-width: 200px;">
+                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">$</span>
+                    <input type="number" step="0.01" class="rounded-none rounded-e-lg bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MinOrderAmount"
                            value="@Model.Coupon?.MinOrderAmount?.ToString("F2")" placeholder="0.00" />
                 </div>
             </div>
 
-            <div class="mb-3">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="FreeShipping" value="true"
+            <div class="mb-4">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2" name="FreeShipping" value="true"
                            @(Model.Coupon?.FreeShipping == true ? "checked" : "") id="freeShipping" />
-                    <label class="form-check-label" for="freeShipping">Include Free Shipping</label>
-                </div>
+                    <span class="ms-2 text-sm font-medium text-gray-900">Include Free Shipping</span>
+                </label>
             </div>
 
-            <h6 class="border-bottom pb-2 mb-3 mt-4">Valid Period</h6>
+            <h6 class="border-b border-gray-200 pb-2 mb-4 mt-6 font-semibold text-gray-900">Valid Period</h6>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Start Date</label>
-                    <input type="datetime-local" class="form-control" name="StartsAt"
+            <div class="grid grid-cols-12 gap-4 mb-4">
+                <div class="col-span-12 md:col-span-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Start Date</label>
+                    <input type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="StartsAt"
                            value="@Model.Coupon?.StartsAt?.ToString("yyyy-MM-ddTHH:mm")" />
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">End Date</label>
-                    <input type="datetime-local" class="form-control" name="ExpiresAt"
+                <div class="col-span-12 md:col-span-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">End Date</label>
+                    <input type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ExpiresAt"
                            value="@Model.Coupon?.ExpiresAt?.ToString("yyyy-MM-ddTHH:mm")" />
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-light border-0 mb-3">
-                <div class="card-body">
-                    <h6 class="card-title">Usage Limits</h6>
-                    <div class="mb-3">
-                        <label class="form-label">Total Usage Limit</label>
-                        <input type="number" class="form-control" name="UsageLimit"
-                               value="@Model.Coupon?.UsageLimit" placeholder="Unlimited" />
-                        <small class="text-muted">Leave empty for unlimited</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Per Customer Limit</label>
-                        <input type="number" class="form-control" name="UsageLimitPerCustomer"
-                               value="@Model.Coupon?.UsageLimitPerCustomer" placeholder="Unlimited" />
-                        <small class="text-muted">Times a single customer can use</small>
-                    </div>
-                    @if (Model.IsEdit)
-                    {
-                        <div class="pt-2 border-top">
-                            <div class="d-flex justify-content-between text-muted">
-                                <span>Times Used:</span>
-                                <span class="fw-semibold">@Model.Coupon?.TimesUsed</span>
-                            </div>
-                        </div>
-                    }
+        <div class="col-span-12 md:col-span-4">
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <h6 class="font-semibold text-gray-900 mb-3">Usage Limits</h6>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Total Usage Limit</label>
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="UsageLimit"
+                           value="@Model.Coupon?.UsageLimit" placeholder="Unlimited" />
+                    <small class="text-gray-500 text-xs">Leave empty for unlimited</small>
                 </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Per Customer Limit</label>
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="UsageLimitPerCustomer"
+                           value="@Model.Coupon?.UsageLimitPerCustomer" placeholder="Unlimited" />
+                    <small class="text-gray-500 text-xs">Times a single customer can use</small>
+                </div>
+                @if (Model.IsEdit)
+                {
+                    <div class="pt-3 border-t border-gray-200">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Times Used:</span>
+                            <span class="font-semibold text-gray-900">@Model.Coupon?.TimesUsed</span>
+                        </div>
+                    </div>
+                }
             </div>
 
-            <div class="card bg-light border-0">
-                <div class="card-body">
-                    <h6 class="card-title">Status</h6>
-                    <div class="form-check form-switch">
-                        <input type="checkbox" class="form-check-input" name="IsActive" value="true"
-                               @(Model.Coupon?.IsActive ?? true ? "checked" : "") id="isActive" />
-                        <label class="form-check-label" for="isActive">Active</label>
-                    </div>
-                </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h6 class="font-semibold text-gray-900 mb-3">Status</h6>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" name="IsActive" value="true"
+                           @(Model.Coupon?.IsActive ?? true ? "checked" : "") id="isActive">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">Active</span>
+                </label>
             </div>
         </div>
     </div>
 
-    <div class="modal-footer mt-4 px-0">
-        <button type="button" class="btn btn-secondary" data-modal-hide="couponModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Coupon
+    <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b gap-2 mt-6">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="couponModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>@(Model.IsEdit ? "Update" : "Create") Coupon
         </button>
     </div>
 </form>

@@ -11,35 +11,35 @@
         <input type="hidden" name="Id" value="@Model.PayrollRun.Id" />
     }
 
-    <div class="row g-3">
-        <div class="col-12">
-            <label class="form-label">Payroll Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="Name"
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Payroll Name <span class="text-red-500">*</span></label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name"
                    value="@(Model.PayrollRun?.Name ?? $"Payroll - {DateTime.Now:MMMM yyyy}")" required
                    placeholder="e.g., Payroll - January 2024">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Period Start <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" name="PeriodStart"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Period Start <span class="text-red-500">*</span></label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PeriodStart"
                    value="@(Model.PayrollRun?.PeriodStart.ToString("yyyy-MM-dd") ?? new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).ToString("yyyy-MM-dd"))" required>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Period End <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" name="PeriodEnd"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Period End <span class="text-red-500">*</span></label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PeriodEnd"
                    value="@(Model.PayrollRun?.PeriodEnd.ToString("yyyy-MM-dd") ?? new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month)).ToString("yyyy-MM-dd"))" required>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Pay Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" name="PayDate"
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Pay Date <span class="text-red-500">*</span></label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PayDate"
                    value="@(Model.PayrollRun?.PayDate.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(5).ToString("yyyy-MM-dd"))" required>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Pay Frequency</label>
-            <select class="form-select" name="PayFrequency">
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Pay Frequency</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PayFrequency">
                 @foreach (var freq in Enum.GetValues<PayFrequency>())
                 {
                     <option value="@freq" selected="@(Model.PayrollRun?.PayFrequency == freq)">@freq</option>
@@ -47,34 +47,34 @@
             </select>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Currency</label>
-            <select class="form-select" name="Currency">
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Currency</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Currency">
                 <option value="USD" selected="@(Model.PayrollRun?.Currency == "USD")">USD</option>
                 <option value="EUR" selected="@(Model.PayrollRun?.Currency == "EUR")">EUR</option>
                 <option value="GBP" selected="@(Model.PayrollRun?.Currency == "GBP")">GBP</option>
             </select>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="2">@Model.PayrollRun?.Notes</textarea>
+        <div class="md:col-span-2">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.PayrollRun?.Notes</textarea>
         </div>
 
         @if (!Model.IsEdit)
         {
-            <div class="col-12">
-                <div class="alert alert-info mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
+            <div class="md:col-span-2">
+                <div class="p-4 mb-0 text-sm text-blue-800 rounded-lg bg-blue-50">
+                    <i class="bi bi-info-circle mr-2"></i>
                     After creating the payroll run, click "Process" to generate payslips for all active employees.
                 </div>
             </div>
         }
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-modal-hide="runModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
+    <div class="flex items-center pt-4 mt-4 border-t border-gray-200 gap-2">
+        <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" data-modal-hide="runModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
             @(Model.IsEdit ? "Update Payroll Run" : "Create Payroll Run")
         </button>
     </div>

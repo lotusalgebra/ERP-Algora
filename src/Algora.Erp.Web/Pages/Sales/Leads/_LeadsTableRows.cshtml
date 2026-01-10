@@ -7,67 +7,83 @@
     {
         var statusClass = lead.Status switch
         {
-            LeadStatus.New => "info",
-            LeadStatus.Contacted => "primary",
-            LeadStatus.Qualified => "success",
-            LeadStatus.Proposal => "warning",
-            LeadStatus.Negotiation => "warning",
-            LeadStatus.Won => "success",
-            LeadStatus.Lost => "danger",
-            LeadStatus.Unqualified => "secondary",
-            _ => "secondary"
+            LeadStatus.New => "bg-blue-100 text-blue-800",
+            LeadStatus.Contacted => "bg-primary-100 text-primary-800",
+            LeadStatus.Qualified => "bg-emerald-100 text-emerald-800",
+            LeadStatus.Proposal => "bg-amber-100 text-amber-800",
+            LeadStatus.Negotiation => "bg-amber-100 text-amber-800",
+            LeadStatus.Won => "bg-emerald-100 text-emerald-800",
+            LeadStatus.Lost => "bg-red-100 text-red-800",
+            LeadStatus.Unqualified => "bg-gray-100 text-gray-800",
+            _ => "bg-gray-100 text-gray-800"
         };
         var ratingClass = lead.Rating switch
         {
-            LeadRating.Hot => "danger",
-            LeadRating.Warm => "warning",
-            LeadRating.Cold => "info",
-            _ => "secondary"
+            LeadRating.Hot => "bg-red-100 text-red-800",
+            LeadRating.Warm => "bg-amber-100 text-amber-800",
+            LeadRating.Cold => "bg-blue-100 text-blue-800",
+            _ => "bg-gray-100 text-gray-800"
         };
 
-        <tr>
-            <td class="ps-4">
-                <div class="fw-medium">@lead.Name</div>
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@lead.Name</div>
                 @if (!string.IsNullOrEmpty(lead.Phone))
                 {
-                    <small class="text-muted">@lead.Phone</small>
+                    <span class="text-sm text-gray-500">@lead.Phone</span>
                 }
             </td>
-            <td>@(lead.Company ?? "-")</td>
-            <td>
+            <td class="px-6 py-4">@(lead.Company ?? "-")</td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(lead.Email))
                 {
-                    <a href="mailto:@lead.Email">@lead.Email</a>
+                    <a href="mailto:@lead.Email" class="text-primary-600 hover:underline">@lead.Email</a>
                 }
                 else
                 {
-                    <span>-</span>
+                    <span class="text-gray-500">-</span>
                 }
             </td>
-            <td>@lead.Source</td>
-            <td>
-                <span class="badge bg-@ratingClass">@lead.Rating</span>
+            <td class="px-6 py-4">@lead.Source</td>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @ratingClass">@lead.Rating</span>
             </td>
-            <td class="text-end">@(lead.EstimatedValue?.ToString("C0") ?? "-")</td>
-            <td class="text-center">
-                <span class="badge bg-@statusClass">@lead.Status</span>
+            <td class="px-6 py-4 text-right">@(lead.EstimatedValue?.ToString("C0") ?? "-")</td>
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusClass">@lead.Status</span>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button" class="btn btn-outline-primary"
-                            hx-get="/Sales/Leads?handler=EditForm&id=@lead.Id"
-                            hx-target="#formContainer"
-                            hx-swap="innerHTML"
-                            data-modal-target="leadModal" data-modal-toggle="leadModal">
-                        <i class="bi bi-pencil"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownLead@(lead.Id)" data-dropdown-toggle="dropdownMenuLead@(lead.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-danger"
-                            hx-delete="/Sales/Leads?id=@lead.Id"
-                            hx-target="#leadsTableBody"
-                            hx-swap="innerHTML"
-                            hx-confirm="Delete this lead?">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuLead@(lead.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="/Sales/Leads?handler=EditForm&id=@lead.Id"
+                                   hx-target="#formContainer"
+                                   hx-swap="innerHTML"
+                                   data-modal-target="leadModal" data-modal-toggle="leadModal">
+                                    <i class="bi bi-pencil mr-2"></i> Edit
+                                </a>
+                            </li>
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="mailto:@lead.Email">
+                                    <i class="bi bi-envelope mr-2"></i> Send Email
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="py-2">
+                            <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                               hx-delete="/Sales/Leads?id=@lead.Id"
+                               hx-target="#leadsTableBody"
+                               hx-swap="innerHTML"
+                               hx-confirm="Delete this lead?">
+                                <i class="bi bi-trash mr-2"></i> Delete
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -75,24 +91,33 @@
 
     <!-- Pagination -->
     <tr>
-        <td colspan="8" class="bg-light">
-            <div class="d-flex justify-content-between align-items-center px-2 py-1">
-                <small class="text-muted">
+        <td colspan="8" class="px-6 py-3 bg-gray-50">
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
-                </small>
+                </span>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 py-2 leading-tight @(Model.Page == 1 ? "text-gray-300 pointer-events-none" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700") bg-white border border-gray-300 rounded-l-lg"
+                               hx-get="?handler=Table&page=@(Model.Page - 1)"
+                               hx-target="#leadsTableBody"
+                               hx-include="#searchInput, #statusFilter, #sourceFilter, #ratingFilter">Previous</a>
                         </li>
                         @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            <li>
+                                <a class="flex items-center justify-center px-3 py-2 leading-tight @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700") border border-gray-300"
+                                   hx-get="?handler=Table&page=@i"
+                                   hx-target="#leadsTableBody"
+                                   hx-include="#searchInput, #statusFilter, #sourceFilter, #ratingFilter">@i</a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        <li>
+                            <a class="flex items-center justify-center px-3 py-2 leading-tight @(Model.Page == Model.TotalPages ? "text-gray-300 pointer-events-none" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700") bg-white border border-gray-300 rounded-r-lg"
+                               hx-get="?handler=Table&page=@(Model.Page + 1)"
+                               hx-target="#leadsTableBody"
+                               hx-include="#searchInput, #statusFilter, #sourceFilter, #ratingFilter">Next</a>
                         </li>
                     </ul>
                 </nav>
@@ -103,8 +128,8 @@
 else
 {
     <tr>
-        <td colspan="8" class="text-center py-5 text-muted">
-            <i class="bi bi-people fs-1 d-block mb-2"></i>
+        <td colspan="8" class="text-center py-5 text-gray-500">
+            <i class="bi bi-people text-4xl block mb-2"></i>
             No leads found
         </td>
     </tr>

@@ -4,248 +4,227 @@
     ViewData["Title"] = "Accounts Receivable Aging";
 }
 
-<div class="container-fluid">
+<div class="p-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="h3 mb-0">Accounts Receivable Aging</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
-                    <li class="breadcrumb-item active">Aging</li>
+            <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">Accounts Receivable Aging</h4>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance/Reports" class="hover:text-primary-600">Reports</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><span class="text-gray-700 dark:text-gray-300">Aging</span></li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <a href="?handler=ExportPdf" class="btn btn-outline-danger">
-                <i class="bi bi-file-pdf me-1"></i>Export PDF
+        <div class="flex gap-2">
+            <a href="?handler=ExportPdf" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white">
+                <i class="bi bi-file-pdf mr-1"></i>Export PDF
             </a>
-            <a href="?handler=ExportCsv" class="btn btn-outline-success">
-                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            <a href="?handler=ExportCsv" class="text-emerald-700 border border-emerald-700 hover:bg-emerald-700 hover:text-white focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-emerald-500 dark:text-emerald-500 dark:hover:bg-emerald-600 dark:hover:text-white">
+                <i class="bi bi-file-earmark-excel mr-1"></i>Export CSV
             </a>
         </div>
     </div>
 
     <!-- As of Date -->
-    <div class="alert alert-info d-flex align-items-center mb-4">
-        <i class="bi bi-calendar-check me-2"></i>
+    <div class="flex items-center p-4 mb-6 text-sm text-sky-800 rounded-lg bg-sky-50 dark:bg-sky-900/20 dark:text-sky-400" role="alert">
+        <i class="bi bi-calendar-check mr-2"></i>
         <span>Report as of <strong>@Model.Report.AsOfDate.ToString("MMMM dd, yyyy")</strong></span>
     </div>
 
     <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100 bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Report.TotalOutstanding.ToString("C0")</h3>
-                    <small class="opacity-75">Total Outstanding</small>
-                </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
+        <div class="bg-primary-600 text-white rounded-lg shadow-md h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold mb-1">@Model.Report.TotalOutstanding.ToString("C0")</h3>
+                <small class="text-primary-200">Total Outstanding</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-success">@Model.Report.Current.Amount.ToString("C0")</h3>
-                    <small class="text-muted">Current</small>
-                    <div class="small text-muted">@Model.Report.Current.InvoiceCount invoices</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mb-1">@Model.Report.Current.Amount.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Current</small>
+                <div class="text-xs text-gray-400 dark:text-gray-500">@Model.Report.Current.InvoiceCount invoices</div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-info">@Model.Report.Days1To30.Amount.ToString("C0")</h3>
-                    <small class="text-muted">1-30 Days</small>
-                    <div class="small text-muted">@Model.Report.Days1To30.InvoiceCount invoices</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-sky-600 dark:text-sky-400 mb-1">@Model.Report.Days1To30.Amount.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">1-30 Days</small>
+                <div class="text-xs text-gray-400 dark:text-gray-500">@Model.Report.Days1To30.InvoiceCount invoices</div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-warning">@Model.Report.Days31To60.Amount.ToString("C0")</h3>
-                    <small class="text-muted">31-60 Days</small>
-                    <div class="small text-muted">@Model.Report.Days31To60.InvoiceCount invoices</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-amber-600 dark:text-amber-400 mb-1">@Model.Report.Days31To60.Amount.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">31-60 Days</small>
+                <div class="text-xs text-gray-400 dark:text-gray-500">@Model.Report.Days31To60.InvoiceCount invoices</div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-orange">@Model.Report.Days61To90.Amount.ToString("C0")</h3>
-                    <small class="text-muted">61-90 Days</small>
-                    <div class="small text-muted">@Model.Report.Days61To90.InvoiceCount invoices</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-orange-600 dark:text-orange-400 mb-1">@Model.Report.Days61To90.Amount.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">61-90 Days</small>
+                <div class="text-xs text-gray-400 dark:text-gray-500">@Model.Report.Days61To90.InvoiceCount invoices</div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-danger">@Model.Report.Over90Days.Amount.ToString("C0")</h3>
-                    <small class="text-muted">Over 90 Days</small>
-                    <div class="small text-muted">@Model.Report.Over90Days.InvoiceCount invoices</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-red-600 dark:text-red-400 mb-1">@Model.Report.Over90Days.Amount.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Over 90 Days</small>
+                <div class="text-xs text-gray-400 dark:text-gray-500">@Model.Report.Over90Days.InvoiceCount invoices</div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-12 gap-6">
         <!-- Aging Distribution Chart -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Aging Distribution</h5>
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-pie-chart mr-2"></i>Aging Distribution</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <canvas id="agingChart" height="250"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Aging Breakdown Table -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>Aging Breakdown</h5>
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-table mr-2"></i>Aging Breakdown</h5>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Period</th>
-                                    <th class="text-center">Invoices</th>
-                                    <th class="text-end">Amount</th>
-                                    <th class="text-end pe-4">%</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    var buckets = new[]
-                                    {
-                                        (Model.Report.Current, "bg-success"),
-                                        (Model.Report.Days1To30, "bg-info"),
-                                        (Model.Report.Days31To60, "bg-warning"),
-                                        (Model.Report.Days61To90, "bg-orange"),
-                                        (Model.Report.Over90Days, "bg-danger")
-                                    };
-                                }
-                                @foreach (var (bucket, colorClass) in buckets)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Period</th>
+                                <th scope="col" class="px-6 py-3 text-center">Invoices</th>
+                                <th scope="col" class="px-6 py-3 text-right">Amount</th>
+                                <th scope="col" class="px-6 py-3 text-right">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var buckets = new[]
                                 {
-                                    <tr>
-                                        <td class="ps-4">
-                                            <span class="badge @colorClass">@bucket.Label</span>
-                                        </td>
-                                        <td class="text-center">@bucket.InvoiceCount</td>
-                                        <td class="text-end">@bucket.Amount.ToString("C0")</td>
-                                        <td class="text-end pe-4">
-                                            <div class="d-flex align-items-center justify-content-end gap-2">
-                                                <div class="progress flex-grow-1" style="width: 60px; height: 6px;">
-                                                    <div class="progress-bar @colorClass" style="width: @bucket.Percentage%"></div>
-                                                </div>
-                                                <span class="small">@bucket.Percentage.ToString("F1")%</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold">Total</td>
-                                    <td class="text-center fw-bold">
-                                        @(Model.Report.Current.InvoiceCount + Model.Report.Days1To30.InvoiceCount +
-                                          Model.Report.Days31To60.InvoiceCount + Model.Report.Days61To90.InvoiceCount +
-                                          Model.Report.Over90Days.InvoiceCount)
+                                    (Model.Report.Current, "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400", "bg-emerald-600"),
+                                    (Model.Report.Days1To30, "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400", "bg-sky-600"),
+                                    (Model.Report.Days31To60, "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400", "bg-amber-600"),
+                                    (Model.Report.Days61To90, "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400", "bg-orange-600"),
+                                    (Model.Report.Over90Days, "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400", "bg-red-600")
+                                };
+                            }
+                            @foreach (var (bucket, badgeClass, barClass) in buckets)
+                            {
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @badgeClass">@bucket.Label</span>
                                     </td>
-                                    <td class="text-end fw-bold">@Model.Report.TotalOutstanding.ToString("C0")</td>
-                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                    <td class="px-6 py-4 text-center">@bucket.InvoiceCount</td>
+                                    <td class="px-6 py-4 text-right">@bucket.Amount.ToString("C0")</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                                <div class="@barClass h-1.5 rounded-full" style="width: @bucket.Percentage%"></div>
+                                            </div>
+                                            <span class="text-xs">@bucket.Percentage.ToString("F1")%</span>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr class="font-bold">
+                                <td class="px-6 py-4">Total</td>
+                                <td class="px-6 py-4 text-center">
+                                    @(Model.Report.Current.InvoiceCount + Model.Report.Days1To30.InvoiceCount +
+                                      Model.Report.Days31To60.InvoiceCount + Model.Report.Days61To90.InvoiceCount +
+                                      Model.Report.Over90Days.InvoiceCount)
+                                </td>
+                                <td class="px-6 py-4 text-right">@Model.Report.TotalOutstanding.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right">100%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
 
         <!-- By Customer Table -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Aging by Customer</h5>
-                    <div class="input-group" style="width: 250px;">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0" id="customerSearch" placeholder="Search customers...">
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-people mr-2"></i>Aging by Customer</h5>
+                    <div class="relative" style="width: 250px;">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-500"></i>
+                        </div>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="customerSearch" placeholder="Search customers...">
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="customerTable">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Customer</th>
-                                    <th class="text-end">Current</th>
-                                    <th class="text-end">1-30 Days</th>
-                                    <th class="text-end">31-60 Days</th>
-                                    <th class="text-end">61-90 Days</th>
-                                    <th class="text-end">Over 90</th>
-                                    <th class="text-end pe-4">Total</th>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="customerTable">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Customer</th>
+                                <th scope="col" class="px-6 py-3 text-right">Current</th>
+                                <th scope="col" class="px-6 py-3 text-right">1-30 Days</th>
+                                <th scope="col" class="px-6 py-3 text-right">31-60 Days</th>
+                                <th scope="col" class="px-6 py-3 text-right">61-90 Days</th>
+                                <th scope="col" class="px-6 py-3 text-right">Over 90</th>
+                                <th scope="col" class="px-6 py-3 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var customer in Model.Report.ByCustomer.OrderByDescending(c => c.Total))
+                            {
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 customer-row">
+                                    <td class="px-6 py-4">
+                                        <a href="/Sales/Customers/Details/@customer.CustomerId" class="font-medium text-primary-600 dark:text-primary-400 hover:underline">
+                                            @customer.CustomerName
+                                        </a>
+                                    </td>
+                                    <td class="px-6 py-4 text-right @(customer.Current > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400")">
+                                        @(customer.Current > 0 ? customer.Current.ToString("C0") : "-")
+                                    </td>
+                                    <td class="px-6 py-4 text-right @(customer.Days1To30 > 0 ? "text-sky-600 dark:text-sky-400" : "text-gray-400")">
+                                        @(customer.Days1To30 > 0 ? customer.Days1To30.ToString("C0") : "-")
+                                    </td>
+                                    <td class="px-6 py-4 text-right @(customer.Days31To60 > 0 ? "text-amber-600 dark:text-amber-400" : "text-gray-400")">
+                                        @(customer.Days31To60 > 0 ? customer.Days31To60.ToString("C0") : "-")
+                                    </td>
+                                    <td class="px-6 py-4 text-right @(customer.Days61To90 > 0 ? "text-orange-600 dark:text-orange-400" : "text-gray-400")">
+                                        @(customer.Days61To90 > 0 ? customer.Days61To90.ToString("C0") : "-")
+                                    </td>
+                                    <td class="px-6 py-4 text-right @(customer.Over90Days > 0 ? "text-red-600 dark:text-red-400 font-bold" : "text-gray-400")">
+                                        @(customer.Over90Days > 0 ? customer.Over90Days.ToString("C0") : "-")
+                                    </td>
+                                    <td class="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">@customer.Total.ToString("C0")</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var customer in Model.Report.ByCustomer.OrderByDescending(c => c.Total))
-                                {
-                                    <tr class="customer-row">
-                                        <td class="ps-4">
-                                            <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-decoration-none">
-                                                @customer.CustomerName
-                                            </a>
-                                        </td>
-                                        <td class="text-end @(customer.Current > 0 ? "text-success" : "text-muted")">
-                                            @(customer.Current > 0 ? customer.Current.ToString("C0") : "-")
-                                        </td>
-                                        <td class="text-end @(customer.Days1To30 > 0 ? "text-info" : "text-muted")">
-                                            @(customer.Days1To30 > 0 ? customer.Days1To30.ToString("C0") : "-")
-                                        </td>
-                                        <td class="text-end @(customer.Days31To60 > 0 ? "text-warning" : "text-muted")">
-                                            @(customer.Days31To60 > 0 ? customer.Days31To60.ToString("C0") : "-")
-                                        </td>
-                                        <td class="text-end @(customer.Days61To90 > 0 ? "" : "text-muted")" style="@(customer.Days61To90 > 0 ? "color: #fd7e14;" : "")">
-                                            @(customer.Days61To90 > 0 ? customer.Days61To90.ToString("C0") : "-")
-                                        </td>
-                                        <td class="text-end @(customer.Over90Days > 0 ? "text-danger fw-bold" : "text-muted")">
-                                            @(customer.Over90Days > 0 ? customer.Over90Days.ToString("C0") : "-")
-                                        </td>
-                                        <td class="text-end pe-4 fw-bold">@customer.Total.ToString("C0")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold">Total</td>
-                                    <td class="text-end fw-bold text-success">@Model.Report.Current.Amount.ToString("C0")</td>
-                                    <td class="text-end fw-bold text-info">@Model.Report.Days1To30.Amount.ToString("C0")</td>
-                                    <td class="text-end fw-bold text-warning">@Model.Report.Days31To60.Amount.ToString("C0")</td>
-                                    <td class="text-end fw-bold" style="color: #fd7e14;">@Model.Report.Days61To90.Amount.ToString("C0")</td>
-                                    <td class="text-end fw-bold text-danger">@Model.Report.Over90Days.Amount.ToString("C0")</td>
-                                    <td class="text-end pe-4 fw-bold">@Model.Report.TotalOutstanding.ToString("C0")</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr class="font-bold">
+                                <td class="px-6 py-4">Total</td>
+                                <td class="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400">@Model.Report.Current.Amount.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right text-sky-600 dark:text-sky-400">@Model.Report.Days1To30.Amount.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right text-amber-600 dark:text-amber-400">@Model.Report.Days31To60.Amount.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right text-orange-600 dark:text-orange-400">@Model.Report.Days61To90.Amount.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right text-red-600 dark:text-red-400">@Model.Report.Over90Days.Amount.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right">@Model.Report.TotalOutstanding.ToString("C0")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .text-orange { color: #fd7e14 !important; }
-    .bg-orange { background-color: #fd7e14 !important; }
-</style>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

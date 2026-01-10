@@ -3,103 +3,105 @@
 
 @foreach (var entry in Model.Entries)
 {
-    var statusColor = entry.Status switch
+    var statusBadge = entry.Status switch
     {
-        JournalEntryStatus.Draft => "secondary",
-        JournalEntryStatus.Pending => "warning",
-        JournalEntryStatus.Posted => "success",
-        JournalEntryStatus.Reversed => "info",
-        JournalEntryStatus.Void => "danger",
-        _ => "secondary"
+        JournalEntryStatus.Draft => "bg-gray-100 text-gray-800",
+        JournalEntryStatus.Pending => "bg-amber-100 text-amber-800",
+        JournalEntryStatus.Posted => "bg-emerald-100 text-emerald-800",
+        JournalEntryStatus.Reversed => "bg-blue-100 text-blue-800",
+        JournalEntryStatus.Void => "bg-red-100 text-red-800",
+        _ => "bg-gray-100 text-gray-800"
     };
 
-    var typeColor = entry.EntryType switch
+    var typeBadge = entry.EntryType switch
     {
-        JournalEntryType.General => "primary",
-        JournalEntryType.Sales => "success",
-        JournalEntryType.Purchase => "info",
-        JournalEntryType.CashReceipt => "success",
-        JournalEntryType.CashPayment => "danger",
-        JournalEntryType.Payroll => "warning",
-        JournalEntryType.Adjustment => "secondary",
-        JournalEntryType.Closing => "dark",
-        JournalEntryType.Opening => "primary",
-        _ => "secondary"
+        JournalEntryType.General => "bg-primary-100 text-primary-800",
+        JournalEntryType.Sales => "bg-emerald-100 text-emerald-800",
+        JournalEntryType.Purchase => "bg-blue-100 text-blue-800",
+        JournalEntryType.CashReceipt => "bg-emerald-100 text-emerald-800",
+        JournalEntryType.CashPayment => "bg-red-100 text-red-800",
+        JournalEntryType.Payroll => "bg-amber-100 text-amber-800",
+        JournalEntryType.Adjustment => "bg-gray-100 text-gray-800",
+        JournalEntryType.Closing => "bg-gray-700 text-white",
+        JournalEntryType.Opening => "bg-primary-100 text-primary-800",
+        _ => "bg-gray-100 text-gray-800"
     };
 
-    <tr>
-        <td class="ps-4">
-            <a href="/Finance/JournalEntries/Edit/@entry.Id" class="text-decoration-none fw-semibold">
+    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <td class="px-6 py-4">
+            <a href="/Finance/JournalEntries/Edit/@entry.Id" class="text-primary-600 hover:underline font-semibold">
                 @entry.EntryNumber
             </a>
             @if (!string.IsNullOrEmpty(entry.Reference))
             {
-                <br><small class="text-muted">Ref: @entry.Reference</small>
+                <br><small class="text-gray-500">Ref: @entry.Reference</small>
             }
         </td>
-        <td>@entry.EntryDate.ToString("MMM dd, yyyy")</td>
-        <td>
+        <td class="px-6 py-4">@entry.EntryDate.ToString("MMM dd, yyyy")</td>
+        <td class="px-6 py-4">
             <span title="@entry.Description">
                 @(entry.Description.Length > 40 ? entry.Description.Substring(0, 40) + "..." : entry.Description)
             </span>
             <br>
-            <small class="text-muted">@entry.Lines.Count line(s)</small>
+            <small class="text-gray-500">@entry.Lines.Count line(s)</small>
         </td>
-        <td>
-            <span class="badge bg-@typeColor bg-opacity-10 text-@typeColor">@entry.EntryType</span>
+        <td class="px-6 py-4">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @typeBadge">@entry.EntryType</span>
         </td>
-        <td class="text-end fw-semibold">@entry.TotalDebit.ToString("C2")</td>
-        <td class="text-end fw-semibold">@entry.TotalCredit.ToString("C2")</td>
-        <td>
-            <span class="badge bg-@statusColor">@entry.Status</span>
+        <td class="px-6 py-4 text-right font-semibold">@entry.TotalDebit.ToString("C2")</td>
+        <td class="px-6 py-4 text-right font-semibold">@entry.TotalCredit.ToString("C2")</td>
+        <td class="px-6 py-4">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusBadge">@entry.Status</span>
             @if (entry.TotalDebit != entry.TotalCredit)
             {
-                <span class="badge bg-danger ms-1">Unbalanced</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 ml-1">Unbalanced</span>
             }
         </td>
-        <td class="text-end pe-4">
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light" id="dropdownJE@(entry.Id)" data-dropdown-toggle="dropdownMenuJE@(entry.Id)">
+        <td class="px-6 py-4 text-right">
+            <div class="relative">
+                <button class="text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-2 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700" id="dropdownJE@(entry.Id)" data-dropdown-toggle="dropdownMenuJE@(entry.Id)" data-dropdown-placement="bottom-end">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuJE@(entry.Id)">
-                    <li>
-                        <a class="dropdown-item" href="/Finance/JournalEntries/Edit/@entry.Id">
-                            <i class="bi bi-eye me-2"></i> View / Edit
-                        </a>
-                    </li>
-                    @if (entry.Status == JournalEntryStatus.Draft || entry.Status == JournalEntryStatus.Pending)
-                    {
-                        @if (entry.TotalDebit == entry.TotalCredit && entry.TotalDebit > 0)
+                <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700" id="dropdownMenuJE@(entry.Id)">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+                        <li>
+                            <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" href="/Finance/JournalEntries/Edit/@entry.Id">
+                                <i class="bi bi-eye mr-2"></i> View / Edit
+                            </a>
+                        </li>
+                        @if (entry.Status == JournalEntryStatus.Draft || entry.Status == JournalEntryStatus.Pending)
                         {
+                            @if (entry.TotalDebit == entry.TotalCredit && entry.TotalDebit > 0)
+                            {
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-emerald-600 dark:text-emerald-400" href="#"
+                                       hx-post="/Finance/JournalEntries?handler=Post&id=@entry.Id"
+                                       hx-target="#tableContent"
+                                       hx-confirm="Post this journal entry? This will update account balances.">
+                                        <i class="bi bi-check-circle mr-2"></i> Post
+                                    </a>
+                                </li>
+                            }
+                            <li class="border-t border-gray-100 dark:border-gray-600"></li>
                             <li>
-                                <a class="dropdown-item text-success" href="#"
-                                   hx-post="/Finance/JournalEntries?handler=Post&id=@entry.Id"
+                                <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 dark:text-red-400" href="#"
+                                   hx-delete="/Finance/JournalEntries?handler=&id=@entry.Id"
                                    hx-target="#tableContent"
-                                   hx-confirm="Post this journal entry? This will update account balances.">
-                                    <i class="bi bi-check-circle me-2"></i> Post
+                                   hx-confirm="Are you sure you want to delete this entry?">
+                                    <i class="bi bi-trash mr-2"></i> Delete
                                 </a>
                             </li>
                         }
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" href="#"
-                               hx-delete="/Finance/JournalEntries?handler=&id=@entry.Id"
-                               hx-target="#tableContent"
-                               hx-confirm="Are you sure you want to delete this entry?">
-                                <i class="bi bi-trash me-2"></i> Delete
-                            </a>
-                        </li>
-                    }
-                    @if (entry.Status == JournalEntryStatus.Posted)
-                    {
-                        <li>
-                            <a class="dropdown-item" href="/Finance/JournalEntries/Create?reverseId=@entry.Id">
-                                <i class="bi bi-arrow-counterclockwise me-2"></i> Create Reversal
-                            </a>
-                        </li>
-                    }
-                </ul>
+                        @if (entry.Status == JournalEntryStatus.Posted)
+                        {
+                            <li>
+                                <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" href="/Finance/JournalEntries/Create?reverseId=@entry.Id">
+                                    <i class="bi bi-arrow-counterclockwise mr-2"></i> Create Reversal
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
             </div>
         </td>
     </tr>
@@ -108,9 +110,9 @@
 @if (!Model.Entries.Any())
 {
     <tr>
-        <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-journal-text fs-1 d-block mb-2"></i>
+        <td colspan="8" class="text-center py-12">
+            <div class="text-gray-500">
+                <i class="bi bi-journal-text text-4xl block mb-3"></i>
                 <p class="mb-0">No journal entries found</p>
             </div>
         </td>
@@ -126,9 +128,9 @@
     {
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            var activeClass = i == Model.Page ? "active" : "";
+            var activeClass = i == Model.Page ? "bg-primary-600 text-white" : "text-gray-500 bg-white hover:bg-gray-100";
             <text>
-            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/Finance/JournalEntries?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">@i</a></li>';
+            paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 @activeClass" href="#" hx-get="/Finance/JournalEntries?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom,#dateTo">@i</a></li>';
             </text>
         }
     }

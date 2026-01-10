@@ -6,43 +6,45 @@
     var project = Model.Project;
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">@title</h5>
-    <button type="button" class="btn-close" data-modal-hide="formModal" aria-label="Close"></button>
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h5 class="text-lg font-semibold text-gray-900">@title</h5>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="formModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 <form hx-post="/Projects"
       hx-target="#projectsTableContainer"
       hx-swap="innerHTML">
-    <div class="modal-body">
+    <div class="p-6">
         @if (Model.IsEdit && project != null)
         {
             <input type="hidden" name="Id" value="@project.Id" />
         }
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-12">
-                <label class="form-label">Project Name <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Project Name <span class="text-red-500">*</span></label>
                 <input type="text"
                        name="Name"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@project?.Name"
                        required />
             </div>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-12">
-                <label class="form-label">Description</label>
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
                 <textarea name="Description"
-                          class="form-control"
+                          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                           rows="3">@project?.Description</textarea>
             </div>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Customer</label>
-                <select name="CustomerId" class="form-select">
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Customer</label>
+                <select name="CustomerId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     <option value="">No Customer</option>
                     @foreach (var customer in Model.Customers)
                     {
@@ -50,9 +52,9 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Project Manager</label>
-                <select name="ProjectManagerId" class="form-select">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Project Manager</label>
+                <select name="ProjectManagerId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     <option value="">No Manager Assigned</option>
                     @foreach (var emp in Model.Employees)
                     {
@@ -62,32 +64,32 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-4">
-                <label class="form-label">Status</label>
-                <select name="Status" class="form-select">
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                <select name="Status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (ProjectStatus status in Enum.GetValues(typeof(ProjectStatus)))
                     {
                         <option value="@status" selected="@(project?.Status == status)">@status</option>
                     }
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Priority</label>
-                <select name="Priority" class="form-select">
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Priority</label>
+                <select name="Priority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (ProjectPriority priority in Enum.GetValues(typeof(ProjectPriority)))
                     {
                         <option value="@priority" selected="@(project?.Priority == priority)">@priority</option>
                     }
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Budget Amount</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Budget Amount</label>
+                <div class="flex">
+                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-s-lg">$</span>
                     <input type="number"
                            name="BudgetAmount"
-                           class="form-control"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-e-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                            value="@project?.BudgetAmount"
                            step="0.01"
                            min="0" />
@@ -95,46 +97,47 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-4">
-                <label class="form-label">Start Date <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Start Date <span class="text-red-500">*</span></label>
                 <input type="date"
                        name="StartDate"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(project?.StartDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
                        required />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">End Date</label>
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">End Date</label>
                 <input type="date"
                        name="EndDate"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@project?.EndDate?.ToString("yyyy-MM-dd")" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Active</label>
-                <div class="form-check form-switch mt-2">
+            <div class="col-span-12 md:col-span-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Active</label>
+                <label class="relative inline-flex items-center cursor-pointer mt-2">
                     <input type="checkbox"
                            name="IsActive"
-                           class="form-check-input"
+                           class="sr-only peer"
                            value="true"
                            @(project?.IsActive != false ? "checked" : "") />
-                    <label class="form-check-label">Active</label>
-                </div>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">Active</span>
+                </label>
             </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Notes</label>
+        <div class="mb-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
             <textarea name="Notes"
-                      class="form-control"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                       rows="2">@project?.Notes</textarea>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="formModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Create") Project
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-1"></i> @(Model.IsEdit ? "Update" : "Create") Project
         </button>
     </div>
 </form>

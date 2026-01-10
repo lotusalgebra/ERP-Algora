@@ -4,72 +4,72 @@
     var billingName = $"{Model.BillingFirstName} {Model.BillingLastName}".Trim();
 }
 
-<div class="row">
+<div class="grid grid-cols-12 gap-6">
     <!-- Order Info -->
-    <div class="col-md-8">
-        <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="col-span-12 md:col-span-8">
+        <div class="flex justify-between items-start mb-6">
             <div>
-                <h5 class="mb-1">Order @Model.OrderNumber</h5>
-                <small class="text-muted">Placed on @Model.OrderDate.ToString("MMMM dd, yyyy 'at' hh:mm tt")</small>
+                <h5 class="text-lg font-semibold text-gray-900 mb-1">Order @Model.OrderNumber</h5>
+                <small class="text-gray-500">Placed on @Model.OrderDate.ToString("MMMM dd, yyyy 'at' hh:mm tt")</small>
             </div>
-            <div class="text-end">
+            <div class="text-right">
                 @switch (Model.Status)
                 {
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending:
-                        <span class="badge bg-warning fs-6">Pending</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-amber-100 text-amber-800">Pending</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed:
-                        <span class="badge bg-info fs-6">Confirmed</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-800">Confirmed</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing:
-                        <span class="badge bg-primary fs-6">Processing</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-primary-100 text-primary-800">Processing</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped:
-                        <span class="badge bg-info fs-6">Shipped</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-800">Shipped</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered:
-                        <span class="badge bg-success fs-6">Delivered</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">Delivered</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled:
-                        <span class="badge bg-dark fs-6">Cancelled</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-gray-700 text-white">Cancelled</span>
                         break;
                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded:
-                        <span class="badge bg-secondary fs-6">Refunded</span>
+                        <span class="text-sm font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-800">Refunded</span>
                         break;
                 }
             </div>
         </div>
 
         <!-- Order Items -->
-        <div class="card border mb-4">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-box me-2"></i>Order Items</h6>
+        <div class="bg-white rounded-lg border border-gray-200 mb-4">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900"><i class="bi bi-box mr-2"></i>Order Items</h6>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-sm mb-0">
-                    <thead class="bg-light">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th>Product</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-end">Price</th>
-                            <th class="text-end">Total</th>
+                            <th class="px-4 py-3">Product</th>
+                            <th class="px-4 py-3 text-center">Qty</th>
+                            <th class="px-4 py-3 text-right">Price</th>
+                            <th class="px-4 py-3 text-right">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.Items)
                         {
-                            <tr>
-                                <td>
-                                    <div class="fw-semibold">@item.ProductName</div>
+                            <tr class="border-b">
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold text-gray-900">@item.ProductName</div>
                                     @if (!string.IsNullOrEmpty(item.VariantName))
                                     {
-                                        <small class="text-muted">@item.VariantName</small>
+                                        <small class="text-gray-500">@item.VariantName</small>
                                     }
-                                    <div><small class="text-muted">SKU: @item.Sku</small></div>
+                                    <div><small class="text-gray-500">SKU: @item.Sku</small></div>
                                 </td>
-                                <td class="text-center">@item.Quantity</td>
-                                <td class="text-end">@item.UnitPrice.ToString("C")</td>
-                                <td class="text-end fw-semibold">@item.LineTotal.ToString("C")</td>
+                                <td class="px-4 py-3 text-center">@item.Quantity</td>
+                                <td class="px-4 py-3 text-right">@item.UnitPrice.ToString("C")</td>
+                                <td class="px-4 py-3 text-right font-semibold">@item.LineTotal.ToString("C")</td>
                             </tr>
                         }
                     </tbody>
@@ -78,33 +78,33 @@
         </div>
 
         <!-- Order Summary -->
-        <div class="card border">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 offset-md-6">
-                        <table class="table table-sm table-borderless mb-0">
+        <div class="bg-white rounded-lg border border-gray-200">
+            <div class="p-4">
+                <div class="grid grid-cols-12">
+                    <div class="col-span-12 md:col-span-6 md:col-start-7">
+                        <table class="w-full text-sm">
                             <tr>
-                                <td>Subtotal</td>
-                                <td class="text-end">@Model.Subtotal.ToString("C")</td>
+                                <td class="py-1 text-gray-600">Subtotal</td>
+                                <td class="py-1 text-right text-gray-900">@Model.Subtotal.ToString("C")</td>
                             </tr>
                             @if (Model.DiscountAmount > 0)
                             {
-                                <tr class="text-success">
-                                    <td>Discount @(!string.IsNullOrEmpty(Model.CouponCode) ? $"({Model.CouponCode})" : "")</td>
-                                    <td class="text-end">-@Model.DiscountAmount.ToString("C")</td>
+                                <tr class="text-emerald-600">
+                                    <td class="py-1">Discount @(!string.IsNullOrEmpty(Model.CouponCode) ? $"({Model.CouponCode})" : "")</td>
+                                    <td class="py-1 text-right">-@Model.DiscountAmount.ToString("C")</td>
                                 </tr>
                             }
                             <tr>
-                                <td>Shipping @(!string.IsNullOrEmpty(Model.ShippingMethod) ? $"({Model.ShippingMethod})" : "")</td>
-                                <td class="text-end">@Model.ShippingAmount.ToString("C")</td>
+                                <td class="py-1 text-gray-600">Shipping @(!string.IsNullOrEmpty(Model.ShippingMethod) ? $"({Model.ShippingMethod})" : "")</td>
+                                <td class="py-1 text-right text-gray-900">@Model.ShippingAmount.ToString("C")</td>
                             </tr>
                             <tr>
-                                <td>Tax</td>
-                                <td class="text-end">@Model.TaxAmount.ToString("C")</td>
+                                <td class="py-1 text-gray-600">Tax</td>
+                                <td class="py-1 text-right text-gray-900">@Model.TaxAmount.ToString("C")</td>
                             </tr>
-                            <tr class="fw-bold border-top">
-                                <td>Total</td>
-                                <td class="text-end">@Model.Total.ToString("C")</td>
+                            <tr class="font-bold border-t border-gray-200">
+                                <td class="py-2 text-gray-900">Total</td>
+                                <td class="py-2 text-right text-gray-900">@Model.Total.ToString("C")</td>
                             </tr>
                         </table>
                     </div>
@@ -114,34 +114,34 @@
     </div>
 
     <!-- Customer & Addresses -->
-    <div class="col-md-4">
+    <div class="col-span-12 md:col-span-4">
         <!-- Customer Info -->
-        <div class="card border mb-3">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-person me-2"></i>Customer</h6>
+        <div class="bg-white rounded-lg border border-gray-200 mb-4">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900"><i class="bi bi-person mr-2"></i>Customer</h6>
             </div>
-            <div class="card-body">
+            <div class="p-4">
                 @if (Model.Customer != null)
                 {
-                    <div class="fw-semibold">@Model.Customer.FirstName @Model.Customer.LastName</div>
-                    <div class="text-muted">@Model.Customer.Email</div>
-                    <div class="text-muted">@Model.Customer.Phone</div>
+                    <div class="font-semibold text-gray-900">@Model.Customer.FirstName @Model.Customer.LastName</div>
+                    <div class="text-gray-500">@Model.Customer.Email</div>
+                    <div class="text-gray-500">@Model.Customer.Phone</div>
                 }
                 else
                 {
-                    <div class="fw-semibold">@shippingName</div>
-                    <div class="text-muted">@Model.CustomerEmail</div>
-                    <div class="text-muted">@Model.CustomerPhone</div>
+                    <div class="font-semibold text-gray-900">@shippingName</div>
+                    <div class="text-gray-500">@Model.CustomerEmail</div>
+                    <div class="text-gray-500">@Model.CustomerPhone</div>
                 }
             </div>
         </div>
 
         <!-- Shipping Address -->
-        <div class="card border mb-3">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-truck me-2"></i>Shipping Address</h6>
+        <div class="bg-white rounded-lg border border-gray-200 mb-4">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900"><i class="bi bi-truck mr-2"></i>Shipping Address</h6>
             </div>
-            <div class="card-body">
+            <div class="p-4 text-gray-600">
                 <div>@shippingName</div>
                 <div>@Model.ShippingAddress1</div>
                 @if (!string.IsNullOrEmpty(Model.ShippingAddress2))
@@ -154,11 +154,11 @@
         </div>
 
         <!-- Billing Address -->
-        <div class="card border mb-3">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-credit-card me-2"></i>Billing Address</h6>
+        <div class="bg-white rounded-lg border border-gray-200 mb-4">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900"><i class="bi bi-credit-card mr-2"></i>Billing Address</h6>
             </div>
-            <div class="card-body">
+            <div class="p-4 text-gray-600">
                 <div>@billingName</div>
                 <div>@Model.BillingAddress1</div>
                 @if (!string.IsNullOrEmpty(Model.BillingAddress2))
@@ -171,38 +171,38 @@
         </div>
 
         <!-- Payment Info -->
-        <div class="card border">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Payment</h6>
+        <div class="bg-white rounded-lg border border-gray-200">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900"><i class="bi bi-wallet2 mr-2"></i>Payment</h6>
             </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <span>Method:</span>
-                    <span class="fw-semibold">@(Model.PaymentMethod ?? "N/A")</span>
+            <div class="p-4">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-600">Method:</span>
+                    <span class="font-semibold text-gray-900">@(Model.PaymentMethod ?? "N/A")</span>
                 </div>
-                <div class="d-flex justify-content-between mt-2">
-                    <span>Status:</span>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Status:</span>
                     @switch (Model.PaymentStatus)
                     {
                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Paid:
-                            <span class="badge bg-success">Paid</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Paid</span>
                             break;
                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Pending:
-                            <span class="badge bg-warning">Pending</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Pending</span>
                             break;
                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Failed:
-                            <span class="badge bg-danger">Failed</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Failed</span>
                             break;
                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Refunded:
-                            <span class="badge bg-secondary">Refunded</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Refunded</span>
                             break;
                     }
                 </div>
                 @if (!string.IsNullOrEmpty(Model.PaymentTransactionId))
                 {
-                    <div class="d-flex justify-content-between mt-2">
-                        <span>Transaction:</span>
-                        <code class="small">@Model.PaymentTransactionId</code>
+                    <div class="flex justify-between mt-2">
+                        <span class="text-gray-600">Transaction:</span>
+                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">@Model.PaymentTransactionId</code>
                     </div>
                 }
             </div>
@@ -213,16 +213,16 @@
 <!-- Order Notes -->
 @if (!string.IsNullOrEmpty(Model.Notes))
 {
-    <div class="card border mt-4">
-        <div class="card-header bg-light">
-            <h6 class="mb-0"><i class="bi bi-sticky me-2"></i>Order Notes</h6>
+    <div class="bg-white rounded-lg border border-gray-200 mt-6">
+        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+            <h6 class="font-semibold text-gray-900"><i class="bi bi-sticky mr-2"></i>Order Notes</h6>
         </div>
-        <div class="card-body">
-            <p class="mb-0">@Model.Notes</p>
+        <div class="p-4">
+            <p class="text-gray-600">@Model.Notes</p>
         </div>
     </div>
 }
 
-<div class="modal-footer mt-4">
-    <button type="button" class="btn btn-secondary" data-modal-hide="orderModal">Close</button>
+<div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b gap-2 mt-6">
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
 </div>

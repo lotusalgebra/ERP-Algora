@@ -6,31 +6,33 @@
     var bom = Model.Bom;
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">@title</h5>
-    <button type="button" class="btn-close" data-modal-hide="formModal" aria-label="Close"></button>
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h3 class="text-xl font-semibold text-gray-900">@title</h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="formModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 <form hx-post="/Manufacturing/BOM"
       hx-target="#bomTableContainer"
       hx-swap="innerHTML">
-    <div class="modal-body">
+    <div class="p-6">
         @if (Model.IsEdit && bom != null)
         {
             <input type="hidden" name="Id" value="@bom.Id" />
         }
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label">Name <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Name <span class="text-red-500">*</span></label>
                 <input type="text"
                        name="Name"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@bom?.Name"
                        required />
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Product <span class="text-danger">*</span></label>
-                <select name="ProductId" class="form-select" required>
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Product <span class="text-red-500">*</span></label>
+                <select name="ProductId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
                     <option value="">Select Product...</option>
                     @foreach (var product in Model.Products)
                     {
@@ -40,110 +42,113 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-12">
-                <label class="form-label">Description</label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
                 <textarea name="Description"
-                          class="form-control"
+                          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                           rows="2">@bom?.Description</textarea>
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <label class="form-label">Quantity <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Quantity <span class="text-red-500">*</span></label>
                 <input type="number"
                        name="Quantity"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(bom?.Quantity ?? 1)"
                        step="0.0001"
                        min="0.0001"
                        required />
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Unit of Measure</label>
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Unit of Measure</label>
                 <input type="text"
                        name="UnitOfMeasure"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@bom?.UnitOfMeasure"
                        placeholder="e.g., EA, PCS" />
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Status</label>
-                <select name="Status" class="form-select">
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                <select name="Status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (BomStatus status in Enum.GetValues(typeof(BomStatus)))
                     {
                         <option value="@status" selected="@(bom?.Status == status)">@status</option>
                     }
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Active</label>
-                <div class="form-check form-switch mt-2">
-                    <input type="checkbox"
-                           name="IsActive"
-                           class="form-check-input"
-                           value="true"
-                           @(bom?.IsActive != false ? "checked" : "") />
-                    <label class="form-check-label">Active</label>
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Active</label>
+                <div class="flex items-center mt-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox"
+                               name="IsActive"
+                               class="sr-only peer"
+                               value="true"
+                               @(bom?.IsActive != false ? "checked" : "") />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                        <span class="ml-3 text-sm font-medium text-gray-900">Active</span>
+                    </label>
                 </div>
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label">Effective From</label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Effective From</label>
                 <input type="date"
                        name="EffectiveFrom"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@bom?.EffectiveFrom?.ToString("yyyy-MM-dd")" />
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Effective To</label>
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Effective To</label>
                 <input type="date"
                        name="EffectiveTo"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@bom?.EffectiveTo?.ToString("yyyy-MM-dd")" />
             </div>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">Notes</label>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
             <textarea name="Notes"
-                      class="form-control"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                       rows="2">@bom?.Notes</textarea>
         </div>
 
         <!-- Materials/Components Section -->
-        <div class="border rounded p-3 bg-light">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0"><i class="bi bi-box-seam me-2"></i>Materials / Components</h6>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addBomLine()">
-                    <i class="bi bi-plus-lg me-1"></i> Add Material
+        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div class="flex justify-between items-center mb-3">
+                <h6 class="text-sm font-medium text-gray-900"><i class="bi bi-box-seam mr-2"></i>Materials / Components</h6>
+                <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addBomLine()">
+                    <i class="bi bi-plus-lg mr-1"></i> Add Material
                 </button>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered mb-0" id="bomLinesTable">
-                    <thead class="table-light">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500" id="bomLinesTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                         <tr>
-                            <th style="width: 30%">Product</th>
-                            <th style="width: 15%">Quantity</th>
-                            <th style="width: 15%">Wastage %</th>
-                            <th style="width: 10%">Optional</th>
-                            <th style="width: 25%">Notes</th>
-                            <th style="width: 5%"></th>
+                            <th scope="col" class="px-3 py-2" style="width: 30%">Product</th>
+                            <th scope="col" class="px-3 py-2" style="width: 15%">Quantity</th>
+                            <th scope="col" class="px-3 py-2" style="width: 15%">Wastage %</th>
+                            <th scope="col" class="px-3 py-2 text-center" style="width: 10%">Optional</th>
+                            <th scope="col" class="px-3 py-2" style="width: 25%">Notes</th>
+                            <th scope="col" class="px-3 py-2" style="width: 5%"></th>
                         </tr>
                     </thead>
-                    <tbody id="bomLinesBody">
+                    <tbody id="bomLinesBody" class="bg-white">
                         @if (bom?.Lines != null && bom.Lines.Any())
                         {
                             var index = 0;
                             @foreach (var line in bom.Lines.OrderBy(l => l.LineNumber))
                             {
-                                <tr class="bom-line-row">
-                                    <td>
-                                        <select name="Lines[@index].ProductId" class="form-select form-select-sm" required>
+                                <tr class="bom-line-row border-b border-gray-200">
+                                    <td class="px-3 py-2">
+                                        <select name="Lines[@index].ProductId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" required>
                                             <option value="">Select...</option>
                                             @foreach (var product in Model.Products)
                                             {
@@ -151,24 +156,24 @@
                                             }
                                         </select>
                                     </td>
-                                    <td>
-                                        <input type="number" name="Lines[@index].Quantity" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="number" name="Lines[@index].Quantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@line.Quantity" step="0.0001" min="0.0001" required />
                                     </td>
-                                    <td>
-                                        <input type="number" name="Lines[@index].WastagePercent" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="number" name="Lines[@index].WastagePercent" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@line.WastagePercent" step="0.01" min="0" max="100" />
                                     </td>
-                                    <td class="text-center">
-                                        <input type="checkbox" name="Lines[@index].IsOptional" class="form-check-input"
+                                    <td class="px-3 py-2 text-center">
+                                        <input type="checkbox" name="Lines[@index].IsOptional" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
                                                value="true" @(line.IsOptional ? "checked" : "") />
                                     </td>
-                                    <td>
-                                        <input type="text" name="Lines[@index].Notes" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="text" name="Lines[@index].Notes" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@line.Notes" />
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeBomLine(this)">
+                                    <td class="px-3 py-2 text-center">
+                                        <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeBomLine(this)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -179,16 +184,16 @@
                     </tbody>
                 </table>
             </div>
-            <div id="noLinesMessage" class="text-center text-muted py-3" style="@(bom?.Lines?.Any() == true ? "display:none;" : "")">
-                <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+            <div id="noLinesMessage" class="text-center text-gray-500 py-4" style="@(bom?.Lines?.Any() == true ? "display:none;" : "")">
+                <i class="bi bi-inbox text-2xl block mb-2"></i>
                 No materials added. Click "Add Material" to add components.
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="formModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Create") BOM
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-1"></i> @(Model.IsEdit ? "Update" : "Create") BOM
         </button>
     </div>
 </form>
@@ -208,29 +213,29 @@
         });
 
         var row = document.createElement('tr');
-        row.className = 'bom-line-row';
+        row.className = 'bom-line-row border-b border-gray-200';
         row.innerHTML = `
-            <td>
-                <select name="Lines[${lineIndex}].ProductId" class="form-select form-select-sm" required>
+            <td class="px-3 py-2">
+                <select name="Lines[${lineIndex}].ProductId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" required>
                     ${productOptions}
                 </select>
             </td>
-            <td>
-                <input type="number" name="Lines[${lineIndex}].Quantity" class="form-control form-control-sm"
+            <td class="px-3 py-2">
+                <input type="number" name="Lines[${lineIndex}].Quantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                        value="1" step="0.0001" min="0.0001" required />
             </td>
-            <td>
-                <input type="number" name="Lines[${lineIndex}].WastagePercent" class="form-control form-control-sm"
+            <td class="px-3 py-2">
+                <input type="number" name="Lines[${lineIndex}].WastagePercent" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                        value="0" step="0.01" min="0" max="100" />
             </td>
-            <td class="text-center">
-                <input type="checkbox" name="Lines[${lineIndex}].IsOptional" class="form-check-input" value="true" />
+            <td class="px-3 py-2 text-center">
+                <input type="checkbox" name="Lines[${lineIndex}].IsOptional" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" value="true" />
             </td>
-            <td>
-                <input type="text" name="Lines[${lineIndex}].Notes" class="form-control form-control-sm" />
+            <td class="px-3 py-2">
+                <input type="text" name="Lines[${lineIndex}].Notes" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" />
             </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeBomLine(this)">
+            <td class="px-3 py-2 text-center">
+                <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeBomLine(this)">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>

@@ -10,15 +10,15 @@
         <input type="hidden" name="Id" value="@Model.PurchaseOrder.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-3">
         <!-- Order Information -->
-        <div class="col-12">
-            <h6 class="text-muted text-uppercase small mb-3">Order Information</h6>
+        <div class="col-span-12">
+            <h6 class="text-gray-500 uppercase text-xs mb-3">Order Information</h6>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Supplier <span class="text-danger">*</span></label>
-            <select class="form-select" name="SupplierId" required>
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Supplier <span class="text-red-500">*</span></label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SupplierId" required>
                 <option value="">-- Select Supplier --</option>
                 @foreach (var supplier in Model.Suppliers)
                 {
@@ -29,9 +29,9 @@
             </select>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Warehouse</label>
-            <select class="form-select" name="WarehouseId">
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Warehouse</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="WarehouseId">
                 <option value="">-- Select Warehouse --</option>
                 @foreach (var warehouse in Model.Warehouses)
                 {
@@ -42,33 +42,33 @@
             </select>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Order Date</label>
-            <input type="date" class="form-control" name="OrderDate"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Order Date</label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="OrderDate"
                    value="@(Model.PurchaseOrder?.OrderDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Due Date</label>
-            <input type="date" class="form-control" name="DueDate"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Due Date</label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DueDate"
                    value="@Model.PurchaseOrder?.DueDate?.ToString("yyyy-MM-dd")">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Expected Delivery</label>
-            <input type="date" class="form-control" name="ExpectedDeliveryDate"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Expected Delivery</label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ExpectedDeliveryDate"
                    value="@Model.PurchaseOrder?.ExpectedDeliveryDate?.ToString("yyyy-MM-dd")">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Reference</label>
-            <input type="text" class="form-control" name="Reference"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Reference</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Reference"
                    value="@Model.PurchaseOrder?.Reference" placeholder="e.g., Quote #, Contract #">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Currency</label>
-            <select class="form-select" name="Currency">
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Currency</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Currency">
                 <option value="USD" selected="@(Model.PurchaseOrder?.Currency == "USD")">USD</option>
                 <option value="EUR" selected="@(Model.PurchaseOrder?.Currency == "EUR")">EUR</option>
                 <option value="GBP" selected="@(Model.PurchaseOrder?.Currency == "GBP")">GBP</option>
@@ -76,27 +76,27 @@
         </div>
 
         <!-- Order Lines -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">
-                Order Items
-                <button type="button" class="btn btn-sm btn-outline-primary float-end" onclick="addLine()">
-                    <i class="bi bi-plus-lg me-1"></i>Add Item
+        <div class="col-span-12 mt-4">
+            <div class="flex justify-between items-center mb-3">
+                <h6 class="text-gray-500 uppercase text-xs">Order Items</h6>
+                <button type="button" class="text-primary-700 hover:text-white border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addLine()">
+                    <i class="bi bi-plus-lg mr-1"></i>Add Item
                 </button>
-            </h6>
+            </div>
         </div>
 
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-sm" id="linesTable">
-                    <thead class="bg-light">
+        <div class="col-span-12">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left" id="linesTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th style="width: 35%">Product</th>
-                            <th style="width: 10%">Qty</th>
-                            <th style="width: 15%">Unit Price</th>
-                            <th style="width: 10%">Disc %</th>
-                            <th style="width: 10%">Tax %</th>
-                            <th style="width: 15%">Total</th>
-                            <th style="width: 5%"></th>
+                            <th class="px-3 py-2" style="width: 35%">Product</th>
+                            <th class="px-3 py-2" style="width: 10%">Qty</th>
+                            <th class="px-3 py-2" style="width: 15%">Unit Price</th>
+                            <th class="px-3 py-2" style="width: 10%">Disc %</th>
+                            <th class="px-3 py-2" style="width: 10%">Tax %</th>
+                            <th class="px-3 py-2" style="width: 15%">Total</th>
+                            <th class="px-3 py-2" style="width: 5%"></th>
                         </tr>
                     </thead>
                     <tbody id="linesBody">
@@ -105,9 +105,9 @@
                             var idx = 0;
                             foreach (var line in Model.PurchaseOrder.Lines.OrderBy(l => l.LineNumber))
                             {
-                                <tr class="line-row">
-                                    <td>
-                                        <select class="form-select form-select-sm" name="Lines[@idx].ProductId" onchange="updateLineTotal(this)" required>
+                                <tr class="line-row border-b">
+                                    <td class="px-3 py-2">
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].ProductId" onchange="updateLineTotal(this)" required>
                                             <option value="">Select...</option>
                                             @foreach (var product in Model.Products)
                                             {
@@ -120,21 +120,21 @@
                                             }
                                         </select>
                                     </td>
-                                    <td><input type="number" class="form-control form-control-sm" name="Lines[@idx].Quantity" value="@line.Quantity" min="0.01" step="0.01" onchange="updateLineTotal(this)"></td>
-                                    <td><input type="number" class="form-control form-control-sm" name="Lines[@idx].UnitPrice" value="@line.UnitPrice" min="0" step="0.01" onchange="updateLineTotal(this)"></td>
-                                    <td><input type="number" class="form-control form-control-sm" name="Lines[@idx].DiscountPercent" value="@line.DiscountPercent" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
-                                    <td><input type="number" class="form-control form-control-sm" name="Lines[@idx].TaxPercent" value="@line.TaxPercent" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
-                                    <td class="line-total fw-medium">@line.LineTotal.ToString("C2")</td>
-                                    <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)"><i class="bi bi-trash"></i></button></td>
+                                    <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].Quantity" value="@line.Quantity" min="0.01" step="0.01" onchange="updateLineTotal(this)"></td>
+                                    <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].UnitPrice" value="@line.UnitPrice" min="0" step="0.01" onchange="updateLineTotal(this)"></td>
+                                    <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].DiscountPercent" value="@line.DiscountPercent" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
+                                    <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].TaxPercent" value="@line.TaxPercent" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
+                                    <td class="px-3 py-2 line-total font-medium">@line.LineTotal.ToString("C2")</td>
+                                    <td class="px-3 py-2"><button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)"><i class="bi bi-trash"></i></button></td>
                                 </tr>
                                 idx++;
                             }
                         }
                         else
                         {
-                            <tr class="line-row">
-                                <td>
-                                    <select class="form-select form-select-sm" name="Lines[0].ProductId" onchange="updateLineTotal(this)" required>
+                            <tr class="line-row border-b">
+                                <td class="px-3 py-2">
+                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[0].ProductId" onchange="updateLineTotal(this)" required>
                                         <option value="">Select...</option>
                                         @foreach (var product in Model.Products)
                                         {
@@ -144,12 +144,12 @@
                                         }
                                     </select>
                                 </td>
-                                <td><input type="number" class="form-control form-control-sm" name="Lines[0].Quantity" value="1" min="0.01" step="0.01" onchange="updateLineTotal(this)"></td>
-                                <td><input type="number" class="form-control form-control-sm" name="Lines[0].UnitPrice" value="0" min="0" step="0.01" onchange="updateLineTotal(this)"></td>
-                                <td><input type="number" class="form-control form-control-sm" name="Lines[0].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
-                                <td><input type="number" class="form-control form-control-sm" name="Lines[0].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
-                                <td class="line-total fw-medium">$0.00</td>
-                                <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)"><i class="bi bi-trash"></i></button></td>
+                                <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[0].Quantity" value="1" min="0.01" step="0.01" onchange="updateLineTotal(this)"></td>
+                                <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[0].UnitPrice" value="0" min="0" step="0.01" onchange="updateLineTotal(this)"></td>
+                                <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[0].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
+                                <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[0].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
+                                <td class="px-3 py-2 line-total font-medium">$0.00</td>
+                                <td class="px-3 py-2"><button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)"><i class="bi bi-trash"></i></button></td>
                             </tr>
                         }
                     </tbody>
@@ -158,33 +158,33 @@
         </div>
 
         <!-- Totals -->
-        <div class="col-md-6">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="3">@Model.PurchaseOrder?.Notes</textarea>
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="3">@Model.PurchaseOrder?.Notes</textarea>
         </div>
 
-        <div class="col-md-6">
-            <div class="bg-light p-3 rounded">
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
+        <div class="col-span-12 md:col-span-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-700">Subtotal:</span>
                     <span id="subtotal">$0.00</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Tax:</span>
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-700">Tax:</span>
                     <span id="taxTotal">$0.00</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Shipping:</span>
-                    <input type="number" class="form-control form-control-sm w-50" name="ShippingAmount"
+                <div class="flex justify-between mb-2 items-center">
+                    <span class="text-gray-700">Shipping:</span>
+                    <input type="number" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 w-1/2 p-2" name="ShippingAmount"
                            value="@(Model.PurchaseOrder?.ShippingAmount ?? 0)" min="0" step="0.01" onchange="updateTotals()">
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Discount:</span>
-                    <input type="number" class="form-control form-control-sm w-50" name="DiscountAmount"
+                <div class="flex justify-between mb-2 items-center">
+                    <span class="text-gray-700">Discount:</span>
+                    <input type="number" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 w-1/2 p-2" name="DiscountAmount"
                            value="@(Model.PurchaseOrder?.DiscountAmount ?? 0)" min="0" step="0.01" onchange="updateTotals()">
                 </div>
-                <hr>
-                <div class="d-flex justify-content-between fw-bold">
+                <hr class="my-2 border-gray-300">
+                <div class="flex justify-between font-bold text-lg">
                     <span>Total:</span>
                     <span id="grandTotal">$0.00</span>
                 </div>
@@ -192,9 +192,9 @@
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-modal-hide="orderModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
             @(Model.IsEdit ? "Update Order" : "Create Order")
         </button>
     </div>
@@ -208,15 +208,15 @@
         const productOptions = document.querySelector('select[name="Lines[0].ProductId"]').innerHTML;
 
         const row = document.createElement('tr');
-        row.className = 'line-row';
+        row.className = 'line-row border-b';
         row.innerHTML = `
-            <td><select class="form-select form-select-sm" name="Lines[${lineIndex}].ProductId" onchange="updateLineTotal(this)" required>${productOptions}</select></td>
-            <td><input type="number" class="form-control form-control-sm" name="Lines[${lineIndex}].Quantity" value="1" min="0.01" step="0.01" onchange="updateLineTotal(this)"></td>
-            <td><input type="number" class="form-control form-control-sm" name="Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="updateLineTotal(this)"></td>
-            <td><input type="number" class="form-control form-control-sm" name="Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
-            <td><input type="number" class="form-control form-control-sm" name="Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
-            <td class="line-total fw-medium">$0.00</td>
-            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)"><i class="bi bi-trash"></i></button></td>
+            <td class="px-3 py-2"><select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].ProductId" onchange="updateLineTotal(this)" required>${productOptions}</select></td>
+            <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].Quantity" value="1" min="0.01" step="0.01" onchange="updateLineTotal(this)"></td>
+            <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="updateLineTotal(this)"></td>
+            <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
+            <td class="px-3 py-2"><input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="updateLineTotal(this)"></td>
+            <td class="px-3 py-2 line-total font-medium">$0.00</td>
+            <td class="px-3 py-2"><button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)"><i class="bi bi-trash"></i></button></td>
         `;
         tbody.appendChild(row);
         lineIndex++;

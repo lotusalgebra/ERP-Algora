@@ -27,13 +27,13 @@
 @{
     var typeClass = Model.DocumentType switch
     {
-        "PurchaseOrder" => "bg-primary",
-        "SalesOrder" => "bg-success",
-        "Invoice" => "bg-info",
-        "GoodsReceiptNote" or "GoodsReceipt" => "bg-warning",
-        "DeliveryChallan" => "bg-secondary",
-        "QualityInspection" => "bg-danger",
-        _ => "bg-dark"
+        "PurchaseOrder" => "bg-primary-100 text-primary-800",
+        "SalesOrder" => "bg-emerald-100 text-emerald-800",
+        "Invoice" => "bg-cyan-100 text-cyan-800",
+        "GoodsReceiptNote" or "GoodsReceipt" => "bg-amber-100 text-amber-800",
+        "DeliveryChallan" => "bg-gray-100 text-gray-800",
+        "QualityInspection" => "bg-red-100 text-red-800",
+        _ => "bg-gray-700 text-white"
     };
 
     var typeIcon = Model.DocumentType switch
@@ -48,94 +48,94 @@
     };
 }
 
-<div class="row g-4">
+<div class="grid grid-cols-12 gap-4">
     <!-- Header Info -->
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-start">
+    <div class="col-span-12">
+        <div class="flex justify-between items-start">
             <div>
-                <h5 class="mb-1">@Model.DocumentNumber</h5>
-                <span class="badge @typeClass">
-                    <i class="bi @typeIcon me-1"></i>@Model.DocumentType
+                <h5 class="text-lg font-semibold text-gray-900 mb-1">@Model.DocumentNumber</h5>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @typeClass">
+                    <i class="bi @typeIcon mr-1"></i>@Model.DocumentType
                 </span>
             </div>
-            <span class="badge bg-danger fs-6">Cancelled</span>
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-base">Cancelled</span>
         </div>
     </div>
 
     <!-- Cancellation Details -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Cancellation Information</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg border border-gray-200 h-full">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0">Cancellation Information</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
-                    <tr>
-                        <td class="text-muted" style="width: 40%;">Document ID:</td>
-                        <td class="fw-medium font-monospace small">@Model.DocumentId</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Cancelled At:</td>
-                        <td class="fw-medium">@Model.CancelledAt.ToString("dd MMM yyyy HH:mm")</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Cancelled By:</td>
-                        <td class="fw-medium">@(Model.CancelledByName ?? "-")</td>
-                    </tr>
+            <div class="p-4">
+                <dl class="space-y-2 text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <dt class="text-gray-500">Document ID:</dt>
+                        <dd class="font-medium font-mono text-xs text-gray-900">@Model.DocumentId</dd>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <dt class="text-gray-500">Cancelled At:</dt>
+                        <dd class="font-medium text-gray-900">@Model.CancelledAt.ToString("dd MMM yyyy HH:mm")</dd>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <dt class="text-gray-500">Cancelled By:</dt>
+                        <dd class="font-medium text-gray-900">@(Model.CancelledByName ?? "-")</dd>
+                    </div>
                     @if (Model.CancelledBy != Guid.Empty)
                     {
-                        <tr>
-                            <td class="text-muted">User ID:</td>
-                            <td class="fw-medium font-monospace small">@Model.CancelledBy</td>
-                        </tr>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">User ID:</dt>
+                            <dd class="font-medium font-mono text-xs text-gray-900">@Model.CancelledBy</dd>
+                        </div>
                     }
-                </table>
+                </dl>
             </div>
         </div>
     </div>
 
     <!-- Audit Info -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Audit Trail</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg border border-gray-200 h-full">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0">Audit Trail</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
-                    <tr>
-                        <td class="text-muted" style="width: 40%;">Record ID:</td>
-                        <td class="fw-medium font-monospace small">@Model.Id</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Created At:</td>
-                        <td class="fw-medium">@Model.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
-                    </tr>
+            <div class="p-4">
+                <dl class="space-y-2 text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <dt class="text-gray-500">Record ID:</dt>
+                        <dd class="font-medium font-mono text-xs text-gray-900">@Model.Id</dd>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <dt class="text-gray-500">Created At:</dt>
+                        <dd class="font-medium text-gray-900">@Model.CreatedAt.ToString("dd MMM yyyy HH:mm")</dd>
+                    </div>
                     @if (Model.ModifiedAt.HasValue)
                     {
-                        <tr>
-                            <td class="text-muted">Last Modified:</td>
-                            <td class="fw-medium">@Model.ModifiedAt.Value.ToString("dd MMM yyyy HH:mm")</td>
-                        </tr>
+                        <div class="grid grid-cols-2 gap-2">
+                            <dt class="text-gray-500">Last Modified:</dt>
+                            <dd class="font-medium text-gray-900">@Model.ModifiedAt.Value.ToString("dd MMM yyyy HH:mm")</dd>
+                        </div>
                     }
-                </table>
+                </dl>
             </div>
         </div>
     </div>
 
     <!-- Reason -->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Cancellation Reason</h6>
+    <div class="col-span-12">
+        <div class="bg-white rounded-lg border border-gray-200">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h6 class="font-semibold text-gray-900 mb-0">Cancellation Reason</h6>
             </div>
-            <div class="card-body">
+            <div class="p-4">
                 @if (!string.IsNullOrEmpty(Model.CancellationReason))
                 {
-                    <p class="mb-0">@Model.CancellationReason</p>
+                    <p class="mb-0 text-gray-700">@Model.CancellationReason</p>
                 }
                 else
                 {
-                    <p class="mb-0 text-muted">No reason provided</p>
+                    <p class="mb-0 text-gray-500">No reason provided</p>
                 }
             </div>
         </div>
@@ -144,46 +144,46 @@
     <!-- Reversal Details -->
     @if (Model.StockReversed || Model.FinancialReversed || !string.IsNullOrEmpty(Model.StockReversalDetails) || !string.IsNullOrEmpty(Model.FinancialReversalDetails))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Reversal Actions</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg border border-gray-200">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                    <h6 class="font-semibold text-gray-900 mb-0">Reversal Actions</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Stock Reversal</label>
-                            <p class="mb-0">
+                <div class="p-4">
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block text-sm text-gray-500 mb-1">Stock Reversal</label>
+                            <div>
                                 @if (Model.StockReversed)
                                 {
-                                    <span class="badge bg-success me-2">Yes</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 mr-2">Yes</span>
                                     @if (!string.IsNullOrEmpty(Model.StockReversalDetails))
                                     {
-                                        <pre class="mt-2 mb-0 bg-light p-2 rounded small"><code>@Model.StockReversalDetails</code></pre>
+                                        <pre class="mt-2 mb-0 bg-gray-100 p-2 rounded text-xs overflow-x-auto"><code>@Model.StockReversalDetails</code></pre>
                                     }
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">No</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">No</span>
                                 }
-                            </p>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Financial Reversal</label>
-                            <p class="mb-0">
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block text-sm text-gray-500 mb-1">Financial Reversal</label>
+                            <div>
                                 @if (Model.FinancialReversed)
                                 {
-                                    <span class="badge bg-success me-2">Yes</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 mr-2">Yes</span>
                                     @if (!string.IsNullOrEmpty(Model.FinancialReversalDetails))
                                     {
-                                        <pre class="mt-2 mb-0 bg-light p-2 rounded small"><code>@Model.FinancialReversalDetails</code></pre>
+                                        <pre class="mt-2 mb-0 bg-gray-100 p-2 rounded text-xs overflow-x-auto"><code>@Model.FinancialReversalDetails</code></pre>
                                     }
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">No</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">No</span>
                                 }
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -194,30 +194,30 @@
     <!-- Original Document State -->
     @if (!string.IsNullOrEmpty(Model.OriginalDocumentState))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">Original Document State</h6>
-                    <span class="badge bg-secondary">At time of cancellation</span>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg border border-gray-200">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg flex justify-between items-center">
+                    <h6 class="font-semibold text-gray-900 mb-0">Original Document State</h6>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">At time of cancellation</span>
                 </div>
-                <div class="card-body">
+                <div class="p-4">
                     @try
                     {
                         var jsonDoc = System.Text.Json.JsonDocument.Parse(Model.OriginalDocumentState);
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped mb-0">
-                                <thead class="table-light">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
-                                        <th style="width: 35%;">Field</th>
-                                        <th>Value</th>
+                                        <th scope="col" class="px-4 py-2" style="width: 35%;">Field</th>
+                                        <th scope="col" class="px-4 py-2">Value</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var prop in jsonDoc.RootElement.EnumerateObject())
                                     {
-                                        <tr>
-                                            <td class="text-muted">@FormatFieldName(prop.Name)</td>
-                                            <td class="fw-medium">@FormatFieldValue(prop.Value)</td>
+                                        <tr class="border-b">
+                                            <td class="px-4 py-2 text-gray-500">@FormatFieldName(prop.Name)</td>
+                                            <td class="px-4 py-2 font-medium text-gray-900">@FormatFieldValue(prop.Value)</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -226,7 +226,7 @@
                     }
                     catch
                     {
-                        <pre class="mb-0 bg-light p-3 rounded small"><code>@Model.OriginalDocumentState</code></pre>
+                        <pre class="mb-0 bg-gray-100 p-3 rounded text-xs overflow-x-auto"><code>@Model.OriginalDocumentState</code></pre>
                     }
                 </div>
             </div>
@@ -236,19 +236,19 @@
     <!-- Notes -->
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Additional Notes</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg border border-gray-200">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                    <h6 class="font-semibold text-gray-900 mb-0">Additional Notes</h6>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">@Model.Notes</p>
+                <div class="p-4">
+                    <p class="mb-0 text-gray-700">@Model.Notes</p>
                 </div>
             </div>
         </div>
     }
 </div>
 
-<div class="modal-footer mt-4 px-0 pb-0">
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+<div class="flex items-center mt-6 pt-4 border-t border-gray-200 gap-2">
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
 </div>

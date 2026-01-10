@@ -4,8 +4,8 @@
 {
     <tr>
         <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-people fs-1 d-block mb-3"></i>
+            <div class="text-gray-500">
+                <i class="bi bi-people text-4xl block mb-3"></i>
                 <p class="mb-0">No suppliers found</p>
             </div>
         </td>
@@ -17,105 +17,116 @@ else
     {
         var poCount = supplier.PurchaseOrders?.Count ?? 0;
 
-        <tr>
-            <td class="ps-4">
-                <code class="bg-light px-2 py-1 rounded">@supplier.Code</code>
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <code class="bg-gray-50 px-2 py-1 rounded text-sm">@supplier.Code</code>
             </td>
-            <td>
-                <div class="fw-medium">@supplier.Name</div>
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@supplier.Name</div>
                 @if (!string.IsNullOrEmpty(supplier.Website))
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-globe me-1"></i>@supplier.Website
+                    <small class="text-gray-500">
+                        <i class="bi bi-globe mr-1"></i>@supplier.Website
                     </small>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(supplier.ContactPerson))
                 {
-                    <div>@supplier.ContactPerson</div>
+                    <div class="text-gray-900">@supplier.ContactPerson</div>
                 }
                 @if (!string.IsNullOrEmpty(supplier.Email))
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-envelope me-1"></i>@supplier.Email
+                    <small class="text-gray-500">
+                        <i class="bi bi-envelope mr-1"></i>@supplier.Email
                     </small>
                 }
                 else if (!string.IsNullOrEmpty(supplier.Phone))
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-telephone me-1"></i>@supplier.Phone
+                    <small class="text-gray-500">
+                        <i class="bi bi-telephone mr-1"></i>@supplier.Phone
                     </small>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(supplier.City))
                 {
-                    <div>
-                        <i class="bi bi-geo-alt me-1 text-muted"></i>
+                    <div class="text-gray-900">
+                        <i class="bi bi-geo-alt mr-1 text-gray-500"></i>
                         @supplier.City@(string.IsNullOrEmpty(supplier.State) ? "" : $", {supplier.State}")
                     </div>
                     @if (!string.IsNullOrEmpty(supplier.Country))
                     {
-                        <small class="text-muted">@supplier.Country</small>
+                        <small class="text-gray-500">@supplier.Country</small>
                     }
                 }
                 else
                 {
-                    <span class="text-muted">—</span>
+                    <span class="text-gray-500">—</span>
                 }
             </td>
-            <td class="text-center">
+            <td class="px-6 py-4 text-center">
                 @if (supplier.LeadTimeDays > 0)
                 {
-                    <span class="badge bg-info bg-opacity-10 text-info">@supplier.LeadTimeDays days</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">@supplier.LeadTimeDays days</span>
                 }
                 else
                 {
-                    <span class="text-muted">—</span>
+                    <span class="text-gray-500">—</span>
                 }
             </td>
-            <td class="text-end">
+            <td class="px-6 py-4 text-right">
                 @if (supplier.CurrentBalance > 0)
                 {
-                    <span class="text-danger fw-medium">@supplier.CurrentBalance.ToString("C2")</span>
+                    <span class="text-red-600 font-medium">@supplier.CurrentBalance.ToString("C2")</span>
                 }
                 else
                 {
-                    <span class="text-success">@supplier.CurrentBalance.ToString("C2")</span>
+                    <span class="text-emerald-600">@supplier.CurrentBalance.ToString("C2")</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (supplier.IsActive)
                 {
-                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                 }
                 else
                 {
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <a href="/Procurement/PurchaseOrders?supplierId=@supplier.Id"
-                       class="btn btn-outline-info"
-                       title="View POs (@poCount)">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </a>
-                    <button type="button"
-                            class="btn btn-outline-primary"
-                            hx-get="?handler=EditForm&id=@supplier.Id"
-                            hx-target="#formModalBody"
-                            data-modal-target="formModal" data-modal-toggle="formModal"
-                            title="Edit">
-                        <i class="bi bi-pencil"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            id="dropdownSupp@(supplier.Id)" data-dropdown-toggle="dropdownMenuSupp@(supplier.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <button type="button"
-                            class="btn btn-outline-danger"
-                            onclick="confirmDelete('@supplier.Id')"
-                            title="Delete">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuSupp@(supplier.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="?handler=EditForm&id=@supplier.Id"
+                                   hx-target="#formModalBody"
+                                   data-modal-target="formModal" data-modal-toggle="formModal">
+                                    <i class="bi bi-pencil mr-2"></i>Edit
+                                </a>
+                            </li>
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Procurement/PurchaseOrders?supplierId=@supplier.Id">
+                                    <i class="bi bi-file-earmark-text mr-2"></i>View POs (@poCount)
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="py-2">
+                            <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                               hx-delete="?handler=Delete&id=@supplier.Id"
+                               hx-target="#suppliersTableBody"
+                               hx-swap="innerHTML"
+                               hx-confirm="Are you sure you want to delete this supplier?">
+                                <i class="bi bi-trash mr-2"></i>Delete
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -123,15 +134,15 @@ else
 
     <!-- Pagination -->
     <tr>
-        <td colspan="8" class="py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small">
+        <td colspan="8" class="px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="text-gray-500 text-sm">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </div>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link"
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page <= 1 ? "pointer-events-none opacity-50" : "")"
                                hx-get="?handler=Table&page=@(Model.Page - 1)"
                                hx-target="#suppliersTableBody"
                                hx-include="#searchInput, #statusFilter, #pageSizeSelect">
@@ -140,8 +151,8 @@ else
                         </li>
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link"
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")"
                                    hx-get="?handler=Table&page=@i"
                                    hx-target="#suppliersTableBody"
                                    hx-include="#searchInput, #statusFilter, #pageSizeSelect">
@@ -149,8 +160,8 @@ else
                                 </a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page >= Model.TotalPages ? "pointer-events-none opacity-50" : "")"
                                hx-get="?handler=Table&page=@(Model.Page + 1)"
                                hx-target="#suppliersTableBody"
                                hx-include="#searchInput, #statusFilter, #pageSizeSelect">

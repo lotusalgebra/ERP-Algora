@@ -4,9 +4,9 @@
 @if (!Model.Projects.Any())
 {
     <tr>
-        <td colspan="9" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-kanban fs-1 d-block mb-3"></i>
+        <td colspan="9" class="text-center py-12">
+            <div class="text-gray-500">
+                <i class="bi bi-kanban text-4xl block mb-3"></i>
                 <p class="mb-0">No projects found</p>
             </div>
         </td>
@@ -18,82 +18,82 @@ else
     {
         var statusClass = project.Status switch
         {
-            ProjectStatus.Planning => "bg-secondary",
-            ProjectStatus.Active => "bg-primary",
-            ProjectStatus.OnHold => "bg-warning",
-            ProjectStatus.Completed => "bg-success",
-            ProjectStatus.Cancelled => "bg-danger",
-            _ => "bg-secondary"
+            ProjectStatus.Planning => "bg-gray-100 text-gray-800",
+            ProjectStatus.Active => "bg-primary-100 text-primary-800",
+            ProjectStatus.OnHold => "bg-amber-100 text-amber-800",
+            ProjectStatus.Completed => "bg-emerald-100 text-emerald-800",
+            ProjectStatus.Cancelled => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-800"
         };
 
         var priorityClass = project.Priority switch
         {
-            ProjectPriority.Low => "text-muted",
-            ProjectPriority.Normal => "text-dark",
-            ProjectPriority.High => "text-warning",
-            ProjectPriority.Critical => "text-danger",
-            _ => "text-dark"
+            ProjectPriority.Low => "text-gray-500",
+            ProjectPriority.Normal => "text-gray-900",
+            ProjectPriority.High => "text-amber-600",
+            ProjectPriority.Critical => "text-red-600",
+            _ => "text-gray-900"
         };
 
         var progressPercent = (int)project.Progress;
 
-        <tr>
-            <td class="ps-4">
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
                 <a href="#"
-                   class="text-decoration-none fw-semibold"
+                   class="font-semibold text-primary-600 hover:text-primary-700"
                    hx-get="/Projects?handler=Details&id=@project.Id"
                    hx-target="#detailsModalContent"
                    data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @project.ProjectCode
                 </a>
-                <div class="small text-muted">@project.Name</div>
+                <div class="text-sm text-gray-500">@project.Name</div>
             </td>
-            <td>@(project.Customer?.Name ?? "-")</td>
-            <td>
+            <td class="px-6 py-4">@(project.Customer?.Name ?? "-")</td>
+            <td class="px-6 py-4">
                 @if (project.ProjectManager != null)
                 {
                     <span>@project.ProjectManager.FirstName @project.ProjectManager.LastName</span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-500">-</span>
                 }
             </td>
-            <td>
-                <div class="d-flex align-items-center">
-                    <div class="progress flex-grow-1" style="height: 8px; width: 80px;">
-                        <div class="progress-bar @(progressPercent >= 100 ? "bg-success" : "bg-primary")"
+            <td class="px-6 py-4">
+                <div class="flex items-center">
+                    <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                        <div class="@(progressPercent >= 100 ? "bg-emerald-500" : "bg-primary-600") h-2 rounded-full"
                              style="width: @progressPercent%"></div>
                     </div>
-                    <span class="ms-2 small">@progressPercent%</span>
+                    <span class="text-sm">@progressPercent%</span>
                 </div>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 <span class="@priorityClass">
                     @if (project.Priority == ProjectPriority.Critical)
                     {
-                        <i class="bi bi-exclamation-circle-fill me-1"></i>
+                        <i class="bi bi-exclamation-circle-fill mr-1"></i>
                     }
                     @project.Priority
                 </span>
             </td>
-            <td>
-                <span class="badge @statusClass">@project.Status</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusClass">@project.Status</span>
             </td>
-            <td>@project.BudgetAmount.ToString("C0")</td>
-            <td>
-                <div class="small">
-                    <span class="text-muted">Start:</span> @project.StartDate.ToString("MMM dd")
+            <td class="px-6 py-4 text-right">@project.BudgetAmount.ToString("C0")</td>
+            <td class="px-6 py-4">
+                <div class="text-sm">
+                    <span class="text-gray-500">Start:</span> @project.StartDate.ToString("MMM dd")
                     @if (project.EndDate.HasValue)
                     {
-                        <br><span class="text-muted">End:</span> @project.EndDate.Value.ToString("MMM dd")
+                        <br><span class="text-gray-500">End:</span> @project.EndDate.Value.ToString("MMM dd")
                     }
                 </div>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group">
+            <td class="px-6 py-4 text-right">
+                <div class="inline-flex rounded-lg shadow-sm" role="group">
                     <button type="button"
-                            class="btn btn-sm btn-outline-secondary"
+                            class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                             hx-get="/Projects?handler=Details&id=@project.Id"
                             hx-target="#detailsModalContent"
                             data-modal-target="detailsModal" data-modal-toggle="detailsModal"
@@ -103,7 +103,7 @@ else
                     @if (project.Status == ProjectStatus.Planning || project.Status == ProjectStatus.OnHold)
                     {
                         <button type="button"
-                                class="btn btn-sm btn-outline-primary"
+                                class="px-3 py-2 text-sm font-medium text-primary-600 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-get="/Projects?handler=EditForm&id=@project.Id"
                                 hx-target="#formModalContent"
                                 data-modal-target="formModal" data-modal-toggle="formModal"
@@ -114,7 +114,7 @@ else
                     @if (project.Status == ProjectStatus.Planning)
                     {
                         <button type="button"
-                                class="btn btn-sm btn-outline-success"
+                                class="px-3 py-2 text-sm font-medium text-emerald-600 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-post="/Projects?handler=UpdateStatus&id=@project.Id&status=Active"
                                 hx-target="#projectsTableContainer"
                                 hx-confirm="Start this project?"
@@ -122,7 +122,7 @@ else
                             <i class="bi bi-play-fill"></i>
                         </button>
                         <button type="button"
-                                class="btn btn-sm btn-outline-danger"
+                                class="px-3 py-2 text-sm font-medium text-red-600 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-delete="/Projects?id=@project.Id"
                                 hx-target="#projectsTableContainer"
                                 hx-confirm="Delete this project?"
@@ -133,7 +133,7 @@ else
                     @if (project.Status == ProjectStatus.Active)
                     {
                         <button type="button"
-                                class="btn btn-sm btn-outline-warning"
+                                class="px-3 py-2 text-sm font-medium text-amber-600 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-post="/Projects?handler=UpdateStatus&id=@project.Id&status=OnHold"
                                 hx-target="#projectsTableContainer"
                                 hx-confirm="Put this project on hold?"
@@ -141,7 +141,7 @@ else
                             <i class="bi bi-pause-fill"></i>
                         </button>
                         <button type="button"
-                                class="btn btn-sm btn-outline-success"
+                                class="px-3 py-2 text-sm font-medium text-emerald-600 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-post="/Projects?handler=UpdateStatus&id=@project.Id&status=Completed"
                                 hx-target="#projectsTableContainer"
                                 hx-confirm="Complete this project?"
@@ -152,7 +152,7 @@ else
                     @if (project.Status == ProjectStatus.OnHold)
                     {
                         <button type="button"
-                                class="btn btn-sm btn-outline-success"
+                                class="px-3 py-2 text-sm font-medium text-emerald-600 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-post="/Projects?handler=UpdateStatus&id=@project.Id&status=Active"
                                 hx-target="#projectsTableContainer"
                                 hx-confirm="Resume this project?"
@@ -160,10 +160,10 @@ else
                             <i class="bi bi-play-fill"></i>
                         </button>
                     }
-                    @if (project.Status != ProjectStatus.Completed && project.Status != ProjectStatus.Cancelled)
+                    @if (project.Status != ProjectStatus.Completed && project.Status != ProjectStatus.Cancelled && project.Status != ProjectStatus.Planning && project.Status != ProjectStatus.Active && project.Status != ProjectStatus.OnHold)
                     {
                         <button type="button"
-                                class="btn btn-sm btn-outline-danger"
+                                class="px-3 py-2 text-sm font-medium text-red-600 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500"
                                 hx-post="/Projects?handler=UpdateStatus&id=@project.Id&status=Cancelled"
                                 hx-target="#projectsTableContainer"
                                 hx-confirm="Cancel this project?"
@@ -181,15 +181,16 @@ else
 @if (Model.TotalPages > 1)
 {
     <tr>
-        <td colspan="9" class="border-0">
-            <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                <div class="text-muted small">
+        <td colspan="9" class="bg-gray-50 px-6 py-3 border-0">
+            <div class="flex justify-between items-center">
+                <div class="text-gray-500 text-sm">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </div>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link" href="#"
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg @(Model.Page <= 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
+                               @(Model.Page > 1 ? "" : "")
                                hx-get="/Projects?handler=Table&page=@(Model.Page - 1)"
                                hx-target="#projectsTableContainer"
                                hx-include="#searchInput, #statusFilter">
@@ -198,17 +199,18 @@ else
                         </li>
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" href="#"
-                                   hx-get="/Projects?handler=Table&page=@i"
+                            var pageNum = i;
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight @(pageNum == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700") cursor-pointer"
+                                   hx-get="/Projects?handler=Table&page=@pageNum"
                                    hx-target="#projectsTableContainer"
                                    hx-include="#searchInput, #statusFilter">
-                                    @i
+                                    @pageNum
                                 </a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="#"
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg @(Model.Page >= Model.TotalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
                                hx-get="/Projects?handler=Table&page=@(Model.Page + 1)"
                                hx-target="#projectsTableContainer"
                                hx-include="#searchInput, #statusFilter">

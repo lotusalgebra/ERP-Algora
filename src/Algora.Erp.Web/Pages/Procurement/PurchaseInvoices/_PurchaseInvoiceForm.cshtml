@@ -6,17 +6,17 @@
         <input type="hidden" name="Id" value="@Model.Invoice.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-3">
         <!-- Left Column -->
-        <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Invoice Information</h6>
+        <div class="col-span-12 md:col-span-6">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="font-medium text-gray-900 mb-0">Invoice Information</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Supplier <span class="text-danger">*</span></label>
-                        <select class="form-select" name="SupplierId" id="supplierSelect" required>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Supplier <span class="text-red-500">*</span></label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SupplierId" id="supplierSelect" required>
                             <option value="">-- Select Supplier --</option>
                             @foreach (var supplier in Model.Suppliers)
                             {
@@ -38,8 +38,8 @@
                     @if (Model.PurchaseOrders.Any())
                     {
                         <div class="mb-3">
-                            <label class="form-label">Purchase Order (Optional)</label>
-                            <select class="form-select" name="PurchaseOrderId" id="poSelect" onchange="loadPoDetails(this.value)">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Purchase Order (Optional)</label>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PurchaseOrderId" id="poSelect" onchange="loadPoDetails(this.value)">
                                 <option value="">-- No PO --</option>
                                 @foreach (var po in Model.PurchaseOrders)
                                 {
@@ -64,8 +64,8 @@
                     @if (Model.GoodsReceiptNotes.Any())
                     {
                         <div class="mb-3">
-                            <label class="form-label">Goods Receipt (Optional)</label>
-                            <select class="form-select" name="GrnId" id="grnSelect" onchange="loadGrnDetails(this.value)">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Goods Receipt (Optional)</label>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="GrnId" id="grnSelect" onchange="loadGrnDetails(this.value)">
                                 <option value="">-- No GRN --</option>
                                 @foreach (var grn in Model.GoodsReceiptNotes)
                                 {
@@ -91,26 +91,26 @@
         </div>
 
         <!-- Right Column -->
-        <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Dates & Reference</h6>
+        <div class="col-span-12 md:col-span-6">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="font-medium text-gray-900 mb-0">Dates & Reference</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Invoice Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="InvoiceDate"
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-3">
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Invoice Date <span class="text-red-500">*</span></label>
+                            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="InvoiceDate"
                                    value="@(Model.Invoice?.InvoiceDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Due Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="DueDate"
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Due Date <span class="text-red-500">*</span></label>
+                            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DueDate"
                                    value="@(Model.Invoice?.DueDate.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(30).ToString("yyyy-MM-dd"))" required />
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Supplier Invoice Reference</label>
-                            <input type="text" class="form-control" name="Reference"
+                        <div class="col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Supplier Invoice Reference</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Reference"
                                    value="@Model.Invoice?.Reference"
                                    placeholder="Supplier's invoice number" />
                         </div>
@@ -120,27 +120,27 @@
         </div>
 
         <!-- Line Items -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">Line Items</h6>
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLine()">
-                        <i class="bi bi-plus-lg me-1"></i>Add Line
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                    <h6 class="font-medium text-gray-900 mb-0">Line Items</h6>
+                    <button type="button" class="text-primary-700 hover:text-white border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addLine()">
+                        <i class="bi bi-plus-lg mr-1"></i>Add Line
                     </button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0" id="linesTable">
-                            <thead class="bg-light">
+                <div class="p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left" id="linesTable">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
-                                    <th style="width: 30%;">Description</th>
-                                    <th class="text-end" style="width: 12%;">Qty</th>
-                                    <th style="width: 10%;">UOM</th>
-                                    <th class="text-end" style="width: 15%;">Unit Price</th>
-                                    <th class="text-end" style="width: 10%;">Disc %</th>
-                                    <th class="text-end" style="width: 10%;">Tax %</th>
-                                    <th class="text-end" style="width: 15%;">Total</th>
-                                    <th style="width: 5%;"></th>
+                                    <th class="px-3 py-2" style="width: 30%;">Description</th>
+                                    <th class="px-3 py-2 text-right" style="width: 12%;">Qty</th>
+                                    <th class="px-3 py-2" style="width: 10%;">UOM</th>
+                                    <th class="px-3 py-2 text-right" style="width: 15%;">Unit Price</th>
+                                    <th class="px-3 py-2 text-right" style="width: 10%;">Disc %</th>
+                                    <th class="px-3 py-2 text-right" style="width: 10%;">Tax %</th>
+                                    <th class="px-3 py-2 text-right" style="width: 15%;">Total</th>
+                                    <th class="px-3 py-2" style="width: 5%;"></th>
                                 </tr>
                             </thead>
                             <tbody id="linesBody">
@@ -149,37 +149,37 @@
                                     var idx = 0;
                                     foreach (var line in Model.Invoice.Lines.Where(l => !l.IsDeleted).OrderBy(l => l.LineNumber))
                                     {
-                                        <tr class="line-row">
-                                            <td>
+                                        <tr class="line-row border-b">
+                                            <td class="px-3 py-2">
                                                 <input type="hidden" name="Lines[@idx].ProductId" value="@line.ProductId" />
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].Description"
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].Description"
                                                        value="@line.Description" required />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end qty-input" name="Lines[@idx].Quantity"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right qty-input" name="Lines[@idx].Quantity"
                                                        value="@line.Quantity" required step="0.01" min="0.01" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].UnitOfMeasure"
+                                            <td class="px-3 py-2">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].UnitOfMeasure"
                                                        value="@line.UnitOfMeasure" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end price-input" name="Lines[@idx].UnitPrice"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input" name="Lines[@idx].UnitPrice"
                                                        value="@line.UnitPrice" required step="0.01" min="0" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end disc-input" name="Lines[@idx].DiscountPercent"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right disc-input" name="Lines[@idx].DiscountPercent"
                                                        value="@line.DiscountPercent" step="0.01" min="0" max="100" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end tax-input" name="Lines[@idx].TaxPercent"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right tax-input" name="Lines[@idx].TaxPercent"
                                                        value="@line.TaxPercent" step="0.01" min="0" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <span class="line-total fw-medium">@line.LineTotal.ToString("N2")</span>
+                                            <td class="px-3 py-2 text-right">
+                                                <span class="line-total font-medium">@line.LineTotal.ToString("N2")</span>
                                             </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                            <td class="px-3 py-2">
+                                                <button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </td>
@@ -193,37 +193,37 @@
                                     foreach (var line in Model.SelectedGrn.Lines.Where(l => l.AcceptedQuantity > 0).OrderBy(l => l.LineNumber))
                                     {
                                         var lineTotal = line.AcceptedQuantity * line.UnitPrice;
-                                        <tr class="line-row">
-                                            <td>
+                                        <tr class="line-row border-b">
+                                            <td class="px-3 py-2">
                                                 <input type="hidden" name="Lines[@idx].ProductId" value="@line.ProductId" />
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].Description"
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].Description"
                                                        value="@line.ProductName" required />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end qty-input" name="Lines[@idx].Quantity"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right qty-input" name="Lines[@idx].Quantity"
                                                        value="@line.AcceptedQuantity" required step="0.01" min="0.01" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].UnitOfMeasure"
+                                            <td class="px-3 py-2">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].UnitOfMeasure"
                                                        value="@line.UnitOfMeasure" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end price-input" name="Lines[@idx].UnitPrice"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input" name="Lines[@idx].UnitPrice"
                                                        value="@line.UnitPrice" required step="0.01" min="0" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end disc-input" name="Lines[@idx].DiscountPercent"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right disc-input" name="Lines[@idx].DiscountPercent"
                                                        value="0" step="0.01" min="0" max="100" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end tax-input" name="Lines[@idx].TaxPercent"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right tax-input" name="Lines[@idx].TaxPercent"
                                                        value="0" step="0.01" min="0" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <span class="line-total fw-medium">@lineTotal.ToString("N2")</span>
+                                            <td class="px-3 py-2 text-right">
+                                                <span class="line-total font-medium">@lineTotal.ToString("N2")</span>
                                             </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                            <td class="px-3 py-2">
+                                                <button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </td>
@@ -238,37 +238,37 @@
                                     {
                                         var invoiceQty = line.QuantityReceived > 0 ? line.QuantityReceived : line.Quantity;
                                         var lineTotal = invoiceQty * line.UnitPrice;
-                                        <tr class="line-row">
-                                            <td>
+                                        <tr class="line-row border-b">
+                                            <td class="px-3 py-2">
                                                 <input type="hidden" name="Lines[@idx].ProductId" value="@line.ProductId" />
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].Description"
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].Description"
                                                        value="@line.ProductName" required />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end qty-input" name="Lines[@idx].Quantity"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right qty-input" name="Lines[@idx].Quantity"
                                                        value="@invoiceQty" required step="0.01" min="0.01" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].UnitOfMeasure"
+                                            <td class="px-3 py-2">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].UnitOfMeasure"
                                                        value="@line.UnitOfMeasure" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end price-input" name="Lines[@idx].UnitPrice"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input" name="Lines[@idx].UnitPrice"
                                                        value="@line.UnitPrice" required step="0.01" min="0" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end disc-input" name="Lines[@idx].DiscountPercent"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right disc-input" name="Lines[@idx].DiscountPercent"
                                                        value="@line.DiscountPercent" step="0.01" min="0" max="100" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end tax-input" name="Lines[@idx].TaxPercent"
+                                            <td class="px-3 py-2">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right tax-input" name="Lines[@idx].TaxPercent"
                                                        value="@line.TaxPercent" step="0.01" min="0" onchange="calculateLineTotal(this)" />
                                             </td>
-                                            <td>
-                                                <span class="line-total fw-medium">@lineTotal.ToString("N2")</span>
+                                            <td class="px-3 py-2 text-right">
+                                                <span class="line-total font-medium">@lineTotal.ToString("N2")</span>
                                             </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                            <td class="px-3 py-2">
+                                                <button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </td>
@@ -277,20 +277,20 @@
                                     }
                                 }
                             </tbody>
-                            <tfoot class="bg-light">
+                            <tfoot class="bg-gray-50">
                                 <tr>
-                                    <td colspan="6" class="text-end fw-medium">Subtotal:</td>
-                                    <td class="text-end fw-medium" id="subtotal">0.00</td>
+                                    <td colspan="6" class="px-3 py-2 text-right font-medium">Subtotal:</td>
+                                    <td class="px-3 py-2 text-right font-medium" id="subtotal">0.00</td>
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6" class="text-end">Tax:</td>
-                                    <td class="text-end" id="taxTotal">0.00</td>
+                                    <td colspan="6" class="px-3 py-2 text-right">Tax:</td>
+                                    <td class="px-3 py-2 text-right" id="taxTotal">0.00</td>
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6" class="text-end fw-bold">Total:</td>
-                                    <td class="text-end fw-bold fs-5" id="grandTotal">0.00</td>
+                                    <td colspan="6" class="px-3 py-2 text-right font-bold">Total:</td>
+                                    <td class="px-3 py-2 text-right font-bold text-lg" id="grandTotal">0.00</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -301,16 +301,16 @@
         </div>
 
         <!-- Notes -->
-        <div class="col-12">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="2">@Model.Invoice?.Notes</textarea>
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.Invoice?.Notes</textarea>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-3">
-        <button type="button" class="btn btn-secondary" data-modal-hide="invoiceModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Invoice
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="invoiceModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>@(Model.IsEdit ? "Update" : "Create") Invoice
         </button>
     </div>
 </form>
@@ -336,35 +336,35 @@
 
     function addLine() {
         const html = `
-            <tr class="line-row">
-                <td>
+            <tr class="line-row border-b">
+                <td class="px-3 py-2">
                     <input type="hidden" name="Lines[${lineIndex}].ProductId" value="" />
-                    <input type="text" class="form-control form-control-sm" name="Lines[${lineIndex}].Description" required placeholder="Description" />
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].Description" required placeholder="Description" />
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm text-end qty-input" name="Lines[${lineIndex}].Quantity"
+                <td class="px-3 py-2">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right qty-input" name="Lines[${lineIndex}].Quantity"
                            required step="0.01" min="0.01" value="1" onchange="calculateLineTotal(this)" />
                 </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Lines[${lineIndex}].UnitOfMeasure" value="EA" />
+                <td class="px-3 py-2">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].UnitOfMeasure" value="EA" />
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm text-end price-input" name="Lines[${lineIndex}].UnitPrice"
+                <td class="px-3 py-2">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input" name="Lines[${lineIndex}].UnitPrice"
                            required step="0.01" min="0" value="0" onchange="calculateLineTotal(this)" />
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm text-end disc-input" name="Lines[${lineIndex}].DiscountPercent"
+                <td class="px-3 py-2">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right disc-input" name="Lines[${lineIndex}].DiscountPercent"
                            step="0.01" min="0" max="100" value="0" onchange="calculateLineTotal(this)" />
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm text-end tax-input" name="Lines[${lineIndex}].TaxPercent"
+                <td class="px-3 py-2">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right tax-input" name="Lines[${lineIndex}].TaxPercent"
                            step="0.01" min="0" value="0" onchange="calculateLineTotal(this)" />
                 </td>
-                <td>
-                    <span class="line-total fw-medium">0.00</span>
+                <td class="px-3 py-2 text-right">
+                    <span class="line-total font-medium">0.00</span>
                 </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                <td class="px-3 py-2">
+                    <button type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1" onclick="removeLine(this)">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>

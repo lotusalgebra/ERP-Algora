@@ -25,17 +25,17 @@
     {
         return category switch
         {
-            CancellationReasonCategory.CustomerRequest => "bg-primary bg-opacity-10 text-primary",
-            CancellationReasonCategory.DuplicateEntry => "bg-secondary bg-opacity-10 text-secondary",
-            CancellationReasonCategory.DataEntryError => "bg-warning bg-opacity-10 text-warning",
-            CancellationReasonCategory.SupplierIssue => "bg-info bg-opacity-10 text-info",
-            CancellationReasonCategory.QualityIssue => "bg-danger bg-opacity-10 text-danger",
-            CancellationReasonCategory.PriceDispute => "bg-warning bg-opacity-10 text-warning",
-            CancellationReasonCategory.DeliveryIssue => "bg-info bg-opacity-10 text-info",
-            CancellationReasonCategory.PaymentIssue => "bg-danger bg-opacity-10 text-danger",
-            CancellationReasonCategory.OutOfStock => "bg-secondary bg-opacity-10 text-secondary",
-            CancellationReasonCategory.SystemError => "bg-dark bg-opacity-10 text-dark",
-            _ => "bg-light text-muted"
+            CancellationReasonCategory.CustomerRequest => "bg-primary-100 text-primary-800",
+            CancellationReasonCategory.DuplicateEntry => "bg-gray-100 text-gray-800",
+            CancellationReasonCategory.DataEntryError => "bg-amber-100 text-amber-800",
+            CancellationReasonCategory.SupplierIssue => "bg-cyan-100 text-cyan-800",
+            CancellationReasonCategory.QualityIssue => "bg-red-100 text-red-800",
+            CancellationReasonCategory.PriceDispute => "bg-amber-100 text-amber-800",
+            CancellationReasonCategory.DeliveryIssue => "bg-cyan-100 text-cyan-800",
+            CancellationReasonCategory.PaymentIssue => "bg-red-100 text-red-800",
+            CancellationReasonCategory.OutOfStock => "bg-gray-100 text-gray-800",
+            CancellationReasonCategory.SystemError => "bg-gray-700 text-white",
+            _ => "bg-gray-100 text-gray-500"
         };
     }
 }
@@ -43,9 +43,9 @@
 @if (!Model.Cancellations.Any())
 {
     <tr>
-        <td colspan="7" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-check-circle fs-1 d-block mb-3"></i>
+        <td colspan="7" class="text-center py-12">
+            <div class="text-gray-500">
+                <i class="bi bi-check-circle text-4xl block mb-3"></i>
                 <p class="mb-0">No cancellations found</p>
             </div>
         </td>
@@ -57,13 +57,13 @@ else
     {
         var typeClass = cancellation.DocumentType switch
         {
-            "PurchaseOrder" => "bg-primary",
-            "SalesOrder" => "bg-success",
-            "Invoice" => "bg-info",
-            "GoodsReceiptNote" or "GoodsReceipt" => "bg-warning",
-            "DeliveryChallan" => "bg-secondary",
-            "QualityInspection" => "bg-danger",
-            _ => "bg-dark"
+            "PurchaseOrder" => "bg-primary-100 text-primary-800",
+            "SalesOrder" => "bg-emerald-100 text-emerald-800",
+            "Invoice" => "bg-cyan-100 text-cyan-800",
+            "GoodsReceiptNote" or "GoodsReceipt" => "bg-amber-100 text-amber-800",
+            "DeliveryChallan" => "bg-gray-100 text-gray-800",
+            "QualityInspection" => "bg-red-100 text-red-800",
+            _ => "bg-gray-700 text-white"
         };
 
         var typeIcon = cancellation.DocumentType switch
@@ -77,52 +77,53 @@ else
             _ => "bi-file-text"
         };
 
-        <tr>
-            <td class="ps-4">
-                <a href="javascript:void(0)" onclick="viewDetails('@cancellation.Id')" class="text-decoration-none fw-medium">
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <a href="/Reports/Cancellations/Details/@cancellation.Id" class="font-medium text-primary-600 hover:text-primary-700">
                     @cancellation.DocumentNumber
                 </a>
             </td>
-            <td>
-                <span class="badge @typeClass">
-                    <i class="bi @typeIcon me-1"></i>@cancellation.DocumentType
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @typeClass">
+                    <i class="bi @typeIcon mr-1"></i>@cancellation.DocumentType
                 </span>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 <div>@cancellation.CancelledAt.ToString("dd MMM yyyy")</div>
-                <small class="text-muted">@cancellation.CancelledAt.ToString("HH:mm")</small>
+                <small class="text-gray-500">@cancellation.CancelledAt.ToString("HH:mm")</small>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(cancellation.CancelledByName))
                 {
                     <span>@cancellation.CancelledByName</span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-500">-</span>
                 }
             </td>
-            <td>
-                <span class="badge @GetCategoryBadgeClass(cancellation.ReasonCategory)">
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @GetCategoryBadgeClass(cancellation.ReasonCategory)">
                     @FormatReasonCategory(cancellation.ReasonCategory)
                 </span>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(cancellation.CancellationReason))
                 {
-                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="@cancellation.CancellationReason">
+                    <span class="truncate inline-block max-w-[150px]" title="@cancellation.CancellationReason">
                         @cancellation.CancellationReason
                     </span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-500">-</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <button class="btn btn-sm btn-outline-secondary" onclick="viewDetails('@cancellation.Id')">
+            <td class="px-6 py-4 text-right">
+                <a href="/Reports/Cancellations/Details/@cancellation.Id"
+                   class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-primary-500 inline-block">
                     <i class="bi bi-eye"></i>
-                </button>
+                </a>
             </td>
         </tr>
     }
@@ -131,15 +132,15 @@ else
     @if (Model.TotalPages > 1)
     {
         <tr>
-            <td colspan="7" class="py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">
+            <td colspan="7" class="bg-gray-50 px-6 py-3 border-0">
+                <div class="flex justify-between items-center">
+                    <small class="text-gray-500">
                         Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                     </small>
                     <nav>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)"
+                        <ul class="inline-flex -space-x-px text-sm">
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg @(Model.Page == 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
                                    hx-get="?handler=Table&page=@(Model.Page - 1)"
                                    hx-target="#cancellationsTableBody"
                                    hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
@@ -148,17 +149,18 @@ else
                             </li>
                             @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                             {
-                                <li class="page-item @(i == Model.Page ? "active" : "")">
-                                    <a class="page-link" href="javascript:void(0)"
-                                       hx-get="?handler=Table&page=@i"
+                                var pageNum = i;
+                                <li>
+                                    <a class="flex items-center justify-center px-3 h-8 leading-tight @(pageNum == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700") cursor-pointer"
+                                       hx-get="?handler=Table&page=@pageNum"
                                        hx-target="#cancellationsTableBody"
                                        hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">
-                                        @i
+                                        @pageNum
                                     </a>
                                 </li>
                             }
-                            <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)"
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg @(Model.Page == Model.TotalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
                                    hx-get="?handler=Table&page=@(Model.Page + 1)"
                                    hx-target="#cancellationsTableBody"
                                    hx-include="#searchInput, #documentTypeFilter, #reasonCategoryFilter, #fromDate, #toDate, #pageSizeSelect">

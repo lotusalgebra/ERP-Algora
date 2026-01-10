@@ -9,97 +9,97 @@
         <input type="hidden" name="Id" value="@Model.Supplier.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-3">
         <!-- Basic Information -->
-        <div class="col-12">
-            <h6 class="text-muted text-uppercase small mb-3">Basic Information</h6>
+        <div class="col-span-12">
+            <h6 class="text-gray-500 uppercase text-xs mb-3">Basic Information</h6>
         </div>
 
-        <div class="col-md-12">
-            <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="Name"
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Supplier Name <span class="text-red-500">*</span></label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name"
                    value="@Model.Supplier?.Name" required>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Contact Person</label>
-            <input type="text" class="form-control" name="ContactPerson"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Contact Person</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ContactPerson"
                    value="@Model.Supplier?.ContactPerson">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" name="Email"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+            <input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Email"
                    value="@Model.Supplier?.Email">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Phone</label>
-            <input type="tel" class="form-control" name="Phone"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Phone</label>
+            <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Phone"
                    value="@Model.Supplier?.Phone">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Fax</label>
-            <input type="text" class="form-control" name="Fax"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Fax</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Fax"
                    value="@Model.Supplier?.Fax">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Website</label>
-            <input type="url" class="form-control" name="Website"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Website</label>
+            <input type="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Website"
                    value="@Model.Supplier?.Website" placeholder="https://">
         </div>
 
         <!-- Address -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Address</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 uppercase text-xs mb-3">Address</h6>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Street Address</label>
-            <input type="text" class="form-control" name="Address"
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Street Address</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Address"
                    value="@Model.Supplier?.Address">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">City</label>
-            <input type="text" class="form-control" name="City"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="City"
                    value="@Model.Supplier?.City">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">State/Province</label>
-            <input type="text" class="form-control" name="State"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">State/Province</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="State"
                    value="@Model.Supplier?.State">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Country</label>
-            <input type="text" class="form-control" name="Country"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Country</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Country"
                    value="@Model.Supplier?.Country">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Postal Code</label>
-            <input type="text" class="form-control" name="PostalCode"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Postal Code</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PostalCode"
                    value="@Model.Supplier?.PostalCode">
         </div>
 
         <!-- Payment Terms -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Payment & Terms</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 uppercase text-xs mb-3">Payment & Terms</h6>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Payment Terms (Days)</label>
-            <input type="number" class="form-control" name="PaymentTermsDays"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Payment Terms (Days)</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PaymentTermsDays"
                    value="@(Model.Supplier?.PaymentTermsDays ?? 30)" min="0">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Currency</label>
-            <select class="form-select" name="Currency">
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Currency</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Currency">
                 <option value="USD" selected="@(Model.Supplier?.Currency == "USD")">USD</option>
                 <option value="EUR" selected="@(Model.Supplier?.Currency == "EUR")">EUR</option>
                 <option value="GBP" selected="@(Model.Supplier?.Currency == "GBP")">GBP</option>
@@ -108,69 +108,69 @@
             </select>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Lead Time (Days)</label>
-            <input type="number" class="form-control" name="LeadTimeDays"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Lead Time (Days)</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="LeadTimeDays"
                    value="@(Model.Supplier?.LeadTimeDays ?? 0)" min="0">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Minimum Order Amount</label>
-            <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input type="number" class="form-control" name="MinimumOrderAmount"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Minimum Order Amount</label>
+            <div class="flex">
+                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-s-lg">$</span>
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-e-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MinimumOrderAmount"
                        value="@(Model.Supplier?.MinimumOrderAmount ?? 0)" step="0.01" min="0">
             </div>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Tax ID</label>
-            <input type="text" class="form-control" name="TaxId"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Tax ID</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TaxId"
                    value="@Model.Supplier?.TaxId">
         </div>
 
         <!-- Bank Information -->
-        <div class="col-12 mt-4">
-            <h6 class="text-muted text-uppercase small mb-3">Bank Information</h6>
+        <div class="col-span-12 mt-4">
+            <h6 class="text-gray-500 uppercase text-xs mb-3">Bank Information</h6>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Bank Name</label>
-            <input type="text" class="form-control" name="BankName"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Bank Name</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="BankName"
                    value="@Model.Supplier?.BankName">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Account Number</label>
-            <input type="text" class="form-control" name="BankAccountNumber"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Account Number</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="BankAccountNumber"
                    value="@Model.Supplier?.BankAccountNumber">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Routing Number</label>
-            <input type="text" class="form-control" name="BankRoutingNumber"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Routing Number</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="BankRoutingNumber"
                    value="@Model.Supplier?.BankRoutingNumber">
         </div>
 
         <!-- Notes -->
-        <div class="col-12 mt-4">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="2">@Model.Supplier?.Notes</textarea>
+        <div class="col-span-12 mt-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.Supplier?.Notes</textarea>
         </div>
 
         <!-- Options -->
-        <div class="col-12">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="IsActive" value="true" id="isActive"
+        <div class="col-span-12">
+            <div class="flex items-center">
+                <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2" type="checkbox" name="IsActive" value="true" id="isActive"
                        checked="@(Model.Supplier?.IsActive ?? true)">
-                <label class="form-check-label" for="isActive">Active</label>
+                <label class="ms-2 text-sm font-medium text-gray-900" for="isActive">Active</label>
             </div>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-modal-hide="supplierModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
             @(Model.IsEdit ? "Update Supplier" : "Create Supplier")
         </button>
     </div>

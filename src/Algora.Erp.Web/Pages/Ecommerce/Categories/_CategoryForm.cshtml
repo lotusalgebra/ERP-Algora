@@ -9,84 +9,81 @@
         <input type="hidden" name="Id" value="@Model.Category?.Id" />
     }
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="mb-3">
-                <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="Name" value="@Model.Category?.Name" required />
+    <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-8">
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Category Name <span class="text-red-500">*</span></label>
+                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Name" value="@Model.Category?.Name" required />
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">URL Slug</label>
-                <input type="text" class="form-control" name="Slug" value="@Model.Category?.Slug" placeholder="auto-generated-from-name" />
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">URL Slug</label>
+                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Slug" value="@Model.Category?.Slug" placeholder="auto-generated-from-name" />
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea class="form-control" name="Description" rows="3">@Model.Category?.Description</textarea>
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Description" rows="3">@Model.Category?.Description</textarea>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Image URL</label>
-                <input type="text" class="form-control" name="ImageUrl" value="@Model.Category?.ImageUrl" placeholder="https://..." />
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Image URL</label>
+                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ImageUrl" value="@Model.Category?.ImageUrl" placeholder="https://..." />
             </div>
 
-            <h6 class="border-bottom pb-2 mb-3 mt-4">SEO</h6>
-            <div class="mb-3">
-                <label class="form-label">Meta Title</label>
-                <input type="text" class="form-control" name="MetaTitle" value="@Model.Category?.MetaTitle" />
+            <h6 class="border-b border-gray-200 pb-2 mb-4 mt-6 font-semibold text-gray-900">SEO</h6>
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Meta Title</label>
+                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MetaTitle" value="@Model.Category?.MetaTitle" />
             </div>
-            <div class="mb-3">
-                <label class="form-label">Meta Description</label>
-                <textarea class="form-control" name="MetaDescription" rows="2">@Model.Category?.MetaDescription</textarea>
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Meta Description</label>
+                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="MetaDescription" rows="2">@Model.Category?.MetaDescription</textarea>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-light border-0 mb-3">
-                <div class="card-body">
-                    <h6 class="card-title">Organization</h6>
-                    <div class="mb-3">
-                        <label class="form-label">Parent Category</label>
-                        <select class="form-select" name="ParentId">
-                            <option value="">-- None (Top Level) --</option>
-                            @foreach (var parent in Model.ParentCategories)
+        <div class="col-span-12 md:col-span-4">
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <h6 class="font-semibold text-gray-900 mb-3">Organization</h6>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Parent Category</label>
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ParentId">
+                        <option value="">-- None (Top Level) --</option>
+                        @foreach (var parent in Model.ParentCategories)
+                        {
+                            if (Model.Category?.ParentId == parent.Id)
                             {
-                                if (Model.Category?.ParentId == parent.Id)
-                                {
-                                    <option value="@parent.Id" selected>@parent.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@parent.Id">@parent.Name</option>
-                                }
+                                <option value="@parent.Id" selected>@parent.Name</option>
                             }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Sort Order</label>
-                        <input type="number" class="form-control" name="SortOrder" value="@(Model.Category?.SortOrder ?? 0)" />
-                    </div>
+                            else
+                            {
+                                <option value="@parent.Id">@parent.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Sort Order</label>
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SortOrder" value="@(Model.Category?.SortOrder ?? 0)" />
                 </div>
             </div>
 
-            <div class="card bg-light border-0">
-                <div class="card-body">
-                    <h6 class="card-title">Status</h6>
-                    <div class="form-check form-switch">
-                        <input type="checkbox" class="form-check-input" name="IsActive" value="true"
-                               @(Model.Category?.IsActive ?? true ? "checked" : "") id="isActive" />
-                        <label class="form-check-label" for="isActive">Active</label>
-                    </div>
-                </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h6 class="font-semibold text-gray-900 mb-3">Status</h6>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" name="IsActive" value="true"
+                           @(Model.Category?.IsActive ?? true ? "checked" : "") id="isActive">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">Active</span>
+                </label>
             </div>
         </div>
     </div>
 
-    <div class="modal-footer mt-4 px-0">
-        <button type="button" class="btn btn-secondary" data-modal-hide="categoryModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Category
+    <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b gap-2 mt-6">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>@(Model.IsEdit ? "Update" : "Create") Category
         </button>
     </div>
 </form>

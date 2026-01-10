@@ -4,15 +4,17 @@
     ViewData["Title"] = "Settings";
 }
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-0">System Settings</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Admin">Admin</a></li>
-                    <li class="breadcrumb-item active">Settings</li>
+            <h1 class="text-2xl font-bold text-gray-900">System Settings</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Admin" class="hover:text-primary-600">Admin</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Settings</li>
                 </ol>
             </nav>
         </div>
@@ -20,112 +22,114 @@
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="flex items-center p-4 text-emerald-800 rounded-lg bg-emerald-50" role="alert">
+            <i class="bi bi-check-circle mr-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-emerald-50 text-emerald-500 rounded-lg p-1.5 hover:bg-emerald-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="flex items-center p-4 text-red-800 rounded-lg bg-red-50" role="alert">
+            <i class="bi bi-exclamation-circle mr-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Settings Navigation -->
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-0">
-                    <div class="nav flex-column nav-pills" id="settingsTabs" role="tablist">
-                        <button class="nav-link active text-start rounded-0 border-bottom" id="general-tab" data-tabs-target="#general" type="button" role="tab">
-                            <i class="bi bi-building me-2"></i>General & Company
-                        </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="currency-tab" data-tabs-target="#currency" type="button" role="tab">
-                            <i class="bi bi-currency-exchange me-2"></i>Currency
-                        </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="tax-tab" data-tabs-target="#tax" type="button" role="tab">
-                            <i class="bi bi-percent me-2"></i>Tax Settings
-                        </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="invoice-tab" data-tabs-target="#invoice" type="button" role="tab">
-                            <i class="bi bi-receipt me-2"></i>Invoice Settings
-                        </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="email-tab" data-tabs-target="#email" type="button" role="tab">
-                            <i class="bi bi-envelope me-2"></i>Email (SMTP)
-                        </button>
-                        <button class="nav-link text-start rounded-0 border-bottom" id="security-tab" data-tabs-target="#security" type="button" role="tab">
-                            <i class="bi bi-shield-lock me-2"></i>Security
-                        </button>
-                        <button class="nav-link text-start rounded-0" id="about-tab" data-tabs-target="#about" type="button" role="tab">
-                            <i class="bi bi-info-circle me-2"></i>About
-                        </button>
-                    </div>
-                </div>
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <nav class="flex flex-col" id="settingsTabs" role="tablist">
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors active:bg-primary-50 active:text-primary-700" id="general-tab" data-tabs-target="#general" type="button" role="tab">
+                        <i class="bi bi-building mr-3"></i>General & Company
+                    </button>
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="currency-tab" data-tabs-target="#currency" type="button" role="tab">
+                        <i class="bi bi-currency-exchange mr-3"></i>Currency
+                    </button>
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="tax-tab" data-tabs-target="#tax" type="button" role="tab">
+                        <i class="bi bi-percent mr-3"></i>Tax Settings
+                    </button>
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="invoice-tab" data-tabs-target="#invoice" type="button" role="tab">
+                        <i class="bi bi-receipt mr-3"></i>Invoice Settings
+                    </button>
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="email-tab" data-tabs-target="#email" type="button" role="tab">
+                        <i class="bi bi-envelope mr-3"></i>Email (SMTP)
+                    </button>
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 border-b border-gray-200 hover:bg-gray-50 transition-colors" id="security-tab" data-tabs-target="#security" type="button" role="tab">
+                        <i class="bi bi-shield-lock mr-3"></i>Security
+                    </button>
+                    <button class="flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors" id="about-tab" data-tabs-target="#about" type="button" role="tab">
+                        <i class="bi bi-info-circle mr-3"></i>About
+                    </button>
+                </nav>
             </div>
         </div>
 
         <!-- Settings Content -->
-        <div class="col-md-9">
+        <div class="lg:col-span-3">
             <div class="tab-content" id="settingsTabContent">
                 <!-- General & Company Settings -->
                 <div class="tab-pane fade show active" id="general" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-building me-2"></i>General & Company Settings</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-building mr-2"></i>General & Company Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="p-6">
                             <form method="post" asp-page-handler="General">
-                                <h6 class="text-muted mb-3">Company Information</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Company Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" asp-for="Settings.CompanyName" required />
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Company Information</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Company Name <span class="text-red-500">*</span></label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.CompanyName" required />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Company Tagline</label>
-                                        <input type="text" class="form-control" asp-for="Settings.CompanyTagline" placeholder="Your business tagline" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Company Tagline</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.CompanyTagline" placeholder="Your business tagline" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Website</label>
-                                        <input type="url" class="form-control" asp-for="Settings.CompanyWebsite" placeholder="https://www.example.com" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Website</label>
+                                        <input type="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.CompanyWebsite" placeholder="https://www.example.com" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" asp-for="Settings.CompanyEmail" placeholder="contact@example.com" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                                        <input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.CompanyEmail" placeholder="contact@example.com" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Phone</label>
-                                        <input type="tel" class="form-control" asp-for="Settings.CompanyPhone" placeholder="+91 9876543210" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Phone</label>
+                                        <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.CompanyPhone" placeholder="+91 9876543210" />
                                     </div>
                                 </div>
 
-                                <h6 class="text-muted mb-3">Address</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Address Line 1</label>
-                                        <input type="text" class="form-control" asp-for="Settings.AddressLine1" />
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Address</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Address Line 1</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.AddressLine1" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Address Line 2</label>
-                                        <input type="text" class="form-control" asp-for="Settings.AddressLine2" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Address Line 2</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.AddressLine2" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">City</label>
-                                        <input type="text" class="form-control" asp-for="Settings.City" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.City" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">State/Province</label>
-                                        <input type="text" class="form-control" asp-for="Settings.State" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">State/Province</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.State" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Postal Code</label>
-                                        <input type="text" class="form-control" asp-for="Settings.PostalCode" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Postal Code</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.PostalCode" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Country</label>
-                                        <select class="form-select" asp-for="Settings.Country" id="countrySelect">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Country</label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.Country" id="countrySelect">
                                             @foreach (var country in Model.CountryOptions)
                                             {
                                                 var isSelected = Model.Settings.Country == country.Name;
@@ -143,11 +147,11 @@
                                     </div>
                                 </div>
 
-                                <h6 class="text-muted mb-3">Regional Settings</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Time Zone</label>
-                                        <select class="form-select" asp-for="Settings.TimeZone">
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Regional Settings</h6>
+                                <div class="grid grid-cols-12 gap-4">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Time Zone</label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.TimeZone">
                                             @foreach (var tz in Model.TimezoneOptions)
                                             {
                                                 var isSelected = Model.Settings.TimeZone == tz.Id;
@@ -162,9 +166,9 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Date Format</label>
-                                        <select class="form-select" asp-for="Settings.DateFormat">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Date Format</label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.DateFormat">
                                             @foreach (var df in Model.DateFormatOptions)
                                             {
                                                 var isSelected = Model.Settings.DateFormat == df.Format;
@@ -179,9 +183,9 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Language</label>
-                                        <select class="form-select" asp-for="Settings.Language">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Language</label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.Language">
                                             @foreach (var lang in Model.LanguageOptions)
                                             {
                                                 var isSelected = Model.Settings.Language == lang.Code;
@@ -198,9 +202,9 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-lg me-1"></i>Save General Settings
+                                <div class="mt-6">
+                                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-check-lg mr-2"></i>Save General Settings
                                     </button>
                                 </div>
                             </form>
@@ -210,16 +214,16 @@
 
                 <!-- Currency Settings -->
                 <div class="tab-pane fade" id="currency" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-currency-exchange me-2"></i>Currency Settings</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-currency-exchange mr-2"></i>Currency Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="p-6">
                             <form method="post" asp-page-handler="Currency">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Currency <span class="text-danger">*</span></label>
-                                        <select class="form-select form-select-lg" asp-for="Settings.Currency" id="currencySelect">
+                                <div class="grid grid-cols-12 gap-4">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Currency <span class="text-red-500">*</span></label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3" asp-for="Settings.Currency" id="currencySelect">
                                             @foreach (var curr in Model.CurrencyOptions)
                                             {
                                                 var isSelected = Model.Settings.Currency == curr.Code;
@@ -234,15 +238,15 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Symbol Preview</label>
-                                        <div class="d-flex align-items-center h-100">
-                                            <span id="currencySymbolPreview" class="badge bg-primary fs-3 px-4 py-2">@Model.Settings.CurrencySymbol</span>
+                                    <div class="col-span-12 md:col-span-3">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Symbol Preview</label>
+                                        <div class="flex items-center h-[46px]">
+                                            <span id="currencySymbolPreview" class="inline-flex items-center px-4 py-2 text-2xl font-medium text-white bg-primary-600 rounded-lg">@Model.Settings.CurrencySymbol</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Decimal Places</label>
-                                        <select class="form-select form-select-lg" asp-for="Settings.CurrencyDecimalPlaces">
+                                    <div class="col-span-12 md:col-span-3">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Decimal Places</label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3" asp-for="Settings.CurrencyDecimalPlaces">
                                             @{
                                                 var dp = Model.Settings.CurrencyDecimalPlaces;
                                             }
@@ -274,15 +278,15 @@
                                     </div>
                                 </div>
 
-                                <div class="alert alert-info mt-4" id="currencyInfoAlert">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    <strong>Selected Currency:</strong> <span id="currencyInfoSymbol">@Model.Settings.CurrencySymbol</span> <span id="currencyInfoName">@Model.Settings.CurrencyName</span> (<span id="currencyInfoCode">@Model.Settings.Currency</span>)
-                                    <br /><small>Currency changes will affect all new invoices and financial documents.</small>
+                                <div class="flex items-center p-4 mt-4 text-blue-800 rounded-lg bg-blue-50" id="currencyInfoAlert">
+                                    <i class="bi bi-info-circle mr-2"></i>
+                                    <strong>Selected Currency:</strong> <span id="currencyInfoSymbol" class="ml-1">@Model.Settings.CurrencySymbol</span> <span id="currencyInfoName">@Model.Settings.CurrencyName</span> (<span id="currencyInfoCode">@Model.Settings.Currency</span>)
+                                    <br /><small class="ml-1">Currency changes will affect all new invoices and financial documents.</small>
                                 </div>
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-lg me-1"></i>Save Currency Settings
+                                <div class="mt-6">
+                                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-check-lg mr-2"></i>Save Currency Settings
                                     </button>
                                 </div>
                             </form>
@@ -292,41 +296,41 @@
 
                 <!-- Tax Settings -->
                 <div class="tab-pane fade" id="tax" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-percent me-2"></i>Tax Settings</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-percent mr-2"></i>Tax Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="p-6">
                             <form method="post" asp-page-handler="Tax">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Tax ID Label</label>
-                                        <input type="text" class="form-control" asp-for="Settings.TaxIdLabel" placeholder="e.g., GSTIN, VAT, TIN" />
-                                        <small class="text-muted">The label shown on invoices (e.g., GSTIN for India, VAT for EU)</small>
+                                <div class="grid grid-cols-12 gap-4">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Tax ID Label</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.TaxIdLabel" placeholder="e.g., GSTIN, VAT, TIN" />
+                                        <p class="mt-1 text-xs text-gray-500">The label shown on invoices (e.g., GSTIN for India, VAT for EU)</p>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">@(Model.Settings.TaxIdLabel ?? "Tax ID")</label>
-                                        <input type="text" class="form-control" asp-for="Settings.TaxId" placeholder="Enter your tax identification number" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">@(Model.Settings.TaxIdLabel ?? "Tax ID")</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.TaxId" placeholder="Enter your tax identification number" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">PAN Number</label>
-                                        <input type="text" class="form-control" asp-for="Settings.PanNumber" placeholder="AAAPA1234A" maxlength="10" />
-                                        <small class="text-muted">Required for India GST registration</small>
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">PAN Number</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.PanNumber" placeholder="AAAPA1234A" maxlength="10" />
+                                        <p class="mt-1 text-xs text-gray-500">Required for India GST registration</p>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-check mt-4">
-                                            <input type="checkbox" class="form-check-input" asp-for="Settings.IsGstRegistered" />
-                                            <label class="form-check-label" asp-for="Settings.IsGstRegistered">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <div class="flex items-center mt-6">
+                                            <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.IsGstRegistered" />
+                                            <label class="ml-2 text-sm font-medium text-gray-900" asp-for="Settings.IsGstRegistered">
                                                 <strong>GST Registered</strong>
                                             </label>
-                                            <small class="text-muted d-block">Enable GST calculations (CGST/SGST for intra-state, IGST for inter-state)</small>
                                         </div>
+                                        <p class="mt-1 text-xs text-gray-500 ml-6">Enable GST calculations (CGST/SGST for intra-state, IGST for inter-state)</p>
                                     </div>
                                 </div>
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-lg me-1"></i>Save Tax Settings
+                                <div class="mt-6">
+                                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-check-lg mr-2"></i>Save Tax Settings
                                     </button>
                                 </div>
                             </form>
@@ -336,88 +340,88 @@
 
                 <!-- Invoice Settings -->
                 <div class="tab-pane fade" id="invoice" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Invoice Settings</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-receipt mr-2"></i>Invoice Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="p-6">
                             <form method="post" asp-page-handler="Invoice">
-                                <h6 class="text-muted mb-3">Document Prefixes</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Invoice Prefix</label>
-                                        <input type="text" class="form-control" asp-for="Settings.InvoicePrefix" maxlength="10" />
-                                        <small class="text-muted">e.g., INV -> INV-2026-0001</small>
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Document Prefixes</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Invoice Prefix</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.InvoicePrefix" maxlength="10" />
+                                        <p class="mt-1 text-xs text-gray-500">e.g., INV -> INV-2026-0001</p>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Quotation Prefix</label>
-                                        <input type="text" class="form-control" asp-for="Settings.QuotationPrefix" maxlength="10" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Quotation Prefix</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.QuotationPrefix" maxlength="10" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Sales Order Prefix</label>
-                                        <input type="text" class="form-control" asp-for="Settings.SalesOrderPrefix" maxlength="10" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Sales Order Prefix</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.SalesOrderPrefix" maxlength="10" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Purchase Order Prefix</label>
-                                        <input type="text" class="form-control" asp-for="Settings.PurchaseOrderPrefix" maxlength="10" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Purchase Order Prefix</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.PurchaseOrderPrefix" maxlength="10" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Delivery Challan Prefix</label>
-                                        <input type="text" class="form-control" asp-for="Settings.DeliveryChallanPrefix" maxlength="10" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Delivery Challan Prefix</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.DeliveryChallanPrefix" maxlength="10" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Goods Receipt Prefix</label>
-                                        <input type="text" class="form-control" asp-for="Settings.GoodsReceiptPrefix" maxlength="10" />
-                                    </div>
-                                </div>
-
-                                <h6 class="text-muted mb-3">Payment Terms</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Default Payment Term (Days)</label>
-                                        <input type="number" class="form-control" asp-for="Settings.DefaultPaymentTermDays" min="0" max="365" />
-                                    </div>
-                                    <div class="col-md-8">
-                                        <label class="form-label">Payment Terms Text</label>
-                                        <input type="text" class="form-control" asp-for="Settings.DefaultPaymentTerms" placeholder="e.g., Net 30, Due on Receipt" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Goods Receipt Prefix</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.GoodsReceiptPrefix" maxlength="10" />
                                     </div>
                                 </div>
 
-                                <h6 class="text-muted mb-3">Invoice PDF Settings</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Invoice Header Text</label>
-                                        <input type="text" class="form-control" asp-for="Settings.InvoiceHeaderText" placeholder="Tax Invoice" />
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Payment Terms</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Default Payment Term (Days)</label>
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.DefaultPaymentTermDays" min="0" max="365" />
                                     </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Invoice Footer Text</label>
-                                        <input type="text" class="form-control" asp-for="Settings.InvoiceFooterText" placeholder="Thank you for your business!" />
+                                    <div class="col-span-12 md:col-span-8">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Payment Terms Text</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.DefaultPaymentTerms" placeholder="e.g., Net 30, Due on Receipt" />
                                     </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Terms and Conditions</label>
-                                        <textarea class="form-control" asp-for="Settings.InvoiceTermsText" rows="3" placeholder="Enter default invoice terms and conditions..."></textarea>
+                                </div>
+
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Invoice PDF Settings</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Invoice Header Text</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.InvoiceHeaderText" placeholder="Tax Invoice" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" asp-for="Settings.ShowGstBreakdown" />
-                                            <label class="form-check-label" asp-for="Settings.ShowGstBreakdown">
+                                    <div class="col-span-12">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Invoice Footer Text</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.InvoiceFooterText" placeholder="Thank you for your business!" />
+                                    </div>
+                                    <div class="col-span-12">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Terms and Conditions</label>
+                                        <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.InvoiceTermsText" rows="3" placeholder="Enter default invoice terms and conditions..."></textarea>
+                                    </div>
+                                    <div class="col-span-12 md:col-span-6">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.ShowGstBreakdown" />
+                                            <label class="ml-2 text-sm font-medium text-gray-900" asp-for="Settings.ShowGstBreakdown">
                                                 Show GST Breakdown (CGST/SGST/IGST)
                                             </label>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" asp-for="Settings.ShowHsnCode" />
-                                            <label class="form-check-label" asp-for="Settings.ShowHsnCode">
+                                    <div class="col-span-12 md:col-span-6">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.ShowHsnCode" />
+                                            <label class="ml-2 text-sm font-medium text-gray-900" asp-for="Settings.ShowHsnCode">
                                                 Show HSN/SAC Code on Invoice
                                             </label>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-lg me-1"></i>Save Invoice Settings
+                                <div class="mt-6">
+                                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-check-lg mr-2"></i>Save Invoice Settings
                                     </button>
                                 </div>
                             </form>
@@ -427,51 +431,51 @@
 
                 <!-- Email Settings -->
                 <div class="tab-pane fade" id="email" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Email (SMTP) Settings</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-envelope mr-2"></i>Email (SMTP) Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="p-6">
                             <form method="post" asp-page-handler="Email">
-                                <div class="row g-3">
-                                    <div class="col-md-8">
-                                        <label class="form-label">SMTP Host</label>
-                                        <input type="text" class="form-control" asp-for="Settings.SmtpHost" placeholder="smtp.gmail.com" />
+                                <div class="grid grid-cols-12 gap-4">
+                                    <div class="col-span-12 md:col-span-8">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">SMTP Host</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.SmtpHost" placeholder="smtp.gmail.com" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">SMTP Port</label>
-                                        <input type="number" class="form-control" asp-for="Settings.SmtpPort" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">SMTP Port</label>
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.SmtpPort" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">SMTP Username</label>
-                                        <input type="text" class="form-control" asp-for="Settings.SmtpUsername" placeholder="your-email@gmail.com" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">SMTP Username</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.SmtpUsername" placeholder="your-email@gmail.com" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">SMTP Password</label>
-                                        <input type="password" class="form-control" asp-for="Settings.SmtpPassword" placeholder="Enter to change password" />
-                                        <small class="text-muted">Leave blank to keep existing password</small>
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">SMTP Password</label>
+                                        <input type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.SmtpPassword" placeholder="Enter to change password" />
+                                        <p class="mt-1 text-xs text-gray-500">Leave blank to keep existing password</p>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">From Email Address</label>
-                                        <input type="email" class="form-control" asp-for="Settings.EmailFromAddress" placeholder="noreply@yourcompany.com" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">From Email Address</label>
+                                        <input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.EmailFromAddress" placeholder="noreply@yourcompany.com" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">From Name</label>
-                                        <input type="text" class="form-control" asp-for="Settings.EmailFromName" placeholder="Your Company Name" />
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">From Name</label>
+                                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.EmailFromName" placeholder="Your Company Name" />
                                     </div>
-                                    <div class="col-12">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" asp-for="Settings.SmtpEnableSsl" />
-                                            <label class="form-check-label" asp-for="Settings.SmtpEnableSsl">Enable SSL/TLS</label>
+                                    <div class="col-span-12">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.SmtpEnableSsl" />
+                                            <label class="ml-2 text-sm font-medium text-gray-900" asp-for="Settings.SmtpEnableSsl">Enable SSL/TLS</label>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-4 d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-lg me-1"></i>Save Email Settings
+                                <div class="mt-6 flex gap-2">
+                                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-check-lg mr-2"></i>Save Email Settings
                                     </button>
-                                    <button type="submit" asp-page-handler="TestEmail" class="btn btn-outline-secondary">
-                                        <i class="bi bi-send me-1"></i>Send Test Email
+                                    <button type="submit" asp-page-handler="TestEmail" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-send mr-2"></i>Send Test Email
                                     </button>
                                 </div>
                             </form>
@@ -481,69 +485,69 @@
 
                 <!-- Security Settings -->
                 <div class="tab-pane fade" id="security" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Security Settings</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-shield-lock mr-2"></i>Security Settings</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="p-6">
                             <form method="post" asp-page-handler="Security">
-                                <h6 class="text-muted mb-3">Password Policy</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Minimum Password Length</label>
-                                        <input type="number" class="form-control" asp-for="Settings.PasswordMinLength" min="6" max="32" />
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Password Policy</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Minimum Password Length</label>
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.PasswordMinLength" min="6" max="32" />
                                     </div>
-                                    <div class="col-md-8">
-                                        <label class="form-label">Password Requirements</label>
-                                        <div class="d-flex flex-wrap gap-3">
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" asp-for="Settings.PasswordRequireUppercase" />
-                                                <label class="form-check-label">Uppercase (A-Z)</label>
+                                    <div class="col-span-12 md:col-span-8">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Password Requirements</label>
+                                        <div class="flex flex-wrap gap-4">
+                                            <div class="flex items-center">
+                                                <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.PasswordRequireUppercase" />
+                                                <label class="ml-2 text-sm text-gray-900">Uppercase (A-Z)</label>
                                             </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" asp-for="Settings.PasswordRequireLowercase" />
-                                                <label class="form-check-label">Lowercase (a-z)</label>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.PasswordRequireLowercase" />
+                                                <label class="ml-2 text-sm text-gray-900">Lowercase (a-z)</label>
                                             </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" asp-for="Settings.PasswordRequireDigit" />
-                                                <label class="form-check-label">Digit (0-9)</label>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.PasswordRequireDigit" />
+                                                <label class="ml-2 text-sm text-gray-900">Digit (0-9)</label>
                                             </div>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" asp-for="Settings.PasswordRequireSpecialChar" />
-                                                <label class="form-check-label">Special (!&#64;#$)</label>
+                                            <div class="flex items-center">
+                                                <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.PasswordRequireSpecialChar" />
+                                                <label class="ml-2 text-sm text-gray-900">Special (!&#64;#$)</label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <h6 class="text-muted mb-3">Session and Lockout</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Session Timeout (minutes)</label>
-                                        <input type="number" class="form-control" asp-for="Settings.SessionTimeoutMinutes" min="5" max="480" />
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Session and Lockout</h6>
+                                <div class="grid grid-cols-12 gap-4 mb-6">
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Session Timeout (minutes)</label>
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.SessionTimeoutMinutes" min="5" max="480" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Max Login Attempts</label>
-                                        <input type="number" class="form-control" asp-for="Settings.MaxLoginAttempts" min="3" max="10" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Max Login Attempts</label>
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.MaxLoginAttempts" min="3" max="10" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Lockout Duration (minutes)</label>
-                                        <input type="number" class="form-control" asp-for="Settings.LockoutDurationMinutes" min="5" max="60" />
+                                    <div class="col-span-12 md:col-span-4">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900">Lockout Duration (minutes)</label>
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Settings.LockoutDurationMinutes" min="5" max="60" />
                                     </div>
                                 </div>
 
-                                <h6 class="text-muted mb-3">Two-Factor Authentication</h6>
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" class="form-check-input" asp-for="Settings.EnableTwoFactor" />
-                                    <label class="form-check-label" asp-for="Settings.EnableTwoFactor">
+                                <h6 class="text-sm font-medium text-gray-500 mb-3">Two-Factor Authentication</h6>
+                                <div class="flex items-center mb-3">
+                                    <input type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500" asp-for="Settings.EnableTwoFactor" />
+                                    <label class="ml-2 text-sm font-medium text-gray-900" asp-for="Settings.EnableTwoFactor">
                                         <strong>Enable Two-Factor Authentication</strong>
                                     </label>
-                                    <small class="text-muted d-block">Users will be required to set up 2FA on next login</small>
                                 </div>
+                                <p class="text-xs text-gray-500 ml-6 mb-6">Users will be required to set up 2FA on next login</p>
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-lg me-1"></i>Save Security Settings
+                                <div class="mt-6">
+                                    <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <i class="bi bi-check-lg mr-2"></i>Save Security Settings
                                     </button>
                                 </div>
                             </form>
@@ -553,70 +557,62 @@
 
                 <!-- About -->
                 <div class="tab-pane fade" id="about" role="tabpanel">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>About</h5>
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-info-circle mr-2"></i>About</h5>
                         </div>
-                        <div class="card-body">
-                            <div class="text-center py-4">
-                                <h2 class="text-primary mb-1">Algora ERP</h2>
-                                <p class="text-muted">Enterprise Resource Planning System</p>
-                                <span class="badge bg-primary fs-6 mb-4">Version 1.0.0</span>
+                        <div class="p-6">
+                            <div class="text-center py-6">
+                                <h2 class="text-2xl font-bold text-primary-600 mb-1">Algora ERP</h2>
+                                <p class="text-gray-500">Enterprise Resource Planning System</p>
+                                <span class="inline-flex items-center px-3 py-1 mt-4 text-sm font-medium text-white bg-primary-600 rounded-full">Version 1.0.0</span>
                             </div>
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="card bg-light border-0">
-                                        <div class="card-body">
-                                            <h6><i class="bi bi-cpu me-2"></i>System Information</h6>
-                                            <table class="table table-sm table-borderless mb-0">
-                                                <tr>
-                                                    <td class="text-muted">.NET Version</td>
-                                                    <td>8.0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Database</td>
-                                                    <td>SQL Server</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Server OS</td>
-                                                    <td>@Environment.OSVersion</td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h6 class="font-medium text-gray-900 mb-3"><i class="bi bi-cpu mr-2"></i>System Information</h6>
+                                    <table class="w-full text-sm">
+                                        <tr>
+                                            <td class="text-gray-500 py-1">.NET Version</td>
+                                            <td class="text-gray-900 py-1">8.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-gray-500 py-1">Database</td>
+                                            <td class="text-gray-900 py-1">SQL Server</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-gray-500 py-1">Server OS</td>
+                                            <td class="text-gray-900 py-1">@Environment.OSVersion</td>
+                                        </tr>
+                                    </table>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="card bg-light border-0">
-                                        <div class="card-body">
-                                            <h6><i class="bi bi-gear me-2"></i>Current Settings</h6>
-                                            <table class="table table-sm table-borderless mb-0">
-                                                <tr>
-                                                    <td class="text-muted">Currency</td>
-                                                    <td>@Model.Settings.CurrencySymbol @Model.Settings.Currency</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Country</td>
-                                                    <td>@Model.Settings.Country</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-muted">Time Zone</td>
-                                                    <td>@Model.Settings.TimeZone</td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h6 class="font-medium text-gray-900 mb-3"><i class="bi bi-gear mr-2"></i>Current Settings</h6>
+                                    <table class="w-full text-sm">
+                                        <tr>
+                                            <td class="text-gray-500 py-1">Currency</td>
+                                            <td class="text-gray-900 py-1">@Model.Settings.CurrencySymbol @Model.Settings.Currency</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-gray-500 py-1">Country</td>
+                                            <td class="text-gray-900 py-1">@Model.Settings.Country</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-gray-500 py-1">Time Zone</td>
+                                            <td class="text-gray-900 py-1">@Model.Settings.TimeZone</td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
 
-                            <hr class="my-4" />
+                            <hr class="my-6 border-gray-200" />
 
-                            <div class="text-center text-muted">
+                            <div class="text-center text-gray-500">
                                 <p class="mb-1">2024-2026 Algora. All rights reserved.</p>
-                                <p class="small mb-0">
-                                    <a href="#" class="text-muted">Documentation</a> |
-                                    <a href="#" class="text-muted">Support</a> |
-                                    <a href="#" class="text-muted">Privacy Policy</a>
+                                <p class="text-sm">
+                                    <a href="#" class="text-gray-500 hover:text-primary-600">Documentation</a> |
+                                    <a href="#" class="text-gray-500 hover:text-primary-600">Support</a> |
+                                    <a href="#" class="text-gray-500 hover:text-primary-600">Privacy Policy</a>
                                 </p>
                             </div>
                         </div>

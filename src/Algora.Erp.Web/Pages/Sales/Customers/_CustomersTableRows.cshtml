@@ -4,8 +4,8 @@
 {
     <tr>
         <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-people fs-1 d-block mb-3"></i>
+            <div class="text-gray-500">
+                <i class="bi bi-people text-4xl block mb-3"></i>
                 <p class="mb-0">No customers found</p>
             </div>
         </td>
@@ -17,92 +17,102 @@ else
     {
         var orderCount = customer.SalesOrders?.Count ?? 0;
 
-        <tr>
-            <td class="ps-4">
-                <code class="bg-light px-2 py-1 rounded">@customer.Code</code>
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <code class="bg-gray-50 px-2 py-1 rounded text-sm">@customer.Code</code>
             </td>
-            <td>
-                <div class="fw-medium">@customer.Name</div>
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@customer.Name</div>
                 @if (!string.IsNullOrEmpty(customer.BillingCity))
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-geo-alt me-1"></i>@customer.BillingCity
-                    </small>
+                    <span class="text-sm text-gray-500">
+                        <i class="bi bi-geo-alt mr-1"></i>@customer.BillingCity
+                    </span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(customer.ContactPerson))
                 {
-                    <div>@customer.ContactPerson</div>
+                    <div class="text-gray-900">@customer.ContactPerson</div>
                 }
                 @if (!string.IsNullOrEmpty(customer.Email))
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-envelope me-1"></i>@customer.Email
-                    </small>
+                    <span class="text-sm text-gray-500">
+                        <i class="bi bi-envelope mr-1"></i>@customer.Email
+                    </span>
                 }
                 else if (!string.IsNullOrEmpty(customer.Phone))
                 {
-                    <small class="text-muted">
-                        <i class="bi bi-telephone me-1"></i>@customer.Phone
-                    </small>
+                    <span class="text-sm text-gray-500">
+                        <i class="bi bi-telephone mr-1"></i>@customer.Phone
+                    </span>
                 }
             </td>
-            <td>
-                <span class="badge bg-@(customer.CustomerType == Algora.Erp.Domain.Entities.Sales.CustomerType.Company ? "primary" : "info") bg-opacity-10 text-@(customer.CustomerType == Algora.Erp.Domain.Entities.Sales.CustomerType.Company ? "primary" : "info")">
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @(customer.CustomerType == Algora.Erp.Domain.Entities.Sales.CustomerType.Company ? "bg-primary-100 text-primary-800" : "bg-blue-100 text-blue-800")">
                     @customer.CustomerType
                 </span>
             </td>
-            <td class="text-center">
-                <a href="/Sales/Orders?customerId=@customer.Id" class="btn btn-link p-0 text-decoration-none">
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary">@orderCount</span>
+            <td class="px-6 py-4 text-center">
+                <a href="/Sales/Orders?customerId=@customer.Id" class="text-primary-600 hover:text-primary-700">
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@orderCount</span>
                 </a>
             </td>
-            <td class="text-end">
+            <td class="px-6 py-4 text-right">
                 @if (customer.CurrentBalance > 0)
                 {
-                    <span class="text-success fw-medium">@customer.CurrentBalance.ToString("C2")</span>
+                    <span class="text-emerald-600 font-medium">@customer.CurrentBalance.ToString("C2")</span>
                 }
                 else if (customer.CurrentBalance < 0)
                 {
-                    <span class="text-danger fw-medium">@customer.CurrentBalance.ToString("C2")</span>
+                    <span class="text-red-600 font-medium">@customer.CurrentBalance.ToString("C2")</span>
                 }
                 else
                 {
-                    <span class="text-muted">@customer.CurrentBalance.ToString("C2")</span>
+                    <span class="text-gray-500">@customer.CurrentBalance.ToString("C2")</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (customer.IsActive)
                 {
-                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                 }
                 else
                 {
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary">Inactive</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <a href="/Sales/Orders?customerId=@customer.Id"
-                       class="btn btn-outline-info"
-                       title="View Orders">
-                        <i class="bi bi-bag-check"></i>
-                    </a>
-                    <button type="button"
-                            class="btn btn-outline-primary"
-                            hx-get="?handler=EditForm&id=@customer.Id"
-                            hx-target="#formModalBody"
-                            data-modal-target="formModal" data-modal-toggle="formModal"
-                            title="Edit">
-                        <i class="bi bi-pencil"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownCust@(customer.Id)" data-dropdown-toggle="dropdownMenuCust@(customer.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <button type="button"
-                            class="btn btn-outline-danger"
-                            onclick="confirmDelete('@customer.Id')"
-                            title="Delete">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuCust@(customer.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="?handler=EditForm&id=@customer.Id"
+                                   hx-target="#formModalBody"
+                                   data-modal-target="formModal" data-modal-toggle="formModal">
+                                    <i class="bi bi-pencil mr-2"></i> Edit
+                                </a>
+                            </li>
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Sales/Orders?customerId=@customer.Id">
+                                    <i class="bi bi-bag-check mr-2"></i> View Orders
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="py-2">
+                            <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                               hx-delete="?handler=Delete&id=@customer.Id"
+                               hx-target="#customersTableBody"
+                               hx-swap="innerHTML"
+                               hx-confirm="Are you sure you want to delete this customer?">
+                                <i class="bi bi-trash mr-2"></i> Delete
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -110,15 +120,15 @@ else
 
     <!-- Pagination -->
     <tr>
-        <td colspan="8" class="py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small">
+        <td colspan="8" class="px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="text-gray-500 text-sm">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </div>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link"
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 py-2 leading-tight @(Model.Page <= 1 ? "text-gray-300 pointer-events-none" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700") bg-white border border-gray-300 rounded-l-lg"
                                hx-get="?handler=Table&page=@(Model.Page - 1)"
                                hx-target="#customersTableBody"
                                hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
@@ -127,8 +137,8 @@ else
                         </li>
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link"
+                            <li>
+                                <a class="flex items-center justify-center px-3 py-2 leading-tight @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700") border border-gray-300"
                                    hx-get="?handler=Table&page=@i"
                                    hx-target="#customersTableBody"
                                    hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">
@@ -136,8 +146,8 @@ else
                                 </a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
+                        <li>
+                            <a class="flex items-center justify-center px-3 py-2 leading-tight @(Model.Page >= Model.TotalPages ? "text-gray-300 pointer-events-none" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700") bg-white border border-gray-300 rounded-r-lg"
                                hx-get="?handler=Table&page=@(Model.Page + 1)"
                                hx-target="#customersTableBody"
                                hx-include="#searchInput, #typeFilter, #statusFilter, #pageSizeSelect">

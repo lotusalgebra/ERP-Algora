@@ -4,22 +4,22 @@
 @{
     var statusClass = Model.Status switch
     {
-        WorkOrderStatus.Draft => "bg-secondary",
-        WorkOrderStatus.Released => "bg-info",
-        WorkOrderStatus.InProgress => "bg-primary",
-        WorkOrderStatus.OnHold => "bg-warning",
-        WorkOrderStatus.Completed => "bg-success",
-        WorkOrderStatus.Cancelled => "bg-danger",
-        _ => "bg-secondary"
+        WorkOrderStatus.Draft => "bg-gray-100 text-gray-800",
+        WorkOrderStatus.Released => "bg-blue-100 text-blue-800",
+        WorkOrderStatus.InProgress => "bg-primary-100 text-primary-800",
+        WorkOrderStatus.OnHold => "bg-amber-100 text-amber-800",
+        WorkOrderStatus.Completed => "bg-emerald-100 text-emerald-800",
+        WorkOrderStatus.Cancelled => "bg-red-100 text-red-800",
+        _ => "bg-gray-100 text-gray-800"
     };
 
     var priorityClass = Model.Priority switch
     {
-        WorkOrderPriority.Low => "bg-light text-dark",
-        WorkOrderPriority.Normal => "bg-info",
-        WorkOrderPriority.High => "bg-warning",
-        WorkOrderPriority.Urgent => "bg-danger",
-        _ => "bg-info"
+        WorkOrderPriority.Low => "bg-gray-100 text-gray-800",
+        WorkOrderPriority.Normal => "bg-blue-100 text-blue-800",
+        WorkOrderPriority.High => "bg-amber-100 text-amber-800",
+        WorkOrderPriority.Urgent => "bg-red-100 text-red-800",
+        _ => "bg-blue-100 text-blue-800"
     };
 
     var progressPercent = Model.PlannedQuantity > 0
@@ -29,51 +29,52 @@
     var totalMaterialCost = Model.Materials.Sum(m => m.TotalCost);
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">
-        <i class="bi bi-clipboard-check me-2"></i>@Model.WorkOrderNumber
-    </h5>
-    <button type="button" class="btn-close" data-modal-hide="detailsModal" aria-label="Close"></button>
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h3 class="text-xl font-semibold text-gray-900">
+        <i class="bi bi-clipboard-check mr-2"></i>@Model.WorkOrderNumber
+    </h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="detailsModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
-<div class="modal-body">
+<div class="p-6">
     <!-- Header Info -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h4 class="mb-1">@Model.Name</h4>
-            <p class="text-muted mb-0">
-                Product: <strong>@Model.Product?.Name</strong>
+    <div class="grid grid-cols-12 gap-3 mb-4">
+        <div class="md:col-span-8 col-span-12">
+            <h4 class="text-lg font-semibold text-gray-900 mb-1">@Model.Name</h4>
+            <p class="text-gray-500">
+                Product: <strong class="text-gray-900">@Model.Product?.Name</strong>
                 @if (Model.BillOfMaterial != null)
                 {
-                    <span class="ms-2">| BOM: <strong>@Model.BillOfMaterial.BomNumber</strong></span>
+                    <span class="ml-2">| BOM: <strong class="text-gray-900">@Model.BillOfMaterial.BomNumber</strong></span>
                 }
             </p>
         </div>
-        <div class="col-md-4 text-end">
-            <span class="badge @statusClass fs-6 me-2">@Model.Status</span>
-            <span class="badge @priorityClass">@Model.Priority Priority</span>
+        <div class="md:col-span-4 col-span-12 md:text-right">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusClass mr-2">@Model.Status</span>
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @priorityClass">@Model.Priority Priority</span>
         </div>
     </div>
 
     <!-- Progress -->
-    <div class="card border mb-4">
-        <div class="card-body">
-            <h6 class="text-muted mb-3">Production Progress</h6>
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="progress" style="height: 24px;">
-                        <div class="progress-bar @(progressPercent >= 100 ? "bg-success" : "bg-primary")"
-                             style="width: @progressPercent%">
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 mb-4">
+        <div class="p-4">
+            <h6 class="text-gray-500 text-sm font-medium mb-3">Production Progress</h6>
+            <div class="flex items-center">
+                <div class="flex-grow mr-4">
+                    <div class="w-full bg-gray-200 rounded-full h-6">
+                        <div class="@(progressPercent >= 100 ? "bg-emerald-600" : "bg-primary-600") h-6 rounded-full flex items-center justify-center text-xs font-medium text-white" style="width: @progressPercent%">
                             @progressPercent%
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 text-end">
-                    <span class="fs-5">
+                <div class="text-right">
+                    <span class="text-lg">
                         <strong>@Model.CompletedQuantity</strong> / @Model.PlannedQuantity @Model.UnitOfMeasure
                     </span>
                     @if (Model.ScrapQuantity > 0)
                     {
-                        <br><small class="text-danger">Scrap: @Model.ScrapQuantity</small>
+                        <br><small class="text-red-600">Scrap: @Model.ScrapQuantity</small>
                     }
                 </div>
             </div>
@@ -81,37 +82,53 @@
     </div>
 
     <!-- Details -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <h6 class="text-muted mb-3">Schedule</h6>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5">Planned Start</dt>
-                        <dd class="col-sm-7">@Model.PlannedStartDate.ToString("MMM dd, yyyy")</dd>
-                        <dt class="col-sm-5">Planned End</dt>
-                        <dd class="col-sm-7">@Model.PlannedEndDate.ToString("MMM dd, yyyy")</dd>
-                        <dt class="col-sm-5">Actual Start</dt>
-                        <dd class="col-sm-7">@(Model.ActualStartDate?.ToString("MMM dd, yyyy HH:mm") ?? "-")</dd>
-                        <dt class="col-sm-5">Actual End</dt>
-                        <dd class="col-sm-7">@(Model.ActualEndDate?.ToString("MMM dd, yyyy HH:mm") ?? "-")</dd>
+    <div class="grid grid-cols-12 gap-3 mb-4">
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md border border-gray-200 h-full">
+                <div class="p-4">
+                    <h6 class="text-gray-500 text-sm font-medium mb-3">Schedule</h6>
+                    <dl class="space-y-2">
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Planned Start</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@Model.PlannedStartDate.ToString("MMM dd, yyyy")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Planned End</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@Model.PlannedEndDate.ToString("MMM dd, yyyy")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Actual Start</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@(Model.ActualStartDate?.ToString("MMM dd, yyyy HH:mm") ?? "-")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Actual End</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@(Model.ActualEndDate?.ToString("MMM dd, yyyy HH:mm") ?? "-")</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <h6 class="text-muted mb-3">Cost & Location</h6>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5">Estimated Cost</dt>
-                        <dd class="col-sm-7">@Model.EstimatedCost.ToString("C")</dd>
-                        <dt class="col-sm-5">Actual Cost</dt>
-                        <dd class="col-sm-7">@Model.ActualCost.ToString("C")</dd>
-                        <dt class="col-sm-5">Material Cost</dt>
-                        <dd class="col-sm-7">@totalMaterialCost.ToString("C")</dd>
-                        <dt class="col-sm-5">Warehouse</dt>
-                        <dd class="col-sm-7">@(Model.Warehouse?.Name ?? "-")</dd>
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md border border-gray-200 h-full">
+                <div class="p-4">
+                    <h6 class="text-gray-500 text-sm font-medium mb-3">Cost & Location</h6>
+                    <dl class="space-y-2">
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Estimated Cost</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@Model.EstimatedCost.ToString("C")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Actual Cost</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@Model.ActualCost.ToString("C")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Material Cost</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@totalMaterialCost.ToString("C")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Warehouse</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@(Model.Warehouse?.Name ?? "-")</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -121,24 +138,24 @@
     <!-- Operations -->
     @if (Model.Operations.Any())
     {
-        <div class="card border mb-4">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">
-                    <i class="bi bi-gear me-2"></i>Operations
-                    <span class="badge bg-primary ms-2">@Model.Operations.Count steps</span>
+        <div class="bg-white rounded-lg shadow-md border border-gray-200 mb-4">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900">
+                    <i class="bi bi-gear mr-2"></i>Operations
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-2">@Model.Operations.Count steps</span>
                 </h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
+            <div class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th class="ps-3">#</th>
-                                <th>Operation</th>
-                                <th>Workstation</th>
-                                <th class="text-end">Planned Hrs</th>
-                                <th class="text-end">Actual Hrs</th>
-                                <th>Status</th>
+                                <th scope="col" class="px-4 py-3">#</th>
+                                <th scope="col" class="px-4 py-3">Operation</th>
+                                <th scope="col" class="px-4 py-3">Workstation</th>
+                                <th scope="col" class="px-4 py-3 text-right">Planned Hrs</th>
+                                <th scope="col" class="px-4 py-3 text-right">Actual Hrs</th>
+                                <th scope="col" class="px-4 py-3">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,34 +163,34 @@
                             {
                                 var opStatusClass = op.Status switch
                                 {
-                                    OperationStatus.Pending => "bg-secondary",
-                                    OperationStatus.InProgress => "bg-primary",
-                                    OperationStatus.Completed => "bg-success",
-                                    OperationStatus.Skipped => "bg-warning",
-                                    _ => "bg-secondary"
+                                    OperationStatus.Pending => "bg-gray-100 text-gray-800",
+                                    OperationStatus.InProgress => "bg-primary-100 text-primary-800",
+                                    OperationStatus.Completed => "bg-emerald-100 text-emerald-800",
+                                    OperationStatus.Skipped => "bg-amber-100 text-amber-800",
+                                    _ => "bg-gray-100 text-gray-800"
                                 };
 
-                                <tr>
-                                    <td class="ps-3">@op.OperationNumber</td>
-                                    <td>
-                                        @op.Name
+                                <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td class="px-4 py-3">@op.OperationNumber</td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-gray-900">@op.Name</span>
                                         @if (!string.IsNullOrEmpty(op.Description))
                                         {
-                                            <br><small class="text-muted">@op.Description</small>
+                                            <br><small class="text-gray-500">@op.Description</small>
                                         }
                                     </td>
-                                    <td>@(op.Workstation ?? "-")</td>
-                                    <td class="text-end">@op.PlannedHours hrs</td>
-                                    <td class="text-end">@op.ActualHours hrs</td>
-                                    <td><span class="badge @opStatusClass">@op.Status</span></td>
+                                    <td class="px-4 py-3">@(op.Workstation ?? "-")</td>
+                                    <td class="px-4 py-3 text-right">@op.PlannedHours hrs</td>
+                                    <td class="px-4 py-3 text-right">@op.ActualHours hrs</td>
+                                    <td class="px-4 py-3"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full @opStatusClass">@op.Status</span></td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="table-light">
+                        <tfoot class="bg-gray-50">
                             <tr>
-                                <td colspan="3" class="text-end fw-bold">Total:</td>
-                                <td class="text-end fw-bold">@Model.Operations.Sum(o => o.PlannedHours) hrs</td>
-                                <td class="text-end fw-bold">@Model.Operations.Sum(o => o.ActualHours) hrs</td>
+                                <td colspan="3" class="px-4 py-3 text-right font-bold text-gray-900">Total:</td>
+                                <td class="px-4 py-3 text-right font-bold text-gray-900">@Model.Operations.Sum(o => o.PlannedHours) hrs</td>
+                                <td class="px-4 py-3 text-right font-bold text-gray-900">@Model.Operations.Sum(o => o.ActualHours) hrs</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -186,46 +203,46 @@
     <!-- Materials -->
     @if (Model.Materials.Any())
     {
-        <div class="card border">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">
-                    <i class="bi bi-box-seam me-2"></i>Materials
-                    <span class="badge bg-primary ms-2">@Model.Materials.Count items</span>
+        <div class="bg-white rounded-lg shadow-md border border-gray-200">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900">
+                    <i class="bi bi-box-seam mr-2"></i>Materials
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-2">@Model.Materials.Count items</span>
                 </h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
+            <div class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th class="ps-3">#</th>
-                                <th>Product</th>
-                                <th class="text-end">Required</th>
-                                <th class="text-end">Issued</th>
-                                <th class="text-end">Consumed</th>
-                                <th class="text-end pe-3">Cost</th>
+                                <th scope="col" class="px-4 py-3">#</th>
+                                <th scope="col" class="px-4 py-3">Product</th>
+                                <th scope="col" class="px-4 py-3 text-right">Required</th>
+                                <th scope="col" class="px-4 py-3 text-right">Issued</th>
+                                <th scope="col" class="px-4 py-3 text-right">Consumed</th>
+                                <th scope="col" class="px-4 py-3 text-right">Cost</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var mat in Model.Materials.OrderBy(m => m.LineNumber))
                             {
-                                <tr>
-                                    <td class="ps-3">@mat.LineNumber</td>
-                                    <td>
-                                        @mat.Product?.Name
-                                        <br><small class="text-muted">@mat.Product?.Sku</small>
+                                <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td class="px-4 py-3">@mat.LineNumber</td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-gray-900">@mat.Product?.Name</span>
+                                        <br><small class="text-gray-500">@mat.Product?.Sku</small>
                                     </td>
-                                    <td class="text-end">@mat.RequiredQuantity @mat.UnitOfMeasure</td>
-                                    <td class="text-end">@mat.IssuedQuantity</td>
-                                    <td class="text-end">@mat.ConsumedQuantity</td>
-                                    <td class="text-end pe-3">@mat.TotalCost.ToString("C")</td>
+                                    <td class="px-4 py-3 text-right">@mat.RequiredQuantity @mat.UnitOfMeasure</td>
+                                    <td class="px-4 py-3 text-right">@mat.IssuedQuantity</td>
+                                    <td class="px-4 py-3 text-right">@mat.ConsumedQuantity</td>
+                                    <td class="px-4 py-3 text-right">@mat.TotalCost.ToString("C")</td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="table-light">
+                        <tfoot class="bg-gray-50">
                             <tr>
-                                <td colspan="5" class="text-end fw-bold">Total Material Cost:</td>
-                                <td class="text-end pe-3 fw-bold text-primary">@totalMaterialCost.ToString("C")</td>
+                                <td colspan="5" class="px-4 py-3 text-right font-bold text-gray-900">Total Material Cost:</td>
+                                <td class="px-4 py-3 text-right font-bold text-primary-600">@totalMaterialCost.ToString("C")</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -236,40 +253,38 @@
 
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="card border mt-3">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-journal-text me-2"></i>Notes</h6>
+        <div class="bg-white rounded-lg shadow-md border border-gray-200 mt-4">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900"><i class="bi bi-journal-text mr-2"></i>Notes</h6>
             </div>
-            <div class="card-body">
-                <p class="mb-0">@Model.Notes</p>
+            <div class="p-4">
+                <p class="text-gray-700 text-sm">@Model.Notes</p>
             </div>
         </div>
     }
 
     <!-- Timestamps -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <small class="text-muted">
-                Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
-                @if (Model.ModifiedAt.HasValue)
-                {
-                    <span class="ms-3">Modified: @Model.ModifiedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
-                }
-            </small>
-        </div>
+    <div class="mt-4">
+        <small class="text-gray-500">
+            Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+            @if (Model.ModifiedAt.HasValue)
+            {
+                <span class="ml-3">Modified: @Model.ModifiedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+            }
+        </small>
     </div>
 </div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+<div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
     @if (Model.Status == WorkOrderStatus.Draft || Model.Status == WorkOrderStatus.Released)
     {
         <button type="button"
-                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
+                class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5"
                 hx-get="/Manufacturing/WorkOrders?handler=EditForm&id=@Model.Id"
                 hx-target="#formModalContent"
                 data-modal-hide="detailsModal"
                 onclick="setTimeout(() => { const modal = FlowbiteInstances.getInstance('Modal', 'formModal'); if(modal) modal.show(); }, 300)">
-            <i class="bi bi-pencil me-1"></i> Edit
+            <i class="bi bi-pencil mr-1"></i> Edit
         </button>
     }
 </div>

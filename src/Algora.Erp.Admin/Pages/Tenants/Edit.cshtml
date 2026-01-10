@@ -5,30 +5,30 @@
 }
 
 <!-- Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="flex justify-between items-center mb-4">
     <div>
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2">
-                <li class="breadcrumb-item"><a href="/Tenants">Tenants</a></li>
-                <li class="breadcrumb-item"><a href="/Tenants/Details/@Model.Tenant.Id">@Model.Tenant.Name</a></li>
-                <li class="breadcrumb-item active">Edit</li>
+            <ol class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+                <li><a href="/Tenants" class="hover:text-primary-600">Tenants</a></li>
+                <li class="before:content-['/'] before:mr-2"><a href="/Tenants/Details/@Model.Tenant.Id" class="hover:text-primary-600">@Model.Tenant.Name</a></li>
+                <li class="before:content-['/'] before:mr-2 text-gray-700 font-medium">Edit</li>
             </ol>
         </nav>
-        <h4 class="mb-0">
-            <i class="bi bi-pencil me-2 text-primary"></i>Edit Tenant
+        <h4 class="text-xl font-bold text-gray-900">
+            <i class="bi bi-pencil mr-2 text-primary-600"></i>Edit Tenant
         </h4>
     </div>
     <div>
-        <a href="/Tenants/Details/@Model.Tenant.Id" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Cancel
+        <a href="/Tenants/Details/@Model.Tenant.Id" class="text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-arrow-left mr-1"></i>Cancel
         </a>
     </div>
 </div>
 
 @if (!ViewData.ModelState.IsValid)
 {
-    <div class="alert alert-danger">
-        <ul class="mb-0">
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
+        <ul class="list-disc list-inside">
             @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
             {
                 <li>@error.ErrorMessage</li>
@@ -40,91 +40,91 @@
 <form method="post">
     <input type="hidden" asp-for="Input.Id" />
 
-    <div class="row">
+    <div class="grid grid-cols-12 gap-6">
         <!-- Left Column -->
-        <div class="col-lg-8">
+        <div class="col-span-12 lg:col-span-8">
             <!-- Basic Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h6>
+            <div class="bg-white rounded-lg shadow-md mb-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-800"><i class="bi bi-info-circle mr-2"></i>Basic Information</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Organization Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" asp-for="Input.Name" />
-                            <span asp-validation-for="Input.Name" class="text-danger small"></span>
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Organization Name <span class="text-red-600">*</span></label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.Name" />
+                            <span asp-validation-for="Input.Name" class="text-red-600 text-sm"></span>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Subdomain</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" asp-for="Input.Subdomain" readonly />
-                                <span class="input-group-text">.algora.app</span>
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Subdomain</label>
+                            <div class="flex">
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.Subdomain" readonly />
+                                <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-gray-300 rounded-r-lg">.algora.app</span>
                             </div>
-                            <small class="text-muted">Subdomain cannot be changed after creation</small>
+                            <small class="text-gray-500 text-sm">Subdomain cannot be changed after creation</small>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-control" asp-for="Input.CompanyName" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Company Name</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.CompanyName" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tax ID / GST Number</label>
-                            <input type="text" class="form-control" asp-for="Input.TaxId" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Tax ID / GST Number</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.TaxId" />
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Contact Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Contact Information</h6>
+            <div class="bg-white rounded-lg shadow-md mb-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-800"><i class="bi bi-person-lines-fill mr-2"></i>Contact Information</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" asp-for="Input.ContactEmail" />
-                            <span asp-validation-for="Input.ContactEmail" class="text-danger small"></span>
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Contact Email <span class="text-red-600">*</span></label>
+                            <input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.ContactEmail" />
+                            <span asp-validation-for="Input.ContactEmail" class="text-red-600 text-sm"></span>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Phone</label>
-                            <input type="tel" class="form-control" asp-for="Input.ContactPhone" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Contact Phone</label>
+                            <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.ContactPhone" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Person</label>
-                            <input type="text" class="form-control" asp-for="Input.ContactPerson" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Contact Person</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.ContactPerson" />
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Address -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Address</h6>
+            <div class="bg-white rounded-lg shadow-md mb-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-800"><i class="bi bi-geo-alt mr-2"></i>Address</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Street Address</label>
-                            <textarea class="form-control" asp-for="Input.Address" rows="2"></textarea>
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Street Address</label>
+                            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.Address" rows="2"></textarea>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-control" asp-for="Input.City" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.City" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">State / Province</label>
-                            <input type="text" class="form-control" asp-for="Input.State" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">State / Province</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.State" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Country</label>
-                            <input type="text" class="form-control" asp-for="Input.Country" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Country</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.Country" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Postal Code</label>
-                            <input type="text" class="form-control" asp-for="Input.PostalCode" />
+                        <div class="col-span-12 md:col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Postal Code</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.PostalCode" />
                         </div>
                     </div>
                 </div>
@@ -132,30 +132,30 @@
         </div>
 
         <!-- Right Column -->
-        <div class="col-lg-4">
+        <div class="col-span-12 lg:col-span-4">
             <!-- Database Settings -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary bg-opacity-10">
-                    <h6 class="mb-0"><i class="bi bi-database me-2"></i>Database Settings</h6>
+            <div class="bg-white rounded-lg shadow-md mb-4">
+                <div class="px-6 py-4 border-b border-gray-200 bg-primary-50">
+                    <h6 class="font-semibold text-gray-800"><i class="bi bi-database mr-2"></i>Database Settings</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Database Name</label>
-                        <input type="text" class="form-control" asp-for="Input.DatabaseName" readonly />
-                        <small class="text-muted">Database name cannot be changed</small>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Database Name</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.DatabaseName" readonly />
+                        <small class="text-gray-500 text-sm">Database name cannot be changed</small>
                     </div>
                 </div>
             </div>
 
             <!-- Regional Settings -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-globe me-2"></i>Regional Settings</h6>
+            <div class="bg-white rounded-lg shadow-md mb-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-800"><i class="bi bi-globe mr-2"></i>Regional Settings</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Currency</label>
-                        <select class="form-select" asp-for="Input.CurrencyCode">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Currency</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.CurrencyCode">
                             <option value="INR">INR - Indian Rupee</option>
                             <option value="USD">USD - US Dollar</option>
                             <option value="EUR">EUR - Euro</option>
@@ -165,8 +165,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Timezone</label>
-                        <select class="form-select" asp-for="Input.TimeZone">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Timezone</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.TimeZone">
                             <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
                             <option value="America/New_York">America/New_York (EST)</option>
                             <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
@@ -181,25 +181,25 @@
             </div>
 
             <!-- Limits -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-sliders me-2"></i>Limits</h6>
+            <div class="bg-white rounded-lg shadow-md mb-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-800"><i class="bi bi-sliders mr-2"></i>Limits</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Maximum Users</label>
-                        <input type="number" class="form-control" asp-for="Input.MaxUsers" min="1" />
-                        <small class="text-muted">Enter -1 for unlimited</small>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Maximum Users</label>
+                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="Input.MaxUsers" min="1" />
+                        <small class="text-gray-500 text-sm">Enter -1 for unlimited</small>
                     </div>
                 </div>
             </div>
 
             <!-- Actions -->
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-gradient btn-lg">
-                    <i class="bi bi-check-lg me-2"></i>Save Changes
+            <div class="grid gap-2">
+                <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-base px-6 py-3 w-full">
+                    <i class="bi bi-check-lg mr-2"></i>Save Changes
                 </button>
-                <a href="/Tenants/Details/@Model.Tenant.Id" class="btn btn-outline-secondary">
+                <a href="/Tenants/Details/@Model.Tenant.Id" class="text-center text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 block">
                     Cancel
                 </a>
             </div>

@@ -22,24 +22,34 @@
         _ => type.ToString()
     };
 
-    string GetTypeColor(OfficeType type) => type switch
+    string GetTypeBgColor(OfficeType type) => type switch
     {
-        OfficeType.HeadOffice => "primary",
-        OfficeType.Branch => "success",
-        OfficeType.Warehouse => "warning",
-        OfficeType.Factory => "info",
-        OfficeType.RegisteredOffice => "secondary",
-        _ => "dark"
+        OfficeType.HeadOffice => "bg-primary-100 text-primary-800",
+        OfficeType.Branch => "bg-emerald-100 text-emerald-800",
+        OfficeType.Warehouse => "bg-amber-100 text-amber-800",
+        OfficeType.Factory => "bg-cyan-100 text-cyan-800",
+        OfficeType.RegisteredOffice => "bg-gray-100 text-gray-800",
+        _ => "bg-gray-100 text-gray-800"
+    };
+
+    string GetTypeIconBg(OfficeType type) => type switch
+    {
+        OfficeType.HeadOffice => "bg-primary-100 text-primary-600",
+        OfficeType.Branch => "bg-emerald-100 text-emerald-600",
+        OfficeType.Warehouse => "bg-amber-100 text-amber-600",
+        OfficeType.Factory => "bg-cyan-100 text-cyan-600",
+        OfficeType.RegisteredOffice => "bg-gray-100 text-gray-600",
+        _ => "bg-gray-100 text-gray-600"
     };
 }
 
 @if (!Model.Any())
 {
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-geo-alt fs-1 text-muted d-block mb-3"></i>
-                <p class="mb-0 text-muted">No office locations configured</p>
+    <div class="col-span-12">
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6 text-center py-12">
+                <i class="bi bi-geo-alt text-4xl text-gray-400 block mb-3"></i>
+                <p class="mb-0 text-gray-500">No office locations configured</p>
             </div>
         </div>
     </div>
@@ -48,70 +58,74 @@ else
 {
     @foreach (var location in Model)
     {
-        <div class="col-md-6 col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-@GetTypeColor(location.Type) bg-opacity-10 rounded-3 p-2 me-3">
-                            <i class="bi @GetTypeIcon(location.Type) text-@GetTypeColor(location.Type) fs-5"></i>
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
+            <div class="bg-white rounded-lg shadow-sm h-full flex flex-col">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div class="@GetTypeIconBg(location.Type) rounded-lg p-2 mr-3">
+                            <i class="bi @GetTypeIcon(location.Type) text-lg"></i>
                         </div>
                         <div>
-                            <h6 class="mb-0">
+                            <h6 class="font-semibold text-gray-900 mb-0">
                                 @location.Name
                                 @if (location.IsHeadOffice)
                                 {
-                                    <span class="badge bg-primary ms-1">HQ</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-1">HQ</span>
                                 }
                             </h6>
-                            <small class="text-muted">@location.Code</small>
+                            <small class="text-gray-500">@location.Code</small>
                         </div>
                     </div>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-light" id="dropdownLoc@(location.Id)" data-dropdown-toggle="dropdownMenuLoc@(location.Id)">
+                    <div class="relative inline-block">
+                        <button class="text-gray-500 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-xs px-3 py-2" id="dropdownLoc@(location.Id)" data-dropdown-toggle="dropdownMenuLoc@(location.Id)" data-dropdown-placement="bottom-end">
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuLoc@(location.Id)">
-                            <li>
-                                <a class="dropdown-item" href="#"
-                                   onclick='editLocation(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
-                                       id = location.Id,
-                                       code = location.Code,
-                                       name = location.Name,
-                                       type = (int)location.Type,
-                                       addressLine1 = location.AddressLine1,
-                                       addressLine2 = location.AddressLine2,
-                                       city = location.City,
-                                       stateId = location.StateId,
-                                       postalCode = location.PostalCode,
-                                       gstNumber = location.GstNumber,
-                                       gstRegistrationType = (int)location.GstRegistrationType,
-                                       isGstRegistered = location.IsGstRegistered,
-                                       defaultCurrencyId = location.DefaultCurrencyId,
-                                       contactPerson = location.ContactPerson,
-                                       phone = location.Phone,
-                                       email = location.Email,
-                                       displayOrder = location.DisplayOrder,
-                                       isHeadOffice = location.IsHeadOffice,
-                                       isActive = location.IsActive
-                                   })))'>
-                                    <i class="bi bi-pencil me-2"></i> Edit
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="#"
-                                   hx-delete="?handler=&id=@location.Id"
-                                   hx-target="#locationsContainer"
-                                   hx-confirm="Delete @location.Name?">
-                                    <i class="bi bi-trash me-2"></i> Delete
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuLoc@(location.Id)">
+                            <ul class="py-2 text-sm text-gray-700">
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                       onclick='editLocation(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                                           id = location.Id,
+                                           code = location.Code,
+                                           name = location.Name,
+                                           type = (int)location.Type,
+                                           addressLine1 = location.AddressLine1,
+                                           addressLine2 = location.AddressLine2,
+                                           city = location.City,
+                                           stateId = location.StateId,
+                                           postalCode = location.PostalCode,
+                                           gstNumber = location.GstNumber,
+                                           gstRegistrationType = (int)location.GstRegistrationType,
+                                           isGstRegistered = location.IsGstRegistered,
+                                           defaultCurrencyId = location.DefaultCurrencyId,
+                                           contactPerson = location.ContactPerson,
+                                           phone = location.Phone,
+                                           email = location.Email,
+                                           displayOrder = location.DisplayOrder,
+                                           isHeadOffice = location.IsHeadOffice,
+                                           isActive = location.IsActive
+                                       })))'>
+                                        <i class="bi bi-pencil mr-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="my-1 border-gray-200">
+                                </li>
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer"
+                                       hx-delete="?handler=&id=@location.Id"
+                                       hx-target="#locationsContainer"
+                                       hx-confirm="Delete @location.Name?">
+                                        <i class="bi bi-trash mr-2"></i> Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="p-6 flex-1">
                     <div class="mb-3">
-                        <small class="text-muted d-block mb-1"><i class="bi bi-geo-alt me-1"></i>Address</small>
+                        <small class="text-gray-500 block mb-1"><i class="bi bi-geo-alt mr-1"></i>Address</small>
                         <span>@location.AddressLine1</span>
                         @if (!string.IsNullOrEmpty(location.AddressLine2))
                         {
@@ -124,41 +138,41 @@ else
                     @if (location.IsGstRegistered && !string.IsNullOrEmpty(location.GstNumber))
                     {
                         <div class="mb-3">
-                            <small class="text-muted d-block mb-1"><i class="bi bi-receipt me-1"></i>GSTIN</small>
-                            <code class="fs-6">@location.GstNumber</code>
+                            <small class="text-gray-500 block mb-1"><i class="bi bi-receipt mr-1"></i>GSTIN</small>
+                            <code class="bg-gray-100 px-2 py-1 rounded text-sm">@location.GstNumber</code>
                         </div>
                     }
 
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-@GetTypeColor(location.Type) bg-opacity-10 text-@GetTypeColor(location.Type)">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @GetTypeBgColor(location.Type)">
                             @GetTypeName(location.Type)
                         </span>
                         @if (location.DefaultCurrency != null)
                         {
-                            <span class="badge bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-currency-exchange me-1"></i>@location.DefaultCurrency.Code
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">
+                                <i class="bi bi-currency-exchange mr-1"></i>@location.DefaultCurrency.Code
                             </span>
                         }
                         @if (location.IsActive)
                         {
-                            <span class="badge bg-success">Active</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                         }
                         else
                         {
-                            <span class="badge bg-secondary">Inactive</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
                         }
                     </div>
                 </div>
                 @if (!string.IsNullOrEmpty(location.Phone) || !string.IsNullOrEmpty(location.Email))
                 {
-                    <div class="card-footer bg-light border-0">
+                    <div class="px-6 py-3 bg-gray-50 border-t border-gray-100 rounded-b-lg">
                         @if (!string.IsNullOrEmpty(location.Phone))
                         {
-                            <small class="text-muted me-3"><i class="bi bi-telephone me-1"></i>@location.Phone</small>
+                            <small class="text-gray-500 mr-3"><i class="bi bi-telephone mr-1"></i>@location.Phone</small>
                         }
                         @if (!string.IsNullOrEmpty(location.Email))
                         {
-                            <small class="text-muted"><i class="bi bi-envelope me-1"></i>@location.Email</small>
+                            <small class="text-gray-500"><i class="bi bi-envelope mr-1"></i>@location.Email</small>
                         }
                     </div>
                 }

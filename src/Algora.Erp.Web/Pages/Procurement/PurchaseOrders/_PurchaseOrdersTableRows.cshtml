@@ -5,8 +5,8 @@
 {
     <tr>
         <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-file-earmark-text fs-1 d-block mb-3"></i>
+            <div class="text-gray-500">
+                <i class="bi bi-file-earmark-text text-4xl block mb-3"></i>
                 <p class="mb-0">No purchase orders found</p>
             </div>
         </td>
@@ -23,43 +23,45 @@ else
 
         var statusClass = order.Status switch
         {
-            PurchaseOrderStatus.Draft => "bg-secondary",
-            PurchaseOrderStatus.Pending => "bg-warning text-dark",
-            PurchaseOrderStatus.Approved => "bg-info",
-            PurchaseOrderStatus.Sent => "bg-primary",
-            PurchaseOrderStatus.PartiallyReceived => "bg-info",
-            PurchaseOrderStatus.Received => "bg-success",
-            PurchaseOrderStatus.Paid => "bg-success",
-            PurchaseOrderStatus.Cancelled => "bg-danger",
-            PurchaseOrderStatus.OnHold => "bg-warning text-dark",
-            _ => "bg-secondary"
+            PurchaseOrderStatus.Draft => "bg-gray-100 text-gray-800",
+            PurchaseOrderStatus.Pending => "bg-amber-100 text-amber-800",
+            PurchaseOrderStatus.Approved => "bg-blue-100 text-blue-800",
+            PurchaseOrderStatus.Sent => "bg-primary-100 text-primary-800",
+            PurchaseOrderStatus.PartiallyReceived => "bg-blue-100 text-blue-800",
+            PurchaseOrderStatus.Received => "bg-emerald-100 text-emerald-800",
+            PurchaseOrderStatus.Paid => "bg-emerald-100 text-emerald-800",
+            PurchaseOrderStatus.Cancelled => "bg-red-100 text-red-800",
+            PurchaseOrderStatus.OnHold => "bg-amber-100 text-amber-800",
+            _ => "bg-gray-100 text-gray-800"
         };
 
         var lineCount = order.Lines?.Count ?? 0;
 
-        <tr>
-            <td class="ps-4">
-                <button class="btn btn-link p-0 text-decoration-none fw-medium"
-                        onclick="viewDetails('@order.Id')">
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <a class="text-primary-600 hover:underline font-medium cursor-pointer"
+                   hx-get="?handler=Details&id=@order.Id"
+                   hx-target="#detailsModalBody"
+                   data-modal-target="detailsModal" data-modal-toggle="detailsModal">
                     @order.OrderNumber
-                </button>
+                </a>
                 @if (!string.IsNullOrEmpty(order.Reference))
                 {
-                    <br><small class="text-muted">Ref: @order.Reference</small>
+                    <br><small class="text-gray-500">Ref: @order.Reference</small>
                 }
             </td>
-            <td>
-                <div class="fw-medium">@order.Supplier?.Name</div>
-                <small class="text-muted">@order.Supplier?.Code</small>
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@order.Supplier?.Name</div>
+                <small class="text-gray-500">@order.Supplier?.Code</small>
             </td>
-            <td>@order.OrderDate.ToString("MMM dd, yyyy")</td>
-            <td>
+            <td class="px-6 py-4">@order.OrderDate.ToString("MMM dd, yyyy")</td>
+            <td class="px-6 py-4">
                 @if (order.DueDate.HasValue)
                 {
                     if (isOverdue)
                     {
-                        <span class="text-danger">
-                            <i class="bi bi-exclamation-circle me-1"></i>@order.DueDate.Value.ToString("MMM dd, yyyy")
+                        <span class="text-red-600">
+                            <i class="bi bi-exclamation-circle mr-1"></i>@order.DueDate.Value.ToString("MMM dd, yyyy")
                         </span>
                     }
                     else
@@ -69,80 +71,108 @@ else
                 }
                 else
                 {
-                    <span class="text-muted">—</span>
+                    <span class="text-gray-500">—</span>
                 }
             </td>
-            <td class="text-center">
-                <span class="badge bg-secondary bg-opacity-10 text-secondary">@lineCount</span>
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@lineCount</span>
             </td>
-            <td class="text-end fw-medium">@order.TotalAmount.ToString("C2")</td>
-            <td>
-                <span class="badge @statusClass">@order.Status</span>
+            <td class="px-6 py-4 text-right font-medium">@order.TotalAmount.ToString("C2")</td>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusClass">@order.Status</span>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button"
-                            class="btn btn-outline-info"
-                            onclick="viewDetails('@order.Id')"
-                            title="View Details">
-                        <i class="bi bi-eye"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            id="dropdownPO@(order.Id)" data-dropdown-toggle="dropdownMenuPO@(order.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    @if (order.Status == PurchaseOrderStatus.Draft)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                hx-get="?handler=EditForm&id=@order.Id"
-                                hx-target="#formModalBody"
-                                data-modal-target="formModal" data-modal-toggle="formModal"
-                                title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-warning"
-                                onclick="updateStatus('@order.Id', 'Pending')"
-                                title="Submit for Approval">
-                            <i class="bi bi-send"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-danger"
-                                onclick="confirmDelete('@order.Id')"
-                                title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    }
-                    else if (order.Status == PurchaseOrderStatus.Pending)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="updateStatus('@order.Id', 'Approved')"
-                                title="Approve">
-                            <i class="bi bi-check-lg"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-danger"
-                                onclick="updateStatus('@order.Id', 'Cancelled')"
-                                title="Reject">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    }
-                    else if (order.Status == PurchaseOrderStatus.Approved)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                onclick="updateStatus('@order.Id', 'Sent')"
-                                title="Mark as Sent">
-                            <i class="bi bi-envelope"></i>
-                        </button>
-                    }
-                    else if (order.Status == PurchaseOrderStatus.Sent)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="updateStatus('@order.Id', 'Received')"
-                                title="Mark as Received">
-                            <i class="bi bi-box-arrow-in-down"></i>
-                        </button>
-                    }
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuPO@(order.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="?handler=Details&id=@order.Id"
+                                   hx-target="#detailsModalBody"
+                                   data-modal-target="detailsModal" data-modal-toggle="detailsModal">
+                                    <i class="bi bi-eye mr-2"></i> View Details
+                                </a>
+                            </li>
+                            @if (order.Status == PurchaseOrderStatus.Draft)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                       hx-get="?handler=EditForm&id=@order.Id"
+                                       hx-target="#formModalBody"
+                                       data-modal-target="formModal" data-modal-toggle="formModal">
+                                        <i class="bi bi-pencil mr-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-amber-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@order.Id&status=Pending"
+                                       hx-target="#ordersTableBody"
+                                       hx-confirm="Submit this order for approval?">
+                                        <i class="bi bi-send mr-2"></i> Submit for Approval
+                                    </a>
+                                </li>
+                            }
+                            @if (order.Status == PurchaseOrderStatus.Pending)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-emerald-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@order.Id&status=Approved"
+                                       hx-target="#ordersTableBody"
+                                       hx-confirm="Approve this purchase order?">
+                                        <i class="bi bi-check-lg mr-2"></i> Approve
+                                    </a>
+                                </li>
+                            }
+                            @if (order.Status == PurchaseOrderStatus.Approved)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-primary-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@order.Id&status=Sent"
+                                       hx-target="#ordersTableBody"
+                                       hx-confirm="Mark this order as sent to supplier?">
+                                        <i class="bi bi-envelope mr-2"></i> Mark as Sent
+                                    </a>
+                                </li>
+                            }
+                            @if (order.Status == PurchaseOrderStatus.Sent)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-emerald-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@order.Id&status=Received"
+                                       hx-target="#ordersTableBody"
+                                       hx-confirm="Mark this order as received?">
+                                        <i class="bi bi-box-arrow-in-down mr-2"></i> Mark Received
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        @if (order.Status == PurchaseOrderStatus.Draft)
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-delete="?handler=Delete&id=@order.Id"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Are you sure you want to delete this purchase order?">
+                                    <i class="bi bi-trash mr-2"></i> Delete
+                                </a>
+                            </div>
+                        }
+                        @if (order.Status == PurchaseOrderStatus.Pending)
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@order.Id&status=Cancelled"
+                                   hx-target="#ordersTableBody"
+                                   hx-confirm="Reject this purchase order?">
+                                    <i class="bi bi-x-lg mr-2"></i> Reject
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </td>
         </tr>
@@ -150,15 +180,15 @@ else
 
     <!-- Pagination -->
     <tr>
-        <td colspan="8" class="py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted small">
+        <td colspan="8" class="px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="text-gray-500 text-sm">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </div>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                            <a class="page-link"
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page <= 1 ? "pointer-events-none opacity-50" : "")"
                                hx-get="?handler=Table&page=@(Model.Page - 1)"
                                hx-target="#ordersTableBody"
                                hx-include="#searchInput, #supplierFilter, #statusFilter, #pageSizeSelect">
@@ -167,8 +197,8 @@ else
                         </li>
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link"
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")"
                                    hx-get="?handler=Table&page=@i"
                                    hx-target="#ordersTableBody"
                                    hx-include="#searchInput, #supplierFilter, #statusFilter, #pageSizeSelect">
@@ -176,8 +206,8 @@ else
                                 </a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 @(Model.Page >= Model.TotalPages ? "pointer-events-none opacity-50" : "")"
                                hx-get="?handler=Table&page=@(Model.Page + 1)"
                                hx-target="#ordersTableBody"
                                hx-include="#searchInput, #supplierFilter, #statusFilter, #pageSizeSelect">

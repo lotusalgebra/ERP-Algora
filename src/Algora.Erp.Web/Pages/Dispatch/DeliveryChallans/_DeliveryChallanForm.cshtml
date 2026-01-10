@@ -6,24 +6,24 @@
         <input type="hidden" name="Id" value="@Model.DeliveryChallan.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-3">
         <!-- Left Column -->
-        <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Challan Information</h6>
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Challan Information</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Challan Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="ChallanDate"
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Challan Date <span class="text-red-500">*</span></label>
+                        <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ChallanDate"
                                value="@(Model.DeliveryChallan?.ChallanDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
                     </div>
                     @if (Model.SalesOrders?.Any() == true)
                     {
                         <div class="mb-3">
-                            <label class="form-label">Sales Order (Optional)</label>
-                            <select class="form-select" name="SalesOrderId" id="salesOrderSelect" onchange="loadSalesOrderDetails(this.value)">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Sales Order (Optional)</label>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SalesOrderId" id="salesOrderSelect" onchange="loadSalesOrderDetails(this.value)">
                                 <option value="">-- Create Manual DC --</option>
                                 @foreach (var so in Model.SalesOrders)
                                 {
@@ -45,8 +45,8 @@
                         </div>
                     }
                     <div class="mb-3">
-                        <label class="form-label">Customer <span class="text-danger">*</span></label>
-                        <select class="form-select" name="CustomerId" id="customerSelect" required>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Customer <span class="text-red-500">*</span></label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="CustomerId" id="customerSelect" required>
                             <option value="">-- Select Customer --</option>
                             @foreach (var customer in Model.Customers)
                             {
@@ -63,8 +63,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Warehouse <span class="text-danger">*</span></label>
-                        <select class="form-select" name="WarehouseId" required>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Warehouse <span class="text-red-500">*</span></label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="WarehouseId" required>
                             <option value="">-- Select Warehouse --</option>
                             @foreach (var warehouse in Model.Warehouses)
                             {
@@ -85,24 +85,24 @@
         </div>
 
         <!-- Right Column -->
-        <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Transport Details</h6>
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Transport Details</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Vehicle Number</label>
-                            <input type="text" class="form-control" name="VehicleNumber"
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-3">
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Vehicle Number</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="VehicleNumber"
                                    value="@Model.DeliveryChallan?.VehicleNumber" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Transport Mode</label>
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Transport Mode</label>
                             @{
                                 var transportMode = Model.DeliveryChallan?.TransportMode;
                             }
-                            <select class="form-select" name="TransportMode">
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TransportMode">
                                 <option value="">-- Select --</option>
                                 @if (transportMode == "Road") { <option value="Road" selected>Road</option> } else { <option value="Road">Road</option> }
                                 @if (transportMode == "Rail") { <option value="Rail" selected>Rail</option> } else { <option value="Rail">Rail</option> }
@@ -111,19 +111,19 @@
                                 @if (transportMode == "Courier") { <option value="Courier" selected>Courier</option> } else { <option value="Courier">Courier</option> }
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Driver Name</label>
-                            <input type="text" class="form-control" name="DriverName"
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Driver Name</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DriverName"
                                    value="@Model.DeliveryChallan?.DriverName" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Driver Phone</label>
-                            <input type="text" class="form-control" name="DriverPhone"
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Driver Phone</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DriverPhone"
                                    value="@Model.DeliveryChallan?.DriverPhone" />
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Transporter Name</label>
-                            <input type="text" class="form-control" name="TransporterName"
+                        <div class="col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Transporter Name</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TransporterName"
                                    value="@Model.DeliveryChallan?.TransporterName" />
                         </div>
                     </div>
@@ -132,51 +132,51 @@
         </div>
 
         <!-- Shipping Address -->
-        <div class="col-12">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Shipping Address</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Shipping Address</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Ship To Name</label>
-                            <input type="text" class="form-control" name="ShipToName"
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-3">
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Ship To Name</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToName"
                                    value="@Model.DeliveryChallan?.ShipToName" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone</label>
-                            <input type="text" class="form-control" name="ShipToPhone"
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Phone</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToPhone"
                                    value="@Model.DeliveryChallan?.ShipToPhone" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Address Line 1</label>
-                            <input type="text" class="form-control" name="ShipToAddress1"
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Address Line 1</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToAddress1"
                                    value="@Model.DeliveryChallan?.ShipToAddress1" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Address Line 2</label>
-                            <input type="text" class="form-control" name="ShipToAddress2"
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Address Line 2</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToAddress2"
                                    value="@Model.DeliveryChallan?.ShipToAddress2" />
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-control" name="ShipToCity"
+                        <div class="md:col-span-3 col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToCity"
                                    value="@Model.DeliveryChallan?.ShipToCity" />
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">State</label>
-                            <input type="text" class="form-control" name="ShipToState"
+                        <div class="md:col-span-3 col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">State</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToState"
                                    value="@Model.DeliveryChallan?.ShipToState" />
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Postal Code</label>
-                            <input type="text" class="form-control" name="ShipToPostalCode"
+                        <div class="md:col-span-3 col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Postal Code</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToPostalCode"
                                    value="@Model.DeliveryChallan?.ShipToPostalCode" />
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Country</label>
-                            <input type="text" class="form-control" name="ShipToCountry"
+                        <div class="md:col-span-3 col-span-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Country</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShipToCountry"
                                    value="@(Model.DeliveryChallan?.ShipToCountry ?? "India")" />
                         </div>
                     </div>
@@ -185,24 +185,24 @@
         </div>
 
         <!-- Line Items -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">Line Items</h6>
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLine()">
-                        <i class="bi bi-plus-lg me-1"></i>Add Line
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Line Items</h6>
+                    <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addLine()">
+                        <i class="bi bi-plus-lg mr-1"></i>Add Line
                     </button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0" id="linesTable">
-                            <thead class="bg-light">
+                <div class="p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500" id="linesTable">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
-                                    <th style="width: 40%;">Product</th>
-                                    <th class="text-end" style="width: 20%;">Quantity</th>
-                                    <th style="width: 15%;">UOM</th>
-                                    <th style="width: 20%;">Notes</th>
-                                    <th style="width: 5%;"></th>
+                                    <th scope="col" class="px-4 py-3" style="width: 40%;">Product</th>
+                                    <th scope="col" class="px-4 py-3 text-right" style="width: 20%;">Quantity</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 15%;">UOM</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 20%;">Notes</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 5%;"></th>
                                 </tr>
                             </thead>
                             <tbody id="linesBody">
@@ -211,10 +211,10 @@
                                     var idx = 0;
                                     foreach (var line in Model.DeliveryChallan.Lines.OrderBy(l => l.LineNumber))
                                     {
-                                        <tr class="line-row">
-                                            <td>
+                                        <tr class="line-row bg-white border-b">
+                                            <td class="px-4 py-3">
                                                 <input type="hidden" name="Lines[@idx].SalesOrderLineId" value="@line.SalesOrderLineId" />
-                                                <select class="form-select form-select-sm" name="Lines[@idx].ProductId" required>
+                                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].ProductId" required>
                                                     @foreach (var product in Model.Products)
                                                     {
                                                         if (line.ProductId == product.Id)
@@ -228,20 +228,20 @@
                                                     }
                                                 </select>
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm text-end" name="Lines[@idx].Quantity"
+                                            <td class="px-4 py-3">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right" name="Lines[@idx].Quantity"
                                                        value="@line.Quantity" required step="0.01" min="0.01" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].UnitOfMeasure"
+                                            <td class="px-4 py-3">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].UnitOfMeasure"
                                                        value="@line.UnitOfMeasure" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Lines[@idx].Notes"
+                                            <td class="px-4 py-3">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[@idx].Notes"
                                                        value="@line.Notes" />
                                             </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                            <td class="px-4 py-3">
+                                                <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeLine(this)">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </td>
@@ -257,38 +257,38 @@
         </div>
 
         <!-- Package Info -->
-        <div class="col-md-4">
-            <label class="form-label">Total Packages</label>
-            <input type="number" class="form-control" name="TotalPackages" min="0"
+        <div class="md:col-span-4 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Total Packages</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TotalPackages" min="0"
                    value="@(Model.DeliveryChallan?.TotalPackages ?? 1)" />
         </div>
-        <div class="col-md-4">
-            <label class="form-label">Total Weight</label>
-            <input type="number" class="form-control" name="TotalWeight" step="0.01" min="0"
+        <div class="md:col-span-4 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Total Weight</label>
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TotalWeight" step="0.01" min="0"
                    value="@Model.DeliveryChallan?.TotalWeight" />
         </div>
-        <div class="col-md-4">
-            <label class="form-label">Weight Unit</label>
+        <div class="md:col-span-4 col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Weight Unit</label>
             @{
                 var weightUnit = Model.DeliveryChallan?.WeightUnit ?? "KG";
             }
-            <select class="form-select" name="WeightUnit">
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="WeightUnit">
                 @if (weightUnit == "KG") { <option value="KG" selected>KG</option> } else { <option value="KG">KG</option> }
                 @if (weightUnit == "LB") { <option value="LB" selected>LB</option> } else { <option value="LB">LB</option> }
             </select>
         </div>
 
         <!-- Notes -->
-        <div class="col-12">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="2">@Model.DeliveryChallan?.Notes</textarea>
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.DeliveryChallan?.Notes</textarea>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-3">
-        <button type="button" class="btn btn-secondary" data-modal-hide="challanModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Challan
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-3 px-0 pb-0">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="challanModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>@(Model.IsEdit ? "Update" : "Create") Challan
         </button>
     </div>
 </form>
@@ -313,25 +313,25 @@
         });
 
         const html = `
-            <tr class="line-row">
-                <td>
-                    <select class="form-select form-select-sm" name="Lines[${lineIndex}].ProductId" required>
+            <tr class="line-row bg-white border-b">
+                <td class="px-4 py-3">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].ProductId" required>
                         <option value="">-- Select Product --</option>
                         ${optionsHtml}
                     </select>
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm text-end" name="Lines[${lineIndex}].Quantity"
+                <td class="px-4 py-3">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right" name="Lines[${lineIndex}].Quantity"
                            required step="0.01" min="0.01" value="1" />
                 </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Lines[${lineIndex}].UnitOfMeasure" value="EA" />
+                <td class="px-4 py-3">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].UnitOfMeasure" value="EA" />
                 </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Lines[${lineIndex}].Notes" />
+                <td class="px-4 py-3">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Lines[${lineIndex}].Notes" />
                 </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                <td class="px-4 py-3">
+                    <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeLine(this)">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>

@@ -7,11 +7,11 @@
 
 @if (Model.Product == null)
 {
-    <div class="container py-5 text-center">
-        <i class="bi bi-box-seam fs-1 text-muted d-block mb-3"></i>
-        <h2>Product Not Found</h2>
-        <p class="text-muted">The product you're looking for doesn't exist or has been removed.</p>
-        <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <i class="bi bi-box-seam text-6xl text-gray-300 block mb-3"></i>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
+        <p class="text-gray-500 mb-4">The product you're looking for doesn't exist or has been removed.</p>
+        <a href="/Shop" class="inline-flex items-center px-5 py-2.5 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">Continue Shopping</a>
     </div>
 }
 else
@@ -19,37 +19,39 @@ else
     var primaryImage = Model.Product.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? Model.Product.Images.FirstOrDefault()?.Url;
 
     <!-- Breadcrumb -->
-    <nav class="bg-light py-3">
-        <div class="container">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="/Shop">Shop</a></li>
+    <nav class="bg-gray-50 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li><a href="/Shop" class="text-gray-500 hover:text-primary-600">Shop</a></li>
                 @if (Model.Product.Category != null)
                 {
-                    <li class="breadcrumb-item"><a href="/Shop?category=@Model.Product.Category.Slug">@Model.Product.Category.Name</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li><a href="/Shop?category=@Model.Product.Category.Slug" class="text-gray-500 hover:text-primary-600">@Model.Product.Category.Name</a></li>
                 }
-                <li class="breadcrumb-item active">@Model.Product.Name</li>
+                <li class="text-gray-400">/</li>
+                <li class="text-gray-900 font-medium">@Model.Product.Name</li>
             </ol>
         </div>
     </nav>
 
-    <div class="container py-5">
-        <div class="row">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Product Images -->
-            <div class="col-lg-6 mb-4">
-                <div class="position-relative">
+            <div class="mb-4">
+                <div class="relative">
                     @if (Model.Product.CompareAtPrice.HasValue && Model.Product.CompareAtPrice > Model.Product.Price)
                     {
                         var discount = (int)Math.Round((1 - Model.Product.Price / Model.Product.CompareAtPrice.Value) * 100);
-                        <span class="badge bg-danger position-absolute top-0 start-0 m-3 fs-6">-@discount% OFF</span>
+                        <span class="absolute top-3 left-3 z-10 px-3 py-1 text-sm font-semibold text-white bg-red-500 rounded-full">-@discount% OFF</span>
                     }
                     @if (!string.IsNullOrEmpty(primaryImage))
                     {
-                        <img src="@primaryImage" alt="@Model.Product.Name" class="img-fluid rounded product-main-image" style="width: 100%;">
+                        <img src="@primaryImage" alt="@Model.Product.Name" class="w-full rounded-lg product-main-image">
                     }
                     else
                     {
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
-                            <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                        <div class="bg-gray-100 rounded-lg flex items-center justify-center h-96">
+                            <i class="bi bi-image text-gray-300" style="font-size: 5rem;"></i>
                         </div>
                     }
                 </div>
@@ -57,11 +59,11 @@ else
                 <!-- Additional Images -->
                 @if (Model.Product.Images.Count > 1)
                 {
-                    <div class="row g-2 mt-3">
+                    <div class="grid grid-cols-4 gap-2 mt-3">
                         @foreach (var image in Model.Product.Images.Take(4))
                         {
-                            <div class="col-3">
-                                <img src="@image.Url" alt="@image.AltText" class="img-fluid rounded cursor-pointer"
+                            <div>
+                                <img src="@image.Url" alt="@image.AltText" class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                                      onclick="document.querySelector('.product-main-image')?.setAttribute('src', '@image.Url')">
                             </div>
                         }
@@ -70,25 +72,25 @@ else
             </div>
 
             <!-- Product Details -->
-            <div class="col-lg-6">
+            <div>
                 @if (Model.Product.Category != null)
                 {
-                    <span class="badge bg-light text-dark mb-2">@Model.Product.Category.Name</span>
+                    <span class="inline-block px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full mb-2">@Model.Product.Category.Name</span>
                 }
 
-                <h1 class="h2 mb-3">@Model.Product.Name</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-3">@Model.Product.Name</h1>
 
                 @if (!string.IsNullOrEmpty(Model.Product.ShortDescription))
                 {
-                    <p class="text-muted mb-4">@Model.Product.ShortDescription</p>
+                    <p class="text-gray-500 mb-4">@Model.Product.ShortDescription</p>
                 }
 
                 <div class="mb-4">
-                    <span class="h2 text-primary fw-bold">@Model.Product.Price.ToString("C")</span>
+                    <span class="text-3xl font-bold text-primary-600">@Model.Product.Price.ToString("C")</span>
                     @if (Model.Product.CompareAtPrice.HasValue && Model.Product.CompareAtPrice > Model.Product.Price)
                     {
-                        <span class="text-muted text-decoration-line-through ms-2 h5">@Model.Product.CompareAtPrice.Value.ToString("C")</span>
-                        <span class="badge bg-success ms-2">Save @((Model.Product.CompareAtPrice.Value - Model.Product.Price).ToString("C"))</span>
+                        <span class="text-gray-400 line-through ml-2 text-xl">@Model.Product.CompareAtPrice.Value.ToString("C")</span>
+                        <span class="ml-2 px-2.5 py-0.5 text-sm font-medium text-emerald-800 bg-emerald-100 rounded-full">Save @((Model.Product.CompareAtPrice.Value - Model.Product.Price).ToString("C"))</span>
                     }
                 </div>
 
@@ -96,15 +98,15 @@ else
                 <div class="mb-4">
                     @if (Model.Product.StockQuantity > 10)
                     {
-                        <span class="text-success"><i class="bi bi-check-circle me-1"></i>In Stock</span>
+                        <span class="text-emerald-600"><i class="bi bi-check-circle mr-1"></i>In Stock</span>
                     }
                     else if (Model.Product.StockQuantity > 0)
                     {
-                        <span class="text-warning"><i class="bi bi-exclamation-circle me-1"></i>Low Stock - Only @Model.Product.StockQuantity left!</span>
+                        <span class="text-amber-500"><i class="bi bi-exclamation-circle mr-1"></i>Low Stock - Only @Model.Product.StockQuantity left!</span>
                     }
                     else
                     {
-                        <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                        <span class="text-red-600"><i class="bi bi-x-circle mr-1"></i>Out of Stock</span>
                     }
                 </div>
 
@@ -112,70 +114,70 @@ else
                 @if (Model.Product.StockQuantity > 0)
                 {
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Quantity</label>
-                        <div class="input-group" style="width: 140px;">
-                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
-                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="@Model.Product.StockQuantity">
-                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+                        <label class="block mb-2 text-sm font-semibold text-gray-900">Quantity</label>
+                        <div class="inline-flex items-center" style="width: 140px;">
+                            <button class="px-4 py-2 text-gray-600 bg-gray-100 border border-gray-300 rounded-l-lg hover:bg-gray-200" type="button" onclick="updateQuantity(-1)">-</button>
+                            <input type="number" class="w-12 text-center border-y border-gray-300 py-2 text-sm focus:ring-primary-500 focus:border-primary-500" id="quantity" value="1" min="1" max="@Model.Product.StockQuantity">
+                            <button class="px-4 py-2 text-gray-600 bg-gray-100 border border-gray-300 rounded-r-lg hover:bg-gray-200" type="button" onclick="updateQuantity(1)">+</button>
                         </div>
                     </div>
 
-                    <div class="d-flex gap-2 mb-4">
-                        <button class="btn btn-primary btn-lg flex-grow-1"
+                    <div class="flex gap-2 mb-4">
+                        <button class="flex-grow-1 inline-flex items-center justify-center px-6 py-3 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-base"
                                 onclick="addToCartWithQty('@Model.Product.Id', '@Model.Product.Name.Replace("'", "\\'")', @Model.Product.Price, '@primaryImage')">
-                            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                            <i class="bi bi-cart-plus mr-2"></i>Add to Cart
                         </button>
-                        <button class="btn btn-outline-secondary btn-lg" title="Add to Wishlist">
+                        <button class="px-4 py-3 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg" title="Add to Wishlist">
                             <i class="bi bi-heart"></i>
                         </button>
                     </div>
                 }
                 else
                 {
-                    <button class="btn btn-secondary btn-lg w-100 mb-4" disabled>
-                        <i class="bi bi-x-circle me-2"></i>Out of Stock
+                    <button class="w-full inline-flex items-center justify-center px-6 py-3 text-gray-900 bg-white border border-gray-300 font-medium rounded-lg text-base mb-4 cursor-not-allowed opacity-60" disabled>
+                        <i class="bi bi-x-circle mr-2"></i>Out of Stock
                     </button>
                 }
 
                 <!-- Product Info -->
-                <div class="border-top pt-4">
-                    <div class="row g-3 text-muted small">
-                        <div class="col-6">
-                            <i class="bi bi-upc me-2"></i>SKU: @(Model.Product.Sku ?? "N/A")
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="grid grid-cols-2 gap-3 text-gray-500 text-sm">
+                        <div>
+                            <i class="bi bi-upc mr-2"></i>SKU: @(Model.Product.Sku ?? "N/A")
                         </div>
                         @if (Model.Product.Category != null)
                         {
-                            <div class="col-6">
-                                <i class="bi bi-tag me-2"></i>Category: @Model.Product.Category.Name
+                            <div>
+                                <i class="bi bi-tag mr-2"></i>Category: @Model.Product.Category.Name
                             </div>
                         }
                         @if (Model.Product.Weight.HasValue)
                         {
-                            <div class="col-6">
-                                <i class="bi bi-box me-2"></i>Weight: @Model.Product.Weight.Value kg
+                            <div>
+                                <i class="bi bi-box mr-2"></i>Weight: @Model.Product.Weight.Value kg
                             </div>
                         }
                     </div>
                 </div>
 
                 <!-- Features -->
-                <div class="border-top mt-4 pt-4">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-truck fs-4 text-primary me-3"></i>
+                <div class="border-t border-gray-200 mt-4 pt-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="flex items-center">
+                                <i class="bi bi-truck text-2xl text-primary-600 mr-3"></i>
                                 <div>
-                                    <div class="fw-semibold">Free Shipping</div>
-                                    <small class="text-muted">On orders over $50</small>
+                                    <div class="font-semibold text-gray-900">Free Shipping</div>
+                                    <small class="text-gray-500">On orders over $50</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-arrow-repeat fs-4 text-primary me-3"></i>
+                        <div>
+                            <div class="flex items-center">
+                                <i class="bi bi-arrow-repeat text-2xl text-primary-600 mr-3"></i>
                                 <div>
-                                    <div class="fw-semibold">Easy Returns</div>
-                                    <small class="text-muted">30-day return policy</small>
+                                    <div class="font-semibold text-gray-900">Easy Returns</div>
+                                    <small class="text-gray-500">30-day return policy</small>
                                 </div>
                             </div>
                         </div>
@@ -185,19 +187,19 @@ else
         </div>
 
         <!-- Description -->
-        <div class="mt-5">
-            <div class="card border">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Description</h5>
+        <div class="mt-12">
+            <div class="bg-white rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200 bg-white">
+                    <h5 class="font-semibold text-gray-900">Description</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     @if (!string.IsNullOrEmpty(Model.Product.Description))
                     {
-                        <div>@Html.Raw(Model.Product.Description.Replace("\n", "<br>"))</div>
+                        <div class="text-gray-700">@Html.Raw(Model.Product.Description.Replace("\n", "<br>"))</div>
                     }
                     else
                     {
-                        <p class="text-muted mb-0">No description available.</p>
+                        <p class="text-gray-500">No description available.</p>
                     }
                 </div>
             </div>
@@ -206,32 +208,30 @@ else
         <!-- Related Products -->
         @if (Model.RelatedProducts.Any())
         {
-            <div class="mt-5">
-                <h3 class="h4 mb-4">Related Products</h3>
-                <div class="row g-4">
+            <div class="mt-12">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Related Products</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                     @foreach (var related in Model.RelatedProducts)
                     {
                         var relatedImage = related.Images.FirstOrDefault(i => i.IsPrimary)?.Url ?? related.Images.FirstOrDefault()?.Url;
-                        <div class="col-6 col-md-3">
-                            <div class="product-card">
-                                <a href="/Shop/Product/@related.Slug">
-                                    @if (!string.IsNullOrEmpty(relatedImage))
-                                    {
-                                        <img src="@relatedImage" alt="@related.Name" class="card-img-top">
-                                    }
-                                    else
-                                    {
-                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                                        </div>
-                                    }
-                                </a>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-2">
-                                        <a href="/Shop/Product/@related.Slug" class="text-decoration-none text-dark">@related.Name</a>
-                                    </h6>
-                                    <div class="product-price">@related.Price.ToString("C")</div>
-                                </div>
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                            <a href="/Shop/Product/@related.Slug">
+                                @if (!string.IsNullOrEmpty(relatedImage))
+                                {
+                                    <img src="@relatedImage" alt="@related.Name" class="w-full h-48 object-cover">
+                                }
+                                else
+                                {
+                                    <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                                        <i class="bi bi-image text-gray-300" style="font-size: 3rem;"></i>
+                                    </div>
+                                }
+                            </a>
+                            <div class="p-4">
+                                <h6 class="font-semibold text-gray-900 mb-2">
+                                    <a href="/Shop/Product/@related.Slug" class="hover:text-primary-600">@related.Name</a>
+                                </h6>
+                                <span class="text-lg font-bold text-primary-600">@related.Price.ToString("C")</span>
                             </div>
                         </div>
                     }

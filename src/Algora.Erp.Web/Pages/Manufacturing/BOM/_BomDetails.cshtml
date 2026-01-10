@@ -4,62 +4,76 @@
 @{
     var statusClass = Model.Status switch
     {
-        BomStatus.Active => "bg-success",
-        BomStatus.Draft => "bg-warning",
-        BomStatus.Obsolete => "bg-secondary",
-        _ => "bg-secondary"
+        BomStatus.Active => "bg-emerald-100 text-emerald-800",
+        BomStatus.Draft => "bg-amber-100 text-amber-800",
+        BomStatus.Obsolete => "bg-gray-100 text-gray-800",
+        _ => "bg-gray-100 text-gray-800"
     };
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">
-        <i class="bi bi-diagram-3 me-2"></i>@Model.BomNumber
-    </h5>
-    <button type="button" class="btn-close" data-modal-hide="detailsModal" aria-label="Close"></button>
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h3 class="text-xl font-semibold text-gray-900">
+        <i class="bi bi-diagram-3 mr-2"></i>@Model.BomNumber
+    </h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="detailsModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
-<div class="modal-body">
+<div class="p-6">
     <!-- Header Info -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h4 class="mb-1">@Model.Name</h4>
+    <div class="grid grid-cols-12 gap-3 mb-4">
+        <div class="md:col-span-8 col-span-12">
+            <h4 class="text-lg font-semibold text-gray-900 mb-1">@Model.Name</h4>
             @if (!string.IsNullOrEmpty(Model.Description))
             {
-                <p class="text-muted mb-0">@Model.Description</p>
+                <p class="text-gray-500 mb-0">@Model.Description</p>
             }
         </div>
-        <div class="col-md-4 text-end">
-            <span class="badge @statusClass fs-6">@Model.Status</span>
+        <div class="md:col-span-4 col-span-12 md:text-right">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusClass">@Model.Status</span>
         </div>
     </div>
 
     <!-- BOM Details -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <h6 class="text-muted mb-3">Product Information</h6>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4">Product</dt>
-                        <dd class="col-sm-8">@Model.Product?.Name</dd>
-                        <dt class="col-sm-4">SKU</dt>
-                        <dd class="col-sm-8">@Model.Product?.Sku</dd>
-                        <dt class="col-sm-4">Quantity</dt>
-                        <dd class="col-sm-8">@Model.Quantity @Model.UnitOfMeasure</dd>
+    <div class="grid grid-cols-12 gap-3 mb-4">
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md border border-gray-200 h-full">
+                <div class="p-4">
+                    <h6 class="text-gray-500 text-sm font-medium mb-3">Product Information</h6>
+                    <dl class="space-y-2">
+                        <div class="flex">
+                            <dt class="w-1/3 text-gray-500 text-sm">Product</dt>
+                            <dd class="w-2/3 text-gray-900 text-sm">@Model.Product?.Name</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/3 text-gray-500 text-sm">SKU</dt>
+                            <dd class="w-2/3 text-gray-900 text-sm">@Model.Product?.Sku</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/3 text-gray-500 text-sm">Quantity</dt>
+                            <dd class="w-2/3 text-gray-900 text-sm">@Model.Quantity @Model.UnitOfMeasure</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card border h-100">
-                <div class="card-body">
-                    <h6 class="text-muted mb-3">Cost & Dates</h6>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5">Material Cost</dt>
-                        <dd class="col-sm-7 fw-bold text-primary">@Model.TotalMaterialCost.ToString("C")</dd>
-                        <dt class="col-sm-5">Effective From</dt>
-                        <dd class="col-sm-7">@(Model.EffectiveFrom?.ToString("MMM dd, yyyy") ?? "-")</dd>
-                        <dt class="col-sm-5">Effective To</dt>
-                        <dd class="col-sm-7">@(Model.EffectiveTo?.ToString("MMM dd, yyyy") ?? "-")</dd>
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md border border-gray-200 h-full">
+                <div class="p-4">
+                    <h6 class="text-gray-500 text-sm font-medium mb-3">Cost & Dates</h6>
+                    <dl class="space-y-2">
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Material Cost</dt>
+                            <dd class="w-1/2 text-primary-600 text-sm font-bold">@Model.TotalMaterialCost.ToString("C")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Effective From</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@(Model.EffectiveFrom?.ToString("MMM dd, yyyy") ?? "-")</dd>
+                        </div>
+                        <div class="flex">
+                            <dt class="w-1/2 text-gray-500 text-sm">Effective To</dt>
+                            <dd class="w-1/2 text-gray-900 text-sm">@(Model.EffectiveTo?.ToString("MMM dd, yyyy") ?? "-")</dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -67,53 +81,53 @@
     </div>
 
     <!-- Materials Table -->
-    <div class="card border">
-        <div class="card-header bg-light">
-            <h6 class="mb-0">
-                <i class="bi bi-box-seam me-2"></i>Materials / Components
-                <span class="badge bg-primary ms-2">@Model.Lines.Count items</span>
+    <div class="bg-white rounded-lg shadow-md border border-gray-200">
+        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <h6 class="text-sm font-medium text-gray-900">
+                <i class="bi bi-box-seam mr-2"></i>Materials / Components
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-2">@Model.Lines.Count items</span>
             </h6>
         </div>
-        <div class="card-body p-0">
+        <div class="p-0">
             @if (Model.Lines.Any())
             {
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th class="ps-3">#</th>
-                                <th>Product</th>
-                                <th>SKU</th>
-                                <th class="text-end">Qty Required</th>
-                                <th class="text-end">Wastage</th>
-                                <th class="text-end">Unit Cost</th>
-                                <th class="text-end pe-3">Total Cost</th>
+                                <th scope="col" class="px-4 py-3">#</th>
+                                <th scope="col" class="px-4 py-3">Product</th>
+                                <th scope="col" class="px-4 py-3">SKU</th>
+                                <th scope="col" class="px-4 py-3 text-right">Qty Required</th>
+                                <th scope="col" class="px-4 py-3 text-right">Wastage</th>
+                                <th scope="col" class="px-4 py-3 text-right">Unit Cost</th>
+                                <th scope="col" class="px-4 py-3 text-right">Total Cost</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var line in Model.Lines.OrderBy(l => l.LineNumber))
                             {
-                                <tr>
-                                    <td class="ps-3">@line.LineNumber</td>
-                                    <td>
+                                <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td class="px-4 py-3">@line.LineNumber</td>
+                                    <td class="px-4 py-3">
                                         @line.Product?.Name
                                         @if (line.IsOptional)
                                         {
-                                            <span class="badge bg-info ms-1">Optional</span>
+                                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 ml-1">Optional</span>
                                         }
                                     </td>
-                                    <td class="text-muted">@line.Product?.Sku</td>
-                                    <td class="text-end">@line.Quantity @line.UnitOfMeasure</td>
-                                    <td class="text-end">@line.WastagePercent%</td>
-                                    <td class="text-end">@line.UnitCost.ToString("C")</td>
-                                    <td class="text-end pe-3 fw-semibold">@line.TotalCost.ToString("C")</td>
+                                    <td class="px-4 py-3 text-gray-500">@line.Product?.Sku</td>
+                                    <td class="px-4 py-3 text-right">@line.Quantity @line.UnitOfMeasure</td>
+                                    <td class="px-4 py-3 text-right">@line.WastagePercent%</td>
+                                    <td class="px-4 py-3 text-right">@line.UnitCost.ToString("C")</td>
+                                    <td class="px-4 py-3 text-right font-semibold">@line.TotalCost.ToString("C")</td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="table-light">
+                        <tfoot class="bg-gray-50">
                             <tr>
-                                <td colspan="6" class="text-end fw-bold">Total Material Cost:</td>
-                                <td class="text-end pe-3 fw-bold text-primary">@Model.TotalMaterialCost.ToString("C")</td>
+                                <td colspan="6" class="px-4 py-3 text-right font-bold text-gray-900">Total Material Cost:</td>
+                                <td class="px-4 py-3 text-right font-bold text-primary-600">@Model.TotalMaterialCost.ToString("C")</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -121,8 +135,8 @@
             }
             else
             {
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                <div class="text-center py-6 text-gray-500">
+                    <i class="bi bi-inbox text-3xl block mb-2"></i>
                     No materials defined
                 </div>
             }
@@ -131,37 +145,35 @@
 
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="card border mt-3">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-journal-text me-2"></i>Notes</h6>
+        <div class="bg-white rounded-lg shadow-md border border-gray-200 mt-4">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900"><i class="bi bi-journal-text mr-2"></i>Notes</h6>
             </div>
-            <div class="card-body">
-                <p class="mb-0">@Model.Notes</p>
+            <div class="p-4">
+                <p class="text-gray-700 text-sm">@Model.Notes</p>
             </div>
         </div>
     }
 
     <!-- Timestamps -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <small class="text-muted">
-                Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
-                @if (Model.ModifiedAt.HasValue)
-                {
-                    <span class="ms-3">Modified: @Model.ModifiedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
-                }
-            </small>
-        </div>
+    <div class="mt-4">
+        <small class="text-gray-500">
+            Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+            @if (Model.ModifiedAt.HasValue)
+            {
+                <span class="ml-3">Modified: @Model.ModifiedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+            }
+        </small>
     </div>
 </div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+<div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
     <button type="button"
-            class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
+            class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5"
             hx-get="/Manufacturing/BOM?handler=EditForm&id=@Model.Id"
             hx-target="#formModalContent"
             data-modal-hide="detailsModal"
             onclick="setTimeout(() => { const modal = FlowbiteInstances.getInstance('Modal', 'formModal'); if(modal) modal.show(); }, 300)">
-        <i class="bi bi-pencil me-1"></i> Edit
+        <i class="bi bi-pencil mr-1"></i> Edit
     </button>
 </div>

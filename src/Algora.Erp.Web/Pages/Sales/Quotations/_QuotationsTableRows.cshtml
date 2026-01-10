@@ -5,8 +5,8 @@
 {
     <tr>
         <td colspan="8" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-file-earmark-x fs-1 d-block mb-3"></i>
+            <div class="text-gray-500">
+                <i class="bi bi-file-earmark-x text-4xl block mb-3"></i>
                 <p class="mb-0">No quotations found</p>
             </div>
         </td>
@@ -28,12 +28,12 @@ else
 
         var statusColor = quote.Status switch
         {
-            SalesOrderStatus.Draft => "secondary",
-            SalesOrderStatus.Confirmed => "primary",
-            SalesOrderStatus.Paid => "success",
-            SalesOrderStatus.Cancelled => "danger",
-            SalesOrderStatus.OnHold => "warning",
-            _ => "secondary"
+            SalesOrderStatus.Draft => "bg-gray-100 text-gray-800",
+            SalesOrderStatus.Confirmed => "bg-primary-100 text-primary-800",
+            SalesOrderStatus.Paid => "bg-emerald-100 text-emerald-800",
+            SalesOrderStatus.Cancelled => "bg-red-100 text-red-800",
+            SalesOrderStatus.OnHold => "bg-amber-100 text-amber-800",
+            _ => "bg-gray-100 text-gray-800"
         };
 
         var isExpired = quote.DueDate.HasValue && quote.DueDate.Value < DateTime.Today &&
@@ -41,100 +41,119 @@ else
                        quote.Status != SalesOrderStatus.Cancelled &&
                        quote.Status != SalesOrderStatus.OnHold;
 
-        <tr>
-            <td class="ps-4">
-                <div class="fw-medium">@quote.OrderNumber</div>
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@quote.OrderNumber</div>
                 @if (!string.IsNullOrEmpty(quote.Reference))
                 {
-                    <small class="text-muted">Ref: @quote.Reference</small>
+                    <span class="text-sm text-gray-500">Ref: @quote.Reference</span>
                 }
             </td>
-            <td>
-                <div class="fw-medium">@quote.Customer?.Name</div>
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@quote.Customer?.Name</div>
                 @if (!string.IsNullOrEmpty(quote.Customer?.Email))
                 {
-                    <small class="text-muted">@quote.Customer.Email</small>
+                    <span class="text-sm text-gray-500">@quote.Customer.Email</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 <div>@quote.OrderDate.ToString("MMM dd, yyyy")</div>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (quote.DueDate.HasValue)
                 {
-                    <span class="@(isExpired ? "text-danger fw-medium" : "")">
+                    <span class="@(isExpired ? "text-red-600 font-medium" : "")">
                         @quote.DueDate.Value.ToString("MMM dd, yyyy")
                         @if (isExpired)
                         {
-                            <i class="bi bi-exclamation-circle ms-1" title="Expired"></i>
+                            <i class="bi bi-exclamation-circle ml-1" title="Expired"></i>
                         }
                     </span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-500">-</span>
                 }
             </td>
-            <td class="text-center">
-                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">
                     @quote.Lines.Count
                 </span>
             </td>
-            <td class="text-end">
-                <span class="fw-medium">@quote.TotalAmount.ToString("C2")</span>
+            <td class="px-6 py-4 text-right">
+                <span class="font-medium text-gray-900">@quote.TotalAmount.ToString("C2")</span>
             </td>
-            <td>
-                <span class="badge bg-@statusColor bg-opacity-10 text-@statusColor">
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusColor">
                     @status
                 </span>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button"
-                            class="btn btn-outline-info"
-                            onclick="viewDetails('@quote.Id')"
-                            title="View Details">
-                        <i class="bi bi-eye"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownQuote@(quote.Id)" data-dropdown-toggle="dropdownMenuQuote@(quote.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-
-                    @if (quote.Status == SalesOrderStatus.Draft)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                hx-get="?handler=EditForm&id=@quote.Id"
-                                hx-target="#formModalBody"
-                                data-modal-target="formModal" data-modal-toggle="formModal"
-                                title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="updateStatus('@quote.Id', 'Sent')"
-                                title="Mark as Sent">
-                            <i class="bi bi-send"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-danger"
-                                onclick="deleteQuotation('@quote.Id')"
-                                title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    }
-                    else if (quote.Status == SalesOrderStatus.Confirmed)
-                    {
-                        <button type="button"
-                                class="btn btn-outline-success"
-                                onclick="convertToOrder('@quote.Id')"
-                                title="Convert to Order">
-                            <i class="bi bi-bag-plus"></i>
-                        </button>
-                        <button type="button"
-                                class="btn btn-outline-warning"
-                                onclick="updateStatus('@quote.Id', 'Rejected')"
-                                title="Mark Rejected">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    }
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuQuote@(quote.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/Sales/Quotations/Details/@quote.Id">
+                                    <i class="bi bi-eye mr-2"></i> View Details
+                                </a>
+                            </li>
+                            @if (quote.Status == SalesOrderStatus.Draft)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                       hx-get="?handler=EditForm&id=@quote.Id"
+                                       hx-target="#formModalBody"
+                                       data-modal-target="formModal" data-modal-toggle="formModal">
+                                        <i class="bi bi-pencil mr-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-emerald-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=UpdateStatus&id=@quote.Id&status=Confirmed"
+                                       hx-target="#quotationsTableBody"
+                                       hx-confirm="Mark this quotation as sent?">
+                                        <i class="bi bi-send mr-2"></i> Mark as Sent
+                                    </a>
+                                </li>
+                            }
+                            @if (quote.Status == SalesOrderStatus.Confirmed)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 text-emerald-600 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=ConvertToOrder&id=@quote.Id"
+                                       hx-target="#quotationsTableBody"
+                                       hx-confirm="Convert this quotation to a sales order?">
+                                        <i class="bi bi-bag-plus mr-2"></i> Convert to Order
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        @if (quote.Status == SalesOrderStatus.Draft)
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-delete="?handler=Delete&id=@quote.Id"
+                                   hx-target="#quotationsTableBody"
+                                   hx-confirm="Are you sure you want to delete this quotation?">
+                                    <i class="bi bi-trash mr-2"></i> Delete
+                                </a>
+                            </div>
+                        }
+                        @if (quote.Status == SalesOrderStatus.Confirmed)
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-amber-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-post="?handler=UpdateStatus&id=@quote.Id&status=Cancelled"
+                                   hx-target="#quotationsTableBody"
+                                   hx-confirm="Mark this quotation as rejected?">
+                                    <i class="bi bi-x-lg mr-2"></i> Mark Rejected
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </td>
         </tr>
@@ -144,17 +163,17 @@ else
     @if (Model.TotalPages > 1)
     {
         <tr>
-            <td colspan="8" class="py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted small">
+            <td colspan="8" class="px-6 py-3">
+                <div class="flex justify-between items-center">
+                    <div class="text-gray-500 text-sm">
                         Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                     </div>
                     <nav>
-                        <ul class="pagination pagination-sm mb-0">
+                        <ul class="inline-flex -space-x-px text-sm">
                             @if (Model.Page > 1)
                             {
-                                <li class="page-item">
-                                    <button type="button" class="page-link"
+                                <li>
+                                    <button type="button" class="flex items-center justify-center px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700"
                                             hx-get="?handler=Table&pageNumber=@(Model.Page - 1)&pageSize=@Model.PageSize"
                                             hx-target="#quotationsTableBody"
                                             hx-include="#searchInput, #customerFilter, #statusFilter">
@@ -164,8 +183,8 @@ else
                             }
                             @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                             {
-                                <li class="page-item @(i == Model.Page ? "active" : "")">
-                                    <button type="button" class="page-link"
+                                <li>
+                                    <button type="button" class="flex items-center justify-center px-3 py-2 leading-tight @(i == Model.Page ? "text-primary-600 bg-primary-50 border-primary-300" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700") border border-gray-300"
                                             hx-get="?handler=Table&pageNumber=@i&pageSize=@Model.PageSize"
                                             hx-target="#quotationsTableBody"
                                             hx-include="#searchInput, #customerFilter, #statusFilter">
@@ -175,8 +194,8 @@ else
                             }
                             @if (Model.Page < Model.TotalPages)
                             {
-                                <li class="page-item">
-                                    <button type="button" class="page-link"
+                                <li>
+                                    <button type="button" class="flex items-center justify-center px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700"
                                             hx-get="?handler=Table&pageNumber=@(Model.Page + 1)&pageSize=@Model.PageSize"
                                             hx-target="#quotationsTableBody"
                                             hx-include="#searchInput, #customerFilter, #statusFilter">
@@ -193,8 +212,8 @@ else
     else if (Model.TotalRecords > 0)
     {
         <tr>
-            <td colspan="8" class="py-3">
-                <div class="text-muted small">
+            <td colspan="8" class="px-6 py-3">
+                <div class="text-gray-500 text-sm">
                     Showing @Model.TotalRecords entries
                 </div>
             </td>

@@ -4,45 +4,45 @@
     ViewData["Title"] = "Customer Revenue Report";
 }
 
-<div class="container-fluid">
+<div class="p-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="h3 mb-0">Customer Revenue Report</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
-                    <li class="breadcrumb-item active">Customers</li>
+            <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">Customer Revenue Report</h4>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance/Reports" class="hover:text-primary-600">Reports</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><span class="text-gray-700 dark:text-gray-300">Customers</span></li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")&TopN=@Model.TopN" class="btn btn-outline-danger">
-                <i class="bi bi-file-pdf me-1"></i>Export PDF
+        <div class="flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")&TopN=@Model.TopN" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white">
+                <i class="bi bi-file-pdf mr-1"></i>Export PDF
             </a>
-            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")&TopN=@Model.TopN" class="btn btn-outline-success">
-                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")&TopN=@Model.TopN" class="text-emerald-700 border border-emerald-700 hover:bg-emerald-700 hover:text-white focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-emerald-500 dark:text-emerald-500 dark:hover:bg-emerald-600 dark:hover:text-white">
+                <i class="bi bi-file-earmark-excel mr-1"></i>Export CSV
             </a>
         </div>
     </div>
 
     <!-- Filters -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-2">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+    <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+        <div class="p-6">
+            <form method="get" class="grid grid-cols-12 gap-4 items-end">
+                <div class="col-span-12 md:col-span-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                <div class="col-span-12 md:col-span-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End Date</label>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">Show Top</label>
-                    <select class="form-select" name="TopN">
+                <div class="col-span-12 md:col-span-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Show Top</label>
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="TopN">
                         <option value="10" selected="@(Model.TopN == 10)">Top 10</option>
                         <option value="25" selected="@(Model.TopN == 25)">Top 25</option>
                         <option value="50" selected="@(Model.TopN == 50)">Top 50</option>
@@ -50,15 +50,15 @@
                         <option value="999" selected="@(Model.TopN >= 999)">All</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                <div class="col-span-12 md:col-span-3">
+                    <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700">
+                        <i class="bi bi-funnel mr-1"></i>Apply Filter
                     </button>
-                    <a href="/Finance/Reports/Customers" class="btn btn-outline-secondary">Reset</a>
+                    <a href="/Finance/Reports/Customers" class="text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 ml-2">Reset</a>
                 </div>
-                <div class="col-md-3 text-end">
-                    <span class="text-muted">
-                        <i class="bi bi-calendar me-1"></i>
+                <div class="col-span-12 md:col-span-3 text-right">
+                    <span class="text-gray-500 dark:text-gray-400">
+                        <i class="bi bi-calendar mr-1"></i>
                         @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
                     </span>
                 </div>
@@ -67,159 +67,149 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Customers.Count</h3>
-                    <small class="text-muted">Total Customers</small>
-                </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.Customers.Count</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Customers</small>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-primary">@Model.TotalRevenue.ToString("C0")</h3>
-                    <small class="text-muted">Total Revenue</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-primary-600 dark:text-primary-400 mb-1">@Model.TotalRevenue.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Revenue</small>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-success">@Model.TotalPaid.ToString("C0")</h3>
-                    <small class="text-muted">Total Paid</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mb-1">@Model.TotalPaid.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Paid</small>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-warning">@Model.TotalOutstanding.ToString("C0")</h3>
-                    <small class="text-muted">Outstanding</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-amber-600 dark:text-amber-400 mb-1">@Model.TotalOutstanding.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Outstanding</small>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-12 gap-6">
         <!-- Revenue Distribution Chart -->
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Top 10 Revenue Distribution</h5>
+        <div class="col-span-12 lg:col-span-5">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-pie-chart mr-2"></i>Top 10 Revenue Distribution</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <canvas id="revenueChart" height="300"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Top Customers Bar Chart -->
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Top Customers by Revenue</h5>
+        <div class="col-span-12 lg:col-span-7">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-bar-chart mr-2"></i>Top Customers by Revenue</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <canvas id="customerBarChart" height="300"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Customer Table -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>Customer Revenue Details</h5>
-                    <div class="input-group" style="width: 250px;">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0" id="customerSearch" placeholder="Search customers...">
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-table mr-2"></i>Customer Revenue Details</h5>
+                    <div class="relative" style="width: 250px;">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="bi bi-search text-gray-500"></i>
+                        </div>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="customerSearch" placeholder="Search customers...">
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="customerTable">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">#</th>
-                                    <th>Customer</th>
-                                    <th>Code</th>
-                                    <th class="text-center">Invoices</th>
-                                    <th class="text-end">Revenue</th>
-                                    <th class="text-end">Paid</th>
-                                    <th class="text-end">Outstanding</th>
-                                    <th class="text-end pe-4">% of Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    var rank = 1;
-                                }
-                                @foreach (var customer in Model.Customers)
-                                {
-                                    var collectionRate = customer.TotalRevenue > 0
-                                        ? (customer.PaidAmount / customer.TotalRevenue * 100)
-                                        : 0;
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="customerTable">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">#</th>
+                                <th scope="col" class="px-6 py-3">Customer</th>
+                                <th scope="col" class="px-6 py-3">Code</th>
+                                <th scope="col" class="px-6 py-3 text-center">Invoices</th>
+                                <th scope="col" class="px-6 py-3 text-right">Revenue</th>
+                                <th scope="col" class="px-6 py-3 text-right">Paid</th>
+                                <th scope="col" class="px-6 py-3 text-right">Outstanding</th>
+                                <th scope="col" class="px-6 py-3 text-right">% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var rank = 1;
+                            }
+                            @foreach (var customer in Model.Customers)
+                            {
+                                var collectionRate = customer.TotalRevenue > 0
+                                    ? (customer.PaidAmount / customer.TotalRevenue * 100)
+                                    : 0;
 
-                                    <tr class="customer-row">
-                                        <td class="ps-4">
-                                            @if (rank <= 3)
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 customer-row">
+                                    <td class="px-6 py-4">
+                                        @if (rank <= 3)
+                                        {
+                                            var medalClass = rank switch
                                             {
-                                                var medalClass = rank switch
-                                                {
-                                                    1 => "text-warning",
-                                                    2 => "text-secondary",
-                                                    3 => "text-danger",
-                                                    _ => ""
-                                                };
-                                                <i class="bi bi-trophy-fill @medalClass"></i>
-                                            }
-                                            else
-                                            {
-                                                @rank
-                                            }
-                                        </td>
-                                        <td>
-                                            <a href="/Sales/Customers/Details/@customer.CustomerId" class="text-decoration-none fw-medium">
-                                                @customer.CustomerName
-                                            </a>
-                                        </td>
-                                        <td class="text-muted">@customer.CustomerCode</td>
-                                        <td class="text-center">
-                                            <span class="badge bg-light text-dark">@customer.InvoiceCount</span>
-                                        </td>
-                                        <td class="text-end fw-medium">@customer.TotalRevenue.ToString("C0")</td>
-                                        <td class="text-end text-success">@customer.PaidAmount.ToString("C0")</td>
-                                        <td class="text-end @(customer.OutstandingAmount > 0 ? "text-warning" : "text-muted")">
-                                            @(customer.OutstandingAmount > 0 ? customer.OutstandingAmount.ToString("C0") : "-")
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            <div class="d-flex align-items-center justify-content-end gap-2">
-                                                <div class="progress flex-grow-1" style="width: 60px; height: 6px;">
-                                                    <div class="progress-bar bg-primary" style="width: @customer.Percentage%"></div>
-                                                </div>
-                                                <span class="small text-muted">@customer.Percentage.ToString("F1")%</span>
+                                                1 => "text-amber-500",
+                                                2 => "text-gray-400",
+                                                3 => "text-orange-600",
+                                                _ => ""
+                                            };
+                                            <i class="bi bi-trophy-fill @medalClass"></i>
+                                        }
+                                        else
+                                        {
+                                            @rank
+                                        }
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <a href="/Sales/Customers/Details/@customer.CustomerId" class="font-medium text-primary-600 dark:text-primary-400 hover:underline">
+                                            @customer.CustomerName
+                                        </a>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400">@customer.CustomerCode</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">@customer.InvoiceCount</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right font-medium text-gray-900 dark:text-white">@customer.TotalRevenue.ToString("C0")</td>
+                                    <td class="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400">@customer.PaidAmount.ToString("C0")</td>
+                                    <td class="px-6 py-4 text-right @(customer.OutstandingAmount > 0 ? "text-amber-600 dark:text-amber-400" : "text-gray-400")">
+                                        @(customer.OutstandingAmount > 0 ? customer.OutstandingAmount.ToString("C0") : "-")
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                                <div class="bg-primary-600 h-1.5 rounded-full" style="width: @customer.Percentage%"></div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    rank++;
-                                }
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold" colspan="3">Total</td>
-                                    <td class="text-center fw-bold">@Model.Customers.Sum(c => c.InvoiceCount)</td>
-                                    <td class="text-end fw-bold">@Model.TotalRevenue.ToString("C0")</td>
-                                    <td class="text-end fw-bold text-success">@Model.TotalPaid.ToString("C0")</td>
-                                    <td class="text-end fw-bold text-warning">@Model.TotalOutstanding.ToString("C0")</td>
-                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">@customer.Percentage.ToString("F1")%</span>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                                rank++;
+                            }
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr class="font-bold">
+                                <td class="px-6 py-4" colspan="3">Total</td>
+                                <td class="px-6 py-4 text-center">@Model.Customers.Sum(c => c.InvoiceCount)</td>
+                                <td class="px-6 py-4 text-right">@Model.TotalRevenue.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400">@Model.TotalPaid.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right text-amber-600 dark:text-amber-400">@Model.TotalOutstanding.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right">100%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>

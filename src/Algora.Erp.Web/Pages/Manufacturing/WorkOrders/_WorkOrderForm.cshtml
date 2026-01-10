@@ -6,31 +6,33 @@
     var wo = Model.WorkOrder;
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">@title</h5>
-    <button type="button" class="btn-close" data-modal-hide="formModal" aria-label="Close"></button>
+<div class="flex items-center justify-between p-4 border-b rounded-t">
+    <h3 class="text-xl font-semibold text-gray-900">@title</h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="formModal" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 <form hx-post="/Manufacturing/WorkOrders"
       hx-target="#workOrdersTableContainer"
       hx-swap="innerHTML">
-    <div class="modal-body">
+    <div class="p-6">
         @if (Model.IsEdit && wo != null)
         {
             <input type="hidden" name="Id" value="@wo.Id" />
         }
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label">Name <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Name <span class="text-red-500">*</span></label>
                 <input type="text"
                        name="Name"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@wo?.Name"
                        required />
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Bill of Material</label>
-                <select name="BillOfMaterialId" id="bomSelect" class="form-select" onchange="loadBomMaterials()">
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Bill of Material</label>
+                <select name="BillOfMaterialId" id="bomSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" onchange="loadBomMaterials()">
                     <option value="">No BOM (Manual)</option>
                     @foreach (var bom in Model.BillOfMaterials)
                     {
@@ -42,10 +44,10 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label">Product <span class="text-danger">*</span></label>
-                <select name="ProductId" id="productSelect" class="form-select" required>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Product <span class="text-red-500">*</span></label>
+                <select name="ProductId" id="productSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
                     <option value="">Select Product...</option>
                     @foreach (var product in Model.Products)
                     {
@@ -53,9 +55,9 @@
                     }
                 </select>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Warehouse</label>
-                <select name="WarehouseId" class="form-select">
+            <div class="md:col-span-6 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Warehouse</label>
+                <select name="WarehouseId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     <option value="">Select Warehouse...</option>
                     @foreach (var wh in Model.Warehouses)
                     {
@@ -65,28 +67,28 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <label class="form-label">Planned Quantity <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Planned Quantity <span class="text-red-500">*</span></label>
                 <input type="number"
                        name="PlannedQuantity"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(wo?.PlannedQuantity ?? 1)"
                        step="0.0001"
                        min="0.0001"
                        required />
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Unit of Measure</label>
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Unit of Measure</label>
                 <input type="text"
                        name="UnitOfMeasure"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@wo?.UnitOfMeasure"
                        placeholder="e.g., EA, PCS" />
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Status</label>
-                <select name="Status" class="form-select">
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                <select name="Status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (WorkOrderStatus status in Enum.GetValues(typeof(WorkOrderStatus)))
                     {
                         if (status == WorkOrderStatus.InProgress || status == WorkOrderStatus.Completed || status == WorkOrderStatus.Cancelled)
@@ -95,9 +97,9 @@
                     }
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Priority</label>
-                <select name="Priority" class="form-select">
+            <div class="md:col-span-3 col-span-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Priority</label>
+                <select name="Priority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
                     @foreach (WorkOrderPriority priority in Enum.GetValues(typeof(WorkOrderPriority)))
                     {
                         <option value="@priority" selected="@(wo?.Priority == priority)">@priority</option>
@@ -106,28 +108,28 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <label class="form-label">Planned Start Date <span class="text-danger">*</span></label>
+        <div class="grid grid-cols-12 gap-3 mb-4">
+            <div class="md:col-span-4 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Planned Start Date <span class="text-red-500">*</span></label>
                 <input type="date"
                        name="PlannedStartDate"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(wo?.PlannedStartDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))"
                        required />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Planned End Date <span class="text-danger">*</span></label>
+            <div class="md:col-span-4 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Planned End Date <span class="text-red-500">*</span></label>
                 <input type="date"
                        name="PlannedEndDate"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@(wo?.PlannedEndDate.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(7).ToString("yyyy-MM-dd"))"
                        required />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">Estimated Cost</label>
+            <div class="md:col-span-4 col-span-12">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Estimated Cost</label>
                 <input type="number"
                        name="EstimatedCost"
-                       class="form-control"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                        value="@wo?.EstimatedCost"
                        step="0.01"
                        min="0" />
@@ -135,59 +137,59 @@
         </div>
 
         <div class="mb-4">
-            <label class="form-label">Notes</label>
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
             <textarea name="Notes"
-                      class="form-control"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
                       rows="2">@wo?.Notes</textarea>
         </div>
 
         <!-- Operations Section -->
-        <div class="border rounded p-3 bg-light mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Operations</h6>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addOperation()">
-                    <i class="bi bi-plus-lg me-1"></i> Add Operation
+        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <h6 class="text-sm font-medium text-gray-900"><i class="bi bi-gear mr-2"></i>Operations</h6>
+                <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addOperation()">
+                    <i class="bi bi-plus-lg mr-1"></i> Add Operation
                 </button>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered mb-0" id="operationsTable">
-                    <thead class="table-light">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500" id="operationsTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                         <tr>
-                            <th style="width: 5%">#</th>
-                            <th style="width: 25%">Name</th>
-                            <th style="width: 20%">Workstation</th>
-                            <th style="width: 15%">Planned Hours</th>
-                            <th style="width: 30%">Description</th>
-                            <th style="width: 5%"></th>
+                            <th scope="col" class="px-3 py-2" style="width: 5%">#</th>
+                            <th scope="col" class="px-3 py-2" style="width: 25%">Name</th>
+                            <th scope="col" class="px-3 py-2" style="width: 20%">Workstation</th>
+                            <th scope="col" class="px-3 py-2" style="width: 15%">Planned Hours</th>
+                            <th scope="col" class="px-3 py-2" style="width: 30%">Description</th>
+                            <th scope="col" class="px-3 py-2" style="width: 5%"></th>
                         </tr>
                     </thead>
-                    <tbody id="operationsBody">
+                    <tbody id="operationsBody" class="bg-white">
                         @if (wo?.Operations != null && wo.Operations.Any())
                         {
                             var opIndex = 0;
                             @foreach (var op in wo.Operations.OrderBy(o => o.OperationNumber))
                             {
-                                <tr class="operation-row">
-                                    <td class="text-center align-middle op-number">@(opIndex + 1)</td>
-                                    <td>
-                                        <input type="text" name="Operations[@opIndex].Name" class="form-control form-control-sm"
+                                <tr class="operation-row border-b border-gray-200">
+                                    <td class="px-3 py-2 text-center align-middle op-number">@(opIndex + 1)</td>
+                                    <td class="px-3 py-2">
+                                        <input type="text" name="Operations[@opIndex].Name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@op.Name" required />
                                     </td>
-                                    <td>
-                                        <input type="text" name="Operations[@opIndex].Workstation" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="text" name="Operations[@opIndex].Workstation" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@op.Workstation" />
                                     </td>
-                                    <td>
-                                        <input type="number" name="Operations[@opIndex].PlannedHours" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="number" name="Operations[@opIndex].PlannedHours" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@op.PlannedHours" step="0.01" min="0" />
                                     </td>
-                                    <td>
-                                        <input type="text" name="Operations[@opIndex].Description" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="text" name="Operations[@opIndex].Description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@op.Description" />
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOperation(this)">
+                                    <td class="px-3 py-2 text-center">
+                                        <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeOperation(this)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -198,39 +200,39 @@
                     </tbody>
                 </table>
             </div>
-            <div id="noOperationsMessage" class="text-center text-muted py-3" style="@(wo?.Operations?.Any() == true ? "display:none;" : "")">
-                <i class="bi bi-gear fs-4 d-block mb-2"></i>
+            <div id="noOperationsMessage" class="text-center text-gray-500 py-4" style="@(wo?.Operations?.Any() == true ? "display:none;" : "")">
+                <i class="bi bi-gear text-2xl block mb-2"></i>
                 No operations defined. Click "Add Operation" to add production steps.
             </div>
         </div>
 
         <!-- Materials Section -->
-        <div class="border rounded p-3 bg-light">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0"><i class="bi bi-box-seam me-2"></i>Materials Required</h6>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMaterial()">
-                    <i class="bi bi-plus-lg me-1"></i> Add Material
+        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div class="flex justify-between items-center mb-3">
+                <h6 class="text-sm font-medium text-gray-900"><i class="bi bi-box-seam mr-2"></i>Materials Required</h6>
+                <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addMaterial()">
+                    <i class="bi bi-plus-lg mr-1"></i> Add Material
                 </button>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered mb-0" id="materialsTable">
-                    <thead class="table-light">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500" id="materialsTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                         <tr>
-                            <th style="width: 60%">Product</th>
-                            <th style="width: 30%">Required Quantity</th>
-                            <th style="width: 10%"></th>
+                            <th scope="col" class="px-3 py-2" style="width: 60%">Product</th>
+                            <th scope="col" class="px-3 py-2" style="width: 30%">Required Quantity</th>
+                            <th scope="col" class="px-3 py-2" style="width: 10%"></th>
                         </tr>
                     </thead>
-                    <tbody id="materialsBody">
+                    <tbody id="materialsBody" class="bg-white">
                         @if (wo?.Materials != null && wo.Materials.Any())
                         {
                             var matIndex = 0;
                             @foreach (var mat in wo.Materials.OrderBy(m => m.LineNumber))
                             {
-                                <tr class="material-row">
-                                    <td>
-                                        <select name="Materials[@matIndex].ProductId" class="form-select form-select-sm" required>
+                                <tr class="material-row border-b border-gray-200">
+                                    <td class="px-3 py-2">
+                                        <select name="Materials[@matIndex].ProductId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" required>
                                             <option value="">Select...</option>
                                             @foreach (var product in Model.Products)
                                             {
@@ -238,12 +240,12 @@
                                             }
                                         </select>
                                     </td>
-                                    <td>
-                                        <input type="number" name="Materials[@matIndex].RequiredQuantity" class="form-control form-control-sm"
+                                    <td class="px-3 py-2">
+                                        <input type="number" name="Materials[@matIndex].RequiredQuantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                                                value="@mat.RequiredQuantity" step="0.0001" min="0.0001" required />
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMaterial(this)">
+                                    <td class="px-3 py-2 text-center">
+                                        <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeMaterial(this)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -254,16 +256,16 @@
                     </tbody>
                 </table>
             </div>
-            <div id="noMaterialsMessage" class="text-center text-muted py-3" style="@(wo?.Materials?.Any() == true ? "display:none;" : "")">
-                <i class="bi bi-box-seam fs-4 d-block mb-2"></i>
+            <div id="noMaterialsMessage" class="text-center text-gray-500 py-4" style="@(wo?.Materials?.Any() == true ? "display:none;" : "")">
+                <i class="bi bi-box-seam text-2xl block mb-2"></i>
                 No materials added. Select a BOM or click "Add Material" to add materials.
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="formModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i> @(Model.IsEdit ? "Update" : "Create") Work Order
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="formModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-1"></i> @(Model.IsEdit ? "Update" : "Create") Work Order
         </button>
     </div>
 </form>
@@ -315,24 +317,24 @@
 
         var rowCount = tbody.children.length + 1;
         var row = document.createElement('tr');
-        row.className = 'operation-row';
+        row.className = 'operation-row border-b border-gray-200';
         row.innerHTML = `
-            <td class="text-center align-middle op-number">${rowCount}</td>
-            <td>
-                <input type="text" name="Operations[${operationIndex}].Name" class="form-control form-control-sm" required />
+            <td class="px-3 py-2 text-center align-middle op-number">${rowCount}</td>
+            <td class="px-3 py-2">
+                <input type="text" name="Operations[${operationIndex}].Name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" required />
             </td>
-            <td>
-                <input type="text" name="Operations[${operationIndex}].Workstation" class="form-control form-control-sm" />
+            <td class="px-3 py-2">
+                <input type="text" name="Operations[${operationIndex}].Workstation" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" />
             </td>
-            <td>
-                <input type="number" name="Operations[${operationIndex}].PlannedHours" class="form-control form-control-sm"
+            <td class="px-3 py-2">
+                <input type="number" name="Operations[${operationIndex}].PlannedHours" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                        value="1" step="0.01" min="0" />
             </td>
-            <td>
-                <input type="text" name="Operations[${operationIndex}].Description" class="form-control form-control-sm" />
+            <td class="px-3 py-2">
+                <input type="text" name="Operations[${operationIndex}].Description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" />
             </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOperation(this)">
+            <td class="px-3 py-2 text-center">
+                <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeOperation(this)">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
@@ -375,19 +377,19 @@
         });
 
         var row = document.createElement('tr');
-        row.className = 'material-row';
+        row.className = 'material-row border-b border-gray-200';
         row.innerHTML = `
-            <td>
-                <select name="Materials[${materialIndex}].ProductId" class="form-select form-select-sm" required>
+            <td class="px-3 py-2">
+                <select name="Materials[${materialIndex}].ProductId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" required>
                     ${productOptions}
                 </select>
             </td>
-            <td>
-                <input type="number" name="Materials[${materialIndex}].RequiredQuantity" class="form-control form-control-sm"
+            <td class="px-3 py-2">
+                <input type="number" name="Materials[${materialIndex}].RequiredQuantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2"
                        value="${quantity}" step="0.0001" min="0.0001" required />
             </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMaterial(this)">
+            <td class="px-3 py-2 text-center">
+                <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeMaterial(this)">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>

@@ -4,60 +4,71 @@
 {
     foreach (var role in Model.Roles)
     {
-        <tr>
-            <td class="ps-4">
-                <div class="d-flex align-items-center">
-                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-                        <i class="bi bi-shield text-primary"></i>
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <div class="flex items-center">
+                    <div class="rounded-full bg-primary-100 flex items-center justify-center mr-2 w-10 h-10">
+                        <i class="bi bi-shield text-primary-600"></i>
                     </div>
                     <div>
-                        <div class="fw-medium">@role.Name</div>
+                        <div class="font-medium text-gray-900">@role.Name</div>
                     </div>
                 </div>
             </td>
-            <td>@(role.Description ?? "-")</td>
-            <td>
+            <td class="px-6 py-4">@(role.Description ?? "-")</td>
+            <td class="px-6 py-4">
                 @if (role.RolePermissions.Any())
                 {
-                    <span class="badge bg-info">@role.RolePermissions.Count permissions</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">@role.RolePermissions.Count permissions</span>
                 }
                 else
                 {
-                    <span class="text-muted">No permissions</span>
+                    <span class="text-gray-500">No permissions</span>
                 }
             </td>
-            <td>
-                <span class="badge bg-secondary">@role.UserRoles.Count users</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@role.UserRoles.Count users</span>
             </td>
-            <td class="text-center">
+            <td class="px-6 py-4 text-center">
                 @if (role.IsSystemRole)
                 {
-                    <span class="badge bg-warning">System</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">System</span>
                 }
                 else
                 {
-                    <span class="badge bg-success">Custom</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Custom</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button" class="btn btn-outline-primary"
-                            hx-get="/Admin/Roles?handler=EditForm&id=@role.Id"
-                            hx-target="#formContainer"
-                            hx-swap="innerHTML"
-                            data-modal-target="roleModal" data-modal-toggle="roleModal">
-                        <i class="bi bi-pencil"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownRole@(role.Id)" data-dropdown-toggle="dropdownMenuRole@(role.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    @if (!role.IsSystemRole)
-                    {
-                        <button type="button" class="btn btn-outline-danger"
-                                hx-delete="/Admin/Roles?id=@role.Id"
-                                hx-target="#rolesTableBody"
-                                hx-swap="innerHTML"
-                                hx-confirm="Delete this role?">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    }
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuRole@(role.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="/Admin/Roles?handler=EditForm&id=@role.Id"
+                                   hx-target="#formContainer"
+                                   hx-swap="innerHTML"
+                                   data-modal-target="roleModal" data-modal-toggle="roleModal">
+                                    <i class="bi bi-pencil mr-2"></i> Edit
+                                </a>
+                            </li>
+                        </ul>
+                        @if (!role.IsSystemRole)
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-delete="/Admin/Roles?id=@role.Id"
+                                   hx-target="#rolesTableBody"
+                                   hx-swap="innerHTML"
+                                   hx-confirm="Delete this role?">
+                                    <i class="bi bi-trash mr-2"></i> Delete
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </td>
         </tr>
@@ -65,24 +76,30 @@
 
     <!-- Pagination -->
     <tr>
-        <td colspan="6" class="bg-light">
-            <div class="d-flex justify-content-between align-items-center px-2 py-1">
-                <small class="text-muted">
+        <td colspan="6" class="bg-gray-50 px-6 py-3">
+            <div class="flex justify-between items-center">
+                <small class="text-gray-500">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </small>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg @(Model.Page == 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
+                               @(Model.Page > 1 ? $"hx-get=\"?handler=Table&page={Model.Page - 1}\" hx-target=\"#rolesTableBody\" hx-include=\"#searchInput, #pageSizeSelect\"" : "")>Previous</a>
                         </li>
                         @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            var pageNum = i;
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight @(pageNum == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700") cursor-pointer"
+                                   hx-get="?handler=Table&page=@pageNum"
+                                   hx-target="#rolesTableBody"
+                                   hx-include="#searchInput, #pageSizeSelect">@pageNum</a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg @(Model.Page == Model.TotalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
+                               @(Model.Page < Model.TotalPages ? $"hx-get=\"?handler=Table&page={Model.Page + 1}\" hx-target=\"#rolesTableBody\" hx-include=\"#searchInput, #pageSizeSelect\"" : "")>Next</a>
                         </li>
                     </ul>
                 </nav>
@@ -93,8 +110,8 @@
 else
 {
     <tr>
-        <td colspan="6" class="text-center py-5 text-muted">
-            <i class="bi bi-shield fs-1 d-block mb-2"></i>
+        <td colspan="6" class="text-center py-12 text-gray-500">
+            <i class="bi bi-shield text-4xl block mb-2"></i>
             No roles found
         </td>
     </tr>

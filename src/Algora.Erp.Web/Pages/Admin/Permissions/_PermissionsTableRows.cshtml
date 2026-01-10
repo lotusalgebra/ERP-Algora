@@ -4,39 +4,50 @@
 {
     foreach (var perm in Model.Permissions)
     {
-        <tr>
-            <td class="ps-4">
-                <code class="bg-light px-2 py-1 rounded">@perm.Code</code>
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <code class="bg-gray-100 px-2 py-1 rounded text-sm">@perm.Code</code>
             </td>
-            <td>
-                <div class="fw-medium">@perm.Name</div>
+            <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">@perm.Name</div>
             </td>
-            <td>@(perm.Description ?? "-")</td>
-            <td>
-                <span class="badge bg-info">@perm.Module</span>
+            <td class="px-6 py-4">@(perm.Description ?? "-")</td>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">@perm.Module</span>
             </td>
-            <td class="text-center">
-                <span class="badge bg-secondary">@perm.RolePermissions.Count</span>
+            <td class="px-6 py-4 text-center">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@perm.RolePermissions.Count</span>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group btn-group-sm">
-                    <button type="button" class="btn btn-outline-primary"
-                            hx-get="/Admin/Permissions?handler=EditForm&id=@perm.Id"
-                            hx-target="#formContainer"
-                            hx-swap="innerHTML"
-                            data-modal-target="permissionModal" data-modal-toggle="permissionModal">
-                        <i class="bi bi-pencil"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownPerm@(perm.Id)" data-dropdown-toggle="dropdownMenuPerm@(perm.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    @if (!perm.RolePermissions.Any())
-                    {
-                        <button type="button" class="btn btn-outline-danger"
-                                hx-delete="/Admin/Permissions?id=@perm.Id"
-                                hx-target="#permissionsTableBody"
-                                hx-swap="innerHTML"
-                                hx-confirm="Delete this permission?">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    }
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuPerm@(perm.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   hx-get="/Admin/Permissions?handler=EditForm&id=@perm.Id"
+                                   hx-target="#formContainer"
+                                   hx-swap="innerHTML"
+                                   data-modal-target="permissionModal" data-modal-toggle="permissionModal">
+                                    <i class="bi bi-pencil mr-2"></i> Edit
+                                </a>
+                            </li>
+                        </ul>
+                        @if (!perm.RolePermissions.Any())
+                        {
+                            <div class="py-2">
+                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                                   hx-delete="/Admin/Permissions?id=@perm.Id"
+                                   hx-target="#permissionsTableBody"
+                                   hx-swap="innerHTML"
+                                   hx-confirm="Delete this permission?">
+                                    <i class="bi bi-trash mr-2"></i> Delete
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </td>
         </tr>
@@ -44,24 +55,30 @@
 
     <!-- Pagination -->
     <tr>
-        <td colspan="6" class="bg-light">
-            <div class="d-flex justify-content-between align-items-center px-2 py-1">
-                <small class="text-muted">
+        <td colspan="6" class="bg-gray-50 px-6 py-3">
+            <div class="flex justify-between items-center">
+                <small class="text-gray-500">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </small>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page - 1)); return false;">Previous</a>
+                    <ul class="inline-flex -space-x-px text-sm">
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg @(Model.Page == 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
+                               @(Model.Page > 1 ? $"hx-get=\"?handler=Table&page={Model.Page - 1}\" hx-target=\"#permissionsTableBody\" hx-include=\"#searchInput, #moduleFilter, #pageSizeSelect\"" : "")>Previous</a>
                         </li>
                         @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" href="#" onclick="loadTable(@i); return false;">@i</a>
+                            var pageNum = i;
+                            <li>
+                                <a class="flex items-center justify-center px-3 h-8 leading-tight @(pageNum == Model.Page ? "text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700") cursor-pointer"
+                                   hx-get="?handler=Table&page=@pageNum"
+                                   hx-target="#permissionsTableBody"
+                                   hx-include="#searchInput, #moduleFilter, #pageSizeSelect">@pageNum</a>
                             </li>
                         }
-                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="#" onclick="loadTable(@(Model.Page + 1)); return false;">Next</a>
+                        <li>
+                            <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg @(Model.Page == Model.TotalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-100 hover:text-gray-700 cursor-pointer")"
+                               @(Model.Page < Model.TotalPages ? $"hx-get=\"?handler=Table&page={Model.Page + 1}\" hx-target=\"#permissionsTableBody\" hx-include=\"#searchInput, #moduleFilter, #pageSizeSelect\"" : "")>Next</a>
                         </li>
                     </ul>
                 </nav>
@@ -72,8 +89,8 @@
 else
 {
     <tr>
-        <td colspan="6" class="text-center py-5 text-muted">
-            <i class="bi bi-key fs-1 d-block mb-2"></i>
+        <td colspan="6" class="text-center py-12 text-gray-500">
+            <i class="bi bi-key text-4xl block mb-2"></i>
             No permissions found
         </td>
     </tr>

@@ -5,37 +5,43 @@
     ViewData["Title"] = $"Edit Invoice {Model.Input.InvoiceNumber}";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="d-flex align-items-center gap-3">
-                <h1 class="h3 mb-1">Edit Invoice</h1>
-                <span class="badge bg-secondary fs-6">@Model.Input.InvoiceNumber</span>
-                <span class="badge bg-warning text-dark fs-6">Draft</span>
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold text-gray-900">Edit Invoice</h1>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@Model.Input.InvoiceNumber</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Draft</span>
             </div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Invoices">Invoices</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Invoices/Details/@Model.Input.Id">@Model.Input.InvoiceNumber</a></li>
-                    <li class="breadcrumb-item active">Edit</li>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Finance/Invoices" class="hover:text-primary-600">Invoices</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li><a href="/Finance/Invoices/Details/@Model.Input.Id" class="hover:text-primary-600">@Model.Input.InvoiceNumber</a></li>
+                    <li><span class="mx-1">/</span></li>
+                    <li class="text-gray-900 font-medium">Edit</li>
                 </ol>
             </nav>
         </div>
         <div>
-            <button type="button" class="btn btn-outline-danger" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                <i class="bi bi-trash me-1"></i>Delete Invoice
+            <button type="button" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
+                <i class="bi bi-trash mr-1"></i>Delete Invoice
             </button>
         </div>
     </div>
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 flex items-center" role="alert">
+            <i class="bi bi-exclamation-circle mr-2"></i>@TempData["Error"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8" onclick="this.parentElement.remove()">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
@@ -43,19 +49,19 @@
         <input type="hidden" name="Input.Id" value="@Model.Input.Id" />
         <input type="hidden" name="Input.InvoiceNumber" value="@Model.Input.InvoiceNumber" />
 
-        <div class="row">
+        <div class="grid grid-cols-12 gap-6">
             <!-- Main Content -->
-            <div class="col-lg-8">
+            <div class="col-span-12 lg:col-span-8 space-y-6">
                 <!-- Invoice Details Card -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Invoice Details</h5>
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-file-earmark-text mr-2"></i>Invoice Details</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Customer <span class="text-danger">*</span></label>
-                                <select class="form-select" name="Input.CustomerId" id="customerSelect" required>
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Customer <span class="text-red-600">*</span></label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.CustomerId" id="customerSelect" required>
                                     <option value="">Select Customer</option>
                                     @foreach (var customer in Model.Customers)
                                     {
@@ -73,9 +79,9 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">From Sales Order</label>
-                                <select class="form-select" name="Input.SalesOrderId" id="salesOrderSelect">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">From Sales Order</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.SalesOrderId" id="salesOrderSelect">
                                     <option value="">None</option>
                                     @foreach (var order in Model.SalesOrders)
                                     {
@@ -86,9 +92,9 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Invoice Type</label>
-                                <select class="form-select" name="Input.Type">
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Invoice Type</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.Type">
                                     @foreach (var type in Enum.GetValues<InvoiceType>())
                                     {
                                         <option value="@type" selected="@(Model.Input.Type == type)">@type</option>
@@ -96,21 +102,21 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Invoice Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="Input.InvoiceDate"
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Invoice Date <span class="text-red-600">*</span></label>
+                                <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.InvoiceDate"
                                        value="@Model.Input.InvoiceDate.ToString("yyyy-MM-dd")" required>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Due Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="Input.DueDate" id="dueDate"
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Due Date <span class="text-red-600">*</span></label>
+                                <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.DueDate" id="dueDate"
                                        value="@Model.Input.DueDate.ToString("yyyy-MM-dd")" required>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Payment Terms</label>
-                                <select class="form-select" name="Input.PaymentTerms" id="paymentTerms" onchange="updateDueDate()">
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Payment Terms</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.PaymentTerms" id="paymentTerms" onchange="updateDueDate()">
                                     <option value="Due on Receipt" data-days="0" selected="@(Model.Input.PaymentTerms == "Due on Receipt")">Due on Receipt</option>
                                     <option value="Net 15" data-days="15" selected="@(Model.Input.PaymentTerms == "Net 15")">Net 15</option>
                                     <option value="Net 30" data-days="30" selected="@(Model.Input.PaymentTerms == "Net 30")">Net 30</option>
@@ -121,9 +127,9 @@
                                 <input type="hidden" name="Input.PaymentTermDays" id="paymentTermDays" value="@Model.Input.PaymentTermDays">
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Currency</label>
-                                <select class="form-select" name="Input.Currency">
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Currency</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.Currency">
                                     <option value="USD" selected="@(Model.Input.Currency == "USD")">USD - US Dollar</option>
                                     <option value="EUR" selected="@(Model.Input.Currency == "EUR")">EUR - Euro</option>
                                     <option value="GBP" selected="@(Model.Input.Currency == "GBP")">GBP - British Pound</option>
@@ -132,9 +138,9 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" name="Input.Reference"
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Reference</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.Reference"
                                        value="@Model.Input.Reference" placeholder="PO#, Quote#, etc.">
                             </div>
                         </div>
@@ -142,15 +148,15 @@
                 </div>
 
                 <!-- GST Details Card -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-percent me-2"></i>GST Details</h5>
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-percent mr-2"></i>GST Details</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">From Location <span class="text-danger">*</span></label>
-                                <select class="form-select" name="Input.FromLocationId" id="fromLocationSelect" required onchange="checkInterState()">
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">From Location <span class="text-red-600">*</span></label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.FromLocationId" id="fromLocationSelect" required onchange="checkInterState()">
                                     <option value="">Select Location</option>
                                     @foreach (var location in Model.Locations)
                                     {
@@ -162,9 +168,9 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Customer State <span class="text-danger">*</span></label>
-                                <select class="form-select" name="Input.CustomerStateId" id="customerStateSelect" required onchange="checkInterState()">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Customer State <span class="text-red-600">*</span></label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.CustomerStateId" id="customerStateSelect" required onchange="checkInterState()">
                                     <option value="">Select State</option>
                                     @foreach (var state in Model.States)
                                     {
@@ -175,15 +181,15 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Customer GSTIN</label>
-                                <input type="text" class="form-control" name="Input.CustomerGstin"
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Customer GSTIN</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.CustomerGstin"
                                        value="@Model.Input.CustomerGstin" placeholder="22AAAAA0000A1Z5"
                                        pattern="^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$">
                             </div>
-                            <div class="col-md-6">
-                                <div id="gstTypeAlert" class="alert alert-info mb-0 py-2 @(Model.Input.FromLocationId.HasValue && Model.Input.CustomerStateId.HasValue ? "" : "d-none")">
-                                    <i class="bi bi-info-circle me-2"></i>
+                            <div class="col-span-12 md:col-span-6">
+                                <div id="gstTypeAlert" class="p-4 text-sm rounded-lg flex items-center @(Model.Input.FromLocationId.HasValue && Model.Input.CustomerStateId.HasValue ? (Model.Input.IsInterState ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-800") : "bg-blue-50 text-blue-800 hidden")">
+                                    <i class="bi bi-info-circle mr-2"></i>
                                     <span id="gstTypeText">@(Model.Input.IsInterState ? "Inter-State: IGST applies" : "Intra-State: CGST + SGST applies")</span>
                                 </div>
                             </div>
@@ -192,29 +198,29 @@
                 </div>
 
                 <!-- Line Items Card -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Line Items</h5>
-                            <button type="button" class="btn btn-sm btn-primary" onclick="addLine()">
-                                <i class="bi bi-plus-lg me-1"></i>Add Line
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-list-ul mr-2"></i>Line Items</h5>
+                            <button type="button" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addLine()">
+                                <i class="bi bi-plus-lg mr-1"></i>Add Line
                             </button>
                         </div>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0" id="linesTable">
-                                <thead class="bg-light">
+                    <div class="p-0">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500 [&>tbody>tr]:hover:bg-gray-100" id="linesTable">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
-                                        <th style="width: 18%">Product</th>
-                                        <th style="width: 15%">Description</th>
-                                        <th style="width: 7%" class="text-center">Qty</th>
-                                        <th style="width: 10%" class="text-end">Unit Price</th>
-                                        <th style="width: 6%" class="text-center">Disc %</th>
-                                        <th style="width: 14%">GST Slab</th>
-                                        <th style="width: 10%">HSN Code</th>
-                                        <th style="width: 10%" class="text-end">Total</th>
-                                        <th style="width: 5%" class="text-center"></th>
+                                        <th scope="col" class="px-4 py-3" style="width: 18%">Product</th>
+                                        <th scope="col" class="px-4 py-3" style="width: 15%">Description</th>
+                                        <th scope="col" class="px-4 py-3 text-center" style="width: 7%">Qty</th>
+                                        <th scope="col" class="px-4 py-3 text-right" style="width: 10%">Unit Price</th>
+                                        <th scope="col" class="px-4 py-3 text-center" style="width: 6%">Disc %</th>
+                                        <th scope="col" class="px-4 py-3" style="width: 14%">GST Slab</th>
+                                        <th scope="col" class="px-4 py-3" style="width: 10%">HSN Code</th>
+                                        <th scope="col" class="px-4 py-3 text-right" style="width: 10%">Total</th>
+                                        <th scope="col" class="px-4 py-3 text-center" style="width: 5%"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="linesBody">
@@ -223,9 +229,9 @@
                                         var index = 0;
                                         foreach (var line in Model.Input.Lines)
                                         {
-                                            <tr data-index="@index">
-                                                <td>
-                                                    <select class="form-select form-select-sm product-select" name="Input.Lines[@index].ProductId" onchange="updateLineFromProduct(this)">
+                                            <tr data-index="@index" class="bg-white border-b">
+                                                <td class="px-4 py-3">
+                                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 product-select" name="Input.Lines[@index].ProductId" onchange="updateLineFromProduct(this)">
                                                         <option value="">Select Product</option>
                                                         @foreach (var product in Model.Products)
                                                         {
@@ -241,24 +247,24 @@
                                                     </select>
                                                     <input type="hidden" name="Input.Lines[@index].ProductCode" class="product-code" value="@line.ProductCode">
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control form-control-sm description-input"
+                                                <td class="px-4 py-3">
+                                                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 description-input"
                                                            name="Input.Lines[@index].Description" value="@line.Description" placeholder="Description">
                                                 </td>
-                                                <td>
-                                                    <input type="number" class="form-control form-control-sm text-center qty-input"
+                                                <td class="px-4 py-3">
+                                                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center qty-input"
                                                            name="Input.Lines[@index].Quantity" value="@line.Quantity" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
                                                 </td>
-                                                <td>
-                                                    <input type="number" class="form-control form-control-sm text-end price-input"
+                                                <td class="px-4 py-3">
+                                                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input"
                                                            name="Input.Lines[@index].UnitPrice" value="@line.UnitPrice" min="0" step="0.01" onchange="calculateLineTotal(this)">
                                                 </td>
-                                                <td>
-                                                    <input type="number" class="form-control form-control-sm text-center discount-input"
+                                                <td class="px-4 py-3">
+                                                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center discount-input"
                                                            name="Input.Lines[@index].DiscountPercent" value="@line.DiscountPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
                                                 </td>
-                                                <td>
-                                                    <select class="form-select form-select-sm gst-select" name="Input.Lines[@index].GstSlabId" onchange="calculateLineTotal(this)">
+                                                <td class="px-4 py-3">
+                                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 gst-select" name="Input.Lines[@index].GstSlabId" onchange="calculateLineTotal(this)">
                                                         <option value="">No GST</option>
                                                         @foreach (var slab in Model.GstSlabs)
                                                         {
@@ -273,15 +279,15 @@
                                                         }
                                                     </select>
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control form-control-sm hsn-input"
+                                                <td class="px-4 py-3">
+                                                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 hsn-input"
                                                            name="Input.Lines[@index].HsnCode" value="@line.HsnCode" placeholder="HSN">
                                                 </td>
-                                                <td class="text-end align-middle">
-                                                    <span class="line-total fw-medium">₹0.00</span>
+                                                <td class="px-4 py-3 text-right align-middle">
+                                                    <span class="line-total font-medium">₹0.00</span>
                                                 </td>
-                                                <td class="text-center">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                                <td class="px-4 py-3 text-center">
+                                                    <button type="button" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-2" onclick="removeLine(this)">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </td>
@@ -290,35 +296,35 @@
                                         }
                                     }
                                 </tbody>
-                                <tfoot class="bg-light">
+                                <tfoot class="bg-gray-50">
                                     <tr>
-                                        <td colspan="7" class="text-end fw-medium">Subtotal:</td>
-                                        <td class="text-end fw-medium" id="subtotalDisplay">₹0.00</td>
+                                        <td colspan="7" class="px-4 py-3 text-right font-medium">Subtotal:</td>
+                                        <td class="px-4 py-3 text-right font-medium" id="subtotalDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="7" class="text-end text-danger">Discount:</td>
-                                        <td class="text-end text-danger" id="discountDisplay">-₹0.00</td>
+                                        <td colspan="7" class="px-4 py-3 text-right text-red-600">Discount:</td>
+                                        <td class="px-4 py-3 text-right text-red-600" id="discountDisplay">-₹0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr id="cgstRow">
-                                        <td colspan="7" class="text-end text-success">CGST:</td>
-                                        <td class="text-end text-success" id="cgstDisplay">₹0.00</td>
+                                        <td colspan="7" class="px-4 py-3 text-right text-emerald-600">CGST:</td>
+                                        <td class="px-4 py-3 text-right text-emerald-600" id="cgstDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr id="sgstRow">
-                                        <td colspan="7" class="text-end text-info">SGST:</td>
-                                        <td class="text-end text-info" id="sgstDisplay">₹0.00</td>
+                                        <td colspan="7" class="px-4 py-3 text-right text-blue-600">SGST:</td>
+                                        <td class="px-4 py-3 text-right text-blue-600" id="sgstDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
-                                    <tr id="igstRow" class="d-none">
-                                        <td colspan="7" class="text-end text-warning">IGST:</td>
-                                        <td class="text-end text-warning" id="igstDisplay">₹0.00</td>
+                                    <tr id="igstRow" class="hidden">
+                                        <td colspan="7" class="px-4 py-3 text-right text-amber-600">IGST:</td>
+                                        <td class="px-4 py-3 text-right text-amber-600" id="igstDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
-                                    <tr class="fw-bold fs-5">
-                                        <td colspan="7" class="text-end">Total:</td>
-                                        <td class="text-end text-primary" id="totalDisplay">₹0.00</td>
+                                    <tr class="font-bold text-lg">
+                                        <td colspan="7" class="px-4 py-3 text-right">Total:</td>
+                                        <td class="px-4 py-3 text-right text-primary-600" id="totalDisplay">₹0.00</td>
                                         <td></td>
                                     </tr>
                                 </tfoot>
@@ -328,19 +334,19 @@
                 </div>
 
                 <!-- Notes Card -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Notes</h5>
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-chat-left-text mr-2"></i>Notes</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Notes (visible to customer)</label>
-                                <textarea class="form-control" name="Input.Notes" rows="2" placeholder="Thank you for your business...">@Model.Input.Notes</textarea>
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Notes (visible to customer)</label>
+                                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.Notes" rows="2" placeholder="Thank you for your business...">@Model.Input.Notes</textarea>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Internal Notes (not visible to customer)</label>
-                                <textarea class="form-control" name="Input.InternalNotes" rows="2" placeholder="Internal notes...">@Model.Input.InternalNotes</textarea>
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Internal Notes (not visible to customer)</label>
+                                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.InternalNotes" rows="2" placeholder="Internal notes...">@Model.Input.InternalNotes</textarea>
                             </div>
                         </div>
                     </div>
@@ -348,42 +354,42 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="col-lg-4">
+            <div class="col-span-12 lg:col-span-4 space-y-6">
                 <!-- Billing Address Card -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Billing Address</h5>
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-geo-alt mr-2"></i>Billing Address</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Name</label>
-                                <input type="text" class="form-control" name="Input.BillingName" id="billingName"
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Name</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.BillingName" id="billingName"
                                        value="@Model.Input.BillingName" placeholder="Company/Customer Name">
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Address</label>
-                                <textarea class="form-control" name="Input.BillingAddress" id="billingAddress"
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
+                                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.BillingAddress" id="billingAddress"
                                           rows="2" placeholder="Street address">@Model.Input.BillingAddress</textarea>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">City</label>
-                                <input type="text" class="form-control" name="Input.BillingCity" id="billingCity"
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.BillingCity" id="billingCity"
                                        value="@Model.Input.BillingCity">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">State</label>
-                                <input type="text" class="form-control" name="Input.BillingState" id="billingState"
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">State</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.BillingState" id="billingState"
                                        value="@Model.Input.BillingState">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Postal Code</label>
-                                <input type="text" class="form-control" name="Input.BillingPostalCode" id="billingPostalCode"
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Postal Code</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.BillingPostalCode" id="billingPostalCode"
                                        value="@Model.Input.BillingPostalCode">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Country</label>
-                                <input type="text" class="form-control" name="Input.BillingCountry" id="billingCountry"
+                            <div class="col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Country</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Input.BillingCountry" id="billingCountry"
                                        value="@Model.Input.BillingCountry">
                             </div>
                         </div>
@@ -391,43 +397,43 @@
                 </div>
 
                 <!-- Summary Card -->
-                <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 1rem;">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Summary</h5>
+                <div class="bg-white rounded-lg shadow-md sticky top-4">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-calculator mr-2"></i>Summary</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Subtotal</span>
+                    <div class="p-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-500">Subtotal</span>
                             <span id="summarySubtotal">₹0.00</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Discount</span>
-                            <span class="text-danger" id="summaryDiscount">-₹0.00</span>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-500">Discount</span>
+                            <span class="text-red-600" id="summaryDiscount">-₹0.00</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2" id="summaryCgstRow">
-                            <span class="text-muted">CGST</span>
-                            <span class="text-success" id="summaryCgst">₹0.00</span>
+                        <div class="flex justify-between mb-2" id="summaryCgstRow">
+                            <span class="text-gray-500">CGST</span>
+                            <span class="text-emerald-600" id="summaryCgst">₹0.00</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2" id="summarySgstRow">
-                            <span class="text-muted">SGST</span>
-                            <span class="text-info" id="summarySgst">₹0.00</span>
+                        <div class="flex justify-between mb-2" id="summarySgstRow">
+                            <span class="text-gray-500">SGST</span>
+                            <span class="text-blue-600" id="summarySgst">₹0.00</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2 d-none" id="summaryIgstRow">
-                            <span class="text-muted">IGST</span>
-                            <span class="text-warning" id="summaryIgst">₹0.00</span>
+                        <div class="flex justify-between mb-2 hidden" id="summaryIgstRow">
+                            <span class="text-gray-500">IGST</span>
+                            <span class="text-amber-600" id="summaryIgst">₹0.00</span>
                         </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="fw-bold fs-5">Total</span>
-                            <span class="fw-bold fs-5 text-primary" id="summaryTotal">₹0.00</span>
+                        <hr class="my-4 border-gray-200">
+                        <div class="flex justify-between mb-4">
+                            <span class="font-bold text-lg">Total</span>
+                            <span class="font-bold text-lg text-primary-600" id="summaryTotal">₹0.00</span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-check-lg me-2"></i>Save Changes
+                        <div class="space-y-2">
+                            <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-3">
+                                <i class="bi bi-check-lg mr-2"></i>Save Changes
                             </button>
-                            <a href="/Finance/Invoices/Details/@Model.Input.Id" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            <a href="/Finance/Invoices/Details/@Model.Input.Id" class="w-full block text-center text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-3">
+                                <i class="bi bi-x-lg mr-2"></i>Cancel
                             </a>
                         </div>
                     </div>
@@ -438,23 +444,25 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-exclamation-triangle text-danger me-2"></i>Delete Invoice</h5>
-                <button type="button" class="btn-close" data-modal-hide="deleteModal"></button>
+<div id="deleteModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow">
+            <div class="flex items-center justify-between p-4 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900"><i class="bi bi-exclamation-triangle text-red-600 mr-2"></i>Delete Invoice</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="deleteModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-            <div class="modal-body">
+            <div class="p-6">
                 <p>Are you sure you want to delete invoice <strong>@Model.Input.InvoiceNumber</strong>?</p>
-                <p class="text-muted mb-0">This action cannot be undone. All line items will be removed.</p>
+                <p class="text-gray-500 mb-0">This action cannot be undone. All line items will be removed.</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-modal-hide="deleteModal">Cancel</button>
-                <form method="post" asp-page-handler="Delete" class="d-inline">
+            <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
+                <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="deleteModal">Cancel</button>
+                <form method="post" asp-page-handler="Delete" class="inline">
                     <input type="hidden" name="Input.Id" value="@Model.Input.Id" />
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash me-1"></i>Delete Invoice
+                    <button type="submit" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                        <i class="bi bi-trash mr-1"></i>Delete Invoice
                     </button>
                 </form>
             </div>
@@ -493,22 +501,22 @@
 
             isInterState = fromStateId !== customerStateId;
 
-            gstTypeAlert.classList.remove('d-none');
+            gstTypeAlert.classList.remove('hidden');
             if (isInterState) {
                 gstTypeText.textContent = 'Inter-State: IGST applies';
-                gstTypeAlert.classList.remove('alert-success');
-                gstTypeAlert.classList.add('alert-warning');
+                gstTypeAlert.classList.remove('bg-emerald-50', 'text-emerald-800');
+                gstTypeAlert.classList.add('bg-amber-50', 'text-amber-800');
             } else {
                 gstTypeText.textContent = 'Intra-State: CGST + SGST applies';
-                gstTypeAlert.classList.remove('alert-warning');
-                gstTypeAlert.classList.add('alert-success');
+                gstTypeAlert.classList.remove('bg-amber-50', 'text-amber-800');
+                gstTypeAlert.classList.add('bg-emerald-50', 'text-emerald-800');
             }
 
             // Update tax display rows
             updateTaxDisplayRows();
             calculateTotals();
         } else {
-            gstTypeAlert.classList.add('d-none');
+            gstTypeAlert.classList.add('hidden');
         }
     }
 
@@ -521,19 +529,19 @@
         const summaryIgstRow = document.getElementById('summaryIgstRow');
 
         if (isInterState) {
-            cgstRow.classList.add('d-none');
-            sgstRow.classList.add('d-none');
-            igstRow.classList.remove('d-none');
-            summaryCgstRow.classList.add('d-none');
-            summarySgstRow.classList.add('d-none');
-            summaryIgstRow.classList.remove('d-none');
+            cgstRow.classList.add('hidden');
+            sgstRow.classList.add('hidden');
+            igstRow.classList.remove('hidden');
+            summaryCgstRow.classList.add('hidden');
+            summarySgstRow.classList.add('hidden');
+            summaryIgstRow.classList.remove('hidden');
         } else {
-            cgstRow.classList.remove('d-none');
-            sgstRow.classList.remove('d-none');
-            igstRow.classList.add('d-none');
-            summaryCgstRow.classList.remove('d-none');
-            summarySgstRow.classList.remove('d-none');
-            summaryIgstRow.classList.add('d-none');
+            cgstRow.classList.remove('hidden');
+            sgstRow.classList.remove('hidden');
+            igstRow.classList.add('hidden');
+            summaryCgstRow.classList.remove('hidden');
+            summarySgstRow.classList.remove('hidden');
+            summaryIgstRow.classList.add('hidden');
         }
     }
 
@@ -541,45 +549,46 @@
         const tbody = document.getElementById('linesBody');
         const row = document.createElement('tr');
         row.setAttribute('data-index', lineIndex);
+        row.className = 'bg-white border-b';
         row.innerHTML = `
-            <td>
-                <select class="form-select form-select-sm product-select" name="Input.Lines[${lineIndex}].ProductId" onchange="updateLineFromProduct(this)">
+            <td class="px-4 py-3">
+                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 product-select" name="Input.Lines[${lineIndex}].ProductId" onchange="updateLineFromProduct(this)">
                     <option value="">Select Product</option>
                     ${products.map(p => `<option value="${p.id}" data-sku="${p.sku}" data-name="${p.name}" data-price="${p.price}" data-tax="${p.tax}">${p.name}</option>`).join('')}
                 </select>
                 <input type="hidden" name="Input.Lines[${lineIndex}].ProductCode" class="product-code" value="">
             </td>
-            <td>
-                <input type="text" class="form-control form-control-sm description-input"
+            <td class="px-4 py-3">
+                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 description-input"
                        name="Input.Lines[${lineIndex}].Description" value="" placeholder="Description">
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-center qty-input"
+            <td class="px-4 py-3">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center qty-input"
                        name="Input.Lines[${lineIndex}].Quantity" value="1" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-end price-input"
+            <td class="px-4 py-3">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input"
                        name="Input.Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-center discount-input"
+            <td class="px-4 py-3">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center discount-input"
                        name="Input.Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td>
-                <select class="form-select form-select-sm gst-select" name="Input.Lines[${lineIndex}].GstSlabId" onchange="calculateLineTotal(this)">
+            <td class="px-4 py-3">
+                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 gst-select" name="Input.Lines[${lineIndex}].GstSlabId" onchange="calculateLineTotal(this)">
                     <option value="">No GST</option>
                     ${gstSlabs.map(g => `<option value="${g.id}" data-rate="${g.rate}" data-cgst="${g.cgst}" data-sgst="${g.sgst}" data-igst="${g.igst}">${g.name} (${g.rate}%)</option>`).join('')}
                 </select>
             </td>
-            <td>
-                <input type="text" class="form-control form-control-sm hsn-input"
+            <td class="px-4 py-3">
+                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 hsn-input"
                        name="Input.Lines[${lineIndex}].HsnCode" value="" placeholder="HSN">
             </td>
-            <td class="text-end align-middle">
-                <span class="line-total fw-medium">₹0.00</span>
+            <td class="px-4 py-3 text-right align-middle">
+                <span class="line-total font-medium">₹0.00</span>
             </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+            <td class="px-4 py-3 text-center">
+                <button type="button" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-2" onclick="removeLine(this)">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>

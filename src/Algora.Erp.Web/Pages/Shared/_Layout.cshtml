@@ -49,6 +49,18 @@
         .sidebar-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
         .htmx-indicator { display: none; }
         .htmx-request .htmx-indicator { display: inline-block; }
+        /* Modal backdrop styling */
+        [data-modal-backdrop] { background-color: rgba(0, 0, 0, 0.5); }
+        /* Ensure modals have proper backdrop when shown */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 40;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body class="bg-slate-100">
@@ -303,6 +315,91 @@
 
     <!-- Flowbite JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+    <!-- Modal backdrop and Flowbite re-initialization -->
+    <script>
+        // Re-initialize Flowbite after HTMX content swaps
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            if (typeof initFlowbite === 'function') {
+                initFlowbite();
+            }
+        });
+        document.body.addEventListener('htmx:afterSettle', function(evt) {
+            if (typeof initFlowbite === 'function') {
+                initFlowbite();
+            }
+        });
+
+        // Create backdrop element
+        function createBackdrop() {
+            let backdrop = document.getElementById('modal-backdrop');
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.id = 'modal-backdrop';
+                backdrop.className = 'fixed inset-0 z-40 bg-gray-900 bg-opacity-50 hidden';
+                document.body.appendChild(backdrop);
+            }
+            return backdrop;
+        }
+
+        // Show backdrop when any modal opens
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('[data-modal-toggle]');
+            if (target) {
+                const backdrop = createBackdrop();
+                backdrop.classList.remove('hidden');
+            }
+        });
+
+        // Hide backdrop when modal closes
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('[data-modal-hide]');
+            if (target) {
+                const backdrop = document.getElementById('modal-backdrop');
+                if (backdrop) backdrop.classList.add('hidden');
+            }
+        });
+
+        // Also handle escape key to hide backdrop
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const backdrop = document.getElementById('modal-backdrop');
+                if (backdrop) backdrop.classList.add('hidden');
+            }
+        });
+
+        // Handle Flowbite modal show/hide events
+        document.addEventListener('DOMContentLoaded', function() {
+            // Watch for modal visibility changes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const target = mutation.target;
+                        if (target.hasAttribute('tabindex') && target.id) {
+                            const backdrop = createBackdrop();
+                            if (target.classList.contains('hidden')) {
+                                backdrop.classList.add('hidden');
+                            } else {
+                                backdrop.classList.remove('hidden');
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Observe all modals
+            document.querySelectorAll('[tabindex="-1"][id]').forEach(function(modal) {
+                observer.observe(modal, { attributes: true });
+            });
+
+            // Re-observe after HTMX updates
+            document.body.addEventListener('htmx:afterSettle', function() {
+                document.querySelectorAll('[tabindex="-1"][id]').forEach(function(modal) {
+                    observer.observe(modal, { attributes: true });
+                });
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -16,7 +16,7 @@
                 hx-target="#formModalBody"
                 data-modal-target="formModal"
                 data-modal-toggle="formModal">
-            <i class="bi bi-plus-lg me-2"></i>New Quotation
+            <i class="bi bi-plus-lg mr-2"></i>New Quotation
         </button>
     </div>
 
@@ -27,7 +27,7 @@
                 <div class="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
                     <i class="bi bi-file-earmark-text text-xl text-primary-600"></i>
                 </div>
-                <div class="ms-4">
+                <div class="ml-4">
                     <p class="text-sm text-gray-500 mb-1">Total Quotations</p>
                     <h3 class="text-2xl font-bold text-gray-900">@Model.TotalQuotations</h3>
                 </div>
@@ -38,7 +38,7 @@
                 <div class="flex-shrink-0 p-3 bg-amber-100 rounded-lg">
                     <i class="bi bi-hourglass-split text-xl text-amber-600"></i>
                 </div>
-                <div class="ms-4">
+                <div class="ml-4">
                     <p class="text-sm text-gray-500 mb-1">Pending</p>
                     <h3 class="text-2xl font-bold text-gray-900">@Model.PendingQuotations</h3>
                 </div>
@@ -49,7 +49,7 @@
                 <div class="flex-shrink-0 p-3 bg-emerald-100 rounded-lg">
                     <i class="bi bi-check-circle text-xl text-emerald-600"></i>
                 </div>
-                <div class="ms-4">
+                <div class="ml-4">
                     <p class="text-sm text-gray-500 mb-1">Accepted</p>
                     <h3 class="text-2xl font-bold text-gray-900">@Model.AcceptedQuotations</h3>
                 </div>
@@ -60,7 +60,7 @@
                 <div class="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
                     <i class="bi bi-currency-dollar text-xl text-blue-600"></i>
                 </div>
-                <div class="ms-4">
+                <div class="ml-4">
                     <p class="text-sm text-gray-500 mb-1">Total Value</p>
                     <h3 class="text-2xl font-bold text-gray-900">@Model.TotalValue.ToString("C0")</h3>
                 </div>
@@ -123,7 +123,7 @@
                     <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg"
                             hx-get="?handler=Export"
                             hx-include="#searchInput, #customerFilter, #statusFilter">
-                        <i class="bi bi-download me-2"></i>Export
+                        <i class="bi bi-download mr-2"></i>Export
                     </button>
                 </div>
             </div>
@@ -163,7 +163,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Quotation</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="formModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" data-modal-hide="formModal">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -182,7 +182,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Quotation Details</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="detailsModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" data-modal-hide="detailsModal">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>

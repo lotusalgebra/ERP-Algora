@@ -13,51 +13,51 @@
         : 0;
 }
 
-<div class="container-fluid">
+<div class="p-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="h3 mb-0">Payment Reports</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
-                    <li class="breadcrumb-item active">Payments</li>
+            <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">Payment Reports</h4>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><a href="/Finance/Reports" class="hover:text-primary-600">Reports</a></li>
+                    <li class="flex items-center"><i class="bi bi-chevron-right mx-2 text-xs"></i><span class="text-gray-700 dark:text-gray-300">Payments</span></li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-danger">
-                <i class="bi bi-file-pdf me-1"></i>Export PDF
+        <div class="flex gap-2">
+            <a href="?handler=ExportPdf&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white">
+                <i class="bi bi-file-pdf mr-1"></i>Export PDF
             </a>
-            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">
-                <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+            <a href="?handler=ExportCsv&StartDate=@Model.StartDate?.ToString("yyyy-MM-dd")&EndDate=@Model.EndDate?.ToString("yyyy-MM-dd")" class="text-emerald-700 border border-emerald-700 hover:bg-emerald-700 hover:text-white focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-emerald-500 dark:text-emerald-500 dark:hover:bg-emerald-600 dark:hover:text-white">
+                <i class="bi bi-file-earmark-excel mr-1"></i>Export CSV
             </a>
         </div>
     </div>
 
     <!-- Date Filter -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-control" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+    <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+        <div class="p-6">
+            <form method="get" class="grid grid-cols-12 gap-4 items-end">
+                <div class="col-span-12 md:col-span-3">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-control" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                <div class="col-span-12 md:col-span-3">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End Date</label>
+                    <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                <div class="col-span-12 md:col-span-3">
+                    <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700">
+                        <i class="bi bi-funnel mr-1"></i>Apply Filter
                     </button>
-                    <a href="/Finance/Reports/Payments" class="btn btn-outline-secondary">Reset</a>
+                    <a href="/Finance/Reports/Payments" class="text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 ml-2">Reset</a>
                 </div>
-                <div class="col-md-3 text-end">
-                    <span class="text-muted">
-                        <i class="bi bi-calendar me-1"></i>
+                <div class="col-span-12 md:col-span-3 text-right">
+                    <span class="text-gray-500 dark:text-gray-400">
+                        <i class="bi bi-calendar mr-1"></i>
                         @Model.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.DateRange.EndDate.ToString("MMM dd, yyyy")
                     </span>
                 </div>
@@ -66,138 +66,120 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Report.TotalPayments</h3>
-                    <small class="text-muted">Total Payments</small>
-                </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.Report.TotalPayments</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Payments</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-success">@Model.Report.TotalReceived.ToString("C0")</h3>
-                    <small class="text-muted">Total Received</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mb-1">@Model.Report.TotalReceived.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Total Received</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Report.AveragePayment.ToString("C0")</h3>
-                    <small class="text-muted">Average Payment</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.Report.AveragePayment.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Average Payment</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1 text-primary">@Model.Report.LargestPayment.ToString("C0")</h3>
-                    <small class="text-muted">Largest Payment</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-primary-600 dark:text-primary-400 mb-1">@Model.Report.LargestPayment.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Largest Payment</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Report.SmallestPayment.ToString("C0")</h3>
-                    <small class="text-muted">Smallest Payment</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">@Model.Report.SmallestPayment.ToString("C0")</h3>
+                <small class="text-gray-500 dark:text-gray-400">Smallest Payment</small>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    @{
-                        var changeClass = weekChange >= 0 ? "text-success" : "text-danger";
-                        var changeIcon = weekChange >= 0 ? "bi-arrow-up" : "bi-arrow-down";
-                    }
-                    <h3 class="mb-1 @changeClass">
-                        <i class="bi @changeIcon"></i> @Math.Abs(weekChange).ToString("F1")%
-                    </h3>
-                    <small class="text-muted">Week over Week</small>
-                </div>
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+            <div class="p-5 text-center">
+                @{
+                    var changeClass = weekChange >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400";
+                    var changeIcon = weekChange >= 0 ? "bi-arrow-up" : "bi-arrow-down";
+                }
+                <h3 class="text-2xl font-semibold @changeClass mb-1">
+                    <i class="bi @changeIcon"></i> @Math.Abs(weekChange).ToString("F1")%
+                </h3>
+                <small class="text-gray-500 dark:text-gray-400">Week over Week</small>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-12 gap-6">
         <!-- Payment by Method -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment by Method</h5>
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-credit-card mr-2"></i>Payment by Method</h5>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Method</th>
-                                    <th class="text-center">Count</th>
-                                    <th class="text-end">Amount</th>
-                                    <th class="text-end pe-4">%</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var method in Model.Report.ByMethod)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Method</th>
+                                <th scope="col" class="px-6 py-3 text-center">Count</th>
+                                <th scope="col" class="px-6 py-3 text-right">Amount</th>
+                                <th scope="col" class="px-6 py-3 text-right">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var method in Model.Report.ByMethod)
+                            {
+                                var iconClass = method.Method switch
                                 {
-                                    var iconClass = method.Method switch
-                                    {
-                                        PaymentMethod.Cash => "bi-cash-coin text-success",
-                                        PaymentMethod.Check => "bi-file-text text-secondary",
-                                        PaymentMethod.BankTransfer => "bi-bank text-primary",
-                                        PaymentMethod.CreditCard => "bi-credit-card text-info",
-                                        PaymentMethod.DebitCard => "bi-credit-card-2-front text-warning",
-                                        PaymentMethod.PayPal => "bi-paypal text-primary",
-                                        _ => "bi-question-circle text-muted"
-                                    };
+                                    PaymentMethod.Cash => "bi-cash-coin text-emerald-600 dark:text-emerald-400",
+                                    PaymentMethod.Check => "bi-file-text text-gray-500 dark:text-gray-400",
+                                    PaymentMethod.BankTransfer => "bi-bank text-primary-600 dark:text-primary-400",
+                                    PaymentMethod.CreditCard => "bi-credit-card text-sky-600 dark:text-sky-400",
+                                    PaymentMethod.DebitCard => "bi-credit-card-2-front text-amber-600 dark:text-amber-400",
+                                    PaymentMethod.PayPal => "bi-paypal text-primary-600 dark:text-primary-400",
+                                    _ => "bi-question-circle text-gray-400"
+                                };
 
-                                    <tr>
-                                        <td class="ps-4">
-                                            <i class="bi @iconClass me-2"></i>@method.Method
-                                        </td>
-                                        <td class="text-center fw-medium">@method.Count</td>
-                                        <td class="text-end">@method.Amount.ToString("C0")</td>
-                                        <td class="text-end pe-4">@method.Percentage.ToString("F1")%</td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold">Total</td>
-                                    <td class="text-center fw-bold">@Model.Report.TotalPayments</td>
-                                    <td class="text-end fw-bold">@Model.Report.TotalReceived.ToString("C0")</td>
-                                    <td class="text-end pe-4 fw-bold">100%</td>
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <td class="px-6 py-4">
+                                        <i class="bi @iconClass mr-2"></i>@method.Method
+                                    </td>
+                                    <td class="px-6 py-4 text-center font-medium">@method.Count</td>
+                                    <td class="px-6 py-4 text-right">@method.Amount.ToString("C0")</td>
+                                    <td class="px-6 py-4 text-right">@method.Percentage.ToString("F1")%</td>
                                 </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr class="font-bold">
+                                <td class="px-6 py-4">Total</td>
+                                <td class="px-6 py-4 text-center">@Model.Report.TotalPayments</td>
+                                <td class="px-6 py-4 text-right">@Model.Report.TotalReceived.ToString("C0")</td>
+                                <td class="px-6 py-4 text-right">100%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
 
         <!-- Cash Flow Summary -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Cash Flow Insights</h5>
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-arrow-left-right mr-2"></i>Cash Flow Insights</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row g-4 mb-4">
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-success bg-opacity-10 rounded">
-                                <h3 class="mb-1 text-success">@Model.CashFlow.TotalInflow.ToString("C0")</h3>
-                                <small class="text-muted">Actual Inflow</small>
-                            </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="text-center p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                            <h3 class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mb-1">@Model.CashFlow.TotalInflow.ToString("C0")</h3>
+                            <small class="text-gray-500 dark:text-gray-400">Actual Inflow</small>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center p-3 bg-primary bg-opacity-10 rounded">
-                                <h3 class="mb-1 text-primary">@Model.CashFlow.ProjectedInflow.ToString("C0")</h3>
-                                <small class="text-muted">Projected Inflow</small>
-                            </div>
+                        <div class="text-center p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+                            <h3 class="text-2xl font-semibold text-primary-600 dark:text-primary-400 mb-1">@Model.CashFlow.ProjectedInflow.ToString("C0")</h3>
+                            <small class="text-gray-500 dark:text-gray-400">Projected Inflow</small>
                         </div>
                     </div>
 
@@ -206,45 +188,45 @@
                             ? (Model.CashFlow.TotalInflow / Model.CashFlow.ProjectedInflow * 100)
                             : 100;
                     }
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Collection Rate</span>
-                            <span class="fw-medium @(collectionRate >= 80 ? "text-success" : collectionRate >= 50 ? "text-warning" : "text-danger")">
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-500 dark:text-gray-400">Collection Rate</span>
+                            <span class="font-medium @(collectionRate >= 80 ? "text-emerald-600 dark:text-emerald-400" : collectionRate >= 50 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400")">
                                 @collectionRate.ToString("F1")%
                             </span>
                         </div>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-success" style="width: @Math.Min(collectionRate, 100)%"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div class="bg-emerald-600 h-2.5 rounded-full" style="width: @Math.Min(collectionRate, 100)%"></div>
                         </div>
                     </div>
 
-                    <div class="text-center p-3 bg-danger bg-opacity-10 rounded">
-                        <h3 class="mb-1 text-danger">@Model.CashFlow.OverdueReceivables.ToString("C0")</h3>
-                        <small class="text-muted">Overdue Receivables</small>
+                    <div class="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                        <h3 class="text-2xl font-semibold text-red-600 dark:text-red-400 mb-1">@Model.CashFlow.OverdueReceivables.ToString("C0")</h3>
+                        <small class="text-gray-500 dark:text-gray-400">Overdue Receivables</small>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Daily Trend Chart -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Daily Payment Trend</h5>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-graph-up mr-2"></i>Daily Payment Trend</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <canvas id="dailyTrendChart" height="100"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Weekly Trend Chart -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Weekly Payment Trend</h5>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-bar-chart mr-2"></i>Weekly Payment Trend</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <canvas id="weeklyTrendChart" height="100"></canvas>
                 </div>
             </div>

@@ -4,8 +4,8 @@
 {
     <tr>
         <td colspan="7" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-currency-exchange fs-1 d-block mb-2"></i>
+            <div class="text-gray-500">
+                <i class="bi bi-currency-exchange text-4xl block mb-2"></i>
                 <p class="mb-0">No currencies configured</p>
             </div>
         </td>
@@ -19,87 +19,91 @@ else
             ? $"{currency.Symbol}1{currency.ThousandsSeparator}234{currency.DecimalSeparator}{"".PadRight(currency.DecimalPlaces, '0')}"
             : $"1{currency.ThousandsSeparator}234{currency.DecimalSeparator}{"".PadRight(currency.DecimalPlaces, '0')}{currency.Symbol}";
 
-        <tr>
-            <td class="ps-4">
-                <span class="fw-semibold">@currency.Code</span>
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <span class="font-semibold">@currency.Code</span>
                 @if (currency.IsBaseCurrency)
                 {
-                    <span class="badge bg-primary ms-1">Base</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 ml-1">Base</span>
                 }
             </td>
-            <td>@currency.Name</td>
-            <td>
-                <span class="fs-5">@currency.Symbol</span>
+            <td class="px-6 py-4">@currency.Name</td>
+            <td class="px-6 py-4">
+                <span class="text-lg">@currency.Symbol</span>
             </td>
-            <td class="text-end">
+            <td class="px-6 py-4 text-right">
                 @if (currency.IsBaseCurrency)
                 {
-                    <span class="text-muted">1.000000</span>
+                    <span class="text-gray-500">1.000000</span>
                 }
                 else
                 {
                     @currency.ExchangeRate.ToString("N6")
                 }
             </td>
-            <td>
-                <code>@sample</code>
+            <td class="px-6 py-4">
+                <code class="bg-gray-100 px-2 py-1 rounded text-sm">@sample</code>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (currency.IsActive)
                 {
-                    <span class="badge bg-success">Active</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                 }
                 else
                 {
-                    <span class="badge bg-secondary">Inactive</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-light" id="dropdownCurr@(currency.Id)" data-dropdown-toggle="dropdownMenuCurr@(currency.Id)">
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="text-gray-500 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-xs px-3 py-2" id="dropdownCurr@(currency.Id)" data-dropdown-toggle="dropdownMenuCurr@(currency.Id)" data-dropdown-placement="bottom-end">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuCurr@(currency.Id)">
-                        <li>
-                            <a class="dropdown-item" href="#"
-                               onclick='editCurrency(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
-                                   id = currency.Id,
-                                   code = currency.Code,
-                                   name = currency.Name,
-                                   symbol = currency.Symbol,
-                                   symbolPosition = currency.SymbolPosition,
-                                   decimalPlaces = currency.DecimalPlaces,
-                                   decimalSeparator = currency.DecimalSeparator,
-                                   thousandsSeparator = currency.ThousandsSeparator,
-                                   exchangeRate = currency.ExchangeRate,
-                                   displayOrder = currency.DisplayOrder,
-                                   isActive = currency.IsActive,
-                                   isBaseCurrency = currency.IsBaseCurrency
-                               })))'>
-                                <i class="bi bi-pencil me-2"></i> Edit
-                            </a>
-                        </li>
-                        @if (!currency.IsBaseCurrency)
-                        {
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuCurr@(currency.Id)">
+                        <ul class="py-2 text-sm text-gray-700">
                             <li>
-                                <a class="dropdown-item" href="#"
-                                   hx-post="?handler=SetBase&id=@currency.Id"
-                                   hx-target="#currenciesTableBody"
-                                   hx-confirm="Set @currency.Name as the base currency?">
-                                    <i class="bi bi-star me-2"></i> Set as Base
+                                <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                   onclick='editCurrency(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                                       id = currency.Id,
+                                       code = currency.Code,
+                                       name = currency.Name,
+                                       symbol = currency.Symbol,
+                                       symbolPosition = currency.SymbolPosition,
+                                       decimalPlaces = currency.DecimalPlaces,
+                                       decimalSeparator = currency.DecimalSeparator,
+                                       thousandsSeparator = currency.ThousandsSeparator,
+                                       exchangeRate = currency.ExchangeRate,
+                                       displayOrder = currency.DisplayOrder,
+                                       isActive = currency.IsActive,
+                                       isBaseCurrency = currency.IsBaseCurrency
+                                   })))'>
+                                    <i class="bi bi-pencil mr-2"></i> Edit
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="#"
-                                   hx-delete="?handler=&id=@currency.Id"
-                                   hx-target="#currenciesTableBody"
-                                   hx-confirm="Delete @currency.Name?">
-                                    <i class="bi bi-trash me-2"></i> Delete
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                            @if (!currency.IsBaseCurrency)
+                            {
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                       hx-post="?handler=SetBase&id=@currency.Id"
+                                       hx-target="#currenciesTableBody"
+                                       hx-confirm="Set @currency.Name as the base currency?">
+                                        <i class="bi bi-star mr-2"></i> Set as Base
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="my-1 border-gray-200">
+                                </li>
+                                <li>
+                                    <a class="block px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer"
+                                       hx-delete="?handler=&id=@currency.Id"
+                                       hx-target="#currenciesTableBody"
+                                       hx-confirm="Delete @currency.Name?">
+                                        <i class="bi bi-trash mr-2"></i> Delete
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
             </td>
         </tr>

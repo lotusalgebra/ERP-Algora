@@ -4,8 +4,8 @@
 @if (Model.Items.Count == 0)
 {
     <tr>
-        <td colspan="8" class="text-center py-4 text-muted">
-            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        <td colspan="8" class="text-center py-12 text-gray-500 dark:text-gray-400">
+            <i class="bi bi-inbox text-4xl block mb-2"></i>
             No recurring invoices found
         </td>
     </tr>
@@ -14,42 +14,42 @@ else
 {
     foreach (var item in Model.Items)
     {
-        var statusBadge = item.Status switch
+        var statusBadgeClass = item.Status switch
         {
-            RecurringInvoiceStatus.Active => "bg-success",
-            RecurringInvoiceStatus.Paused => "bg-warning",
-            RecurringInvoiceStatus.Completed => "bg-secondary",
-            RecurringInvoiceStatus.Cancelled => "bg-danger",
-            _ => "bg-secondary"
+            RecurringInvoiceStatus.Active => "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+            RecurringInvoiceStatus.Paused => "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+            RecurringInvoiceStatus.Completed => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+            RecurringInvoiceStatus.Cancelled => "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+            _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
         };
 
-        <tr>
-            <td class="ps-4">
-                <a href="/Finance/Invoices/Recurring/Details/@item.Id" class="text-decoration-none fw-medium">
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <td class="px-6 py-4">
+                <a href="/Finance/Invoices/Recurring/Details/@item.Id" class="text-primary-600 hover:underline font-medium">
                     @item.Name
                 </a>
             </td>
-            <td>@item.CustomerName</td>
-            <td>
-                <span class="text-muted">
-                    <i class="bi bi-arrow-repeat me-1"></i>@item.FrequencyText
+            <td class="px-6 py-4">@item.CustomerName</td>
+            <td class="px-6 py-4">
+                <span class="text-gray-500 dark:text-gray-400">
+                    <i class="bi bi-arrow-repeat mr-1"></i>@item.FrequencyText
                 </span>
             </td>
-            <td class="text-end">@item.Amount.ToString("C2")</td>
-            <td>
+            <td class="px-6 py-4 text-right">@item.Amount.ToString("C2")</td>
+            <td class="px-6 py-4">
                 @if (item.NextGenerationDate.HasValue)
                 {
                     var daysUntil = (item.NextGenerationDate.Value.Date - DateTime.Today).Days;
                     if (daysUntil < 0)
                     {
-                        <span class="text-danger">
-                            <i class="bi bi-exclamation-circle me-1"></i>Overdue
+                        <span class="text-red-600 dark:text-red-400">
+                            <i class="bi bi-exclamation-circle mr-1"></i>Overdue
                         </span>
                     }
                     else if (daysUntil == 0)
                     {
-                        <span class="text-warning">
-                            <i class="bi bi-clock me-1"></i>Today
+                        <span class="text-amber-600 dark:text-amber-400">
+                            <i class="bi bi-clock mr-1"></i>Today
                         </span>
                     }
                     else
@@ -59,66 +59,85 @@ else
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-400">-</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (item.MaxOccurrences.HasValue)
                 {
                     var progress = (double)item.OccurrencesGenerated / item.MaxOccurrences.Value * 100;
-                    <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
-                            <div class="progress-bar" role="progressbar" style="width: @progress%"></div>
+                    <div class="flex items-center">
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 mr-2 dark:bg-gray-700">
+                            <div class="bg-primary-600 h-1.5 rounded-full" style="width: @progress%"></div>
                         </div>
-                        <small class="text-muted">@item.OccurrencesGenerated/@item.MaxOccurrences</small>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">@item.OccurrencesGenerated/@item.MaxOccurrences</span>
                     </div>
                 }
                 else
                 {
-                    <span class="text-muted small">@item.OccurrencesGenerated generated</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">@item.OccurrencesGenerated generated</span>
                 }
             </td>
-            <td>
-                <span class="badge @statusBadge">@item.Status</span>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusBadgeClass">@item.Status</span>
             </td>
-            <td class="text-end pe-4">
-                <div class="btn-group">
-                    <a href="/Finance/Invoices/Recurring/Details/@item.Id" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    @if (item.Status == RecurringInvoiceStatus.Active)
-                    {
-                        <form method="post" asp-page-handler="Generate" asp-route-id="@item.Id" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-success" title="Generate Invoice Now">
-                                <i class="bi bi-file-earmark-plus"></i>
-                            </button>
-                        </form>
-                        <form method="post" asp-page-handler="Pause" asp-route-id="@item.Id" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Pause">
-                                <i class="bi bi-pause"></i>
-                            </button>
-                        </form>
-                    }
-                    else if (item.Status == RecurringInvoiceStatus.Paused)
-                    {
-                        <form method="post" asp-page-handler="Resume" asp-route-id="@item.Id" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-success" title="Resume">
-                                <i class="bi bi-play"></i>
-                            </button>
-                        </form>
-                    }
-                    @if (item.Status != RecurringInvoiceStatus.Cancelled)
-                    {
-                        <a href="/Finance/Invoices/Recurring/Edit/@item.Id" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                    }
-                    <button type="button" class="btn btn-sm btn-outline-danger"
-                            data-modal-target="deleteModal" data-modal-toggle="deleteModal"
-                            data-id="@item.Id"
-                            data-name="@item.Name">
-                        <i class="bi bi-trash"></i>
+            <td class="px-6 py-4 text-right">
+                <div class="relative inline-block">
+                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600" id="dropdownRI@(item.Id)" data-dropdown-toggle="dropdownMenuRI@(item.Id)" data-dropdown-placement="bottom-end">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
+                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600" id="dropdownMenuRI@(item.Id)">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+                            <li>
+                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600" href="/Finance/Invoices/Recurring/Details/@item.Id">
+                                    <i class="bi bi-eye mr-2"></i> View Details
+                                </a>
+                            </li>
+                            @if (item.Status != RecurringInvoiceStatus.Cancelled)
+                            {
+                                <li>
+                                    <a class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600" href="/Finance/Invoices/Recurring/Edit/@item.Id">
+                                        <i class="bi bi-pencil mr-2"></i> Edit
+                                    </a>
+                                </li>
+                            }
+                            @if (item.Status == RecurringInvoiceStatus.Active)
+                            {
+                                <li>
+                                    <form method="post" asp-page-handler="Generate" asp-route-id="@item.Id" class="inline w-full">
+                                        <button type="submit" class="flex items-center w-full px-4 py-2 text-emerald-600 hover:bg-gray-100 dark:text-emerald-400 dark:hover:bg-gray-600">
+                                            <i class="bi bi-file-earmark-plus mr-2"></i> Generate Now
+                                        </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form method="post" asp-page-handler="Pause" asp-route-id="@item.Id" class="inline w-full">
+                                        <button type="submit" class="flex items-center w-full px-4 py-2 text-amber-600 hover:bg-gray-100 dark:text-amber-400 dark:hover:bg-gray-600">
+                                            <i class="bi bi-pause mr-2"></i> Pause
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                            @if (item.Status == RecurringInvoiceStatus.Paused)
+                            {
+                                <li>
+                                    <form method="post" asp-page-handler="Resume" asp-route-id="@item.Id" class="inline w-full">
+                                        <button type="submit" class="flex items-center w-full px-4 py-2 text-emerald-600 hover:bg-gray-100 dark:text-emerald-400 dark:hover:bg-gray-600">
+                                            <i class="bi bi-play mr-2"></i> Resume
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                        <div class="py-2">
+                            <button type="button" class="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-600"
+                                    data-modal-target="deleteModal" data-modal-toggle="deleteModal"
+                                    data-id="@item.Id"
+                                    data-name="@item.Name">
+                                <i class="bi bi-trash mr-2"></i> Delete
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -146,9 +165,8 @@ else
         if (totalPages > 1) {
             // Previous button
             var prevLi = document.createElement('li');
-            prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
             var prevA = document.createElement('a');
-            prevA.className = 'page-link';
+            prevA.className = 'flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white' + (currentPage === 1 ? ' opacity-50 cursor-not-allowed' : ' rounded-l-lg');
             prevA.href = '#';
             prevA.innerHTML = '&laquo;';
             if (currentPage > 1) {
@@ -162,9 +180,10 @@ else
             // Page numbers
             for (var i = 1; i <= totalPages; i++) {
                 var li = document.createElement('li');
-                li.className = 'page-item' + (i === currentPage ? ' active' : '');
                 var a = document.createElement('a');
-                a.className = 'page-link';
+                a.className = i === currentPage
+                    ? 'flex items-center justify-center px-3 h-8 text-primary-600 border border-gray-300 bg-primary-50 hover:bg-primary-100 dark:border-gray-700 dark:bg-gray-700 dark:text-white'
+                    : 'flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white';
                 a.href = '#';
                 a.textContent = i;
                 a.setAttribute('hx-get', '/Finance/Invoices/Recurring?handler=Table&page=' + i);
@@ -176,9 +195,8 @@ else
 
             // Next button
             var nextLi = document.createElement('li');
-            nextLi.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
             var nextA = document.createElement('a');
-            nextA.className = 'page-link';
+            nextA.className = 'flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white' + (currentPage === totalPages ? ' opacity-50 cursor-not-allowed' : ' rounded-r-lg');
             nextA.href = '#';
             nextA.innerHTML = '&raquo;';
             if (currentPage < totalPages) {

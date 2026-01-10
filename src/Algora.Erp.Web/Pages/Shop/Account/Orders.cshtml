@@ -5,28 +5,28 @@
     Layout = "_LayoutShop";
 }
 
-<div class="container py-5">
-    <div class="row">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Sidebar -->
-        <div class="col-lg-3 mb-4">
-            <div class="card border">
-                <div class="card-body">
-                    <nav class="nav flex-column">
-                        <a class="nav-link" href="/Shop/Account">
-                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        <div class="lg:col-span-1 mb-4">
+            <div class="bg-white rounded-lg border border-gray-200">
+                <div class="p-6">
+                    <nav class="flex flex-col space-y-1">
+                        <a class="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100" href="/Shop/Account">
+                            <i class="bi bi-speedometer2 mr-2"></i>Dashboard
                         </a>
-                        <a class="nav-link active" href="/Shop/Account/Orders">
-                            <i class="bi bi-bag me-2"></i>My Orders
+                        <a class="flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-primary-50 text-primary-600" href="/Shop/Account/Orders">
+                            <i class="bi bi-bag mr-2"></i>My Orders
                         </a>
-                        <a class="nav-link" href="/Shop/Account/Profile">
-                            <i class="bi bi-person me-2"></i>Profile
+                        <a class="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100" href="/Shop/Account/Profile">
+                            <i class="bi bi-person mr-2"></i>Profile
                         </a>
-                        <a class="nav-link" href="/Shop/Account/Addresses">
-                            <i class="bi bi-geo-alt me-2"></i>Addresses
+                        <a class="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100" href="/Shop/Account/Addresses">
+                            <i class="bi bi-geo-alt mr-2"></i>Addresses
                         </a>
-                        <hr>
-                        <a class="nav-link text-danger" href="/Shop/Account/Logout">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        <hr class="my-2 border-gray-200">
+                        <a class="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50" href="/Shop/Account/Logout">
+                            <i class="bi bi-box-arrow-right mr-2"></i>Logout
                         </a>
                     </nav>
                 </div>
@@ -34,75 +34,77 @@
         </div>
 
         <!-- Main Content -->
-        <div class="col-lg-9">
+        <div class="lg:col-span-3">
             @if (Model.Order != null)
             {
                 <!-- Order Detail View -->
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/Shop/Account">Account</a></li>
-                        <li class="breadcrumb-item"><a href="/Shop/Account/Orders">Orders</a></li>
-                        <li class="breadcrumb-item active">@Model.Order.OrderNumber</li>
+                <nav class="mb-4">
+                    <ol class="flex items-center space-x-2 text-sm">
+                        <li><a href="/Shop/Account" class="text-gray-500 hover:text-primary-600">Account</a></li>
+                        <li class="text-gray-400">/</li>
+                        <li><a href="/Shop/Account/Orders" class="text-gray-500 hover:text-primary-600">Orders</a></li>
+                        <li class="text-gray-400">/</li>
+                        <li class="text-gray-900 font-medium">@Model.Order.OrderNumber</li>
                     </ol>
                 </nav>
 
-                <div class="card border mb-4">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Order @Model.Order.OrderNumber</h5>
+                <div class="bg-white rounded-lg border border-gray-200 mb-4">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-white flex justify-between items-center">
+                        <h5 class="font-semibold text-gray-900">Order @Model.Order.OrderNumber</h5>
                         @switch (Model.Order.Status)
                         {
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending:
-                                <span class="badge bg-warning">Pending</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800">Pending</span>
                                 break;
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed:
-                                <span class="badge bg-info">Confirmed</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Confirmed</span>
                                 break;
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing:
-                                <span class="badge bg-primary">Processing</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-100 text-primary-800">Processing</span>
                                 break;
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped:
-                                <span class="badge bg-info">Shipped</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Shipped</span>
                                 break;
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered:
-                                <span class="badge bg-success">Delivered</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">Delivered</span>
                                 break;
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled:
-                                <span class="badge bg-dark">Cancelled</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-800 text-white">Cancelled</span>
                                 break;
                             case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded:
-                                <span class="badge bg-secondary">Refunded</span>
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Refunded</span>
                                 break;
                         }
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <h6 class="text-muted">Order Date</h6>
-                                <p class="mb-0">@Model.Order.OrderDate.ToString("MMMM dd, yyyy")</p>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <h6 class="text-gray-500 text-sm font-medium mb-2">Order Date</h6>
+                                <p class="text-gray-900">@Model.Order.OrderDate.ToString("MMMM dd, yyyy")</p>
                             </div>
-                            <div class="col-md-4">
-                                <h6 class="text-muted">Payment Status</h6>
-                                <p class="mb-0">
+                            <div>
+                                <h6 class="text-gray-500 text-sm font-medium mb-2">Payment Status</h6>
+                                <p class="text-gray-900">
                                     @switch (Model.Order.PaymentStatus)
                                     {
                                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Pending:
-                                            <span class="badge bg-warning">Pending</span>
+                                            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800">Pending</span>
                                             break;
                                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Paid:
-                                            <span class="badge bg-success">Paid</span>
+                                            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">Paid</span>
                                             break;
                                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Failed:
-                                            <span class="badge bg-danger">Failed</span>
+                                            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-800">Failed</span>
                                             break;
                                         case Algora.Erp.Domain.Entities.Ecommerce.PaymentStatus.Refunded:
-                                            <span class="badge bg-secondary">Refunded</span>
+                                            <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Refunded</span>
                                             break;
                                     }
                                 </p>
                             </div>
-                            <div class="col-md-4">
-                                <h6 class="text-muted">Shipping Address</h6>
-                                <p class="mb-0 small">
+                            <div>
+                                <h6 class="text-gray-500 text-sm font-medium mb-2">Shipping Address</h6>
+                                <p class="text-sm text-gray-900">
                                     @Model.Order.ShippingFirstName @Model.Order.ShippingLastName<br>
                                     @Model.Order.ShippingAddress1<br>
                                     @Model.Order.ShippingCity, @Model.Order.ShippingState @Model.Order.ShippingPostalCode
@@ -110,129 +112,131 @@
                             </div>
                         </div>
 
-                        <h6 class="mb-3">Items</h6>
-                        <table class="table">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th class="text-center">Qty</th>
-                                    <th class="text-end">Price</th>
-                                    <th class="text-end">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Order.Items)
-                                {
+                        <h6 class="font-medium text-gray-900 mb-3">Items</h6>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
-                                        <td>
-                                            <div class="fw-semibold">@item.ProductName</div>
-                                            @if (!string.IsNullOrEmpty(item.Sku))
-                                            {
-                                                <small class="text-muted">SKU: @item.Sku</small>
-                                            }
-                                        </td>
-                                        <td class="text-center">@item.Quantity</td>
-                                        <td class="text-end">@item.UnitPrice.ToString("C")</td>
-                                        <td class="text-end fw-semibold">@item.LineTotal.ToString("C")</td>
+                                        <th class="px-4 py-3">Product</th>
+                                        <th class="px-4 py-3 text-center">Qty</th>
+                                        <th class="px-4 py-3 text-right">Price</th>
+                                        <th class="px-4 py-3 text-right">Total</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    @foreach (var item in Model.Order.Items)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="font-semibold text-gray-900">@item.ProductName</div>
+                                                @if (!string.IsNullOrEmpty(item.Sku))
+                                                {
+                                                    <small class="text-gray-500">SKU: @item.Sku</small>
+                                                }
+                                            </td>
+                                            <td class="px-4 py-3 text-center">@item.Quantity</td>
+                                            <td class="px-4 py-3 text-right">@item.UnitPrice.ToString("C")</td>
+                                            <td class="px-4 py-3 text-right font-semibold text-gray-900">@item.LineTotal.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
 
-                        <div class="row justify-content-end">
-                            <div class="col-md-5">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Subtotal</span>
-                                    <span>@Model.Order.Subtotal.ToString("C")</span>
+                        <div class="flex justify-end mt-4">
+                            <div class="w-full md:w-64">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span class="text-gray-900">@Model.Order.Subtotal.ToString("C")</span>
                                 </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Shipping</span>
-                                    <span>@Model.Order.ShippingAmount.ToString("C")</span>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Shipping</span>
+                                    <span class="text-gray-900">@Model.Order.ShippingAmount.ToString("C")</span>
                                 </div>
                                 @if (Model.Order.TaxAmount > 0)
                                 {
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Tax</span>
-                                        <span>@Model.Order.TaxAmount.ToString("C")</span>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-600">Tax</span>
+                                        <span class="text-gray-900">@Model.Order.TaxAmount.ToString("C")</span>
                                     </div>
                                 }
                                 @if (Model.Order.DiscountAmount > 0)
                                 {
-                                    <div class="d-flex justify-content-between mb-2 text-success">
+                                    <div class="flex justify-between mb-2 text-emerald-600">
                                         <span>Discount</span>
                                         <span>-@Model.Order.DiscountAmount.ToString("C")</span>
                                     </div>
                                 }
-                                <hr>
-                                <div class="d-flex justify-content-between fw-bold h5">
-                                    <span>Total</span>
-                                    <span>@Model.Order.Total.ToString("C")</span>
+                                <hr class="my-3 border-gray-200">
+                                <div class="flex justify-between font-bold text-lg">
+                                    <span class="text-gray-900">Total</span>
+                                    <span class="text-gray-900">@Model.Order.Total.ToString("C")</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <a href="/Shop/Account/Orders" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Orders
+                <a href="/Shop/Account/Orders" class="inline-flex items-center px-5 py-2.5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm">
+                    <i class="bi bi-arrow-left mr-2"></i>Back to Orders
                 </a>
             }
             else
             {
                 <!-- Orders List -->
-                <h4 class="mb-4">My Orders</h4>
+                <h4 class="text-xl font-bold text-gray-900 mb-6">My Orders</h4>
 
                 @if (Model.Orders.Any())
                 {
-                    <div class="card border">
-                        <div class="card-body p-0">
-                            <table class="table mb-0">
-                                <thead class="bg-light">
+                    <div class="bg-white rounded-lg border border-gray-200">
+                        <div class="p-0 overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
-                                        <th>Order #</th>
-                                        <th>Date</th>
-                                        <th>Items</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Total</th>
-                                        <th></th>
+                                        <th class="px-6 py-3">Order #</th>
+                                        <th class="px-6 py-3">Date</th>
+                                        <th class="px-6 py-3">Items</th>
+                                        <th class="px-6 py-3">Status</th>
+                                        <th class="px-6 py-3 text-right">Total</th>
+                                        <th class="px-6 py-3"></th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-gray-200">
                                     @foreach (var order in Model.Orders)
                                     {
-                                        <tr>
-                                            <td class="fw-semibold">@order.OrderNumber</td>
-                                            <td>@order.OrderDate.ToString("MMM dd, yyyy")</td>
-                                            <td>@order.Items.Sum(i => i.Quantity) items</td>
-                                            <td>
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 font-semibold text-gray-900">@order.OrderNumber</td>
+                                            <td class="px-6 py-4">@order.OrderDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="px-6 py-4">@order.Items.Sum(i => i.Quantity) items</td>
+                                            <td class="px-6 py-4">
                                                 @switch (order.Status)
                                                 {
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Pending:
-                                                        <span class="badge bg-warning">Pending</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800">Pending</span>
                                                         break;
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Confirmed:
-                                                        <span class="badge bg-info">Confirmed</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Confirmed</span>
                                                         break;
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Processing:
-                                                        <span class="badge bg-primary">Processing</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-primary-100 text-primary-800">Processing</span>
                                                         break;
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Shipped:
-                                                        <span class="badge bg-info">Shipped</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Shipped</span>
                                                         break;
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Delivered:
-                                                        <span class="badge bg-success">Delivered</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">Delivered</span>
                                                         break;
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Cancelled:
-                                                        <span class="badge bg-dark">Cancelled</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-800 text-white">Cancelled</span>
                                                         break;
                                                     case Algora.Erp.Domain.Entities.Ecommerce.WebOrderStatus.Refunded:
-                                                        <span class="badge bg-secondary">Refunded</span>
+                                                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Refunded</span>
                                                         break;
                                                 }
                                             </td>
-                                            <td class="text-end fw-semibold">@order.Total.ToString("C")</td>
-                                            <td class="text-end">
-                                                <a href="/Shop/Account/Orders/@order.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                            <td class="px-6 py-4 text-right font-semibold text-gray-900">@order.Total.ToString("C")</td>
+                                            <td class="px-6 py-4 text-right">
+                                                <a href="/Shop/Account/Orders/@order.Id" class="text-xs px-3 py-2 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg">View</a>
                                             </td>
                                         </tr>
                                     }
@@ -243,12 +247,12 @@
                 }
                 else
                 {
-                    <div class="card border">
-                        <div class="card-body text-center py-5">
-                            <i class="bi bi-bag fs-1 text-muted d-block mb-3"></i>
-                            <h5>No orders yet</h5>
-                            <p class="text-muted">You haven't placed any orders yet.</p>
-                            <a href="/Shop" class="btn btn-primary">Start Shopping</a>
+                    <div class="bg-white rounded-lg border border-gray-200">
+                        <div class="p-6 text-center py-12">
+                            <i class="bi bi-bag text-5xl text-gray-300 block mb-3"></i>
+                            <h5 class="text-lg font-semibold text-gray-700 mb-2">No orders yet</h5>
+                            <p class="text-gray-500 mb-4">You haven't placed any orders yet.</p>
+                            <a href="/Shop" class="inline-flex items-center px-5 py-2.5 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">Start Shopping</a>
                         </div>
                     </div>
                 }

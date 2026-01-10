@@ -7,331 +7,336 @@
 <!-- Alerts -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+    <div class="flex items-center p-4 mb-4 text-emerald-800 bg-emerald-50 rounded-lg" role="alert">
+        <i class="bi bi-check-circle mr-3"></i>
+        <span class="text-sm font-medium">@TempData["SuccessMessage"]</span>
     </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+    <div class="flex items-center p-4 mb-4 text-red-800 bg-red-50 rounded-lg" role="alert">
+        <i class="bi bi-exclamation-triangle mr-3"></i>
+        <span class="text-sm font-medium">@TempData["ErrorMessage"]</span>
     </div>
 }
 
 <!-- Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="flex justify-between items-center mb-6">
     <div>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2">
-                <li class="breadcrumb-item"><a href="/Tenants">Tenants</a></li>
-                <li class="breadcrumb-item active">@Model.Tenant.Name</li>
+        <nav class="flex mb-2" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                <li><a href="/Tenants" class="hover:text-primary-600">Tenants</a></li>
+                <li><i class="bi bi-chevron-right mx-2"></i></li>
+                <li class="text-gray-900">@Model.Tenant.Name</li>
             </ol>
         </nav>
-        <h4 class="mb-0">
-            <i class="bi bi-building me-2 text-primary"></i>@Model.Tenant.Name
+        <h4 class="text-xl font-bold text-gray-900">
+            <i class="bi bi-building mr-2 text-primary-600"></i>@Model.Tenant.Name
             @switch (Model.Tenant.Status)
             {
                 case Algora.Erp.Admin.Entities.TenantStatus.Active:
-                    <span class="badge bg-success ms-2">Active</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 ml-2">Active</span>
                     break;
                 case Algora.Erp.Admin.Entities.TenantStatus.Pending:
-                    <span class="badge bg-info ms-2">Pending</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-2">Pending</span>
                     break;
                 case Algora.Erp.Admin.Entities.TenantStatus.Suspended:
-                    <span class="badge bg-danger ms-2">Suspended</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 ml-2">Suspended</span>
                     break;
                 case Algora.Erp.Admin.Entities.TenantStatus.Cancelled:
-                    <span class="badge bg-secondary ms-2">Cancelled</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-2">Cancelled</span>
                     break;
             }
         </h4>
     </div>
-    <div>
-        <a href="/Tenants/Edit/@Model.Tenant.Id" class="btn btn-outline-primary me-2">
-            <i class="bi bi-pencil me-1"></i>Edit
+    <div class="flex space-x-2">
+        <a href="/Tenants/Users/@Model.Tenant.Id" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+            <i class="bi bi-people mr-1"></i>Manage Users
         </a>
-        <a href="/Tenants" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Back to List
+        <a href="/Tenants/Edit/@Model.Tenant.Id" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            <i class="bi bi-pencil mr-1"></i>Edit
+        </a>
+        <a href="/Tenants" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            <i class="bi bi-arrow-left mr-1"></i>Back
         </a>
     </div>
 </div>
 
-<div class="row">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Left Column: Tenant Details -->
-    <div class="col-lg-4">
+    <div class="lg:col-span-1">
         <!-- Basic Info Card -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h6>
+        <div class="bg-white rounded-xl shadow-sm mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h6 class="font-semibold text-gray-800"><i class="bi bi-info-circle mr-2"></i>Basic Information</h6>
             </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Subdomain</dt>
-                    <dd class="col-sm-7"><code>@(Model.Tenant.Subdomain).algora.app</code></dd>
-
-                    <dt class="col-sm-5">Company</dt>
-                    <dd class="col-sm-7">@(Model.Tenant.CompanyName ?? "-")</dd>
-
-                    <dt class="col-sm-5">Contact</dt>
-                    <dd class="col-sm-7">
-                        @Model.Tenant.ContactEmail<br />
-                        <small class="text-muted">@Model.Tenant.ContactPerson</small>
-                    </dd>
-
-                    <dt class="col-sm-5">Phone</dt>
-                    <dd class="col-sm-7">@(Model.Tenant.ContactPhone ?? "-")</dd>
-
-                    <dt class="col-sm-5">Created</dt>
-                    <dd class="col-sm-7">@Model.Tenant.CreatedAt.ToString("MMM dd, yyyy HH:mm")</dd>
-
+            <div class="p-6">
+                <dl class="space-y-3">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Subdomain</dt>
+                        <dd><code class="bg-gray-100 px-2 py-1 rounded text-sm">@(Model.Tenant.Subdomain).algora.app</code></dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Company</dt>
+                        <dd class="text-gray-900">@(Model.Tenant.CompanyName ?? "—")</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Contact</dt>
+                        <dd class="text-right">
+                            <div class="text-gray-900">@Model.Tenant.ContactEmail</div>
+                            <div class="text-sm text-gray-500">@Model.Tenant.ContactPerson</div>
+                        </dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Phone</dt>
+                        <dd class="text-gray-900">@(Model.Tenant.ContactPhone ?? "—")</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Created</dt>
+                        <dd class="text-gray-900">@Model.Tenant.CreatedAt.ToString("MMM dd, yyyy HH:mm")</dd>
+                    </div>
                     @if (Model.Tenant.IsInTrial)
                     {
-                        <dt class="col-sm-5">Trial Ends</dt>
-                        <dd class="col-sm-7">
-                            <span class="badge bg-warning text-dark">@Model.Tenant.TrialEndsAt?.ToString("MMM dd, yyyy")</span>
-                        </dd>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">Trial Ends</dt>
+                            <dd>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                    @Model.Tenant.TrialEndsAt?.ToString("MMM dd, yyyy")
+                                </span>
+                            </dd>
+                        </div>
                     }
                 </dl>
             </div>
         </div>
 
         <!-- Database Info Card -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary bg-opacity-10">
-                <h6 class="mb-0"><i class="bi bi-database me-2"></i>Database Information</h6>
+        <div class="bg-white rounded-xl shadow-sm mb-6">
+            <div class="px-6 py-4 border-b border-gray-200 bg-primary-50">
+                <h6 class="font-semibold text-gray-800"><i class="bi bi-database mr-2"></i>Database Information</h6>
             </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Database Name</dt>
-                    <dd class="col-sm-7">
-                        <code class="text-primary fs-6">@(Model.Tenant.DatabaseName ?? "Not Set")</code>
-                    </dd>
-
-                    <dt class="col-sm-5">Max Users</dt>
-                    <dd class="col-sm-7">
-                        @if (Model.Tenant.MaxUsers == -1)
-                        {
-                            <span class="badge bg-success">Unlimited</span>
-                        }
-                        else
-                        {
-                            @Model.Tenant.MaxUsers
-                        }
-                    </dd>
-
-                    <dt class="col-sm-5">Currency</dt>
-                    <dd class="col-sm-7">@(Model.Tenant.CurrencyCode ?? "INR")</dd>
-
-                    <dt class="col-sm-5">Timezone</dt>
-                    <dd class="col-sm-7">@(Model.Tenant.TimeZone ?? "Asia/Kolkata")</dd>
+            <div class="p-6">
+                <dl class="space-y-3">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Database Name</dt>
+                        <dd><code class="bg-gray-100 px-2 py-1 rounded text-sm text-primary-600">@(Model.Tenant.DatabaseName ?? "Not Set")</code></dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Max Users</dt>
+                        <dd>
+                            @if (Model.Tenant.MaxUsers == -1)
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Unlimited</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-900">@Model.Tenant.MaxUsers</span>
+                            }
+                        </dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Currency</dt>
+                        <dd class="text-gray-900">@(Model.Tenant.CurrencyCode ?? "INR")</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Timezone</dt>
+                        <dd class="text-gray-900">@(Model.Tenant.TimeZone ?? "Asia/Kolkata")</dd>
+                    </div>
                 </dl>
             </div>
         </div>
 
         <!-- Plan Info Card -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-credit-card me-2"></i>Subscription</h6>
+        <div class="bg-white rounded-xl shadow-sm mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h6 class="font-semibold text-gray-800"><i class="bi bi-credit-card mr-2"></i>Subscription</h6>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 @if (Model.Tenant.CurrentSubscription?.Plan != null)
                 {
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
-                            <i class="bi bi-gem text-primary fs-4"></i>
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 rounded-full p-3 mr-3">
+                            <i class="bi bi-gem text-primary-600 text-xl"></i>
                         </div>
                         <div>
-                            <h5 class="mb-0">@Model.Tenant.CurrentSubscription.Plan.Name</h5>
-                            <small class="text-muted">@Model.Tenant.CurrentSubscription.Plan.Description</small>
+                            <h5 class="font-bold text-gray-900">@Model.Tenant.CurrentSubscription.Plan.Name</h5>
+                            <small class="text-gray-500">@Model.Tenant.CurrentSubscription.Plan.Description</small>
                         </div>
                     </div>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-6">Billing Cycle</dt>
-                        <dd class="col-sm-6">@Model.Tenant.CurrentSubscription.BillingCycle</dd>
-
-                        <dt class="col-sm-6">Amount</dt>
-                        <dd class="col-sm-6">@Model.Tenant.CurrentSubscription.TotalAmount.ToString("C2")</dd>
-
-                        <dt class="col-sm-6">Next Billing</dt>
-                        <dd class="col-sm-6">@Model.Tenant.CurrentSubscription.NextBillingDate?.ToString("MMM dd, yyyy")</dd>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">Billing Cycle</dt>
+                            <dd class="text-gray-900">@Model.Tenant.CurrentSubscription.BillingCycle</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">Amount</dt>
+                            <dd class="text-gray-900 font-semibold">@Model.Tenant.CurrentSubscription.TotalAmount.ToString("C2")</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">Next Billing</dt>
+                            <dd class="text-gray-900">@Model.Tenant.CurrentSubscription.NextBillingDate?.ToString("MMM dd, yyyy")</dd>
+                        </div>
                     </dl>
                 }
                 else
                 {
-                    <p class="text-muted mb-0">No active subscription</p>
+                    <p class="text-gray-500 text-center py-4">No active subscription</p>
                 }
             </div>
         </div>
     </div>
 
     <!-- Right Column: Backup Management -->
-    <div class="col-lg-8">
+    <div class="lg:col-span-2">
         <!-- Backup Stats -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="card h-100 border-0 bg-light">
-                    <div class="card-body text-center">
-                        <div class="text-primary fs-4 mb-1">@Model.BackupStats.TotalBackups</div>
-                        <small class="text-muted">Total Backups</small>
-                    </div>
-                </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow-sm p-4 text-center">
+                <div class="text-primary-600 text-2xl font-bold">@Model.BackupStats.TotalBackups</div>
+                <small class="text-gray-500">Total Backups</small>
             </div>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 bg-light">
-                    <div class="card-body text-center">
-                        <div class="text-success fs-4 mb-1">@Model.BackupStats.CompletedBackups</div>
-                        <small class="text-muted">Completed</small>
-                    </div>
-                </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 text-center">
+                <div class="text-emerald-600 text-2xl font-bold">@Model.BackupStats.CompletedBackups</div>
+                <small class="text-gray-500">Completed</small>
             </div>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 bg-light">
-                    <div class="card-body text-center">
-                        <div class="text-info fs-4 mb-1">@Model.BackupStats.TotalSizeFormatted</div>
-                        <small class="text-muted">Total Size</small>
-                    </div>
-                </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 text-center">
+                <div class="text-blue-600 text-2xl font-bold">@Model.BackupStats.TotalSizeFormatted</div>
+                <small class="text-gray-500">Total Size</small>
             </div>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 bg-light">
-                    <div class="card-body text-center">
-                        <div class="text-secondary fs-4 mb-1">
-                            @(Model.BackupStats.LastBackupDate?.ToString("MMM dd") ?? "Never")
-                        </div>
-                        <small class="text-muted">Last Backup</small>
-                    </div>
-                </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 text-center">
+                <div class="text-gray-600 text-2xl font-bold">@(Model.BackupStats.LastBackupDate?.ToString("MMM dd") ?? "Never")</div>
+                <small class="text-gray-500">Last Backup</small>
             </div>
         </div>
 
         <!-- Backup Management Card -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-cloud-arrow-up me-2"></i>Database Backups</h6>
-                <button class="btn btn-gradient btn-sm" data-modal-target="createBackupModal" data-modal-toggle="createBackupModal"
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+                <h6 class="font-semibold text-gray-800"><i class="bi bi-cloud-arrow-up mr-2"></i>Database Backups</h6>
+                <button class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-modal-target="createBackupModal" data-modal-toggle="createBackupModal"
                         @(string.IsNullOrEmpty(Model.Tenant.DatabaseName) ? "disabled" : "")>
-                    <i class="bi bi-plus-lg me-1"></i>Create Backup
+                    <i class="bi bi-plus-lg mr-1"></i>Create Backup
                 </button>
             </div>
-            <div class="card-body p-0">
+            <div class="overflow-x-auto">
                 @if (string.IsNullOrEmpty(Model.Tenant.DatabaseName))
                 {
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-database-x fs-1 d-block mb-2"></i>
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="bi bi-database-x text-5xl block mb-2"></i>
                         <p class="mb-0">Database name not configured for this tenant.</p>
                         <small>Set the database name to enable backups.</small>
                     </div>
                 }
                 else if (!Model.Backups.Any())
                 {
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-cloud-slash fs-1 d-block mb-2"></i>
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="bi bi-cloud-slash text-5xl block mb-2"></i>
                         <p class="mb-0">No backups yet.</p>
                         <small>Create your first backup to protect your data.</small>
                     </div>
                 }
                 else
                 {
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Backup</th>
-                                    <th>Type</th>
-                                    <th>Size</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th class="text-end pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var backup in Model.Backups)
-                                {
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center">
-                                                <div class="bg-secondary bg-opacity-10 rounded p-2 me-2">
-                                                    <i class="bi bi-file-earmark-zip text-secondary"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-semibold text-truncate" style="max-width: 200px;" title="@backup.FileName">
-                                                        @backup.FileName
-                                                    </div>
-                                                    @if (!string.IsNullOrEmpty(backup.Notes))
-                                                    {
-                                                        <small class="text-muted">@backup.Notes</small>
-                                                    }
-                                                </div>
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Backup</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Size</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created</th>
+                                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @foreach (var backup in Model.Backups)
+                            {
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="bg-gray-100 rounded p-2 mr-3">
+                                                <i class="bi bi-file-earmark-zip text-gray-600"></i>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge @(backup.Type == Algora.Erp.Admin.Entities.BackupType.Full ? "bg-primary" : backup.Type == Algora.Erp.Admin.Entities.BackupType.Differential ? "bg-info" : "bg-secondary")">
-                                                @backup.Type
-                                            </span>
-                                        </td>
-                                        <td>@(backup.FileSizeFormatted ?? "-")</td>
-                                        <td>
-                                            @switch (backup.Status)
-                                            {
-                                                case Algora.Erp.Admin.Entities.BackupStatus.Pending:
-                                                    <span class="badge bg-warning text-dark">Pending</span>
-                                                    break;
-                                                case Algora.Erp.Admin.Entities.BackupStatus.InProgress:
-                                                    <span class="badge bg-info">In Progress</span>
-                                                    break;
-                                                case Algora.Erp.Admin.Entities.BackupStatus.Completed:
-                                                    <span class="badge bg-success">Completed</span>
-                                                    break;
-                                                case Algora.Erp.Admin.Entities.BackupStatus.Failed:
-                                                    <span class="badge bg-danger" title="@backup.ErrorMessage">Failed</span>
-                                                    break;
-                                                case Algora.Erp.Admin.Entities.BackupStatus.Deleted:
-                                                    <span class="badge bg-secondary">Deleted</span>
-                                                    break;
-                                            }
-                                        </td>
-                                        <td>
-                                            <div>@backup.CreatedAt.ToString("MMM dd, yyyy")</div>
-                                            <small class="text-muted">@backup.CreatedAt.ToString("HH:mm")</small>
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            @if (backup.Status == Algora.Erp.Admin.Entities.BackupStatus.Completed)
-                                            {
-                                                <div class="btn-group">
-                                                    <a href="/Tenants/Details/@Model.Tenant.Id?handler=DownloadBackup&backupId=@backup.Id"
-                                                       class="btn btn-sm btn-outline-primary" title="Download">
-                                                        <i class="bi bi-download"></i>
-                                                    </a>
-                                                    <button class="btn btn-sm btn-outline-warning" title="Restore"
-                                                            onclick="confirmRestore('@backup.Id', '@backup.FileName')">
-                                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-outline-danger" title="Delete"
-                                                            onclick="confirmDelete('@backup.Id', '@backup.FileName')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
+                                            <div>
+                                                <div class="font-semibold text-gray-900 truncate max-w-xs" title="@backup.FileName">
+                                                    @backup.FileName
                                                 </div>
-                                            }
-                                            else if (backup.Status == Algora.Erp.Admin.Entities.BackupStatus.Failed)
-                                            {
-                                                <button class="btn btn-sm btn-outline-danger" title="Delete"
+                                                @if (!string.IsNullOrEmpty(backup.Notes))
+                                                {
+                                                    <small class="text-gray-500">@backup.Notes</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @{
+                                            var typeClass = backup.Type == Algora.Erp.Admin.Entities.BackupType.Full ? "bg-primary-100 text-primary-800" :
+                                                           backup.Type == Algora.Erp.Admin.Entities.BackupType.Differential ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800";
+                                        }
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @typeClass">
+                                            @backup.Type
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-700">@(backup.FileSizeFormatted ?? "—")</td>
+                                    <td class="px-6 py-4">
+                                        @switch (backup.Status)
+                                        {
+                                            case Algora.Erp.Admin.Entities.BackupStatus.Pending:
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Pending</span>
+                                                break;
+                                            case Algora.Erp.Admin.Entities.BackupStatus.InProgress:
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">In Progress</span>
+                                                break;
+                                            case Algora.Erp.Admin.Entities.BackupStatus.Completed:
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Completed</span>
+                                                break;
+                                            case Algora.Erp.Admin.Entities.BackupStatus.Failed:
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" title="@backup.ErrorMessage">Failed</span>
+                                                break;
+                                            case Algora.Erp.Admin.Entities.BackupStatus.Deleted:
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Deleted</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900">@backup.CreatedAt.ToString("MMM dd, yyyy")</div>
+                                        <small class="text-gray-500">@backup.CreatedAt.ToString("HH:mm")</small>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        @if (backup.Status == Algora.Erp.Admin.Entities.BackupStatus.Completed)
+                                        {
+                                            <div class="inline-flex rounded-md shadow-sm" role="group">
+                                                <a href="/Tenants/Details/@Model.Tenant.Id?handler=DownloadBackup&backupId=@backup.Id"
+                                                   class="px-3 py-2 text-xs font-medium text-gray-900 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100" title="Download">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
+                                                <button class="px-3 py-2 text-xs font-medium text-amber-700 bg-white border-t border-b border-gray-300 hover:bg-amber-50" title="Restore"
+                                                        onclick="confirmRestore('@backup.Id', '@backup.FileName')">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                                <button class="px-3 py-2 text-xs font-medium text-red-700 bg-white border border-gray-300 rounded-r-lg hover:bg-red-50" title="Delete"
                                                         onclick="confirmDelete('@backup.Id', '@backup.FileName')">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                            </div>
+                                        }
+                                        else if (backup.Status == Algora.Erp.Admin.Entities.BackupStatus.Failed)
+                                        {
+                                            <button class="px-3 py-2 text-xs font-medium text-red-700 bg-white border border-gray-300 rounded-lg hover:bg-red-50" title="Delete"
+                                                    onclick="confirmDelete('@backup.Id', '@backup.FileName')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 }
             </div>
-            <div class="card-footer bg-light">
-                <small class="text-muted">
-                    <i class="bi bi-folder2 me-1"></i>Backup Location: <code>@Model.BackupDirectory</code>
+            <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+                <small class="text-gray-500">
+                    <i class="bi bi-folder2 mr-1"></i>Backup Location: <code class="bg-gray-100 px-2 py-1 rounded text-sm">@Model.BackupDirectory</code>
                 </small>
             </div>
         </div>
@@ -339,42 +344,44 @@
 </div>
 
 <!-- Create Backup Modal -->
-<div class="modal fade" id="createBackupModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-cloud-arrow-up me-2"></i>Create Database Backup</h5>
-                <button type="button" class="btn-close" data-modal-hide="createBackupModal"></button>
+<div id="createBackupModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900"><i class="bi bi-cloud-arrow-up mr-2"></i>Create Database Backup</h3>
+                <button type="button" data-modal-hide="createBackupModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form method="post" asp-page-handler="CreateBackup">
                 <input type="hidden" name="id" value="@Model.Tenant.Id" />
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Database</label>
-                        <input type="text" class="form-control" value="@Model.Tenant.DatabaseName" readonly />
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Database</label>
+                        <input type="text" class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg" value="@Model.Tenant.DatabaseName" readonly />
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Backup Type</label>
-                        <select class="form-select" name="type">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Backup Type</label>
+                        <select class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" name="type">
                             <option value="0" selected>Full Backup</option>
                             <option value="1">Differential Backup</option>
                             <option value="2">Transaction Log</option>
                         </select>
-                        <small class="text-muted">Full backup is recommended for most cases.</small>
+                        <small class="text-gray-500">Full backup is recommended for most cases.</small>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Notes (Optional)</label>
-                        <textarea class="form-control" name="notes" rows="2" placeholder="e.g., Pre-upgrade backup"></textarea>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                        <textarea class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" name="notes" rows="2" placeholder="e.g., Pre-upgrade backup"></textarea>
                     </div>
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle me-2"></i>
-                        The backup will be stored for @Model.RetentionDays days before automatic cleanup.
+                    <div class="flex items-center p-4 text-blue-800 bg-blue-50 rounded-lg">
+                        <i class="bi bi-info-circle mr-3"></i>
+                        <span class="text-sm">The backup will be stored for @Model.RetentionDays days before automatic cleanup.</span>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-hide="createBackupModal">Cancel</button>
-                    <button type="submit" class="btn btn-gradient">
-                        <i class="bi bi-cloud-arrow-up me-1"></i>Create Backup
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="createBackupModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                        <i class="bi bi-cloud-arrow-up mr-1"></i>Create Backup
                     </button>
                 </div>
             </form>
@@ -383,28 +390,29 @@
 </div>
 
 <!-- Restore Confirmation Modal -->
-<div class="modal fade" id="restoreModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-warning"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Restore</h5>
-                <button type="button" class="btn-close" data-modal-hide="restoreModal"></button>
+<div id="restoreModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-amber-600"><i class="bi bi-exclamation-triangle mr-2"></i>Confirm Restore</h3>
+                <button type="button" data-modal-hide="restoreModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form method="post" asp-page-handler="RestoreBackup">
                 <input type="hidden" name="id" value="@Model.Tenant.Id" />
                 <input type="hidden" name="backupId" id="restoreBackupId" />
-                <div class="modal-body">
-                    <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-octagon me-2"></i>
-                        <strong>Warning:</strong> Restoring a backup will overwrite the current database.
-                        All data since the backup was created will be lost!
+                <div class="p-6">
+                    <div class="flex items-center p-4 text-red-800 bg-red-50 rounded-lg mb-4">
+                        <i class="bi bi-exclamation-octagon mr-3"></i>
+                        <span class="text-sm"><strong>Warning:</strong> Restoring a backup will overwrite the current database. All data since the backup was created will be lost!</span>
                     </div>
-                    <p>Are you sure you want to restore from backup: <strong id="restoreBackupName"></strong>?</p>
+                    <p class="text-gray-700">Are you sure you want to restore from backup: <strong id="restoreBackupName"></strong>?</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-hide="restoreModal">Cancel</button>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i>Restore Database
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="restoreModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700">
+                        <i class="bi bi-arrow-counterclockwise mr-1"></i>Restore Database
                     </button>
                 </div>
             </form>
@@ -413,24 +421,26 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger"><i class="bi bi-trash me-2"></i>Delete Backup</h5>
-                <button type="button" class="btn-close" data-modal-hide="deleteModal"></button>
+<div id="deleteModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-xl shadow-lg">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-red-600"><i class="bi bi-trash mr-2"></i>Delete Backup</h3>
+                <button type="button" data-modal-hide="deleteModal" class="text-gray-400 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <form method="post" asp-page-handler="DeleteBackup">
                 <input type="hidden" name="id" value="@Model.Tenant.Id" />
                 <input type="hidden" name="backupId" id="deleteBackupId" />
-                <div class="modal-body">
-                    <p>Are you sure you want to delete backup: <strong id="deleteBackupName"></strong>?</p>
-                    <p class="text-muted mb-0">This will permanently delete the backup file.</p>
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">Are you sure you want to delete backup: <strong id="deleteBackupName"></strong>?</p>
+                    <p class="text-gray-500 text-sm">This will permanently delete the backup file.</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-hide="deleteModal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash me-1"></i>Delete Backup
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                    <button type="button" data-modal-hide="deleteModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">
+                        <i class="bi bi-trash mr-1"></i>Delete Backup
                     </button>
                 </div>
             </form>

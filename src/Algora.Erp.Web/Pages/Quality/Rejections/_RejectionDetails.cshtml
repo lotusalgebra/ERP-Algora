@@ -4,82 +4,82 @@
 @{
     var dispositionClass = Model.DispositionStatus switch
     {
-        RejectionDisposition.Pending => "bg-secondary",
-        RejectionDisposition.ReturnToSupplier => "bg-primary",
-        RejectionDisposition.Scrapped => "bg-danger",
-        RejectionDisposition.Reworked => "bg-info",
-        RejectionDisposition.Disposed => "bg-dark",
-        RejectionDisposition.AcceptedWithDeviation => "bg-warning",
-        RejectionDisposition.HoldForReview => "bg-warning",
-        _ => "bg-secondary"
+        RejectionDisposition.Pending => "bg-gray-100 text-gray-800",
+        RejectionDisposition.ReturnToSupplier => "bg-primary-100 text-primary-800",
+        RejectionDisposition.Scrapped => "bg-red-100 text-red-800",
+        RejectionDisposition.Reworked => "bg-blue-100 text-blue-800",
+        RejectionDisposition.Disposed => "bg-gray-700 text-white",
+        RejectionDisposition.AcceptedWithDeviation => "bg-amber-100 text-amber-800",
+        RejectionDisposition.HoldForReview => "bg-amber-100 text-amber-800",
+        _ => "bg-gray-100 text-gray-800"
     };
 
     var categoryClass = Model.RejectionCategory switch
     {
-        RejectionCategory.QualityDefect => "bg-danger",
-        RejectionCategory.DamagedInTransit => "bg-warning",
-        RejectionCategory.WrongProduct => "bg-info",
-        RejectionCategory.QuantityMismatch => "bg-secondary",
-        RejectionCategory.ExpiredProduct => "bg-dark",
-        _ => "bg-secondary"
+        RejectionCategory.QualityDefect => "bg-red-100 text-red-800",
+        RejectionCategory.DamagedInTransit => "bg-amber-100 text-amber-800",
+        RejectionCategory.WrongProduct => "bg-blue-100 text-blue-800",
+        RejectionCategory.QuantityMismatch => "bg-gray-100 text-gray-800",
+        RejectionCategory.ExpiredProduct => "bg-gray-700 text-white",
+        _ => "bg-gray-100 text-gray-800"
     };
 }
 
-<div class="row g-4">
+<div class="grid grid-cols-12 gap-4">
     <!-- Header Info -->
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-start">
+    <div class="col-span-12">
+        <div class="flex justify-between items-start">
             <div>
-                <h5 class="mb-1">@Model.RejectionNumber</h5>
-                <p class="text-muted mb-0">@Model.RejectionDate.ToString("dd MMM yyyy")</p>
+                <h5 class="text-lg font-semibold text-gray-900 mb-1">@Model.RejectionNumber</h5>
+                <p class="text-gray-500 mb-0">@Model.RejectionDate.ToString("dd MMM yyyy")</p>
             </div>
-            <div class="text-end">
-                <span class="badge @categoryClass fs-6 me-2">@Model.RejectionCategory</span>
-                <span class="badge @dispositionClass fs-6">@Model.DispositionStatus</span>
+            <div class="text-right">
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @categoryClass mr-2">@Model.RejectionCategory</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @dispositionClass">@Model.DispositionStatus</span>
             </div>
         </div>
     </div>
 
     <!-- Product Details -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Product Information</h6>
+    <div class="md:col-span-6 col-span-12">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900 mb-0">Product Information</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
+            <div class="p-6">
+                <table class="w-full text-sm">
                     <tr>
-                        <td class="text-muted" style="width: 40%;">Product:</td>
-                        <td>
-                            <div class="fw-medium">@Model.ProductName</div>
-                            <small class="text-muted">@Model.ProductSku</small>
+                        <td class="text-gray-500 py-1" style="width: 40%;">Product:</td>
+                        <td class="py-1">
+                            <div class="font-medium text-gray-900">@Model.ProductName</div>
+                            <small class="text-gray-500">@Model.ProductSku</small>
                         </td>
                     </tr>
                     @if (Model.Warehouse != null)
                     {
                         <tr>
-                            <td class="text-muted">Warehouse:</td>
-                            <td class="fw-medium">@Model.Warehouse.Name</td>
+                            <td class="text-gray-500 py-1">Warehouse:</td>
+                            <td class="font-medium text-gray-900 py-1">@Model.Warehouse.Name</td>
                         </tr>
                     }
                     @if (Model.Supplier != null)
                     {
                         <tr>
-                            <td class="text-muted">Supplier:</td>
-                            <td class="fw-medium">@Model.Supplier.Name</td>
+                            <td class="text-gray-500 py-1">Supplier:</td>
+                            <td class="font-medium text-gray-900 py-1">@Model.Supplier.Name</td>
                         </tr>
                     }
                     <tr>
-                        <td class="text-muted">Source Document:</td>
-                        <td class="fw-medium">
+                        <td class="text-gray-500 py-1">Source Document:</td>
+                        <td class="font-medium text-gray-900 py-1">
                             @(Model.SourceDocumentType): @(Model.SourceDocumentNumber ?? "-")
                         </td>
                     </tr>
                     @if (Model.QualityInspection != null)
                     {
                         <tr>
-                            <td class="text-muted">QC Inspection:</td>
-                            <td class="fw-medium">@Model.QualityInspection.InspectionNumber</td>
+                            <td class="text-gray-500 py-1">QC Inspection:</td>
+                            <td class="font-medium text-gray-900 py-1">@Model.QualityInspection.InspectionNumber</td>
                         </tr>
                     }
                 </table>
@@ -88,24 +88,24 @@
     </div>
 
     <!-- Quantity & Value -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Quantity & Value</h6>
+    <div class="md:col-span-6 col-span-12">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900 mb-0">Quantity & Value</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
+            <div class="p-6">
+                <table class="w-full text-sm">
                     <tr>
-                        <td class="text-muted" style="width: 40%;">Rejected Quantity:</td>
-                        <td class="fw-medium">@Model.RejectedQuantity.ToString("N2") @Model.UnitOfMeasure</td>
+                        <td class="text-gray-500 py-1" style="width: 40%;">Rejected Quantity:</td>
+                        <td class="font-medium text-gray-900 py-1">@Model.RejectedQuantity.ToString("N2") @Model.UnitOfMeasure</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Unit Cost:</td>
-                        <td class="fw-medium">@Model.UnitCost.ToString("C2")</td>
+                        <td class="text-gray-500 py-1">Unit Cost:</td>
+                        <td class="font-medium text-gray-900 py-1">@Model.UnitCost.ToString("C2")</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Total Value:</td>
-                        <td class="fw-medium text-danger fs-5">@Model.TotalValue.ToString("C2")</td>
+                        <td class="text-gray-500 py-1">Total Value:</td>
+                        <td class="font-medium text-red-600 text-lg py-1">@Model.TotalValue.ToString("C2")</td>
                     </tr>
                 </table>
             </div>
@@ -113,26 +113,26 @@
     </div>
 
     <!-- Rejection Details -->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Rejection Details</h6>
+    <div class="col-span-12">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="text-sm font-medium text-gray-900 mb-0">Rejection Details</h6>
             </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label text-muted small">Category</label>
-                        <p class="mb-0"><span class="badge @categoryClass">@Model.RejectionCategory</span></p>
+            <div class="p-6">
+                <div class="grid grid-cols-12 gap-3">
+                    <div class="md:col-span-6 col-span-12">
+                        <label class="block mb-1 text-sm text-gray-500">Category</label>
+                        <p class="mb-0"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full @categoryClass">@Model.RejectionCategory</span></p>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted small">Reason</label>
-                        <p class="mb-0 fw-medium">@Model.RejectionReason</p>
+                    <div class="md:col-span-6 col-span-12">
+                        <label class="block mb-1 text-sm text-gray-500">Reason</label>
+                        <p class="mb-0 font-medium text-gray-900">@Model.RejectionReason</p>
                     </div>
                     @if (!string.IsNullOrEmpty(Model.DefectDescription))
                     {
-                        <div class="col-12">
-                            <label class="form-label text-muted small">Defect Description</label>
-                            <p class="mb-0">@Model.DefectDescription</p>
+                        <div class="col-span-12">
+                            <label class="block mb-1 text-sm text-gray-500">Defect Description</label>
+                            <p class="mb-0 text-gray-700">@Model.DefectDescription</p>
                         </div>
                     }
                 </div>
@@ -143,36 +143,36 @@
     <!-- Disposition Details -->
     @if (Model.DispositionStatus != RejectionDisposition.Pending)
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Disposition Details</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Disposition Details</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small">Disposition</label>
-                            <p class="mb-0"><span class="badge @dispositionClass">@Model.DispositionStatus</span></p>
+                <div class="p-6">
+                    <div class="grid grid-cols-12 gap-3">
+                        <div class="md:col-span-4 col-span-12">
+                            <label class="block mb-1 text-sm text-gray-500">Disposition</label>
+                            <p class="mb-0"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full @dispositionClass">@Model.DispositionStatus</span></p>
                         </div>
                         @if (Model.DispositionDate.HasValue)
                         {
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small">Disposition Date</label>
-                                <p class="mb-0 fw-medium">@Model.DispositionDate.Value.ToString("dd MMM yyyy")</p>
+                            <div class="md:col-span-4 col-span-12">
+                                <label class="block mb-1 text-sm text-gray-500">Disposition Date</label>
+                                <p class="mb-0 font-medium text-gray-900">@Model.DispositionDate.Value.ToString("dd MMM yyyy")</p>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.DisposerName))
                         {
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small">Processed By</label>
-                                <p class="mb-0 fw-medium">@Model.DisposerName</p>
+                            <div class="md:col-span-4 col-span-12">
+                                <label class="block mb-1 text-sm text-gray-500">Processed By</label>
+                                <p class="mb-0 font-medium text-gray-900">@Model.DisposerName</p>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.DispositionAction))
                         {
-                            <div class="col-12">
-                                <label class="form-label text-muted small">Action Taken</label>
-                                <p class="mb-0">@Model.DispositionAction</p>
+                            <div class="col-span-12">
+                                <label class="block mb-1 text-sm text-gray-500">Action Taken</label>
+                                <p class="mb-0 text-gray-700">@Model.DispositionAction</p>
                             </div>
                         }
 
@@ -181,23 +181,23 @@
                         {
                             @if (Model.ReturnDate.HasValue)
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Return Date</label>
-                                    <p class="mb-0 fw-medium">@Model.ReturnDate.Value.ToString("dd MMM yyyy")</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Return Date</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ReturnDate.Value.ToString("dd MMM yyyy")</p>
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(Model.ReturnReference))
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Return Reference</label>
-                                    <p class="mb-0 fw-medium">@Model.ReturnReference</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Return Reference</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ReturnReference</p>
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(Model.DebitNoteNumber))
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Debit Note</label>
-                                    <p class="mb-0 fw-medium">@Model.DebitNoteNumber</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Debit Note</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.DebitNoteNumber</p>
                                 </div>
                             }
                         }
@@ -207,23 +207,23 @@
                         {
                             @if (Model.ScrapDate.HasValue)
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Scrap Date</label>
-                                    <p class="mb-0 fw-medium">@Model.ScrapDate.Value.ToString("dd MMM yyyy")</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Scrap Date</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ScrapDate.Value.ToString("dd MMM yyyy")</p>
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(Model.ScrapReference))
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Scrap Reference</label>
-                                    <p class="mb-0 fw-medium">@Model.ScrapReference</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Scrap Reference</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ScrapReference</p>
                                 </div>
                             }
                             @if (Model.ScrapValue.HasValue)
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Scrap Value</label>
-                                    <p class="mb-0 fw-medium">@Model.ScrapValue.Value.ToString("C2")</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Scrap Value</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ScrapValue.Value.ToString("C2")</p>
                                 </div>
                             }
                         }
@@ -233,23 +233,23 @@
                         {
                             @if (!string.IsNullOrEmpty(Model.ReworkInstructions))
                             {
-                                <div class="col-12">
-                                    <label class="form-label text-muted small">Rework Instructions</label>
-                                    <p class="mb-0">@Model.ReworkInstructions</p>
+                                <div class="col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Rework Instructions</label>
+                                    <p class="mb-0 text-gray-700">@Model.ReworkInstructions</p>
                                 </div>
                             }
                             @if (Model.ReworkCompletedAt.HasValue)
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Rework Completed</label>
-                                    <p class="mb-0 fw-medium">@Model.ReworkCompletedAt.Value.ToString("dd MMM yyyy HH:mm")</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Rework Completed</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ReworkCompletedAt.Value.ToString("dd MMM yyyy HH:mm")</p>
                                 </div>
                             }
                             @if (Model.ReworkCost.HasValue)
                             {
-                                <div class="col-md-4">
-                                    <label class="form-label text-muted small">Rework Cost</label>
-                                    <p class="mb-0 fw-medium">@Model.ReworkCost.Value.ToString("C2")</p>
+                                <div class="md:col-span-4 col-span-12">
+                                    <label class="block mb-1 text-sm text-gray-500">Rework Cost</label>
+                                    <p class="mb-0 font-medium text-gray-900">@Model.ReworkCost.Value.ToString("C2")</p>
                                 </div>
                             }
                         }
@@ -262,28 +262,28 @@
     <!-- Notes -->
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Notes</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Notes</h6>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">@Model.Notes</p>
+                <div class="p-6">
+                    <p class="mb-0 text-gray-700">@Model.Notes</p>
                 </div>
             </div>
         </div>
     }
 </div>
 
-<div class="modal-footer mt-4 px-0 pb-0">
+<div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
     @if (Model.DispositionStatus == RejectionDisposition.Pending || Model.DispositionStatus == RejectionDisposition.HoldForReview)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editRejection('@Model.Id')" data-modal-hide="detailsModal">
-            <i class="bi bi-pencil me-2"></i>Edit
+        <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="editRejection('@Model.Id')" data-modal-hide="detailsModal">
+            <i class="bi bi-pencil mr-2"></i>Edit
         </button>
-        <button type="button" class="btn btn-primary" onclick="showDispositionModal('@Model.Id', '@Model.DispositionStatus')" data-modal-hide="detailsModal">
-            <i class="bi bi-arrow-right-circle me-2"></i>Update Disposition
+        <button type="button" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="showDispositionModal('@Model.Id', '@Model.DispositionStatus')" data-modal-hide="detailsModal">
+            <i class="bi bi-arrow-right-circle mr-2"></i>Update Disposition
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
 </div>

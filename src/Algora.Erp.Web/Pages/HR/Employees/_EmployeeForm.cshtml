@@ -1,67 +1,71 @@
 @model Algora.Erp.Web.Pages.HR.Employees.EmployeeFormViewModel
 
-<div class="modal-header">
-    <h5 class="modal-title">@(Model.IsEdit ? "Edit Employee" : "Add New Employee")</h5>
-    <button type="button" class="btn-close" data-modal-hide="employeeModal"></button>
+<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+    <h3 class="text-xl font-semibold text-gray-900">@(Model.IsEdit ? "Edit Employee" : "Add New Employee")</h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="employeeModal">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 <form hx-post="/HR/Employees" hx-target="#employeesTableBody" hx-swap="innerHTML">
     @if (Model.IsEdit && Model.Employee != null)
     {
         <input type="hidden" name="Id" value="@Model.Employee.Id" />
     }
-    <div class="modal-body">
+    <div class="p-4 md:p-5">
         <!-- Nav tabs -->
-        <ul class="nav nav-tabs nav-fill mb-4" id="employeeTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="personal-tab" data-tabs-target="#personal" href="#personal" role="tab">
-                    <i class="bi bi-person me-1"></i>Personal
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="employment-tab" data-tabs-target="#employment" href="#employment" role="tab">
-                    <i class="bi bi-briefcase me-1"></i>Employment
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="contact-tab" data-tabs-target="#contact" href="#contact" role="tab">
-                    <i class="bi bi-telephone me-1"></i>Contact
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="compensation-tab" data-tabs-target="#compensation" href="#compensation" role="tab">
-                    <i class="bi bi-cash me-1"></i>Compensation
-                </a>
-            </li>
-        </ul>
+        <div class="mb-4 border-b border-gray-200">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="employeeTabs" role="tablist">
+                <li class="mr-2" role="presentation">
+                    <button class="inline-flex items-center p-4 border-b-2 border-primary-600 text-primary-600 rounded-t-lg active" id="personal-tab" data-tabs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                        <i class="bi bi-person mr-2"></i>Personal
+                    </button>
+                </li>
+                <li class="mr-2" role="presentation">
+                    <button class="inline-flex items-center p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="employment-tab" data-tabs-target="#employment" type="button" role="tab" aria-controls="employment" aria-selected="false">
+                        <i class="bi bi-briefcase mr-2"></i>Employment
+                    </button>
+                </li>
+                <li class="mr-2" role="presentation">
+                    <button class="inline-flex items-center p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="contact-tab" data-tabs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                        <i class="bi bi-telephone mr-2"></i>Contact
+                    </button>
+                </li>
+                <li role="presentation">
+                    <button class="inline-flex items-center p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="compensation-tab" data-tabs-target="#compensation" type="button" role="tab" aria-controls="compensation" aria-selected="false">
+                        <i class="bi bi-cash mr-2"></i>Compensation
+                    </button>
+                </li>
+            </ul>
+        </div>
 
         <!-- Tab content -->
-        <div class="tab-content">
+        <div id="tabContent">
             <!-- Personal Information -->
-            <div id="personal" class="tab-pane fade show active">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">First Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="FirstName" required
+            <div id="personal" class="block" role="tabpanel" aria-labelledby="personal-tab">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">First Name <span class="text-red-500">*</span></label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="FirstName" required
                                value="@Model.Employee?.FirstName" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="LastName" required
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Last Name <span class="text-red-500">*</span></label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="LastName" required
                                value="@Model.Employee?.LastName" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Email <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control" name="Email" required
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Email <span class="text-red-500">*</span></label>
+                        <input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Email" required
                                value="@Model.Employee?.Email" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="DateOfBirth" required
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Date of Birth <span class="text-red-500">*</span></label>
+                        <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DateOfBirth" required
                                value="@Model.Employee?.DateOfBirth.ToString("yyyy-MM-dd")" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Gender</label>
-                        <select class="form-select" name="Gender">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Gender</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Gender">
                             @foreach (var gender in Enum.GetValues<Algora.Erp.Domain.Enums.Gender>())
                             {
                                 if (Model.Employee?.Gender == gender)
@@ -75,25 +79,25 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Phone</label>
-                        <input type="tel" class="form-control" name="Phone"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Phone</label>
+                        <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Phone"
                                value="@Model.Employee?.Phone" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Mobile</label>
-                        <input type="tel" class="form-control" name="Mobile"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Mobile</label>
+                        <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Mobile"
                                value="@Model.Employee?.Mobile" />
                     </div>
                 </div>
             </div>
 
             <!-- Employment Details -->
-            <div id="employment" class="tab-pane fade">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Department</label>
-                        <select class="form-select" name="DepartmentId">
+            <div id="employment" class="hidden" role="tabpanel" aria-labelledby="employment-tab">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Department</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DepartmentId">
                             <option value="">Select Department</option>
                             @foreach (var dept in Model.Departments)
                             {
@@ -108,9 +112,9 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Position</label>
-                        <select class="form-select" name="PositionId">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Position</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PositionId">
                             <option value="">Select Position</option>
                             @foreach (var pos in Model.Positions)
                             {
@@ -125,9 +129,9 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Manager</label>
-                        <select class="form-select" name="ManagerId">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Manager</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ManagerId">
                             <option value="">Select Manager</option>
                             @foreach (var mgr in Model.Managers)
                             {
@@ -142,14 +146,14 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Hire Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="HireDate" required
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Hire Date <span class="text-red-500">*</span></label>
+                        <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="HireDate" required
                                value="@(Model.Employee?.HireDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Employment Type</label>
-                        <select class="form-select" name="EmploymentType">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Employment Type</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="EmploymentType">
                             @foreach (var type in Enum.GetValues<Algora.Erp.Domain.Enums.EmploymentType>())
                             {
                                 if (Model.Employee?.EmploymentType == type)
@@ -163,9 +167,9 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Employment Status</label>
-                        <select class="form-select" name="EmploymentStatus">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Employment Status</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="EmploymentStatus">
                             @foreach (var status in Enum.GetValues<Algora.Erp.Domain.Enums.EmploymentStatus>())
                             {
                                 if (Model.Employee?.EmploymentStatus == status)
@@ -183,62 +187,62 @@
             </div>
 
             <!-- Contact & Address -->
-            <div id="contact" class="tab-pane fade">
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label">Address</label>
-                        <textarea class="form-control" name="Address" rows="2">@Model.Employee?.Address</textarea>
+            <div id="contact" class="hidden" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
+                        <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Address" rows="2">@Model.Employee?.Address</textarea>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">City</label>
-                        <input type="text" class="form-control" name="City"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="City"
                                value="@Model.Employee?.City" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">State/Province</label>
-                        <input type="text" class="form-control" name="State"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">State/Province</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="State"
                                value="@Model.Employee?.State" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Country</label>
-                        <input type="text" class="form-control" name="Country"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Country</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Country"
                                value="@Model.Employee?.Country" />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" name="PostalCode"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Postal Code</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PostalCode"
                                value="@Model.Employee?.PostalCode" />
                     </div>
 
-                    <div class="col-12">
-                        <hr class="my-3">
-                        <h6 class="text-muted mb-3"><i class="bi bi-exclamation-triangle me-2"></i>Emergency Contact</h6>
+                    <div class="md:col-span-2">
+                        <hr class="my-3 border-gray-200">
+                        <h6 class="text-gray-500 mb-3"><i class="bi bi-exclamation-triangle mr-2"></i>Emergency Contact</h6>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Contact Name</label>
-                        <input type="text" class="form-control" name="EmergencyContactName"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Contact Name</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="EmergencyContactName"
                                value="@Model.Employee?.EmergencyContactName" />
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Contact Phone</label>
-                        <input type="tel" class="form-control" name="EmergencyContactPhone"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Contact Phone</label>
+                        <input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="EmergencyContactPhone"
                                value="@Model.Employee?.EmergencyContactPhone" />
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Relationship</label>
-                        <input type="text" class="form-control" name="EmergencyContactRelation"
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Relationship</label>
+                        <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="EmergencyContactRelation"
                                value="@Model.Employee?.EmergencyContactRelation" />
                     </div>
                 </div>
             </div>
 
             <!-- Compensation -->
-            <div id="compensation" class="tab-pane fade">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Base Salary</label>
-                        <div class="input-group">
-                            <select class="form-select" name="SalaryCurrency" style="max-width: 100px;">
+            <div id="compensation" class="hidden" role="tabpanel" aria-labelledby="compensation-tab">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Base Salary</label>
+                        <div class="flex">
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5" name="SalaryCurrency" style="max-width: 100px;">
                                 @{
                                     var currencies = new[] { "USD", "EUR", "GBP", "INR" };
                                     var selectedCurrency = Model.Employee?.SalaryCurrency ?? "USD";
@@ -255,13 +259,13 @@
                                     }
                                 }
                             </select>
-                            <input type="number" class="form-control" name="BaseSalary" step="0.01"
+                            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-e-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="BaseSalary" step="0.01"
                                    value="@Model.Employee?.BaseSalary" />
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Pay Frequency</label>
-                        <select class="form-select" name="PayFrequency">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Pay Frequency</label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="PayFrequency">
                             @foreach (var freq in Enum.GetValues<Algora.Erp.Domain.Enums.PayFrequency>())
                             {
                                 if (Model.Employee?.PayFrequency == freq)
@@ -279,10 +283,15 @@
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-modal-hide="employeeModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <span class="htmx-indicator spinner-border spinner-border-sm me-1"></span>
+    <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b gap-2">
+        <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" data-modal-hide="employeeModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
+            <span class="htmx-indicator animate-spin h-4 w-4 mr-2 hidden">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </span>
             @(Model.IsEdit ? "Update Employee" : "Add Employee")
         </button>
     </div>

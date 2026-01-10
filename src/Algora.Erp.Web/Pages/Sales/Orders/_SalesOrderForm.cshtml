@@ -10,15 +10,15 @@
         <input type="hidden" name="Id" value="@Model.SalesOrder.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-3">
         <!-- Order Information -->
-        <div class="col-12">
-            <h6 class="text-muted text-uppercase small mb-3">Order Information</h6>
+        <div class="col-span-12">
+            <h6 class="text-gray-500 uppercase text-sm mb-3">Order Information</h6>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Customer <span class="text-danger">*</span></label>
-            <select class="form-select" name="CustomerId" id="customerSelect" required>
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Customer <span class="text-red-600">*</span></label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="CustomerId" id="customerSelect" required>
                 <option value="">Select Customer</option>
                 @foreach (var customer in Model.Customers)
                 {
@@ -31,9 +31,9 @@
             </select>
         </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Order Type</label>
-            <select class="form-select" name="OrderType">
+        <div class="col-span-12 md:col-span-3">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Order Type</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="OrderType">
                 @foreach (var type in Enum.GetValues<SalesOrderType>())
                 {
                     <option value="@type" selected="@(Model.SalesOrder?.OrderType == type)">@type</option>
@@ -41,9 +41,9 @@
             </select>
         </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select class="form-select" name="Status">
+        <div class="col-span-12 md:col-span-3">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Status">
                 @foreach (var status in Enum.GetValues<SalesOrderStatus>())
                 {
                     <option value="@status" selected="@(Model.SalesOrder?.Status == status)">@status</option>
@@ -51,42 +51,42 @@
             </select>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Order Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" name="OrderDate"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Order Date <span class="text-red-600">*</span></label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="OrderDate"
                    value="@(Model.SalesOrder?.OrderDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Due Date</label>
-            <input type="date" class="form-control" name="DueDate"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Due Date</label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="DueDate"
                    value="@Model.SalesOrder?.DueDate?.ToString("yyyy-MM-dd")">
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Expected Delivery</label>
-            <input type="date" class="form-control" name="ExpectedDeliveryDate"
+        <div class="col-span-12 md:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Expected Delivery</label>
+            <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ExpectedDeliveryDate"
                    value="@Model.SalesOrder?.ExpectedDeliveryDate?.ToString("yyyy-MM-dd")">
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Reference</label>
-            <input type="text" class="form-control" name="Reference"
+        <div class="col-span-12 md:col-span-6">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Reference</label>
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Reference"
                    value="@Model.SalesOrder?.Reference" placeholder="PO#, Quote#, etc.">
         </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Currency</label>
-            <select class="form-select" name="Currency">
+        <div class="col-span-12 md:col-span-3">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Currency</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Currency">
                 <option value="USD" selected="@(Model.SalesOrder?.Currency == "USD")">USD</option>
                 <option value="EUR" selected="@(Model.SalesOrder?.Currency == "EUR")">EUR</option>
                 <option value="GBP" selected="@(Model.SalesOrder?.Currency == "GBP")">GBP</option>
             </select>
         </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Shipping Method</label>
-            <select class="form-select" name="ShippingMethod">
+        <div class="col-span-12 md:col-span-3">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Shipping Method</label>
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShippingMethod">
                 <option value="">Select...</option>
                 <option value="Ground" selected="@(Model.SalesOrder?.ShippingMethod == "Ground")">Ground</option>
                 <option value="Express" selected="@(Model.SalesOrder?.ShippingMethod == "Express")">Express</option>
@@ -95,34 +95,34 @@
             </select>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Shipping Address</label>
-            <textarea class="form-control" name="ShippingAddress" rows="2" id="shippingAddress"
+        <div class="col-span-12">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Shipping Address</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ShippingAddress" rows="2" id="shippingAddress"
                       placeholder="Enter shipping address or select customer to auto-fill">@Model.SalesOrder?.ShippingAddress</textarea>
         </div>
 
         <!-- Order Lines -->
-        <div class="col-12 mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="text-muted text-uppercase small mb-0">Order Lines</h6>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLine()">
-                    <i class="bi bi-plus-lg me-1"></i>Add Line
+        <div class="col-span-12 mt-4">
+            <div class="flex justify-between items-center mb-3">
+                <h6 class="text-gray-500 uppercase text-sm mb-0">Order Lines</h6>
+                <button type="button" class="text-primary-700 border border-primary-700 hover:bg-primary-700 hover:text-white focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addLine()">
+                    <i class="bi bi-plus-lg mr-1"></i>Add Line
                 </button>
             </div>
         </div>
 
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered" id="linesTable">
-                    <thead class="bg-light">
+        <div class="col-span-12">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border border-gray-200" id="linesTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th style="width: 30%">Product</th>
-                            <th style="width: 10%" class="text-center">Qty</th>
-                            <th style="width: 15%" class="text-end">Unit Price</th>
-                            <th style="width: 10%" class="text-center">Disc %</th>
-                            <th style="width: 10%" class="text-center">Tax %</th>
-                            <th style="width: 15%" class="text-end">Total</th>
-                            <th style="width: 10%" class="text-center">Action</th>
+                            <th style="width: 30%" class="px-4 py-3">Product</th>
+                            <th style="width: 10%" class="px-4 py-3 text-center">Qty</th>
+                            <th style="width: 15%" class="px-4 py-3 text-right">Unit Price</th>
+                            <th style="width: 10%" class="px-4 py-3 text-center">Disc %</th>
+                            <th style="width: 10%" class="px-4 py-3 text-center">Tax %</th>
+                            <th style="width: 15%" class="px-4 py-3 text-right">Total</th>
+                            <th style="width: 10%" class="px-4 py-3 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody id="linesBody">
@@ -131,9 +131,9 @@
                             var index = 0;
                             foreach (var line in Model.SalesOrder.Lines.OrderBy(l => l.LineNumber))
                             {
-                                <tr data-index="@index">
-                                    <td>
-                                        <select class="form-select form-select-sm product-select" name="Lines[@index].ProductId" onchange="updateLinePrice(this)">
+                                <tr data-index="@index" class="border-b border-gray-200">
+                                    <td class="px-4 py-2">
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 product-select" name="Lines[@index].ProductId" onchange="updateLinePrice(this)">
                                             <option value="">Select Product</option>
                                             @foreach (var product in Model.Products)
                                             {
@@ -146,27 +146,27 @@
                                             }
                                         </select>
                                     </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm text-center qty-input"
+                                    <td class="px-4 py-2">
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center qty-input"
                                                name="Lines[@index].Quantity" value="@line.Quantity" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
                                     </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm text-end price-input"
+                                    <td class="px-4 py-2">
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input"
                                                name="Lines[@index].UnitPrice" value="@line.UnitPrice" min="0" step="0.01" onchange="calculateLineTotal(this)">
                                     </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm text-center discount-input"
+                                    <td class="px-4 py-2">
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center discount-input"
                                                name="Lines[@index].DiscountPercent" value="@line.DiscountPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
                                     </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm text-center tax-input"
+                                    <td class="px-4 py-2">
+                                        <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center tax-input"
                                                name="Lines[@index].TaxPercent" value="@line.TaxPercent" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
                                     </td>
-                                    <td class="text-end align-middle">
-                                        <span class="line-total fw-medium">$0.00</span>
+                                    <td class="px-4 py-2 text-right align-middle">
+                                        <span class="line-total font-medium">$0.00</span>
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+                                    <td class="px-4 py-2 text-center">
+                                        <button type="button" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-2" onclick="removeLine(this)">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -175,40 +175,40 @@
                             }
                         }
                     </tbody>
-                    <tfoot class="bg-light">
-                        <tr>
-                            <td colspan="5" class="text-end fw-medium">Subtotal:</td>
-                            <td class="text-end" id="subtotalDisplay">$0.00</td>
+                    <tfoot class="bg-gray-50">
+                        <tr class="border-b border-gray-200">
+                            <td colspan="5" class="px-4 py-2 text-right font-medium">Subtotal:</td>
+                            <td class="px-4 py-2 text-right" id="subtotalDisplay">$0.00</td>
                             <td></td>
                         </tr>
-                        <tr>
-                            <td colspan="5" class="text-end">Tax:</td>
-                            <td class="text-end" id="taxDisplay">$0.00</td>
+                        <tr class="border-b border-gray-200">
+                            <td colspan="5" class="px-4 py-2 text-right">Tax:</td>
+                            <td class="px-4 py-2 text-right" id="taxDisplay">$0.00</td>
                             <td></td>
                         </tr>
-                        <tr>
-                            <td colspan="4" class="text-end">Shipping:</td>
-                            <td>
-                                <input type="number" class="form-control form-control-sm text-end"
+                        <tr class="border-b border-gray-200">
+                            <td colspan="4" class="px-4 py-2 text-right">Shipping:</td>
+                            <td class="px-4 py-2">
+                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right"
                                        name="ShippingAmount" id="shippingAmount" value="@(Model.SalesOrder?.ShippingAmount ?? 0)"
                                        min="0" step="0.01" onchange="calculateTotals()">
                             </td>
-                            <td class="text-end" id="shippingDisplay">$0.00</td>
+                            <td class="px-4 py-2 text-right" id="shippingDisplay">$0.00</td>
                             <td></td>
                         </tr>
-                        <tr>
-                            <td colspan="4" class="text-end">Discount:</td>
-                            <td>
-                                <input type="number" class="form-control form-control-sm text-end"
+                        <tr class="border-b border-gray-200">
+                            <td colspan="4" class="px-4 py-2 text-right">Discount:</td>
+                            <td class="px-4 py-2">
+                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right"
                                        name="DiscountAmount" id="discountAmount" value="@(Model.SalesOrder?.DiscountAmount ?? 0)"
                                        min="0" step="0.01" onchange="calculateTotals()">
                             </td>
-                            <td class="text-end text-danger" id="discountDisplay">-$0.00</td>
+                            <td class="px-4 py-2 text-right text-red-600" id="discountDisplay">-$0.00</td>
                             <td></td>
                         </tr>
-                        <tr class="fw-bold">
-                            <td colspan="5" class="text-end">Total:</td>
-                            <td class="text-end" id="totalDisplay">$0.00</td>
+                        <tr class="font-bold">
+                            <td colspan="5" class="px-4 py-2 text-right">Total:</td>
+                            <td class="px-4 py-2 text-right" id="totalDisplay">$0.00</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -217,15 +217,15 @@
         </div>
 
         <!-- Notes -->
-        <div class="col-12 mt-3">
-            <label class="form-label">Notes</label>
-            <textarea class="form-control" name="Notes" rows="2">@Model.SalesOrder?.Notes</textarea>
+        <div class="col-span-12 mt-3">
+            <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+            <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.SalesOrder?.Notes</textarea>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0 mt-4">
-        <button type="button" class="btn btn-secondary" data-modal-hide="orderModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 -mx-4 -mb-4">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="orderModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
             @(Model.IsEdit ? "Update Order" : "Create Order")
         </button>
     </div>
@@ -245,34 +245,35 @@
         const tbody = document.getElementById('linesBody');
         const row = document.createElement('tr');
         row.setAttribute('data-index', lineIndex);
+        row.className = 'border-b border-gray-200';
         row.innerHTML = `
-            <td>
-                <select class="form-select form-select-sm product-select" name="Lines[${lineIndex}].ProductId" onchange="updateLinePrice(this)">
+            <td class="px-4 py-2">
+                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 product-select" name="Lines[${lineIndex}].ProductId" onchange="updateLinePrice(this)">
                     <option value="">Select Product</option>
                     ${products.map(p => `<option value="${p.id}" data-price="${p.price}" data-tax="${p.tax}">${p.name} (${p.sku})</option>`).join('')}
                 </select>
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-center qty-input"
+            <td class="px-4 py-2">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center qty-input"
                        name="Lines[${lineIndex}].Quantity" value="1" min="0.01" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-end price-input"
+            <td class="px-4 py-2">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right price-input"
                        name="Lines[${lineIndex}].UnitPrice" value="0" min="0" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-center discount-input"
+            <td class="px-4 py-2">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center discount-input"
                        name="Lines[${lineIndex}].DiscountPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td>
-                <input type="number" class="form-control form-control-sm text-center tax-input"
+            <td class="px-4 py-2">
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-center tax-input"
                        name="Lines[${lineIndex}].TaxPercent" value="0" min="0" max="100" step="0.01" onchange="calculateLineTotal(this)">
             </td>
-            <td class="text-end align-middle">
-                <span class="line-total fw-medium">$0.00</span>
+            <td class="px-4 py-2 text-right align-middle">
+                <span class="line-total font-medium">$0.00</span>
             </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+            <td class="px-4 py-2 text-center">
+                <button type="button" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-2" onclick="removeLine(this)">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>

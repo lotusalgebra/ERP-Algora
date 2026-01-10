@@ -7,22 +7,22 @@
         <input type="hidden" name="Id" value="@Model.Inspection.Id" />
     }
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 gap-3">
         <!-- Left Column -->
-        <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Inspection Information</h6>
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Inspection Information</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Inspection Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="InspectionDate"
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Inspection Date <span class="text-red-500">*</span></label>
+                        <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="InspectionDate"
                                value="@(Model.Inspection?.InspectionDate.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Inspection Type <span class="text-danger">*</span></label>
-                        <select class="form-select" name="InspectionType" required>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Inspection Type <span class="text-red-500">*</span></label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="InspectionType" required>
                             @foreach (var type in Enum.GetValues<InspectionType>())
                             {
                                 if (Model.Inspection?.InspectionType == type)
@@ -39,8 +39,8 @@
                     @if (Model.PendingGrns?.Any() == true || Model.SelectedGrn != null)
                     {
                         <div class="mb-3">
-                            <label class="form-label">Source: Goods Receipt Note</label>
-                            <select class="form-select" name="SourceDocumentId" id="grnSelect" onchange="loadGrnDetails(this.value)">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Source: Goods Receipt Note</label>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SourceDocumentId" id="grnSelect" onchange="loadGrnDetails(this.value)">
                                 <option value="">-- Select GRN --</option>
                                 @foreach (var grn in Model.PendingGrns ?? new List<Algora.Erp.Domain.Entities.Procurement.GoodsReceiptNote>())
                                 {
@@ -67,13 +67,13 @@
                     else
                     {
                         <div class="mb-3">
-                            <label class="form-label">Source Document Type</label>
-                            <input type="text" class="form-control" name="SourceDocumentType"
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Source Document Type</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SourceDocumentType"
                                    value="@Model.Inspection?.SourceDocumentType" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Source Document Number</label>
-                            <input type="text" class="form-control" name="SourceDocumentNumber"
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Source Document Number</label>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SourceDocumentNumber"
                                    value="@Model.Inspection?.SourceDocumentNumber" />
                         </div>
                     }
@@ -82,15 +82,15 @@
         </div>
 
         <!-- Right Column -->
-        <div class="col-md-6">
-            <div class="card mb-3">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Product & Location</h6>
+        <div class="md:col-span-6 col-span-12">
+            <div class="bg-white rounded-lg shadow-md mb-3">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Product & Location</h6>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <div class="mb-3">
-                        <label class="form-label">Product <span class="text-danger">*</span></label>
-                        <select class="form-select" name="ProductId" id="productSelect" required>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Product <span class="text-red-500">*</span></label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="ProductId" id="productSelect" required>
                             <option value="">-- Select Product --</option>
                             @foreach (var product in Model.Products)
                             {
@@ -106,8 +106,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Warehouse <span class="text-danger">*</span></label>
-                        <select class="form-select" name="WarehouseId" id="warehouseSelect" required>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Warehouse <span class="text-red-500">*</span></label>
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="WarehouseId" id="warehouseSelect" required>
                             <option value="">-- Select Warehouse --</option>
                             @foreach (var warehouse in Model.Warehouses)
                             {
@@ -124,15 +124,15 @@
                         </select>
                     </div>
                     <input type="hidden" name="SupplierId" id="supplierId" value="@Model.SelectedGrn?.SupplierId" />
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Total Quantity</label>
-                            <input type="number" class="form-control" name="TotalQuantity" step="0.01" min="0"
+                    <div class="grid grid-cols-12 gap-3">
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Total Quantity</label>
+                            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="TotalQuantity" step="0.01" min="0"
                                    value="@(Model.Inspection?.TotalQuantity ?? 0)" id="totalQuantity" />
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Sample Size</label>
-                            <input type="number" class="form-control" name="SampleSize" step="0.01" min="0"
+                        <div class="md:col-span-6 col-span-12">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Sample Size</label>
+                            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="SampleSize" step="0.01" min="0"
                                    value="@(Model.Inspection?.SampleSize ?? 0)" />
                         </div>
                     </div>
@@ -141,27 +141,27 @@
         </div>
 
         <!-- QC Parameters -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">Quality Check Parameters</h6>
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addParameter()">
-                        <i class="bi bi-plus-lg me-1"></i>Add Parameter
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                    <h6 class="text-sm font-medium text-gray-900 mb-0">Quality Check Parameters</h6>
+                    <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2" onclick="addParameter()">
+                        <i class="bi bi-plus-lg mr-1"></i>Add Parameter
                     </button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0" id="parametersTable">
-                            <thead class="bg-light">
+                <div class="p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500" id="parametersTable">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
-                                    <th style="width: 20%;">Parameter Name</th>
-                                    <th style="width: 15%;">Expected Value</th>
-                                    <th style="width: 10%;">Min</th>
-                                    <th style="width: 10%;">Max</th>
-                                    <th style="width: 15%;">Actual Value</th>
-                                    <th style="width: 12%;">Result</th>
-                                    <th style="width: 13%;">Remarks</th>
-                                    <th style="width: 5%;"></th>
+                                    <th scope="col" class="px-3 py-3" style="width: 20%;">Parameter Name</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 15%;">Expected Value</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 10%;">Min</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 10%;">Max</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 15%;">Actual Value</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 12%;">Result</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 13%;">Remarks</th>
+                                    <th scope="col" class="px-3 py-3" style="width: 5%;"></th>
                                 </tr>
                             </thead>
                             <tbody id="parametersBody">
@@ -170,29 +170,29 @@
                                     var idx = 0;
                                     foreach (var param in Model.Inspection.Parameters.OrderBy(p => p.SequenceNumber))
                                     {
-                                        <tr class="param-row">
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Parameters[@idx].ParameterName"
+                                        <tr class="param-row bg-white border-b">
+                                            <td class="px-3 py-3">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].ParameterName"
                                                        value="@param.ParameterName" required placeholder="e.g., Weight, Color" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Parameters[@idx].ExpectedValue"
+                                            <td class="px-3 py-3">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].ExpectedValue"
                                                        value="@param.ExpectedValue" placeholder="Expected" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm" name="Parameters[@idx].MinValue"
+                                            <td class="px-3 py-3">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].MinValue"
                                                        value="@param.MinValue" step="0.001" placeholder="Min" />
                                             </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm" name="Parameters[@idx].MaxValue"
+                                            <td class="px-3 py-3">
+                                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].MaxValue"
                                                        value="@param.MaxValue" step="0.001" placeholder="Max" />
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Parameters[@idx].ActualValue"
+                                            <td class="px-3 py-3">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].ActualValue"
                                                        value="@param.ActualValue" placeholder="Actual" />
                                             </td>
-                                            <td>
-                                                <select class="form-select form-select-sm" name="Parameters[@idx].Result">
+                                            <td class="px-3 py-3">
+                                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].Result">
                                                     @foreach (var result in Enum.GetValues<QCParameterResult>())
                                                     {
                                                         if (param.Result == result)
@@ -206,12 +206,12 @@
                                                     }
                                                 </select>
                                             </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm" name="Parameters[@idx].Remarks"
+                                            <td class="px-3 py-3">
+                                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[@idx].Remarks"
                                                        value="@param.Remarks" placeholder="Notes" />
                                             </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeParameter(this)">
+                                            <td class="px-3 py-3">
+                                                <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeParameter(this)">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </td>
@@ -222,41 +222,41 @@
                                 else
                                 {
                                     <!-- Default parameters for new inspection -->
-                                    <tr class="param-row">
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm" name="Parameters[0].ParameterName"
+                                    <tr class="param-row bg-white border-b">
+                                        <td class="px-3 py-3">
+                                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].ParameterName"
                                                    value="Visual Inspection" required placeholder="e.g., Weight, Color" />
                                         </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm" name="Parameters[0].ExpectedValue"
+                                        <td class="px-3 py-3">
+                                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].ExpectedValue"
                                                    value="No visible defects" placeholder="Expected" />
                                         </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm" name="Parameters[0].MinValue"
+                                        <td class="px-3 py-3">
+                                            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].MinValue"
                                                    step="0.001" placeholder="Min" />
                                         </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm" name="Parameters[0].MaxValue"
+                                        <td class="px-3 py-3">
+                                            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].MaxValue"
                                                    step="0.001" placeholder="Max" />
                                         </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm" name="Parameters[0].ActualValue"
+                                        <td class="px-3 py-3">
+                                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].ActualValue"
                                                    placeholder="Actual" />
                                         </td>
-                                        <td>
-                                            <select class="form-select form-select-sm" name="Parameters[0].Result">
+                                        <td class="px-3 py-3">
+                                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].Result">
                                                 @foreach (var result in Enum.GetValues<QCParameterResult>())
                                                 {
                                                     <option value="@result">@result</option>
                                                 }
                                             </select>
                                         </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm" name="Parameters[0].Remarks"
+                                        <td class="px-3 py-3">
+                                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[0].Remarks"
                                                    placeholder="Notes" />
                                         </td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeParameter(this)">
+                                        <td class="px-3 py-3">
+                                            <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeParameter(this)">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -270,18 +270,18 @@
         </div>
 
         <!-- Notes -->
-        <div class="col-12">
+        <div class="col-span-12">
             <div class="mb-3">
-                <label class="form-label">Notes</label>
-                <textarea class="form-control" name="Notes" rows="2">@Model.Inspection?.Notes</textarea>
+                <label class="block mb-2 text-sm font-medium text-gray-900">Notes</label>
+                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" name="Notes" rows="2">@Model.Inspection?.Notes</textarea>
             </div>
         </div>
     </div>
 
-    <div class="modal-footer px-0 pb-0">
-        <button type="button" class="btn btn-secondary" data-modal-hide="inspectionModal">Cancel</button>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-2"></i>@(Model.IsEdit ? "Update" : "Create") Inspection
+    <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 px-0 pb-0">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="inspectionModal">Cancel</button>
+        <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+            <i class="bi bi-check-lg mr-2"></i>@(Model.IsEdit ? "Update" : "Create") Inspection
         </button>
     </div>
 </form>
@@ -301,29 +301,29 @@
 
     function addParameter() {
         const html = `
-            <tr class="param-row">
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Parameters[${paramIndex}].ParameterName"
+            <tr class="param-row bg-white border-b">
+                <td class="px-3 py-3">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].ParameterName"
                            required placeholder="e.g., Weight, Color" />
                 </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Parameters[${paramIndex}].ExpectedValue"
+                <td class="px-3 py-3">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].ExpectedValue"
                            placeholder="Expected" />
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm" name="Parameters[${paramIndex}].MinValue"
+                <td class="px-3 py-3">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].MinValue"
                            step="0.001" placeholder="Min" />
                 </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm" name="Parameters[${paramIndex}].MaxValue"
+                <td class="px-3 py-3">
+                    <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].MaxValue"
                            step="0.001" placeholder="Max" />
                 </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Parameters[${paramIndex}].ActualValue"
+                <td class="px-3 py-3">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].ActualValue"
                            placeholder="Actual" />
                 </td>
-                <td>
-                    <select class="form-select form-select-sm" name="Parameters[${paramIndex}].Result">
+                <td class="px-3 py-3">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].Result">
                         <option value="Pending">Pending</option>
                         <option value="Pass">Pass</option>
                         <option value="Fail">Fail</option>
@@ -331,12 +331,12 @@
                         <option value="NotApplicable">N/A</option>
                     </select>
                 </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm" name="Parameters[${paramIndex}].Remarks"
+                <td class="px-3 py-3">
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" name="Parameters[${paramIndex}].Remarks"
                            placeholder="Notes" />
                 </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeParameter(this)">
+                <td class="px-3 py-3">
+                    <button type="button" class="text-red-600 border border-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs px-2 py-1.5" onclick="removeParameter(this)">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>

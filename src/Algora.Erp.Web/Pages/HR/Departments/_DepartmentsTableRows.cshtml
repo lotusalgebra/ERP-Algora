@@ -2,87 +2,88 @@
 
 @foreach (var dept in Model.Departments)
 {
-    <tr>
-        <td class="ps-4">
-            <div class="d-flex align-items-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3"
+    <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4">
+            <div class="flex items-center">
+                <div class="bg-primary-100 rounded-full flex items-center justify-center mr-3"
                      style="width: 40px; height: 40px;">
-                    <i class="bi bi-building text-primary"></i>
+                    <i class="bi bi-building text-primary-600"></i>
                 </div>
                 <div>
-                    <h6 class="mb-0">@dept.Name</h6>
+                    <h6 class="font-semibold text-gray-900 mb-0">@dept.Name</h6>
                     @if (!string.IsNullOrEmpty(dept.Description))
                     {
-                        <small class="text-muted">@(dept.Description.Length > 50 ? dept.Description.Substring(0, 50) + "..." : dept.Description)</small>
+                        <span class="text-sm text-gray-500">@(dept.Description.Length > 50 ? dept.Description.Substring(0, 50) + "..." : dept.Description)</span>
                     }
                 </div>
             </div>
         </td>
-        <td>
-            <span class="badge bg-secondary">@dept.Code</span>
+        <td class="px-6 py-4">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@dept.Code</span>
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (dept.Manager != null)
             {
                 <span>@dept.Manager.FirstName @dept.Manager.LastName</span>
             }
             else
             {
-                <span class="text-muted">Not assigned</span>
+                <span class="text-gray-500">Not assigned</span>
             }
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (dept.ParentDepartment != null)
             {
                 <span>@dept.ParentDepartment.Name</span>
             }
             else
             {
-                <span class="text-muted">-</span>
+                <span class="text-gray-500">-</span>
             }
         </td>
-        <td>
-            <span class="badge bg-info">@dept.Employees.Count</span>
+        <td class="px-6 py-4 text-center">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">@dept.Employees.Count</span>
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (dept.IsActive)
             {
-                <span class="badge bg-success">Active</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
             }
             else
             {
-                <span class="badge bg-secondary">Inactive</span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
             }
         </td>
-        <td class="text-end pe-4">
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light" id="dropdownDept@(dept.Id)" data-dropdown-toggle="dropdownMenuDept@(dept.Id)">
+        <td class="px-6 py-4 text-right">
+            <div class="relative inline-block">
+                <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownDept@(dept.Id)" data-dropdown-toggle="dropdownMenuDept@(dept.Id)" data-dropdown-placement="bottom-end">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuDept@(dept.Id)">
-                    <li>
-                        <a class="dropdown-item" href="#"
-                           hx-get="/HR/Departments?handler=EditForm&id=@dept.Id"
-                           hx-target="#formContainer"
-                           data-modal-target="departmentModal" data-modal-toggle="departmentModal">
-                            <i class="bi bi-pencil me-2"></i> Edit
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="/HR/Employees?departmentId=@dept.Id">
-                            <i class="bi bi-people me-2"></i> View Employees
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item text-danger" href="#"
+                <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuDept@(dept.Id)">
+                    <ul class="py-2 text-sm text-gray-700">
+                        <li>
+                            <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                               hx-get="/HR/Departments?handler=EditForm&id=@dept.Id"
+                               hx-target="#formContainer"
+                               data-modal-target="departmentModal" data-modal-toggle="departmentModal">
+                                <i class="bi bi-pencil mr-2"></i> Edit
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center px-4 py-2 hover:bg-gray-100" href="/HR/Employees?departmentId=@dept.Id">
+                                <i class="bi bi-people mr-2"></i> View Employees
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="py-2">
+                        <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
                            hx-delete="/HR/Departments?handler=&id=@dept.Id"
                            hx-target="#tableContent"
                            hx-confirm="Are you sure you want to delete this department?">
-                            <i class="bi bi-trash me-2"></i> Delete
+                            <i class="bi bi-trash mr-2"></i> Delete
                         </a>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
         </td>
     </tr>
@@ -91,9 +92,9 @@
 @if (!Model.Departments.Any())
 {
     <tr>
-        <td colspan="7" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-building fs-1 d-block mb-2"></i>
+        <td colspan="7" class="text-center py-12">
+            <div class="text-gray-500">
+                <i class="bi bi-building text-4xl block mb-2"></i>
                 <p class="mb-0">No departments found</p>
             </div>
         </td>
@@ -107,13 +108,18 @@
     var paginationHtml = '';
     @if (Model.TotalPages > 1)
     {
+        <text>
+        paginationHtml = '<ul class="inline-flex -space-x-px text-sm">';
+        </text>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            var activeClass = i == Model.Page ? "active" : "";
+            var activeClass = i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
             <text>
-            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/HR/Departments?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter">@i</a></li>';
+            paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight @activeClass" href="#" hx-get="/HR/Departments?handler=Table&page=@i" hx-target="#tableContent" hx-include="#searchInput,#statusFilter">@i</a></li>';
             </text>
         }
+        @:paginationHtml += '</ul>';
     }
-    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+    document.querySelector('#paginationNav').innerHTML = paginationHtml;
+    htmx.process(document.getElementById('paginationNav'));
 </script>

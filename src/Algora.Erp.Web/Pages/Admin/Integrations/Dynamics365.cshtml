@@ -4,115 +4,124 @@
     ViewData["Title"] = "Dynamics 365 Integration";
 }
 
-<div class="container-fluid py-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/Admin/Integrations">Integrations</a></li>
-            <li class="breadcrumb-item active">Dynamics 365</li>
+<div class="space-y-6">
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+            <li><a href="/Admin/Integrations" class="hover:text-primary-600">Integrations</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium">Dynamics 365</li>
         </ol>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h4 class="mb-1">Microsoft Dynamics 365 Integration</h4>
-            <p class="text-muted mb-0">Configure your Dynamics 365 connection settings</p>
+            <h1 class="text-2xl font-bold text-gray-900">Microsoft Dynamics 365 Integration</h1>
+            <p class="text-gray-500 mt-1">Configure your Dynamics 365 connection settings</p>
         </div>
         @if (Model.IsConnected)
         {
-            <span class="badge bg-success fs-6">Connected</span>
+            <span class="text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
         }
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="flex items-center p-4 text-emerald-800 rounded-lg bg-emerald-50" role="alert">
+            <i class="bi bi-check-circle mr-2"></i>@TempData["Success"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-emerald-50 text-emerald-500 rounded-lg p-1.5 hover:bg-emerald-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+        <div class="flex items-center p-4 text-red-800 rounded-lg bg-red-50" role="alert">
+            <i class="bi bi-exclamation-circle mr-2"></i>@TempData["Error"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     }
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Connection Settings</h5>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h5 class="text-lg font-semibold text-gray-900">Connection Settings</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <form method="post">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Tenant ID</label>
-                                <input type="text" class="form-control" asp-for="TenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
-                                <small class="text-muted">Your Azure AD Tenant ID</small>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Tenant ID</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="TenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                <small class="text-gray-500">Your Azure AD Tenant ID</small>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Client ID (Application ID)</label>
-                                <input type="text" class="form-control" asp-for="ClientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
-                                <small class="text-muted">From your Azure AD App Registration</small>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Client ID (Application ID)</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="ClientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                <small class="text-gray-500">From your Azure AD App Registration</small>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Client Secret</label>
-                                <input type="password" class="form-control" asp-for="ClientSecret" placeholder="Enter your Client Secret">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Client Secret</label>
+                                <input type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="ClientSecret" placeholder="Enter your Client Secret">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Instance URL</label>
-                                <input type="url" class="form-control" asp-for="InstanceUrl" placeholder="https://yourorg.crm.dynamics.com">
-                                <small class="text-muted">Your Dynamics 365 environment URL</small>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Instance URL</label>
+                                <input type="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="InstanceUrl" placeholder="https://yourorg.crm.dynamics.com">
+                                <small class="text-gray-500">Your Dynamics 365 environment URL</small>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Sync Interval (minutes)</label>
-                                <input type="number" class="form-control" asp-for="SyncIntervalMinutes" min="5" max="1440">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Sync Interval (minutes)</label>
+                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="SyncIntervalMinutes" min="5" max="1440">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">API Version</label>
-                                <input type="text" class="form-control" asp-for="ApiVersion" readonly>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <h6 class="mb-3">Sync Options</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" asp-for="SyncContacts" id="syncContacts">
-                                    <label class="form-check-label" for="syncContacts">Sync Contacts</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" asp-for="SyncLeads" id="syncLeads">
-                                    <label class="form-check-label" for="syncLeads">Sync Leads</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" asp-for="SyncOpportunities" id="syncOpportunities">
-                                    <label class="form-check-label" for="syncOpportunities">Sync Opportunities</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" asp-for="SyncAccounts" id="syncAccounts">
-                                    <label class="form-check-label" for="syncAccounts">Sync Accounts</label>
-                                </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">API Version</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" asp-for="ApiVersion" readonly>
                             </div>
                         </div>
 
-                        <div class="mt-4 d-flex gap-2">
-                            <button type="submit" class="btn btn-info">Save Settings</button>
-                            <button type="submit" asp-page-handler="Test" class="btn btn-outline-secondary">Test Connection</button>
+                        <hr class="my-6 border-gray-200" />
+
+                        <h6 class="text-sm font-medium text-gray-500 mb-3">Sync Options</h6>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncContacts" id="syncContacts">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Contacts</span>
+                                </label>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncLeads" id="syncLeads">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Leads</span>
+                                </label>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncOpportunities" id="syncOpportunities">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Opportunities</span>
+                                </label>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncAccounts" id="syncAccounts">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Accounts</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <button type="submit" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5">Save Settings</button>
+                            <button type="submit" asp-page-handler="Test" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">Test Connection</button>
                             @if (Model.IsConnected)
                             {
-                                <button type="submit" asp-page-handler="Disconnect" class="btn btn-outline-danger ms-auto">Disconnect</button>
+                                <button type="submit" asp-page-handler="Disconnect" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 ml-auto">Disconnect</button>
                             }
                         </div>
                     </form>
@@ -120,24 +129,24 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card border mb-4">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0">Setup Instructions</h6>
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-900">Setup Instructions</h6>
                 </div>
-                <div class="card-body">
-                    <ol class="mb-0 ps-3">
-                        <li class="mb-2">Go to Azure Portal</li>
-                        <li class="mb-2">Navigate to Azure Active Directory</li>
-                        <li class="mb-2">Register a new application</li>
-                        <li class="mb-2">Add API permissions:
-                            <ul class="mt-1">
-                                <li>Dynamics CRM → user_impersonation</li>
+                <div class="p-6">
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                        <li>Go to Azure Portal</li>
+                        <li>Navigate to Azure Active Directory</li>
+                        <li>Register a new application</li>
+                        <li>Add API permissions:
+                            <ul class="list-disc list-inside ml-4 mt-1 text-gray-500">
+                                <li>Dynamics CRM - user_impersonation</li>
                             </ul>
                         </li>
-                        <li class="mb-2">Create a client secret</li>
-                        <li class="mb-2">Grant admin consent</li>
-                        <li class="mb-2">In Dynamics 365, create an Application User</li>
+                        <li>Create a client secret</li>
+                        <li>Grant admin consent</li>
+                        <li>In Dynamics 365, create an Application User</li>
                         <li>Assign security roles to the app user</li>
                     </ol>
                 </div>
@@ -145,18 +154,18 @@
 
             @if (Model.IsConnected)
             {
-                <div class="card border">
-                    <div class="card-header bg-white">
-                        <h6 class="mb-0">Quick Actions</h6>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h6 class="font-semibold text-gray-900">Quick Actions</h6>
                     </div>
-                    <div class="card-body">
+                    <div class="p-6">
                         <form method="post" asp-page-handler="Sync">
-                            <button type="submit" class="btn btn-info w-100 mb-2">
-                                <i class="bi bi-arrow-repeat me-2"></i>Sync Now
+                            <button type="submit" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 w-full mb-2">
+                                <i class="bi bi-arrow-repeat mr-2"></i>Sync Now
                             </button>
                         </form>
-                        <a href="/Admin/Integrations/SyncHistory?crm=Dynamics365" class="btn btn-outline-secondary w-100">
-                            <i class="bi bi-clock-history me-2"></i>View Sync History
+                        <a href="/Admin/Integrations/SyncHistory?crm=Dynamics365" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 w-full inline-flex justify-center items-center">
+                            <i class="bi bi-clock-history mr-2"></i>View Sync History
                         </a>
                     </div>
                 </div>

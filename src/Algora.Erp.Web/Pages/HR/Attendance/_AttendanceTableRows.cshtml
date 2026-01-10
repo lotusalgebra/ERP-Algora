@@ -3,115 +3,116 @@
 
 @foreach (var att in Model.Attendances)
 {
-    <tr>
-        <td class="ps-4">
-            <div class="d-flex align-items-center">
-                <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3"
-                     style="width: 40px; height: 40px; font-size: 14px;">
+    <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4">
+            <div class="flex items-center">
+                <div class="bg-primary-600 rounded-full text-white flex items-center justify-center mr-3 text-sm"
+                     style="width: 40px; height: 40px;">
                     @att.Employee.FirstName[0]@att.Employee.LastName[0]
                 </div>
                 <div>
-                    <h6 class="mb-0">@att.Employee.FirstName @att.Employee.LastName</h6>
-                    <small class="text-muted">@att.Employee.EmployeeCode · @(att.Employee.Department?.Name ?? "No Dept")</small>
+                    <h6 class="font-semibold text-gray-900 mb-0">@att.Employee.FirstName @att.Employee.LastName</h6>
+                    <span class="text-sm text-gray-500">@att.Employee.EmployeeCode · @(att.Employee.Department?.Name ?? "No Dept")</span>
                 </div>
             </div>
         </td>
-        <td>@att.Date.ToString("MMM dd, yyyy")</td>
-        <td>
+        <td class="px-6 py-4">@att.Date.ToString("MMM dd, yyyy")</td>
+        <td class="px-6 py-4">
             @if (att.CheckInTime.HasValue)
             {
                 <span>@att.CheckInTime.Value.ToString(@"hh\:mm")</span>
                 @if (att.IsLate)
                 {
-                    <span class="badge bg-warning ms-1">Late</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 ml-1">Late</span>
                 }
             }
             else
             {
-                <span class="text-muted">-</span>
+                <span class="text-gray-500">-</span>
             }
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (att.CheckOutTime.HasValue)
             {
                 <span>@att.CheckOutTime.Value.ToString(@"hh\:mm")</span>
                 @if (att.IsEarlyDeparture)
                 {
-                    <span class="badge bg-warning ms-1">Early</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 ml-1">Early</span>
                 }
             }
             else
             {
-                <span class="text-muted">-</span>
+                <span class="text-gray-500">-</span>
             }
         </td>
-        <td>
+        <td class="px-6 py-4">
             @if (att.TotalWorkHours.HasValue)
             {
                 <span>@att.TotalWorkHours.Value.ToString(@"hh\:mm")</span>
                 @if (att.OvertimeHours.HasValue && att.OvertimeHours.Value.TotalMinutes > 0)
                 {
-                    <span class="badge bg-info ms-1">+@att.OvertimeHours.Value.ToString(@"hh\:mm") OT</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 ml-1">+@att.OvertimeHours.Value.ToString(@"hh\:mm") OT</span>
                 }
             }
             else
             {
-                <span class="text-muted">-</span>
+                <span class="text-gray-500">-</span>
             }
         </td>
-        <td>
+        <td class="px-6 py-4">
             @switch (att.Status)
             {
                 case AttendanceStatus.Present:
-                    <span class="badge bg-success">Present</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Present</span>
                     break;
                 case AttendanceStatus.Absent:
-                    <span class="badge bg-danger">Absent</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Absent</span>
                     break;
                 case AttendanceStatus.Late:
-                    <span class="badge bg-warning text-dark">Late</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Late</span>
                     break;
                 case AttendanceStatus.HalfDay:
-                    <span class="badge bg-info">Half Day</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">Half Day</span>
                     break;
                 case AttendanceStatus.OnLeave:
-                    <span class="badge bg-secondary">On Leave</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">On Leave</span>
                     break;
                 case AttendanceStatus.Holiday:
-                    <span class="badge bg-primary">Holiday</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800">Holiday</span>
                     break;
                 case AttendanceStatus.Weekend:
-                    <span class="badge bg-secondary">Weekend</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Weekend</span>
                     break;
                 case AttendanceStatus.WorkFromHome:
-                    <span class="badge bg-info">WFH</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">WFH</span>
                     break;
             }
         </td>
-        <td class="text-end pe-4">
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light" id="dropdownAtt@(att.Id)" data-dropdown-toggle="dropdownMenuAtt@(att.Id)">
+        <td class="px-6 py-4 text-right">
+            <div class="relative inline-block">
+                <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownAtt@(att.Id)" data-dropdown-toggle="dropdownMenuAtt@(att.Id)" data-dropdown-placement="bottom-end">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuAtt@(att.Id)">
-                    <li>
-                        <a class="dropdown-item" href="#"
-                           hx-get="/HR/Attendance?handler=EditForm&id=@att.Id"
-                           hx-target="#formContainer"
-                           data-modal-target="attendanceModal" data-modal-toggle="attendanceModal">
-                            <i class="bi bi-pencil me-2"></i> Edit
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item text-danger" href="#"
+                <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuAtt@(att.Id)">
+                    <ul class="py-2 text-sm text-gray-700">
+                        <li>
+                            <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                               hx-get="/HR/Attendance?handler=EditForm&id=@att.Id"
+                               hx-target="#formContainer"
+                               data-modal-target="attendanceModal" data-modal-toggle="attendanceModal">
+                                <i class="bi bi-pencil mr-2"></i> Edit
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="py-2">
+                        <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
                            hx-delete="/HR/Attendance?handler=&id=@att.Id"
                            hx-target="#tableContent"
                            hx-confirm="Are you sure you want to delete this attendance record?">
-                            <i class="bi bi-trash me-2"></i> Delete
+                            <i class="bi bi-trash mr-2"></i> Delete
                         </a>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
         </td>
     </tr>
@@ -120,9 +121,9 @@
 @if (!Model.Attendances.Any())
 {
     <tr>
-        <td colspan="7" class="text-center py-5">
-            <div class="text-muted">
-                <i class="bi bi-calendar-check fs-1 d-block mb-2"></i>
+        <td colspan="7" class="text-center py-12">
+            <div class="text-gray-500">
+                <i class="bi bi-calendar-check text-4xl block mb-2"></i>
                 <p class="mb-0">No attendance records found for this date</p>
             </div>
         </td>
@@ -136,13 +137,18 @@
     var paginationHtml = '';
     @if (Model.TotalPages > 1)
     {
+        <text>
+        paginationHtml = '<ul class="inline-flex -space-x-px text-sm">';
+        </text>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            var activeClass = i == Model.Page ? "active" : "";
+            var activeClass = i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
             <text>
-            paginationHtml += '<li class="page-item @activeClass"><a class="page-link" href="#" hx-get="/HR/Attendance?handler=Table&page=@i&dateFilter=@Model.DateFilter" hx-target="#tableContent" hx-include="#searchInput,#statusFilter">@i</a></li>';
+            paginationHtml += '<li><a class="flex items-center justify-center px-3 h-8 leading-tight @activeClass" href="#" hx-get="/HR/Attendance?handler=Table&page=@i&dateFilter=@Model.DateFilter" hx-target="#tableContent" hx-include="#searchInput,#statusFilter">@i</a></li>';
             </text>
         }
+        @:paginationHtml += '</ul>';
     }
-    document.querySelector('#paginationNav .pagination').innerHTML = paginationHtml;
+    document.querySelector('#paginationNav').innerHTML = paginationHtml;
+    htmx.process(document.getElementById('paginationNav'));
 </script>

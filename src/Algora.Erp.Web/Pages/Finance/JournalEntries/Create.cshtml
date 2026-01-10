@@ -5,17 +5,34 @@
     ViewData["Title"] = "New Journal Entry";
 }
 
-<div class="container-fluid">
+<div class="w-full">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="h3 mb-1">New Journal Entry</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/JournalEntries">Journal Entries</a></li>
-                    <li class="breadcrumb-item active">New</li>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">New Journal Entry</h1>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="/" class="text-sm text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-500">Dashboard</a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            <a href="/Finance" class="text-sm text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-500">Finance</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            <a href="/Finance/JournalEntries" class="text-sm text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-500">Journal Entries</a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mx-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">New</span>
+                        </div>
+                    </li>
                 </ol>
             </nav>
         </div>
@@ -25,49 +42,56 @@
         <!-- Validation Summary -->
         @if (!ViewData.ModelState.IsValid)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <span>@error.ErrorMessage</span><br />
-                }
-                <button type="button" class="btn-close" data-dismiss-target="[role='alert']" aria-label="Close"></button>
+            <div class="flex items-center p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+                <i class="bi bi-exclamation-triangle mr-2"></i>
+                <div class="flex-1">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <span>@error.ErrorMessage</span><br />
+                    }
+                </div>
+                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" data-dismiss-target="[role='alert']" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
             </div>
         }
 
-        <div class="row g-4">
+        <div class="grid grid-cols-12 gap-6">
             <!-- Entry Header -->
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Entry Details</h5>
+            <div class="col-span-12 lg:col-span-8">
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-semibold text-gray-900 dark:text-white"><i class="bi bi-info-circle mr-2"></i>Entry Details</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Entry Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" asp-for="Input.EntryDate" required />
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Entry Date <span class="text-red-500">*</span></label>
+                                <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" asp-for="Input.EntryDate" required />
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Entry Type <span class="text-danger">*</span></label>
-                                <select class="form-select" asp-for="Input.EntryType" asp-items="Model.EntryTypes"></select>
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Entry Type <span class="text-red-500">*</span></label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" asp-for="Input.EntryType" asp-items="Model.EntryTypes"></select>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Reference</label>
-                                <input type="text" class="form-control" asp-for="Input.Reference" placeholder="e.g., INV-001, PO-123" />
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reference</label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" asp-for="Input.Reference" placeholder="e.g., INV-001, PO-123" />
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Description <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" asp-for="Input.Description" placeholder="Brief description of this entry" required />
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description <span class="text-red-500">*</span></label>
+                                <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" asp-for="Input.Description" placeholder="Brief description of this entry" required />
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Notes</label>
-                                <textarea class="form-control" asp-for="Input.Notes" rows="2" placeholder="Additional notes (optional)"></textarea>
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Notes</label>
+                                <textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" asp-for="Input.Notes" rows="2" placeholder="Additional notes (optional)"></textarea>
                             </div>
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" asp-for="Input.IsAdjusting" />
-                                    <label class="form-check-label" asp-for="Input.IsAdjusting">
+                            <div class="col-span-12">
+                                <div class="flex items-center">
+                                    <input class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="checkbox" asp-for="Input.IsAdjusting" />
+                                    <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" asp-for="Input.IsAdjusting">
                                         This is an adjusting entry
                                     </label>
                                 </div>
@@ -78,44 +102,44 @@
             </div>
 
             <!-- Summary Card -->
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Summary</h5>
+            <div class="col-span-12 lg:col-span-4">
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-semibold text-gray-900 dark:text-white"><i class="bi bi-calculator mr-2"></i>Summary</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Total Debit:</span>
-                            <span class="fw-bold text-success" id="totalDebit">$0.00</span>
+                    <div class="p-6">
+                        <div class="flex justify-between mb-3">
+                            <span class="text-gray-500 dark:text-gray-400">Total Debit:</span>
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400" id="totalDebit">$0.00</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Total Credit:</span>
-                            <span class="fw-bold text-danger" id="totalCredit">$0.00</span>
+                        <div class="flex justify-between mb-3">
+                            <span class="text-gray-500 dark:text-gray-400">Total Credit:</span>
+                            <span class="font-bold text-red-600 dark:text-red-400" id="totalCredit">$0.00</span>
                         </div>
-                        <hr />
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">Difference:</span>
-                            <span class="fw-bold" id="difference">$0.00</span>
+                        <hr class="border-gray-200 dark:border-gray-700" />
+                        <div class="flex justify-between mt-3">
+                            <span class="text-gray-500 dark:text-gray-400">Difference:</span>
+                            <span class="font-bold" id="difference">$0.00</span>
                         </div>
-                        <div id="balanceStatus" class="mt-3 text-center">
-                            <span class="badge bg-warning text-dark">
-                                <i class="bi bi-exclamation-triangle me-1"></i>Entry not balanced
+                        <div id="balanceStatus" class="mt-4 text-center">
+                            <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                                <i class="bi bi-exclamation-triangle mr-1"></i>Entry not balanced
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm mt-3">
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-outline-primary" name="Input.SaveAsDraft" value="true">
-                                <i class="bi bi-save me-2"></i>Save as Draft
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mt-4">
+                    <div class="p-6">
+                        <div class="flex flex-col gap-3">
+                            <button type="submit" class="w-full text-primary-700 hover:text-white border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-primary-500 dark:text-primary-500 dark:hover:text-white dark:hover:bg-primary-600 dark:focus:ring-primary-800" name="Input.SaveAsDraft" value="true">
+                                <i class="bi bi-save mr-2"></i>Save as Draft
                             </button>
-                            <button type="submit" class="btn btn-primary" name="Input.SaveAsDraft" value="false" id="submitBtn">
-                                <i class="bi bi-check-lg me-2"></i>Submit for Approval
+                            <button type="submit" class="w-full text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" name="Input.SaveAsDraft" value="false" id="submitBtn">
+                                <i class="bi bi-check-lg mr-2"></i>Submit for Approval
                             </button>
-                            <a href="/Finance/JournalEntries" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            <a href="/Finance/JournalEntries" class="w-full text-gray-700 hover:text-white border border-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-500 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700">
+                                <i class="bi bi-x-lg mr-2"></i>Cancel
                             </a>
                         </div>
                     </div>
@@ -124,87 +148,85 @@
         </div>
 
         <!-- Line Items -->
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Line Items</h5>
-                <button type="button" class="btn btn-sm btn-primary" id="addLineBtn">
-                    <i class="bi bi-plus-lg me-1"></i>Add Line
+        <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mt-6">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h5 class="text-lg font-semibold text-gray-900 dark:text-white"><i class="bi bi-list-ul mr-2"></i>Line Items</h5>
+                <button type="button" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" id="addLineBtn">
+                    <i class="bi bi-plus-lg mr-1"></i>Add Line
                 </button>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th style="width: 40px;">#</th>
-                                <th style="width: 35%;">Account <span class="text-danger">*</span></th>
-                                <th>Description</th>
-                                <th style="width: 150px;" class="text-end">Debit</th>
-                                <th style="width: 150px;" class="text-end">Credit</th>
-                                <th style="width: 50px;"></th>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-4 py-3" style="width: 40px;">#</th>
+                            <th scope="col" class="px-4 py-3" style="width: 35%;">Account <span class="text-red-500">*</span></th>
+                            <th scope="col" class="px-4 py-3">Description</th>
+                            <th scope="col" class="px-4 py-3 text-right" style="width: 150px;">Debit</th>
+                            <th scope="col" class="px-4 py-3 text-right" style="width: 150px;">Credit</th>
+                            <th scope="col" class="px-4 py-3" style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="linesContainer">
+                        @for (int i = 0; i < Model.Input.Lines.Count; i++)
+                        {
+                            <tr class="line-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" data-index="@i">
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 line-number">@(i + 1)</td>
+                                <td class="px-4 py-3">
+                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 account-select"
+                                            name="Input.Lines[@i].AccountId">
+                                        <option value="">-- Select Account --</option>
+                                        @foreach (var group in Model.Accounts.GroupBy(a => a.Group?.Name))
+                                        {
+                                            <optgroup label="@group.Key">
+                                                @foreach (var account in group)
+                                                {
+                                                    <option value="@account.Value"
+                                                            selected="@(account.Value == Model.Input.Lines[i].AccountId.ToString())">
+                                                        @account.Text
+                                                    </option>
+                                                }
+                                            </optgroup>
+                                        }
+                                    </select>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                           name="Input.Lines[@i].Description"
+                                           value="@Model.Input.Lines[i].Description"
+                                           placeholder="Line description" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <input type="number" step="0.01" min="0"
+                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 debit-input"
+                                           name="Input.Lines[@i].DebitAmount"
+                                           value="@(Model.Input.Lines[i].DebitAmount > 0 ? Model.Input.Lines[i].DebitAmount : "")"
+                                           placeholder="0.00" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <input type="number" step="0.01" min="0"
+                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 credit-input"
+                                           name="Input.Lines[@i].CreditAmount"
+                                           value="@(Model.Input.Lines[i].CreditAmount > 0 ? Model.Input.Lines[i].CreditAmount : "")"
+                                           placeholder="0.00" />
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" class="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 remove-line-btn" title="Remove line">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody id="linesContainer">
-                            @for (int i = 0; i < Model.Input.Lines.Count; i++)
-                            {
-                                <tr class="line-row" data-index="@i">
-                                    <td class="text-muted line-number">@(i + 1)</td>
-                                    <td>
-                                        <select class="form-select form-select-sm account-select"
-                                                name="Input.Lines[@i].AccountId">
-                                            <option value="">-- Select Account --</option>
-                                            @foreach (var group in Model.Accounts.GroupBy(a => a.Group?.Name))
-                                            {
-                                                <optgroup label="@group.Key">
-                                                    @foreach (var account in group)
-                                                    {
-                                                        <option value="@account.Value"
-                                                                selected="@(account.Value == Model.Input.Lines[i].AccountId.ToString())">
-                                                            @account.Text
-                                                        </option>
-                                                    }
-                                                </optgroup>
-                                            }
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                               name="Input.Lines[@i].Description"
-                                               value="@Model.Input.Lines[i].Description"
-                                               placeholder="Line description" />
-                                    </td>
-                                    <td>
-                                        <input type="number" step="0.01" min="0"
-                                               class="form-control form-control-sm text-end debit-input"
-                                               name="Input.Lines[@i].DebitAmount"
-                                               value="@(Model.Input.Lines[i].DebitAmount > 0 ? Model.Input.Lines[i].DebitAmount : "")"
-                                               placeholder="0.00" />
-                                    </td>
-                                    <td>
-                                        <input type="number" step="0.01" min="0"
-                                               class="form-control form-control-sm text-end credit-input"
-                                               name="Input.Lines[@i].CreditAmount"
-                                               value="@(Model.Input.Lines[i].CreditAmount > 0 ? Model.Input.Lines[i].CreditAmount : "")"
-                                               placeholder="0.00" />
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-line-btn" title="Remove line">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                        <tfoot class="bg-light">
-                            <tr>
-                                <td colspan="3" class="text-end fw-bold">Totals:</td>
-                                <td class="text-end fw-bold text-success" id="footerDebit">$0.00</td>
-                                <td class="text-end fw-bold text-danger" id="footerCredit">$0.00</td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                        }
+                    </tbody>
+                    <tfoot class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <td colspan="3" class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">Totals:</td>
+                            <td class="px-4 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400" id="footerDebit">$0.00</td>
+                            <td class="px-4 py-3 text-right font-bold text-red-600 dark:text-red-400" id="footerCredit">$0.00</td>
+                            <td class="px-4 py-3"></td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </form>
@@ -212,10 +234,10 @@
 
 <!-- Line Template (hidden) -->
 <template id="lineTemplate">
-    <tr class="line-row" data-index="__INDEX__">
-        <td class="text-muted line-number">__LINE_NUM__</td>
-        <td>
-            <select class="form-select form-select-sm account-select"
+    <tr class="line-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" data-index="__INDEX__">
+        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 line-number">__LINE_NUM__</td>
+        <td class="px-4 py-3">
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 account-select"
                     name="Input.Lines[__INDEX__].AccountId">
                 <option value="">-- Select Account --</option>
                 @foreach (var group in Model.Accounts.GroupBy(a => a.Group?.Name))
@@ -229,25 +251,25 @@
                 }
             </select>
         </td>
-        <td>
-            <input type="text" class="form-control form-control-sm"
+        <td class="px-4 py-3">
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                    name="Input.Lines[__INDEX__].Description"
                    placeholder="Line description" />
         </td>
-        <td>
+        <td class="px-4 py-3">
             <input type="number" step="0.01" min="0"
-                   class="form-control form-control-sm text-end debit-input"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 debit-input"
                    name="Input.Lines[__INDEX__].DebitAmount"
                    placeholder="0.00" />
         </td>
-        <td>
+        <td class="px-4 py-3">
             <input type="number" step="0.01" min="0"
-                   class="form-control form-control-sm text-end credit-input"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 text-right dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 credit-input"
                    name="Input.Lines[__INDEX__].CreditAmount"
                    placeholder="0.00" />
         </td>
-        <td class="text-center">
-            <button type="button" class="btn btn-sm btn-outline-danger remove-line-btn" title="Remove line">
+        <td class="px-4 py-3 text-center">
+            <button type="button" class="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 remove-line-btn" title="Remove line">
                 <i class="bi bi-trash"></i>
             </button>
         </td>
@@ -302,13 +324,13 @@
 
                 const balanceStatus = document.getElementById('balanceStatus');
                 if (difference === 0 && totalDebit > 0) {
-                    diffElement.classList.remove('text-danger');
-                    diffElement.classList.add('text-success');
-                    balanceStatus.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Entry is balanced</span>';
+                    diffElement.classList.remove('text-red-600', 'dark:text-red-400');
+                    diffElement.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                    balanceStatus.innerHTML = '<span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"><i class="bi bi-check-circle mr-1"></i>Entry is balanced</span>';
                 } else {
-                    diffElement.classList.remove('text-success');
-                    diffElement.classList.add('text-danger');
-                    balanceStatus.innerHTML = '<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Entry not balanced</span>';
+                    diffElement.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+                    diffElement.classList.add('text-red-600', 'dark:text-red-400');
+                    balanceStatus.innerHTML = '<span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300"><i class="bi bi-exclamation-triangle mr-1"></i>Entry not balanced</span>';
                 }
             }
 

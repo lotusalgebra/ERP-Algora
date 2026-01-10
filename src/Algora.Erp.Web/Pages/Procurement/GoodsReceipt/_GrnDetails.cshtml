@@ -4,74 +4,74 @@
 @{
     var statusClass = Model.Status switch
     {
-        GoodsReceiptStatus.Draft => "bg-secondary",
-        GoodsReceiptStatus.Pending => "bg-info",
-        GoodsReceiptStatus.QCPending => "bg-warning",
-        GoodsReceiptStatus.QCCompleted => "bg-primary",
-        GoodsReceiptStatus.Accepted => "bg-success",
-        GoodsReceiptStatus.PartiallyAccepted => "bg-warning",
-        GoodsReceiptStatus.Rejected => "bg-danger",
-        GoodsReceiptStatus.Cancelled => "bg-dark",
-        _ => "bg-secondary"
+        GoodsReceiptStatus.Draft => "bg-gray-100 text-gray-800",
+        GoodsReceiptStatus.Pending => "bg-blue-100 text-blue-800",
+        GoodsReceiptStatus.QCPending => "bg-amber-100 text-amber-800",
+        GoodsReceiptStatus.QCCompleted => "bg-primary-100 text-primary-800",
+        GoodsReceiptStatus.Accepted => "bg-emerald-100 text-emerald-800",
+        GoodsReceiptStatus.PartiallyAccepted => "bg-amber-100 text-amber-800",
+        GoodsReceiptStatus.Rejected => "bg-red-100 text-red-800",
+        GoodsReceiptStatus.Cancelled => "bg-gray-800 text-white",
+        _ => "bg-gray-100 text-gray-800"
     };
 }
 
-<div class="row g-4">
+<div class="grid grid-cols-12 gap-4">
     <!-- Header Info -->
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-start">
+    <div class="col-span-12">
+        <div class="flex justify-between items-start">
             <div>
-                <h5 class="mb-1">@Model.GrnNumber</h5>
-                <p class="text-muted mb-0">@Model.SupplierName</p>
+                <h5 class="text-xl font-semibold text-gray-900 mb-1">@Model.GrnNumber</h5>
+                <p class="text-gray-500 mb-0">@Model.SupplierName</p>
             </div>
-            <span class="badge @statusClass fs-6">@Model.Status</span>
+            <span class="text-sm font-medium px-3 py-1 rounded-full @statusClass">@Model.Status</span>
         </div>
     </div>
 
     <!-- Receipt Details -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Receipt Information</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Receipt Information</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
+            <div class="p-6">
+                <table class="w-full text-sm">
                     <tr>
-                        <td class="text-muted" style="width: 40%;">GRN Date:</td>
-                        <td class="fw-medium">@Model.GrnDate.ToString("dd MMM yyyy")</td>
+                        <td class="text-gray-500 py-1" style="width: 40%;">GRN Date:</td>
+                        <td class="font-medium text-gray-900 py-1">@Model.GrnDate.ToString("dd MMM yyyy")</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">PO Number:</td>
-                        <td class="fw-medium">@(Model.PurchaseOrderNumber ?? "-")</td>
+                        <td class="text-gray-500 py-1">PO Number:</td>
+                        <td class="font-medium text-gray-900 py-1">@(Model.PurchaseOrderNumber ?? "-")</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Supplier Invoice:</td>
-                        <td class="fw-medium">@(Model.SupplierInvoiceNumber ?? "-")</td>
+                        <td class="text-gray-500 py-1">Supplier Invoice:</td>
+                        <td class="font-medium text-gray-900 py-1">@(Model.SupplierInvoiceNumber ?? "-")</td>
                     </tr>
                     @if (Model.SupplierInvoiceDate.HasValue)
                     {
                         <tr>
-                            <td class="text-muted">Invoice Date:</td>
-                            <td class="fw-medium">@Model.SupplierInvoiceDate.Value.ToString("dd MMM yyyy")</td>
+                            <td class="text-gray-500 py-1">Invoice Date:</td>
+                            <td class="font-medium text-gray-900 py-1">@Model.SupplierInvoiceDate.Value.ToString("dd MMM yyyy")</td>
                         </tr>
                     }
                     @if (Model.ReceivedAt.HasValue)
                     {
                         <tr>
-                            <td class="text-muted">Received At:</td>
-                            <td class="fw-medium">@Model.ReceivedAt.Value.ToString("dd MMM yyyy HH:mm")</td>
+                            <td class="text-gray-500 py-1">Received At:</td>
+                            <td class="font-medium text-gray-900 py-1">@Model.ReceivedAt.Value.ToString("dd MMM yyyy HH:mm")</td>
                         </tr>
                     }
                     <tr>
-                        <td class="text-muted">QC Required:</td>
-                        <td>
+                        <td class="text-gray-500 py-1">QC Required:</td>
+                        <td class="py-1">
                             @if (Model.QCRequired)
                             {
-                                <span class="badge bg-warning">Yes</span>
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Yes</span>
                             }
                             else
                             {
-                                <span class="badge bg-secondary">No</span>
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">No</span>
                             }
                         </td>
                     </tr>
@@ -81,28 +81,28 @@
     </div>
 
     <!-- Transport Details -->
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Transport Details</h6>
+    <div class="col-span-12 md:col-span-6">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Transport Details</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-sm table-borderless mb-0">
+            <div class="p-6">
+                <table class="w-full text-sm">
                     <tr>
-                        <td class="text-muted" style="width: 40%;">Vehicle Number:</td>
-                        <td class="fw-medium">@(Model.VehicleNumber ?? "-")</td>
+                        <td class="text-gray-500 py-1" style="width: 40%;">Vehicle Number:</td>
+                        <td class="font-medium text-gray-900 py-1">@(Model.VehicleNumber ?? "-")</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Driver Name:</td>
-                        <td class="fw-medium">@(Model.DriverName ?? "-")</td>
+                        <td class="text-gray-500 py-1">Driver Name:</td>
+                        <td class="font-medium text-gray-900 py-1">@(Model.DriverName ?? "-")</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Transporter:</td>
-                        <td class="fw-medium">@(Model.TransporterName ?? "-")</td>
+                        <td class="text-gray-500 py-1">Transporter:</td>
+                        <td class="font-medium text-gray-900 py-1">@(Model.TransporterName ?? "-")</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Way Bill #:</td>
-                        <td class="fw-medium">@(Model.WayBillNumber ?? "-")</td>
+                        <td class="text-gray-500 py-1">Way Bill #:</td>
+                        <td class="font-medium text-gray-900 py-1">@(Model.WayBillNumber ?? "-")</td>
                     </tr>
                 </table>
             </div>
@@ -110,37 +110,37 @@
     </div>
 
     <!-- Summary -->
-    <div class="col-12">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <div class="card bg-light border-0">
-                    <div class="card-body text-center py-3">
-                        <p class="text-muted mb-1 small">Total Ordered</p>
-                        <h5 class="mb-0">@Model.TotalOrderedQuantity.ToString("N2")</h5>
+    <div class="col-span-12">
+        <div class="grid grid-cols-12 gap-3">
+            <div class="col-span-12 md:col-span-3">
+                <div class="bg-gray-50 rounded-lg border-0">
+                    <div class="p-4 text-center">
+                        <p class="text-gray-500 mb-1 text-sm">Total Ordered</p>
+                        <h5 class="text-xl font-bold text-gray-900 mb-0">@Model.TotalOrderedQuantity.ToString("N2")</h5>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-light border-0">
-                    <div class="card-body text-center py-3">
-                        <p class="text-muted mb-1 small">Total Received</p>
-                        <h5 class="mb-0">@Model.TotalReceivedQuantity.ToString("N2")</h5>
+            <div class="col-span-12 md:col-span-3">
+                <div class="bg-gray-50 rounded-lg border-0">
+                    <div class="p-4 text-center">
+                        <p class="text-gray-500 mb-1 text-sm">Total Received</p>
+                        <h5 class="text-xl font-bold text-gray-900 mb-0">@Model.TotalReceivedQuantity.ToString("N2")</h5>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-light border-0">
-                    <div class="card-body text-center py-3">
-                        <p class="text-muted mb-1 small">Total Accepted</p>
-                        <h5 class="mb-0 text-success">@Model.TotalAcceptedQuantity.ToString("N2")</h5>
+            <div class="col-span-12 md:col-span-3">
+                <div class="bg-gray-50 rounded-lg border-0">
+                    <div class="p-4 text-center">
+                        <p class="text-gray-500 mb-1 text-sm">Total Accepted</p>
+                        <h5 class="text-xl font-bold text-emerald-600 mb-0">@Model.TotalAcceptedQuantity.ToString("N2")</h5>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-light border-0">
-                    <div class="card-body text-center py-3">
-                        <p class="text-muted mb-1 small">Total Value</p>
-                        <h5 class="mb-0">@Model.TotalValue.ToString("C2")</h5>
+            <div class="col-span-12 md:col-span-3">
+                <div class="bg-gray-50 rounded-lg border-0">
+                    <div class="p-4 text-center">
+                        <p class="text-gray-500 mb-1 text-sm">Total Value</p>
+                        <h5 class="text-xl font-bold text-gray-900 mb-0">@Model.TotalValue.ToString("C2")</h5>
                     </div>
                 </div>
             </div>
@@ -148,25 +148,25 @@
     </div>
 
     <!-- Line Items -->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Line Items</h6>
+    <div class="col-span-12">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h6 class="font-medium text-gray-900 mb-0">Line Items</h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead class="bg-light">
+            <div class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th>#</th>
-                                <th>Product</th>
-                                <th class="text-end">Ordered</th>
-                                <th class="text-end">Received</th>
-                                <th class="text-end">Accepted</th>
-                                <th class="text-end">Rejected</th>
-                                <th class="text-end">Unit Price</th>
-                                <th class="text-end">Total</th>
-                                <th>QC Status</th>
+                                <th class="px-4 py-3">#</th>
+                                <th class="px-4 py-3">Product</th>
+                                <th class="px-4 py-3 text-right">Ordered</th>
+                                <th class="px-4 py-3 text-right">Received</th>
+                                <th class="px-4 py-3 text-right">Accepted</th>
+                                <th class="px-4 py-3 text-right">Rejected</th>
+                                <th class="px-4 py-3 text-right">Unit Price</th>
+                                <th class="px-4 py-3 text-right">Total</th>
+                                <th class="px-4 py-3">QC Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -174,39 +174,39 @@
                             {
                                 var qcStatusClass = line.QCStatus switch
                                 {
-                                    GoodsReceiptLineQCStatus.Pending => "bg-secondary",
-                                    GoodsReceiptLineQCStatus.Passed => "bg-success",
-                                    GoodsReceiptLineQCStatus.Failed => "bg-danger",
-                                    GoodsReceiptLineQCStatus.PartialPass => "bg-warning",
-                                    _ => "bg-secondary"
+                                    GoodsReceiptLineQCStatus.Pending => "bg-gray-100 text-gray-800",
+                                    GoodsReceiptLineQCStatus.Passed => "bg-emerald-100 text-emerald-800",
+                                    GoodsReceiptLineQCStatus.Failed => "bg-red-100 text-red-800",
+                                    GoodsReceiptLineQCStatus.PartialPass => "bg-amber-100 text-amber-800",
+                                    _ => "bg-gray-100 text-gray-800"
                                 };
 
-                                <tr>
-                                    <td>@line.LineNumber</td>
-                                    <td>
-                                        <div class="fw-medium">@line.ProductName</div>
-                                        <small class="text-muted">@line.ProductSku</small>
+                                <tr class="border-b">
+                                    <td class="px-4 py-3">@line.LineNumber</td>
+                                    <td class="px-4 py-3">
+                                        <div class="font-medium text-gray-900">@line.ProductName</div>
+                                        <small class="text-gray-500">@line.ProductSku</small>
                                         @if (!string.IsNullOrEmpty(line.BatchNumber))
                                         {
-                                            <br /><small class="text-muted">Batch: @line.BatchNumber</small>
+                                            <br /><small class="text-gray-500">Batch: @line.BatchNumber</small>
                                         }
                                     </td>
-                                    <td class="text-end">@line.OrderedQuantity.ToString("N2")</td>
-                                    <td class="text-end">@line.ReceivedQuantity.ToString("N2")</td>
-                                    <td class="text-end text-success">@line.AcceptedQuantity.ToString("N2")</td>
-                                    <td class="text-end @(line.RejectedQuantity > 0 ? "text-danger" : "")">@line.RejectedQuantity.ToString("N2")</td>
-                                    <td class="text-end">@line.UnitPrice.ToString("C2")</td>
-                                    <td class="text-end fw-medium">@line.LineTotal.ToString("C2")</td>
-                                    <td>
-                                        <span class="badge @qcStatusClass">@line.QCStatus</span>
+                                    <td class="px-4 py-3 text-right">@line.OrderedQuantity.ToString("N2")</td>
+                                    <td class="px-4 py-3 text-right">@line.ReceivedQuantity.ToString("N2")</td>
+                                    <td class="px-4 py-3 text-right text-emerald-600">@line.AcceptedQuantity.ToString("N2")</td>
+                                    <td class="px-4 py-3 text-right @(line.RejectedQuantity > 0 ? "text-red-600" : "")">@line.RejectedQuantity.ToString("N2")</td>
+                                    <td class="px-4 py-3 text-right">@line.UnitPrice.ToString("C2")</td>
+                                    <td class="px-4 py-3 text-right font-medium">@line.LineTotal.ToString("C2")</td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @qcStatusClass">@line.QCStatus</span>
                                     </td>
                                 </tr>
                             }
                         </tbody>
-                        <tfoot class="bg-light">
+                        <tfoot class="bg-gray-50">
                             <tr>
-                                <td colspan="7" class="text-end fw-bold">Total:</td>
-                                <td class="text-end fw-bold">@Model.TotalValue.ToString("C2")</td>
+                                <td colspan="7" class="px-4 py-3 text-right font-bold">Total:</td>
+                                <td class="px-4 py-3 text-right font-bold">@Model.TotalValue.ToString("C2")</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -219,37 +219,37 @@
     <!-- Notes -->
     @if (!string.IsNullOrEmpty(Model.Notes))
     {
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0">Notes</h6>
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h6 class="font-medium text-gray-900 mb-0">Notes</h6>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">@Model.Notes</p>
+                <div class="p-6">
+                    <p class="mb-0 text-gray-700">@Model.Notes</p>
                 </div>
             </div>
         </div>
     }
 </div>
 
-<div class="modal-footer mt-4 px-0 pb-0">
+<div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
     @if (Model.Status == GoodsReceiptStatus.Draft || Model.Status == GoodsReceiptStatus.Pending)
     {
-        <button type="button" class="btn btn-outline-primary" onclick="editGrn('@Model.Id')" data-modal-hide="detailsModal">
-            <i class="bi bi-pencil me-2"></i>Edit
+        <button type="button" class="text-primary-700 hover:text-white border border-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="editGrn('@Model.Id')" data-modal-hide="detailsModal">
+            <i class="bi bi-pencil mr-2"></i>Edit
         </button>
     }
     @if (Model.Status == GoodsReceiptStatus.QCPending)
     {
-        <a href="/Quality/Inspections?grnId=@Model.Id" class="btn btn-warning" data-modal-hide="detailsModal">
-            <i class="bi bi-clipboard-check me-2"></i>Start QC Inspection
+        <a href="/Quality/Inspections?grnId=@Model.Id" class="text-white bg-amber-600 hover:bg-amber-700 focus:ring-4 focus:ring-amber-300 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">
+            <i class="bi bi-clipboard-check mr-2"></i>Start QC Inspection
         </a>
     }
     @if (Model.Status == GoodsReceiptStatus.QCCompleted || Model.Status == GoodsReceiptStatus.Pending)
     {
-        <button type="button" class="btn btn-success" onclick="updateStatus('@Model.Id', 'Accepted')" data-modal-hide="detailsModal">
-            <i class="bi bi-check-circle me-2"></i>Accept GRN
+        <button type="button" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Accepted')" data-modal-hide="detailsModal">
+            <i class="bi bi-check-circle mr-2"></i>Accept GRN
         </button>
     }
-    <button type="button" class="btn btn-secondary" data-modal-hide="detailsModal">Close</button>
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
 </div>

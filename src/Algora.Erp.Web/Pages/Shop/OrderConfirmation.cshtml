@@ -5,41 +5,40 @@
     Layout = "_LayoutShop";
 }
 
-<div class="container py-5">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     @if (Model.Order == null)
     {
         <div class="text-center">
-            <i class="bi bi-exclamation-circle fs-1 text-warning d-block mb-3"></i>
-            <h2>Order Not Found</h2>
-            <p class="text-muted">We couldn't find this order. Please check your order confirmation email.</p>
-            <a href="/Shop" class="btn btn-primary">Continue Shopping</a>
+            <i class="bi bi-exclamation-circle text-6xl text-amber-500 block mb-3"></i>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Order Not Found</h2>
+            <p class="text-gray-500 mb-4">We couldn't find this order. Please check your order confirmation email.</p>
+            <a href="/Shop" class="inline-flex items-center px-5 py-2.5 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">Continue Shopping</a>
         </div>
     }
     else
     {
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
+        <div class="flex justify-center">
+            <div class="w-full max-w-3xl">
                 <!-- Success Message -->
-                <div class="text-center mb-5">
-                    <div class="rounded-circle bg-success bg-opacity-10 text-success d-inline-flex align-items-center justify-content-center mb-4"
-                         style="width: 80px; height: 80px;">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mb-4">
                         <i class="bi bi-check-lg" style="font-size: 3rem;"></i>
                     </div>
-                    <h1 class="h2">Thank You for Your Order!</h1>
-                    <p class="text-muted lead">Your order has been placed successfully.</p>
-                    <p class="mb-0">Order Number: <span class="fw-bold">@Model.Order.OrderNumber</span></p>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
+                    <p class="text-lg text-gray-500 mb-2">Your order has been placed successfully.</p>
+                    <p class="text-gray-700">Order Number: <span class="font-bold">@Model.Order.OrderNumber</span></p>
                 </div>
 
                 <!-- Order Details -->
-                <div class="card border mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Order Details</h5>
+                <div class="bg-white rounded-lg border border-gray-200 mb-4">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-white">
+                        <h5 class="font-semibold text-gray-900">Order Details</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Shipping Address</h6>
-                                <p class="mb-0">
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h6 class="text-gray-500 mb-2 text-sm font-medium">Shipping Address</h6>
+                                <p class="text-gray-900">
                                     @Model.Order.ShippingFirstName @Model.Order.ShippingLastName<br>
                                     @Model.Order.ShippingAddress1
                                     @if (!string.IsNullOrEmpty(Model.Order.ShippingAddress2))
@@ -51,78 +50,80 @@
                                     @Model.Order.ShippingCountry
                                 </p>
                             </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Order Info</h6>
-                                <p class="mb-0">
-                                    <span class="text-muted">Order Date:</span> @Model.Order.OrderDate.ToString("MMM dd, yyyy")<br>
-                                    <span class="text-muted">Status:</span>
-                                    <span class="badge bg-warning">@Model.Order.Status</span><br>
-                                    <span class="text-muted">Payment:</span>
-                                    <span class="badge bg-secondary">@Model.Order.PaymentStatus</span>
+                            <div>
+                                <h6 class="text-gray-500 mb-2 text-sm font-medium">Order Info</h6>
+                                <p class="text-gray-900">
+                                    <span class="text-gray-500">Order Date:</span> @Model.Order.OrderDate.ToString("MMM dd, yyyy")<br>
+                                    <span class="text-gray-500">Status:</span>
+                                    <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800">@Model.Order.Status</span><br>
+                                    <span class="text-gray-500">Payment:</span>
+                                    <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">@Model.Order.PaymentStatus</span>
                                 </p>
                             </div>
                         </div>
 
                         <!-- Order Items -->
-                        <h6 class="text-muted mb-3">Items Ordered</h6>
-                        <table class="table">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th class="text-center">Qty</th>
-                                    <th class="text-end">Price</th>
-                                    <th class="text-end">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Order.Items)
-                                {
+                        <h6 class="text-gray-500 mb-3 text-sm font-medium">Items Ordered</h6>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
-                                        <td>
-                                            <div class="fw-semibold">@item.ProductName</div>
-                                            @if (!string.IsNullOrEmpty(item.Sku))
-                                            {
-                                                <small class="text-muted">SKU: @item.Sku</small>
-                                            }
-                                        </td>
-                                        <td class="text-center">@item.Quantity</td>
-                                        <td class="text-end">@item.UnitPrice.ToString("C")</td>
-                                        <td class="text-end fw-semibold">@item.LineTotal.ToString("C")</td>
+                                        <th class="px-4 py-3">Product</th>
+                                        <th class="px-4 py-3 text-center">Qty</th>
+                                        <th class="px-4 py-3 text-right">Price</th>
+                                        <th class="px-4 py-3 text-right">Total</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    @foreach (var item in Model.Order.Items)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="font-semibold text-gray-900">@item.ProductName</div>
+                                                @if (!string.IsNullOrEmpty(item.Sku))
+                                                {
+                                                    <small class="text-gray-500">SKU: @item.Sku</small>
+                                                }
+                                            </td>
+                                            <td class="px-4 py-3 text-center">@item.Quantity</td>
+                                            <td class="px-4 py-3 text-right">@item.UnitPrice.ToString("C")</td>
+                                            <td class="px-4 py-3 text-right font-semibold text-gray-900">@item.LineTotal.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
 
                         <!-- Totals -->
-                        <div class="border-top pt-3">
-                            <div class="row justify-content-end">
-                                <div class="col-md-5">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Subtotal</span>
-                                        <span>@Model.Order.Subtotal.ToString("C")</span>
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <div class="flex justify-end">
+                                <div class="w-full md:w-64">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-600">Subtotal</span>
+                                        <span class="text-gray-900">@Model.Order.Subtotal.ToString("C")</span>
                                     </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Shipping</span>
-                                        <span>@Model.Order.ShippingAmount.ToString("C")</span>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-600">Shipping</span>
+                                        <span class="text-gray-900">@Model.Order.ShippingAmount.ToString("C")</span>
                                     </div>
                                     @if (Model.Order.TaxAmount > 0)
                                     {
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span>Tax</span>
-                                            <span>@Model.Order.TaxAmount.ToString("C")</span>
+                                        <div class="flex justify-between mb-2">
+                                            <span class="text-gray-600">Tax</span>
+                                            <span class="text-gray-900">@Model.Order.TaxAmount.ToString("C")</span>
                                         </div>
                                     }
                                     @if (Model.Order.DiscountAmount > 0)
                                     {
-                                        <div class="d-flex justify-content-between mb-2 text-success">
+                                        <div class="flex justify-between mb-2 text-emerald-600">
                                             <span>Discount</span>
                                             <span>-@Model.Order.DiscountAmount.ToString("C")</span>
                                         </div>
                                     }
-                                    <hr>
-                                    <div class="d-flex justify-content-between fw-bold h5">
-                                        <span>Total</span>
-                                        <span>@Model.Order.Total.ToString("C")</span>
+                                    <hr class="my-3 border-gray-200">
+                                    <div class="flex justify-between font-bold text-lg">
+                                        <span class="text-gray-900">Total</span>
+                                        <span class="text-gray-900">@Model.Order.Total.ToString("C")</span>
                                     </div>
                                 </div>
                             </div>
@@ -131,34 +132,34 @@
                 </div>
 
                 <!-- Next Steps -->
-                <div class="card border mb-4">
-                    <div class="card-body">
-                        <h6 class="mb-3">What's Next?</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-start">
-                                    <i class="bi bi-envelope text-primary fs-4 me-3"></i>
+                <div class="bg-white rounded-lg border border-gray-200 mb-4">
+                    <div class="p-6">
+                        <h6 class="font-semibold text-gray-900 mb-4">What's Next?</h6>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <div class="flex items-start">
+                                    <i class="bi bi-envelope text-2xl text-primary-600 mr-3"></i>
                                     <div>
-                                        <div class="fw-semibold">Confirmation Email</div>
-                                        <small class="text-muted">You'll receive an email with your order details.</small>
+                                        <div class="font-semibold text-gray-900">Confirmation Email</div>
+                                        <small class="text-gray-500">You'll receive an email with your order details.</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-start">
-                                    <i class="bi bi-box-seam text-primary fs-4 me-3"></i>
+                            <div>
+                                <div class="flex items-start">
+                                    <i class="bi bi-box-seam text-2xl text-primary-600 mr-3"></i>
                                     <div>
-                                        <div class="fw-semibold">Order Processing</div>
-                                        <small class="text-muted">We'll start preparing your order right away.</small>
+                                        <div class="font-semibold text-gray-900">Order Processing</div>
+                                        <small class="text-gray-500">We'll start preparing your order right away.</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-start">
-                                    <i class="bi bi-truck text-primary fs-4 me-3"></i>
+                            <div>
+                                <div class="flex items-start">
+                                    <i class="bi bi-truck text-2xl text-primary-600 mr-3"></i>
                                     <div>
-                                        <div class="fw-semibold">Shipping Updates</div>
-                                        <small class="text-muted">Track your package once it ships.</small>
+                                        <div class="font-semibold text-gray-900">Shipping Updates</div>
+                                        <small class="text-gray-500">Track your package once it ships.</small>
                                     </div>
                                 </div>
                             </div>
@@ -167,12 +168,12 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="/Shop" class="btn btn-primary">
-                        <i class="bi bi-shop me-2"></i>Continue Shopping
+                <div class="flex justify-center gap-3">
+                    <a href="/Shop" class="inline-flex items-center px-5 py-2.5 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">
+                        <i class="bi bi-shop mr-2"></i>Continue Shopping
                     </a>
-                    <a href="/Shop/Account/Orders" class="btn btn-outline-secondary">
-                        <i class="bi bi-list-ul me-2"></i>View All Orders
+                    <a href="/Shop/Account/Orders" class="inline-flex items-center px-5 py-2.5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm">
+                        <i class="bi bi-list-ul mr-2"></i>View All Orders
                     </a>
                 </div>
             </div>

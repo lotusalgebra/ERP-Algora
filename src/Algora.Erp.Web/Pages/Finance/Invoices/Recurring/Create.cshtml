@@ -5,40 +5,43 @@
     ViewData["Title"] = "Create Recurring Invoice";
 }
 
-<div class="container-fluid">
+<div class="p-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="h3 mb-1">Create Recurring Invoice</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Invoices/Recurring">Recurring Invoices</a></li>
-                    <li class="breadcrumb-item active">Create</li>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-1">Create Recurring Invoice</h1>
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+                    <li><a href="/" class="hover:text-primary-600">Dashboard</a></li>
+                    <li><span class="mx-2">/</span></li>
+                    <li><a href="/Finance" class="hover:text-primary-600">Finance</a></li>
+                    <li><span class="mx-2">/</span></li>
+                    <li><a href="/Finance/Invoices/Recurring" class="hover:text-primary-600">Recurring Invoices</a></li>
+                    <li><span class="mx-2">/</span></li>
+                    <li class="text-gray-700 dark:text-gray-300">Create</li>
                 </ol>
             </nav>
         </div>
     </div>
 
     <form method="post" id="recurringForm">
-        <div class="row">
+        <div class="grid grid-cols-12 gap-6">
             <!-- Main Content -->
-            <div class="col-lg-8">
+            <div class="col-span-12 lg:col-span-8">
                 <!-- Basic Info -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-info-circle mr-2"></i>Basic Information</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" asp-for="Input.Name" class="form-control" placeholder="e.g., Monthly Hosting Fee" required />
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name <span class="text-red-500">*</span></label>
+                                <input type="text" asp-for="Input.Name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="e.g., Monthly Hosting Fee" required />
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Customer <span class="text-danger">*</span></label>
-                                <select asp-for="Input.CustomerId" class="form-select" id="customerId" required>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer <span class="text-red-500">*</span></label>
+                                <select asp-for="Input.CustomerId" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="customerId" required>
                                     <option value="">Select customer...</option>
                                     @foreach (var customer in Model.Customers)
                                     {
@@ -46,40 +49,40 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Description</label>
-                                <textarea asp-for="Input.Description" class="form-control" rows="2"></textarea>
+                            <div class="col-span-12">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                                <textarea asp-for="Input.Description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Schedule -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Schedule</h5>
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-calendar-check mr-2"></i>Schedule</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Frequency <span class="text-danger">*</span></label>
-                                <select asp-for="Input.Frequency" class="form-select" id="frequency">
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Frequency <span class="text-red-500">*</span></label>
+                                <select asp-for="Input.Frequency" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="frequency">
                                     @foreach (RecurrenceFrequency freq in Enum.GetValues(typeof(RecurrenceFrequency)))
                                     {
                                         <option value="@((int)freq)">@freq</option>
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Every</label>
-                                <div class="input-group">
-                                    <input type="number" asp-for="Input.FrequencyInterval" class="form-control" min="1" max="12" />
-                                    <span class="input-group-text" id="intervalSuffix">month(s)</span>
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Every</label>
+                                <div class="flex">
+                                    <input type="number" asp-for="Input.FrequencyInterval" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" min="1" max="12" />
+                                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-l-0 border-gray-300 rounded-r-lg dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600" id="intervalSuffix">month(s)</span>
                                 </div>
                             </div>
-                            <div class="col-md-4" id="dayOfMonthContainer">
-                                <label class="form-label">Day of Month</label>
-                                <select asp-for="Input.DayOfMonth" class="form-select">
+                            <div class="col-span-12 md:col-span-4" id="dayOfMonthContainer">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Day of Month</label>
+                                <select asp-for="Input.DayOfMonth" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     <option value="">Same as start date</option>
                                     @for (int i = 1; i <= 31; i++)
                                     {
@@ -87,98 +90,96 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-4 d-none" id="dayOfWeekContainer">
-                                <label class="form-label">Day of Week</label>
-                                <select asp-for="Input.DayOfWeek" class="form-select">
+                            <div class="col-span-12 md:col-span-4 hidden" id="dayOfWeekContainer">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Day of Week</label>
+                                <select asp-for="Input.DayOfWeek" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
                                     {
                                         <option value="@((int)day)">@day</option>
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Start Date <span class="text-danger">*</span></label>
-                                <input type="date" asp-for="Input.StartDate" class="form-control" required />
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date <span class="text-red-500">*</span></label>
+                                <input type="date" asp-for="Input.StartDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">End Date</label>
-                                <input type="date" asp-for="Input.EndDate" class="form-control" />
-                                <small class="text-muted">Leave empty for indefinite</small>
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End Date</label>
+                                <input type="date" asp-for="Input.EndDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave empty for indefinite</p>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Max Occurrences</label>
-                                <input type="number" asp-for="Input.MaxOccurrences" class="form-control" min="1" placeholder="Unlimited" />
+                            <div class="col-span-12 md:col-span-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Max Occurrences</label>
+                                <input type="number" asp-for="Input.MaxOccurrences" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" min="1" placeholder="Unlimited" />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Line Items -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Line Items</h5>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="addLineBtn">
-                            <i class="bi bi-plus-lg me-1"></i>Add Line
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-list-ol mr-2"></i>Line Items</h5>
+                        <button type="button" class="text-primary-700 border border-primary-700 hover:bg-primary-700 hover:text-white focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-3 py-1.5 dark:border-primary-500 dark:text-primary-500 dark:hover:bg-primary-600 dark:hover:text-white" id="addLineBtn">
+                            <i class="bi bi-plus-lg mr-1"></i>Add Line
                         </button>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-borderless align-middle mb-0" id="linesTable">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th style="width: 30%;">Product/Description</th>
-                                        <th style="width: 10%;">Qty</th>
-                                        <th style="width: 15%;">Unit Price</th>
-                                        <th style="width: 10%;">Disc %</th>
-                                        <th style="width: 10%;">Tax %</th>
-                                        <th class="text-end" style="width: 15%;">Total</th>
-                                        <th style="width: 5%;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="linesBody">
-                                    <!-- Lines will be added here -->
-                                </tbody>
-                                <tfoot class="bg-light">
-                                    <tr>
-                                        <td colspan="5" class="text-end fw-medium">Subtotal:</td>
-                                        <td class="text-end fw-medium" id="subtotalDisplay">$0.00</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="5" class="text-end">Discount:</td>
-                                        <td class="text-end" id="discountDisplay">-$0.00</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="5" class="text-end">Tax:</td>
-                                        <td class="text-end" id="taxDisplay">$0.00</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr class="fw-bold">
-                                        <td colspan="5" class="text-end">Total:</td>
-                                        <td class="text-end" id="totalDisplay">$0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="linesTable">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3" style="width: 30%;">Product/Description</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 10%;">Qty</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 15%;">Unit Price</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 10%;">Disc %</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 10%;">Tax %</th>
+                                    <th scope="col" class="px-4 py-3 text-right" style="width: 15%;">Total</th>
+                                    <th scope="col" class="px-4 py-3" style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="linesBody">
+                                <!-- Lines will be added here -->
+                            </tbody>
+                            <tfoot class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-3 text-right font-medium">Subtotal:</td>
+                                    <td class="px-4 py-3 text-right font-medium" id="subtotalDisplay">$0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="px-4 py-3 text-right">Discount:</td>
+                                    <td class="px-4 py-3 text-right" id="discountDisplay">-$0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="px-4 py-3 text-right">Tax:</td>
+                                    <td class="px-4 py-3 text-right" id="taxDisplay">$0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr class="font-bold">
+                                    <td colspan="5" class="px-4 py-3 text-right">Total:</td>
+                                    <td class="px-4 py-3 text-right" id="totalDisplay">$0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
 
                 <!-- Notes -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-sticky me-2"></i>Notes</h5>
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-sticky mr-2"></i>Notes</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Invoice Notes</label>
-                                <textarea asp-for="Input.Notes" class="form-control" rows="3" placeholder="Notes visible on invoice..."></textarea>
+                    <div class="p-6">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invoice Notes</label>
+                                <textarea asp-for="Input.Notes" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3" placeholder="Notes visible on invoice..."></textarea>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Internal Notes</label>
-                                <textarea asp-for="Input.InternalNotes" class="form-control" rows="3" placeholder="Internal notes only..."></textarea>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Internal Notes</label>
+                                <textarea asp-for="Input.InternalNotes" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3" placeholder="Internal notes only..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -186,25 +187,25 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="col-lg-4">
+            <div class="col-span-12 lg:col-span-4">
                 <!-- Invoice Settings -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Invoice Settings</h5>
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-gear mr-2"></i>Invoice Settings</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Invoice Type</label>
-                            <select asp-for="Input.InvoiceType" class="form-select">
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invoice Type</label>
+                            <select asp-for="Input.InvoiceType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 @foreach (InvoiceType type in Enum.GetValues(typeof(InvoiceType)))
                                 {
                                     <option value="@((int)type)">@type</option>
                                 }
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Payment Terms</label>
-                            <select asp-for="Input.PaymentTermDays" class="form-select" id="paymentTermDays">
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Payment Terms</label>
+                            <select asp-for="Input.PaymentTermDays" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="paymentTermDays">
                                 <option value="0">Due on Receipt</option>
                                 <option value="7">Net 7</option>
                                 <option value="15">Net 15</option>
@@ -214,9 +215,9 @@
                                 <option value="90">Net 90</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Currency</label>
-                            <select asp-for="Input.Currency" class="form-select">
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Currency</label>
+                            <select asp-for="Input.Currency" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="USD">USD - US Dollar</option>
                                 <option value="EUR">EUR - Euro</option>
                                 <option value="GBP">GBP - British Pound</option>
@@ -225,80 +226,80 @@
                             </select>
                         </div>
                         <div>
-                            <label class="form-label">Reference</label>
-                            <input type="text" asp-for="Input.Reference" class="form-control" placeholder="PO number, contract, etc." />
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reference</label>
+                            <input type="text" asp-for="Input.Reference" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="PO number, contract, etc." />
                         </div>
                     </div>
                 </div>
 
                 <!-- Billing Address -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Billing Address</h5>
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-geo-alt mr-2"></i>Billing Address</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" asp-for="Input.BillingName" class="form-control" id="billingName" />
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" asp-for="Input.BillingName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="billingName" />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Address</label>
-                            <input type="text" asp-for="Input.BillingAddress" class="form-control" id="billingAddress" />
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                            <input type="text" asp-for="Input.BillingAddress" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="billingAddress" />
                         </div>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label class="form-label">City</label>
-                                <input type="text" asp-for="Input.BillingCity" class="form-control" id="billingCity" />
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
+                                <input type="text" asp-for="Input.BillingCity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="billingCity" />
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">State</label>
-                                <input type="text" asp-for="Input.BillingState" class="form-control" id="billingState" />
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">State</label>
+                                <input type="text" asp-for="Input.BillingState" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="billingState" />
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">Postal Code</label>
-                                <input type="text" asp-for="Input.BillingPostalCode" class="form-control" id="billingPostalCode" />
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Postal Code</label>
+                                <input type="text" asp-for="Input.BillingPostalCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="billingPostalCode" />
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">Country</label>
-                                <input type="text" asp-for="Input.BillingCountry" class="form-control" id="billingCountry" />
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                                <input type="text" asp-for="Input.BillingCountry" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="billingCountry" />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Auto-Send Options -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Auto-Send Options</h5>
+                <div class="bg-white rounded-lg shadow-md dark:bg-gray-800 mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h5 class="text-lg font-medium text-gray-900 dark:text-white"><i class="bi bi-envelope mr-2"></i>Auto-Send Options</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="form-check mb-3">
-                            <input type="checkbox" asp-for="Input.AutoSend" class="form-check-input" id="autoSend" />
-                            <label class="form-check-label" for="autoSend">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <input type="checkbox" asp-for="Input.AutoSend" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" id="autoSend" />
+                            <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" for="autoSend">
                                 Auto-mark as sent when generated
                             </label>
                         </div>
-                        <div class="form-check mb-3">
-                            <input type="checkbox" asp-for="Input.AutoSendEmail" class="form-check-input" id="autoSendEmail" />
-                            <label class="form-check-label" for="autoSendEmail">
+                        <div class="flex items-center mb-4">
+                            <input type="checkbox" asp-for="Input.AutoSendEmail" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" id="autoSendEmail" />
+                            <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" for="autoSendEmail">
                                 Email invoice automatically
                             </label>
                         </div>
                         <div id="emailRecipientsDiv">
-                            <label class="form-label">Email Recipients</label>
-                            <input type="text" asp-for="Input.EmailRecipients" class="form-control" id="emailRecipients"
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email Recipients</label>
+                            <input type="text" asp-for="Input.EmailRecipients" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" id="emailRecipients"
                                    placeholder="email@example.com" />
-                            <small class="text-muted">Comma-separated for multiple</small>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated for multiple</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-check-lg me-1"></i>Create Recurring Invoice
+                <div class="flex flex-col gap-2">
+                    <button type="submit" class="w-full text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-base px-5 py-3 dark:bg-primary-600 dark:hover:bg-primary-700">
+                        <i class="bi bi-check-lg mr-1"></i>Create Recurring Invoice
                     </button>
-                    <a href="/Finance/Invoices/Recurring" class="btn btn-outline-secondary">
+                    <a href="/Finance/Invoices/Recurring" class="w-full text-center text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-base px-5 py-3 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700">
                         Cancel
                     </a>
                 </div>
@@ -309,9 +310,9 @@
 
 <!-- Line Template -->
 <template id="lineTemplate">
-    <tr class="line-row">
-        <td>
-            <select class="form-select form-select-sm product-select" onchange="productChanged(this)">
+    <tr class="line-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td class="px-4 py-3">
+            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white product-select" onchange="productChanged(this)">
                 <option value="">Select product or type description...</option>
                 @foreach (var product in Model.Products)
                 {
@@ -322,25 +323,25 @@
             </select>
             <input type="hidden" class="line-product-id" name="" />
             <input type="hidden" class="line-product-code" name="" />
-            <input type="text" class="form-control form-control-sm mt-1 line-description" placeholder="Description" name="" />
+            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white line-description" placeholder="Description" name="" />
         </td>
-        <td>
-            <input type="number" class="form-control form-control-sm line-qty" value="1" min="0.01" step="0.01" name="" onchange="calculateLine(this)" />
+        <td class="px-4 py-3">
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white line-qty" value="1" min="0.01" step="0.01" name="" onchange="calculateLine(this)" />
         </td>
-        <td>
-            <input type="number" class="form-control form-control-sm line-price" value="0" min="0" step="0.01" name="" onchange="calculateLine(this)" />
+        <td class="px-4 py-3">
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white line-price" value="0" min="0" step="0.01" name="" onchange="calculateLine(this)" />
         </td>
-        <td>
-            <input type="number" class="form-control form-control-sm line-discount" value="0" min="0" max="100" step="0.01" name="" onchange="calculateLine(this)" />
+        <td class="px-4 py-3">
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white line-discount" value="0" min="0" max="100" step="0.01" name="" onchange="calculateLine(this)" />
         </td>
-        <td>
-            <input type="number" class="form-control form-control-sm line-tax" value="0" min="0" max="100" step="0.01" name="" onchange="calculateLine(this)" />
+        <td class="px-4 py-3">
+            <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white line-tax" value="0" min="0" max="100" step="0.01" name="" onchange="calculateLine(this)" />
         </td>
-        <td class="text-end">
-            <span class="line-total fw-medium">$0.00</span>
+        <td class="px-4 py-3 text-right">
+            <span class="line-total font-medium">$0.00</span>
         </td>
-        <td>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLine(this)">
+        <td class="px-4 py-3">
+            <button type="button" class="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white" onclick="removeLine(this)">
                 <i class="bi bi-trash"></i>
             </button>
         </td>
@@ -399,14 +400,14 @@
             intervalSuffix.textContent = suffixes[freq] || 'period(s)';
 
             if (freq === 1) { // Weekly
-                dayOfMonthContainer.classList.add('d-none');
-                dayOfWeekContainer.classList.remove('d-none');
+                dayOfMonthContainer.classList.add('hidden');
+                dayOfWeekContainer.classList.remove('hidden');
             } else if (freq === 2 || freq === 3) { // Monthly or Quarterly
-                dayOfMonthContainer.classList.remove('d-none');
-                dayOfWeekContainer.classList.add('d-none');
+                dayOfMonthContainer.classList.remove('hidden');
+                dayOfWeekContainer.classList.add('hidden');
             } else {
-                dayOfMonthContainer.classList.add('d-none');
-                dayOfWeekContainer.classList.add('d-none');
+                dayOfMonthContainer.classList.add('hidden');
+                dayOfWeekContainer.classList.add('hidden');
             }
         }
 

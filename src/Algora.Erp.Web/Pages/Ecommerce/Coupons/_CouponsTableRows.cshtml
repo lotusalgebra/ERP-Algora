@@ -3,8 +3,8 @@
 @if (!Model.Coupons.Any())
 {
     <tr>
-        <td colspan="7" class="text-center py-5 text-muted">
-            <i class="bi bi-ticket-perforated fs-1 d-block mb-3"></i>
+        <td colspan="7" class="text-center py-12 text-gray-500">
+            <i class="bi bi-ticket-perforated text-4xl block mb-3"></i>
             No coupons found
         </td>
     </tr>
@@ -17,116 +17,116 @@ else
         var isNotStarted = coupon.StartsAt.HasValue && coupon.StartsAt.Value > Model.Now;
         var isAtLimit = coupon.UsageLimit.HasValue && coupon.TimesUsed >= coupon.UsageLimit;
 
-        <tr>
-            <td class="ps-4">
-                <code class="bg-light px-2 py-1 rounded fs-6">@coupon.Code</code>
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4">
+                <code class="bg-gray-100 px-2 py-1 rounded text-sm font-semibold">@coupon.Code</code>
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!string.IsNullOrEmpty(coupon.Description))
                 {
-                    <span>@coupon.Description</span>
+                    <span class="text-gray-700">@coupon.Description</span>
                 }
                 else
                 {
-                    <span class="text-muted">-</span>
+                    <span class="text-gray-400">-</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (coupon.DiscountType == Algora.Erp.Domain.Entities.Ecommerce.DiscountType.Percentage)
                 {
-                    <span class="fw-semibold text-success">@coupon.DiscountValue%</span>
+                    <span class="font-semibold text-emerald-600">@coupon.DiscountValue%</span>
                     @if (coupon.MaxDiscountAmount.HasValue)
                     {
-                        <small class="text-muted d-block">Max: @coupon.MaxDiscountAmount.Value.ToString("C")</small>
+                        <small class="text-gray-500 block">Max: @coupon.MaxDiscountAmount.Value.ToString("C")</small>
                     }
                 }
                 else
                 {
-                    <span class="fw-semibold text-success">@coupon.DiscountValue.ToString("C")</span>
+                    <span class="font-semibold text-emerald-600">@coupon.DiscountValue.ToString("C")</span>
                 }
                 @if (coupon.MinOrderAmount.HasValue)
                 {
-                    <small class="text-muted d-block">Min order: @coupon.MinOrderAmount.Value.ToString("C")</small>
+                    <small class="text-gray-500 block">Min order: @coupon.MinOrderAmount.Value.ToString("C")</small>
                 }
             </td>
-            <td class="text-center">
-                <span class="fw-semibold">@coupon.TimesUsed</span>
+            <td class="px-6 py-4 text-center">
+                <span class="font-semibold text-gray-900">@coupon.TimesUsed</span>
                 @if (coupon.UsageLimit.HasValue)
                 {
-                    <span class="text-muted">/ @coupon.UsageLimit</span>
+                    <span class="text-gray-500">/ @coupon.UsageLimit</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (coupon.StartsAt.HasValue || coupon.ExpiresAt.HasValue)
                 {
-                    <div class="small">
+                    <div class="text-sm">
                         @if (coupon.StartsAt.HasValue)
                         {
-                            <span>@coupon.StartsAt.Value.ToString("MMM dd, yyyy")</span>
+                            <span class="text-gray-700">@coupon.StartsAt.Value.ToString("MMM dd, yyyy")</span>
                         }
                         else
                         {
-                            <span>Start</span>
+                            <span class="text-gray-400">Start</span>
                         }
-                        <span class="text-muted">→</span>
+                        <span class="text-gray-400 mx-1">-</span>
                         @if (coupon.ExpiresAt.HasValue)
                         {
-                            <span>@coupon.ExpiresAt.Value.ToString("MMM dd, yyyy")</span>
+                            <span class="text-gray-700">@coupon.ExpiresAt.Value.ToString("MMM dd, yyyy")</span>
                         }
                         else
                         {
-                            <span>Forever</span>
+                            <span class="text-gray-400">Forever</span>
                         }
                     </div>
                 }
                 else
                 {
-                    <span class="text-muted">No limit</span>
+                    <span class="text-gray-400">No limit</span>
                 }
             </td>
-            <td>
+            <td class="px-6 py-4">
                 @if (!coupon.IsActive)
                 {
-                    <span class="badge bg-secondary">Disabled</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Disabled</span>
                 }
                 else if (isExpired)
                 {
-                    <span class="badge bg-dark">Expired</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-700 text-white">Expired</span>
                 }
                 else if (isNotStarted)
                 {
-                    <span class="badge bg-info">Scheduled</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">Scheduled</span>
                 }
                 else if (isAtLimit)
                 {
-                    <span class="badge bg-warning">Limit Reached</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Limit Reached</span>
                 }
                 else
                 {
-                    <span class="badge bg-success">Active</span>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
                 }
             </td>
-            <td class="text-end pe-4">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownCoupon@(coupon.Id)" data-dropdown-toggle="dropdownMenuCoupon@(coupon.Id)">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenuCoupon@(coupon.Id)">
+            <td class="px-6 py-4 text-right">
+                <button class="px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-gray-200" type="button" id="dropdownCoupon@(coupon.Id)" data-dropdown-toggle="dropdownMenuCoupon@(coupon.Id)" data-dropdown-placement="bottom-end">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuCoupon@(coupon.Id)">
+                    <ul class="py-2 text-sm text-gray-700">
                         <li>
-                            <a class="dropdown-item" href="#"
+                            <a class="block px-4 py-2 hover:bg-gray-100" href="#"
                                hx-get="?handler=EditForm&id=@coupon.Id"
                                hx-target="#couponModalBody"
                                data-modal-target="couponModal" data-modal-toggle="couponModal">
-                                <i class="bi bi-pencil me-2"></i>Edit
+                                <i class="bi bi-pencil mr-2"></i>Edit
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><hr class="my-1 border-gray-200"></li>
                         <li>
-                            <a class="dropdown-item text-danger" href="#"
+                            <a class="block px-4 py-2 hover:bg-gray-100 text-red-600" href="#"
                                hx-delete="?handler=&id=@coupon.Id"
                                hx-target="#couponsTableBody"
                                hx-confirm="Are you sure you want to delete this coupon?">
-                                <i class="bi bi-trash me-2"></i>Delete
+                                <i class="bi bi-trash mr-2"></i>Delete
                             </a>
                         </li>
                     </ul>
@@ -139,17 +139,17 @@ else
     @if (Model.TotalPages > 1)
     {
     <tr>
-        <td colspan="7" class="bg-light">
-            <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                <small class="text-muted">
+        <td colspan="7" class="bg-gray-50 px-6 py-3">
+            <div class="flex justify-between items-center">
+                <small class="text-gray-500">
                     Showing @((Model.Page - 1) * Model.PageSize + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalRecords) of @Model.TotalRecords entries
                 </small>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
+                    <ul class="inline-flex -space-x-px text-sm">
                         @if (Model.Page > 1)
                         {
-                            <li class="page-item">
-                                <button type="button" class="page-link"
+                            <li>
+                                <button type="button" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700"
                                         hx-get="?handler=Table&pageNumber=@(Model.Page - 1)&pageSize=@Model.PageSize"
                                         hx-target="#couponsTableBody"
                                         hx-include="#searchInput, #statusFilter">
@@ -159,8 +159,8 @@ else
                         }
                         @for (var i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
                         {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <button type="button" class="page-link"
+                            <li>
+                                <button type="button" class="flex items-center justify-center px-3 h-8 leading-tight @(i == Model.Page ? "text-primary-600 border border-primary-300 bg-primary-50 hover:bg-primary-100 hover:text-primary-700" : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700")"
                                         hx-get="?handler=Table&pageNumber=@i&pageSize=@Model.PageSize"
                                         hx-target="#couponsTableBody"
                                         hx-include="#searchInput, #statusFilter">
@@ -170,8 +170,8 @@ else
                         }
                         @if (Model.Page < Model.TotalPages)
                         {
-                            <li class="page-item">
-                                <button type="button" class="page-link"
+                            <li>
+                                <button type="button" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
                                         hx-get="?handler=Table&pageNumber=@(Model.Page + 1)&pageSize=@Model.PageSize"
                                         hx-target="#couponsTableBody"
                                         hx-include="#searchInput, #statusFilter">
@@ -188,10 +188,8 @@ else
     else if (Model.TotalRecords > 0)
     {
     <tr>
-        <td colspan="7" class="bg-light">
-            <div class="px-3 py-2">
-                <small class="text-muted">Showing @Model.TotalRecords entries</small>
-            </div>
+        <td colspan="7" class="bg-gray-50 px-6 py-3">
+            <small class="text-gray-500">Showing @Model.TotalRecords entries</small>
         </td>
     </tr>
     }
