@@ -2,12 +2,14 @@ using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Manufacturing;
 using Algora.Erp.Web.Pages.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Manufacturing.WorkOrders;
 
+[Authorize(Policy = "CanViewManufacturing")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

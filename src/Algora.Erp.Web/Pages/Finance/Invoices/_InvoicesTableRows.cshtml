@@ -1,6 +1,7 @@
 @model Algora.Erp.Web.Pages.Finance.Invoices.InvoicesTableViewModel
 @using Algora.Erp.Domain.Entities.Finance
 
+<tbody id="tableContent">
 @if (Model.Invoices.Count == 0)
 {
     <tr>
@@ -73,12 +74,11 @@ else
                 <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusBadgeClass">@invoice.Status</span>
             </td>
             <td class="px-6 py-4 text-right">
-                <div class="relative inline-block">
                     <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                            id="dropdownInv@(invoice.Id)" data-dropdown-toggle="dropdownMenuInv@(invoice.Id)" data-dropdown-placement="bottom-end">
+                            id="dropdownInv@(invoice.Id)" data-dropdown-toggle="dropdownMenuInv@(invoice.Id)" data-dropdown-placement="left-start">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700" id="dropdownMenuInv@(invoice.Id)">
+                    <div class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuInv@(invoice.Id)">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
                             <li>
                                 <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" href="/Finance/Invoices/Details/@invoice.Id">
@@ -96,6 +96,7 @@ else
                                     <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                             hx-post="/Finance/Invoices?handler=Send&id=@invoice.Id"
                                             hx-target="#tableContent"
+                                            hx-swap="outerHTML"
                                             hx-confirm="Are you sure you want to send this invoice?">
                                         <i class="bi bi-send mr-2"></i> Send
                                     </button>
@@ -115,6 +116,7 @@ else
                                     <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                             hx-post="/Finance/Invoices?handler=MarkPaid&id=@invoice.Id"
                                             hx-target="#tableContent"
+                                            hx-swap="outerHTML"
                                             hx-confirm="Mark this invoice as fully paid?">
                                         <i class="bi bi-check-circle mr-2"></i> Mark as Paid
                                     </button>
@@ -132,6 +134,7 @@ else
                                     <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 dark:text-red-400"
                                             hx-delete="/Finance/Invoices?id=@invoice.Id"
                                             hx-target="#tableContent"
+                                            hx-swap="outerHTML"
                                             hx-confirm="Are you sure you want to delete this invoice?">
                                         <i class="bi bi-trash mr-2"></i> Delete
                                     </button>
@@ -143,6 +146,7 @@ else
                                     <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-amber-600 dark:text-amber-400"
                                             hx-post="/Finance/Invoices?handler=Void&id=@invoice.Id"
                                             hx-target="#tableContent"
+                                            hx-swap="outerHTML"
                                             hx-confirm="Are you sure you want to void this invoice?">
                                         <i class="bi bi-x-circle mr-2"></i> Void
                                     </button>
@@ -150,24 +154,13 @@ else
                             }
                         </ul>
                     </div>
-                </div>
             </td>
         </tr>
     }
 }
-
-@* Out-of-band swap for pagination info *@
-<div id="paginationInfo" hx-swap-oob="true">
-    @await Html.PartialAsync("~/Pages/Shared/_PaginationInfo.cshtml", Model.Pagination)
-</div>
-
-@* Out-of-band swap for pagination navigation *@
-<nav id="paginationNav" hx-swap-oob="true">
-    @await Html.PartialAsync("~/Pages/Shared/_Pagination.cshtml", Model.Pagination)
-</nav>
-
+</tbody>
 <script>
-    // Re-initialize Flowbite dropdowns after HTMX content swap
+    // Re-initialize Flowbite dropdowns after HTMX swap
     if (typeof initFlowbite === 'function') { initFlowbite(); }
-    if (typeof htmx !== 'undefined') { htmx.process(document.body); }
 </script>
+

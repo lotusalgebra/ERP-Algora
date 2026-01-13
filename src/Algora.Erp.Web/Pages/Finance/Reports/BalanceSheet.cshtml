@@ -4,268 +4,232 @@
     ViewData["Title"] = "Balance Sheet";
 }
 
-<div class="container-fluid px-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-0">Balance Sheet</h1>
-            <p class="text-muted mb-0">Financial position as of @Model.Report.AsOfDate.ToString("MMMM dd, yyyy")</p>
+            <h1 class="text-2xl font-bold text-gray-900">Balance Sheet</h1>
+            <p class="text-sm text-gray-500 mt-1">Financial position as of @Model.Report.AsOfDate.ToString("MMMM dd, yyyy")</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="flex gap-2">
             <a href="/Finance/Reports/BalanceSheet?handler=ExportPdf&asOfDate=@Model.AsOfDate?.ToString("yyyy-MM-dd")"
-               class="btn btn-outline-primary">
-                <i class="bi bi-file-pdf me-1"></i> Export PDF
+               class="inline-flex items-center px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50">
+                <i class="bi bi-file-pdf me-2"></i>Export PDF
             </a>
             <a href="/Finance/Reports/BalanceSheet?handler=ExportCsv&asOfDate=@Model.AsOfDate?.ToString("yyyy-MM-dd")"
-               class="btn btn-outline-success">
-                <i class="bi bi-file-csv me-1"></i> Export CSV
+               class="inline-flex items-center px-4 py-2 border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-50">
+                <i class="bi bi-file-csv me-2"></i>Export CSV
             </a>
         </div>
     </div>
 
     <!-- Date Selector -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label">As of Date</label>
-                    <input type="date" class="form-control" name="asOfDate"
-                           value="@Model.AsOfDate?.ToString("yyyy-MM-dd")" />
-                </div>
-                <div class="col-md-4">
-                    <div class="btn-group" role="group">
-                        <a href="/Finance/Reports/BalanceSheet?asOfDate=@DateTime.Today.ToString("yyyy-MM-dd")"
-                           class="btn btn-outline-secondary @(Model.AsOfDate?.Date == DateTime.Today ? "active" : "")">Today</a>
-                        <a href="/Finance/Reports/BalanceSheet?asOfDate=@(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddDays(-1).ToString("yyyy-MM-dd"))"
-                           class="btn btn-outline-secondary">Last Month End</a>
-                        <a href="/Finance/Reports/BalanceSheet?asOfDate=@(new DateTime(DateTime.Today.Year, 1, 1).AddDays(-1).ToString("yyyy-MM-dd"))"
-                           class="btn btn-outline-secondary">Last Year End</a>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </div>
-            </form>
-        </div>
+    <div class="bg-white rounded-xl shadow-sm p-4">
+        <form method="get" class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="w-full md:w-auto">
+                <label class="block text-sm font-medium text-gray-700 mb-1">As of Date</label>
+                <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                       name="asOfDate" value="@Model.AsOfDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="flex gap-2">
+                <a href="/Finance/Reports/BalanceSheet?asOfDate=@DateTime.Today.ToString("yyyy-MM-dd")"
+                   class="px-3 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 @(Model.AsOfDate?.Date == DateTime.Today ? "bg-primary-50 border-primary-300" : "")">Today</a>
+                <a href="/Finance/Reports/BalanceSheet?asOfDate=@(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddDays(-1).ToString("yyyy-MM-dd"))"
+                   class="px-3 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Last Month End</a>
+                <a href="/Finance/Reports/BalanceSheet?asOfDate=@(new DateTime(DateTime.Today.Year, 1, 1).AddDays(-1).ToString("yyyy-MM-dd"))"
+                   class="px-3 py-2.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Last Year End</a>
+            </div>
+            <button type="submit" class="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Update</button>
+        </form>
     </div>
 
     <!-- Key Metrics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-white-50">Total Assets</h6>
-                            <h4 class="card-title mb-0">@Model.Report.TotalAssets.ToString("C0")</h4>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-building fs-1 opacity-50"></i>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-primary-600 text-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-primary-100 text-sm mb-2">Total Assets</p>
+                    <h3 class="text-2xl font-bold">@Model.Report.TotalAssets.ToString("C0")</h3>
                     @if (Model.Report.PreviousPeriod != null)
                     {
                         var change = Model.Report.PreviousPeriod.AssetsChange;
-                        <small class="@(change >= 0 ? "text-success-emphasis" : "text-danger-emphasis")">
+                        <p class="text-sm mt-1 @(change >= 0 ? "text-emerald-200" : "text-red-200")">
                             <i class="bi bi-arrow-@(change >= 0 ? "up" : "down")"></i>
                             @Math.Abs(change).ToString("F1")% vs last year
-                        </small>
+                        </p>
                     }
                 </div>
+                <i class="bi bi-building text-4xl opacity-50"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-white-50">Total Liabilities</h6>
-                            <h4 class="card-title mb-0">@Model.Report.TotalLiabilities.ToString("C0")</h4>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-credit-card fs-1 opacity-50"></i>
-                        </div>
-                    </div>
+        <div class="bg-red-600 text-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-red-100 text-sm mb-2">Total Liabilities</p>
+                    <h3 class="text-2xl font-bold">@Model.Report.TotalLiabilities.ToString("C0")</h3>
                     @if (Model.Report.PreviousPeriod != null)
                     {
                         var change = Model.Report.PreviousPeriod.LiabilitiesChange;
-                        <small class="@(change <= 0 ? "text-success-emphasis" : "text-danger-emphasis")">
+                        <p class="text-sm mt-1 @(change <= 0 ? "text-emerald-200" : "text-red-200")">
                             <i class="bi bi-arrow-@(change >= 0 ? "up" : "down")"></i>
                             @Math.Abs(change).ToString("F1")% vs last year
-                        </small>
+                        </p>
                     }
                 </div>
+                <i class="bi bi-credit-card text-4xl opacity-50"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-white-50">Total Equity</h6>
-                            <h4 class="card-title mb-0">@Model.Report.TotalEquity.ToString("C0")</h4>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-bank fs-1 opacity-50"></i>
-                        </div>
-                    </div>
+        <div class="bg-emerald-600 text-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-emerald-100 text-sm mb-2">Total Equity</p>
+                    <h3 class="text-2xl font-bold">@Model.Report.TotalEquity.ToString("C0")</h3>
                     @if (Model.Report.PreviousPeriod != null)
                     {
                         var change = Model.Report.PreviousPeriod.EquityChange;
-                        <small class="@(change >= 0 ? "text-success-emphasis" : "text-danger-emphasis")">
+                        <p class="text-sm mt-1 @(change >= 0 ? "text-emerald-200" : "text-red-200")">
                             <i class="bi bi-arrow-@(change >= 0 ? "up" : "down")"></i>
                             @Math.Abs(change).ToString("F1")% vs last year
-                        </small>
+                        </p>
                     }
                 </div>
+                <i class="bi bi-bank text-4xl opacity-50"></i>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card @(Model.Report.IsBalanced ? "bg-info" : "bg-warning") text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-subtitle mb-2 text-white-50">Balance Check</h6>
-                            <h4 class="card-title mb-0">
-                                @if (Model.Report.IsBalanced)
-                                {
-                                    <i class="bi bi-check-circle me-1"></i> <span>Balanced</span>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-exclamation-triangle me-1"></i> <span>Unbalanced</span>
-                                }
-                            </h4>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-balance-scale fs-1 opacity-50"></i>
-                        </div>
-                    </div>
-                    <small>A = L + E</small>
+        <div class="@(Model.Report.IsBalanced ? "bg-blue-600" : "bg-amber-600") text-white rounded-xl shadow-sm p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-white/70 text-sm mb-2">Balance Check</p>
+                    <h3 class="text-xl font-bold">
+                        @if (Model.Report.IsBalanced)
+                        {
+                            <i class="bi bi-check-circle me-1"></i><span>Balanced</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-exclamation-triangle me-1"></i><span>Unbalanced</span>
+                        }
+                    </h3>
+                    <p class="text-sm text-white/70 mt-1">A = L + E</p>
                 </div>
+                <i class="bi bi-balance-scale text-4xl opacity-50"></i>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Left Column: Assets -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-building me-2"></i>Assets</h5>
-                </div>
-                <div class="card-body">
-                    @foreach (var section in Model.Report.AssetSections)
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Assets -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-primary-600 text-white px-6 py-4">
+                <h5 class="text-lg font-semibold"><i class="bi bi-building me-2"></i>Assets</h5>
+            </div>
+            <div class="p-6">
+                @foreach (var section in Model.Report.AssetSections)
+                {
+                    if (section.Items.Any())
                     {
-                        if (section.Items.Any())
-                        {
-                            <h6 class="text-uppercase text-muted mb-3">@(section.SectionName)</h6>
-                            <table class="table table-sm table-borderless mb-4">
-                                <tbody>
-                                    @foreach (var item in section.Items)
-                                    {
-                                        <tr>
-                                            <td class="ps-3">
-                                                <small class="text-muted">@item.AccountCode</small>
-                                                @item.AccountName
-                                            </td>
-                                            <td class="text-end">@item.Balance.ToString("C2")</td>
-                                        </tr>
-                                    }
-                                    <tr class="border-top">
-                                        <td class="fw-bold">Total @(section.SectionName)</td>
-                                        <td class="text-end fw-bold">@(section.Total.ToString("C2"))</td>
+                        <h6 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">@(section.SectionName)</h6>
+                        <table class="w-full text-sm mb-6">
+                            <tbody>
+                                @foreach (var item in section.Items)
+                                {
+                                    <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                        <td class="py-2 ps-3">
+                                            <span class="text-xs text-gray-400 me-2">@item.AccountCode</span>
+                                            @item.AccountName
+                                        </td>
+                                        <td class="py-2 text-right">@item.Balance.ToString("C2")</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        }
+                                }
+                                <tr class="border-t-2 border-gray-200 font-semibold">
+                                    <td class="py-2">Total @(section.SectionName)</td>
+                                    <td class="py-2 text-right">@(section.Total.ToString("C2"))</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     }
-
-                    <div class="border-top border-2 border-primary pt-3">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold">TOTAL ASSETS</h5>
-                            <h5 class="fw-bold">@Model.Report.TotalAssets.ToString("C2")</h5>
-                        </div>
+                }
+                <div class="border-t-4 border-primary-600 pt-4">
+                    <div class="flex justify-between items-center">
+                        <h5 class="text-lg font-bold">TOTAL ASSETS</h5>
+                        <h5 class="text-lg font-bold text-primary-600">@Model.Report.TotalAssets.ToString("C2")</h5>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Liabilities & Equity -->
-        <div class="col-lg-6 mb-4">
+        <!-- Liabilities & Equity -->
+        <div class="space-y-6">
             <!-- Liabilities -->
-            <div class="card mb-4">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Liabilities</h5>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="bg-red-600 text-white px-6 py-4">
+                    <h5 class="text-lg font-semibold"><i class="bi bi-credit-card me-2"></i>Liabilities</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     @foreach (var section in Model.Report.LiabilitySections)
                     {
                         if (section.Items.Any())
                         {
-                            <h6 class="text-uppercase text-muted mb-3">@(section.SectionName)</h6>
-                            <table class="table table-sm table-borderless mb-4">
+                            <h6 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">@(section.SectionName)</h6>
+                            <table class="w-full text-sm mb-6">
                                 <tbody>
                                     @foreach (var item in section.Items)
                                     {
-                                        <tr>
-                                            <td class="ps-3">
-                                                <small class="text-muted">@item.AccountCode</small>
+                                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                            <td class="py-2 ps-3">
+                                                <span class="text-xs text-gray-400 me-2">@item.AccountCode</span>
                                                 @item.AccountName
                                             </td>
-                                            <td class="text-end">@item.Balance.ToString("C2")</td>
+                                            <td class="py-2 text-right">@item.Balance.ToString("C2")</td>
                                         </tr>
                                     }
-                                    <tr class="border-top">
-                                        <td class="fw-bold">Total @(section.SectionName)</td>
-                                        <td class="text-end fw-bold">@(section.Total.ToString("C2"))</td>
+                                    <tr class="border-t-2 border-gray-200 font-semibold">
+                                        <td class="py-2">Total @(section.SectionName)</td>
+                                        <td class="py-2 text-right">@(section.Total.ToString("C2"))</td>
                                     </tr>
                                 </tbody>
                             </table>
                         }
                     }
-
-                    <div class="border-top border-2 border-danger pt-3">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold">TOTAL LIABILITIES</h5>
-                            <h5 class="fw-bold">@Model.Report.TotalLiabilities.ToString("C2")</h5>
+                    <div class="border-t-4 border-red-600 pt-4">
+                        <div class="flex justify-between items-center">
+                            <h5 class="text-lg font-bold">TOTAL LIABILITIES</h5>
+                            <h5 class="text-lg font-bold text-red-600">@Model.Report.TotalLiabilities.ToString("C2")</h5>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Equity -->
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-bank me-2"></i>Equity</h5>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="bg-emerald-600 text-white px-6 py-4">
+                    <h5 class="text-lg font-semibold"><i class="bi bi-bank me-2"></i>Equity</h5>
                 </div>
-                <div class="card-body">
-                    <table class="table table-sm table-borderless mb-4">
+                <div class="p-6">
+                    <table class="w-full text-sm mb-6">
                         <tbody>
                             @foreach (var item in Model.Report.EquityItems)
                             {
-                                <tr>
-                                    <td class="ps-3">
-                                        <small class="text-muted">@item.AccountCode</small>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                    <td class="py-2 ps-3">
+                                        <span class="text-xs text-gray-400 me-2">@item.AccountCode</span>
                                         @item.AccountName
                                     </td>
-                                    <td class="text-end">@item.Balance.ToString("C2")</td>
+                                    <td class="py-2 text-right">@item.Balance.ToString("C2")</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
-
-                    <div class="border-top border-2 border-success pt-3">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold">TOTAL EQUITY</h5>
-                            <h5 class="fw-bold">@Model.Report.TotalEquity.ToString("C2")</h5>
+                    <div class="border-t-4 border-emerald-600 pt-4">
+                        <div class="flex justify-between items-center">
+                            <h5 class="text-lg font-bold">TOTAL EQUITY</h5>
+                            <h5 class="text-lg font-bold text-emerald-600">@Model.Report.TotalEquity.ToString("C2")</h5>
                         </div>
                     </div>
-
-                    <div class="border-top border-3 border-dark mt-3 pt-3">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold">TOTAL LIABILITIES & EQUITY</h5>
-                            <h5 class="fw-bold">@Model.Report.TotalLiabilitiesAndEquity.ToString("C2")</h5>
+                    <div class="border-t-4 border-gray-800 mt-4 pt-4">
+                        <div class="flex justify-between items-center">
+                            <h5 class="text-lg font-bold">TOTAL LIABILITIES & EQUITY</h5>
+                            <h5 class="text-lg font-bold">@Model.Report.TotalLiabilitiesAndEquity.ToString("C2")</h5>
                         </div>
                     </div>
                 </div>
@@ -273,129 +237,113 @@
         </div>
     </div>
 
-    <!-- Key Ratios -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Key Financial Ratios</h5>
+    <!-- Key Financial Ratios -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h5 class="text-lg font-semibold text-gray-900"><i class="bi bi-graph-up me-2"></i>Key Financial Ratios</h5>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <h6 class="text-sm text-gray-500 mb-2">Current Ratio</h6>
+                    <h3 class="text-2xl font-bold mb-1 @(Model.Report.CurrentRatio >= 1 ? "text-emerald-600" : "text-red-600")">
+                        @Model.Report.CurrentRatio.ToString("F2")
+                    </h3>
+                    <p class="text-xs text-gray-500">Current Assets / Current Liabilities</p>
+                    <div class="mt-2">
+                        @if (Model.Report.CurrentRatio >= 2)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Excellent</span>
+                        }
+                        else if (Model.Report.CurrentRatio >= 1)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Adequate</span>
+                        }
+                        else
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Low</span>
+                        }
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h6 class="text-muted mb-2">Current Ratio</h6>
-                                <h3 class="mb-1 @(Model.Report.CurrentRatio >= 1 ? "text-success" : "text-danger")">
-                                    @Model.Report.CurrentRatio.ToString("F2")
-                                </h3>
-                                <small class="text-muted">Current Assets / Current Liabilities</small>
-                                <div class="mt-2">
-                                    @if (Model.Report.CurrentRatio >= 2)
-                                    {
-                                        <span class="badge bg-success">Excellent</span>
-                                    }
-                                    else if (Model.Report.CurrentRatio >= 1)
-                                    {
-                                        <span class="badge bg-warning">Adequate</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Low</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h6 class="text-muted mb-2">Quick Ratio</h6>
-                                <h3 class="mb-1 @(Model.Report.QuickRatio >= 1 ? "text-success" : "text-danger")">
-                                    @Model.Report.QuickRatio.ToString("F2")
-                                </h3>
-                                <small class="text-muted">(Current Assets - Inventory) / Current Liabilities</small>
-                                <div class="mt-2">
-                                    @if (Model.Report.QuickRatio >= 1)
-                                    {
-                                        <span class="badge bg-success">Good</span>
-                                    }
-                                    else if (Model.Report.QuickRatio >= 0.5m)
-                                    {
-                                        <span class="badge bg-warning">Moderate</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Low</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h6 class="text-muted mb-2">Debt to Equity</h6>
-                                <h3 class="mb-1 @(Model.Report.DebtToEquityRatio <= 2 ? "text-success" : "text-warning")">
-                                    @Model.Report.DebtToEquityRatio.ToString("F2")
-                                </h3>
-                                <small class="text-muted">Total Liabilities / Total Equity</small>
-                                <div class="mt-2">
-                                    @if (Model.Report.DebtToEquityRatio <= 1)
-                                    {
-                                        <span class="badge bg-success">Conservative</span>
-                                    }
-                                    else if (Model.Report.DebtToEquityRatio <= 2)
-                                    {
-                                        <span class="badge bg-warning">Moderate</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">High Leverage</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-light rounded">
-                                <h6 class="text-muted mb-2">Working Capital</h6>
-                                <h3 class="mb-1 @(Model.Report.WorkingCapital >= 0 ? "text-success" : "text-danger")">
-                                    @Model.Report.WorkingCapital.ToString("C0")
-                                </h3>
-                                <small class="text-muted">Current Assets - Current Liabilities</small>
-                                <div class="mt-2">
-                                    @if (Model.Report.WorkingCapital > 0)
-                                    {
-                                        <span class="badge bg-success">Positive</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Negative</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <h6 class="text-sm text-gray-500 mb-2">Quick Ratio</h6>
+                    <h3 class="text-2xl font-bold mb-1 @(Model.Report.QuickRatio >= 1 ? "text-emerald-600" : "text-red-600")">
+                        @Model.Report.QuickRatio.ToString("F2")
+                    </h3>
+                    <p class="text-xs text-gray-500">(Current Assets - Inventory) / Current Liabilities</p>
+                    <div class="mt-2">
+                        @if (Model.Report.QuickRatio >= 1)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Good</span>
+                        }
+                        else if (Model.Report.QuickRatio >= 0.5m)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Moderate</span>
+                        }
+                        else
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Low</span>
+                        }
+                    </div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <h6 class="text-sm text-gray-500 mb-2">Debt to Equity</h6>
+                    <h3 class="text-2xl font-bold mb-1 @(Model.Report.DebtToEquityRatio <= 2 ? "text-emerald-600" : "text-amber-600")">
+                        @Model.Report.DebtToEquityRatio.ToString("F2")
+                    </h3>
+                    <p class="text-xs text-gray-500">Total Liabilities / Total Equity</p>
+                    <div class="mt-2">
+                        @if (Model.Report.DebtToEquityRatio <= 1)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Conservative</span>
+                        }
+                        else if (Model.Report.DebtToEquityRatio <= 2)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Moderate</span>
+                        }
+                        else
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">High Leverage</span>
+                        }
+                    </div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <h6 class="text-sm text-gray-500 mb-2">Working Capital</h6>
+                    <h3 class="text-2xl font-bold mb-1 @(Model.Report.WorkingCapital >= 0 ? "text-emerald-600" : "text-red-600")">
+                        @Model.Report.WorkingCapital.ToString("C0")
+                    </h3>
+                    <p class="text-xs text-gray-500">Current Assets - Current Liabilities</p>
+                    <div class="mt-2">
+                        @if (Model.Report.WorkingCapital > 0)
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Positive</span>
+                        }
+                        else
+                        {
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Negative</span>
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Asset Composition Chart -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="mb-0">Asset Composition</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="assetChart" height="200"></canvas>
-                </div>
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">Asset Composition</h5>
+            </div>
+            <div class="p-6">
+                <canvas id="assetChart" height="200"></canvas>
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="mb-0">Liabilities & Equity Composition</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="liabilityEquityChart" height="200"></canvas>
-                </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">Liabilities & Equity Composition</h5>
+            </div>
+            <div class="p-6">
+                <canvas id="liabilityEquityChart" height="200"></canvas>
             </div>
         </div>
     </div>
@@ -403,64 +351,60 @@
     @if (Model.Report.PreviousPeriod != null)
     {
         <!-- Year-over-Year Comparison -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Year-over-Year Comparison</h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th class="text-end">@Model.Report.AsOfDate.ToString("MMM yyyy")</th>
-                                    <th class="text-end">@Model.Report.PreviousPeriod.AsOfDate.ToString("MMM yyyy")</th>
-                                    <th class="text-end">Change</th>
-                                    <th class="text-end">% Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Total Assets</strong></td>
-                                    <td class="text-end">@Model.Report.TotalAssets.ToString("C2")</td>
-                                    <td class="text-end">@Model.Report.PreviousPeriod.TotalAssets.ToString("C2")</td>
-                                    <td class="text-end @(Model.Report.TotalAssets - Model.Report.PreviousPeriod.TotalAssets >= 0 ? "text-success" : "text-danger")">
-                                        @((Model.Report.TotalAssets - Model.Report.PreviousPeriod.TotalAssets).ToString("C2"))
-                                    </td>
-                                    <td class="text-end @(Model.Report.PreviousPeriod.AssetsChange >= 0 ? "text-success" : "text-danger")">
-                                        <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.AssetsChange >= 0 ? "up" : "down")"></i>
-                                        @Math.Abs(Model.Report.PreviousPeriod.AssetsChange).ToString("F1")%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Total Liabilities</strong></td>
-                                    <td class="text-end">@Model.Report.TotalLiabilities.ToString("C2")</td>
-                                    <td class="text-end">@Model.Report.PreviousPeriod.TotalLiabilities.ToString("C2")</td>
-                                    <td class="text-end @(Model.Report.TotalLiabilities - Model.Report.PreviousPeriod.TotalLiabilities <= 0 ? "text-success" : "text-danger")">
-                                        @((Model.Report.TotalLiabilities - Model.Report.PreviousPeriod.TotalLiabilities).ToString("C2"))
-                                    </td>
-                                    <td class="text-end @(Model.Report.PreviousPeriod.LiabilitiesChange <= 0 ? "text-success" : "text-danger")">
-                                        <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.LiabilitiesChange >= 0 ? "up" : "down")"></i>
-                                        @Math.Abs(Model.Report.PreviousPeriod.LiabilitiesChange).ToString("F1")%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Total Equity</strong></td>
-                                    <td class="text-end">@Model.Report.TotalEquity.ToString("C2")</td>
-                                    <td class="text-end">@Model.Report.PreviousPeriod.TotalEquity.ToString("C2")</td>
-                                    <td class="text-end @(Model.Report.TotalEquity - Model.Report.PreviousPeriod.TotalEquity >= 0 ? "text-success" : "text-danger")">
-                                        @((Model.Report.TotalEquity - Model.Report.PreviousPeriod.TotalEquity).ToString("C2"))
-                                    </td>
-                                    <td class="text-end @(Model.Report.PreviousPeriod.EquityChange >= 0 ? "text-success" : "text-danger")">
-                                        <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.EquityChange >= 0 ? "up" : "down")"></i>
-                                        @Math.Abs(Model.Report.PreviousPeriod.EquityChange).ToString("F1")%
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-900">Year-over-Year Comparison</h5>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                        <tr>
+                            <th class="px-6 py-3 text-left">Category</th>
+                            <th class="px-6 py-3 text-right">@Model.Report.AsOfDate.ToString("MMM yyyy")</th>
+                            <th class="px-6 py-3 text-right">@Model.Report.PreviousPeriod.AsOfDate.ToString("MMM yyyy")</th>
+                            <th class="px-6 py-3 text-right">Change</th>
+                            <th class="px-6 py-3 text-right">% Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-semibold">Total Assets</td>
+                            <td class="px-6 py-4 text-right">@Model.Report.TotalAssets.ToString("C2")</td>
+                            <td class="px-6 py-4 text-right">@Model.Report.PreviousPeriod.TotalAssets.ToString("C2")</td>
+                            <td class="px-6 py-4 text-right @(Model.Report.TotalAssets - Model.Report.PreviousPeriod.TotalAssets >= 0 ? "text-emerald-600" : "text-red-600")">
+                                @((Model.Report.TotalAssets - Model.Report.PreviousPeriod.TotalAssets).ToString("C2"))
+                            </td>
+                            <td class="px-6 py-4 text-right @(Model.Report.PreviousPeriod.AssetsChange >= 0 ? "text-emerald-600" : "text-red-600")">
+                                <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.AssetsChange >= 0 ? "up" : "down")"></i>
+                                @Math.Abs(Model.Report.PreviousPeriod.AssetsChange).ToString("F1")%
+                            </td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-semibold">Total Liabilities</td>
+                            <td class="px-6 py-4 text-right">@Model.Report.TotalLiabilities.ToString("C2")</td>
+                            <td class="px-6 py-4 text-right">@Model.Report.PreviousPeriod.TotalLiabilities.ToString("C2")</td>
+                            <td class="px-6 py-4 text-right @(Model.Report.TotalLiabilities - Model.Report.PreviousPeriod.TotalLiabilities <= 0 ? "text-emerald-600" : "text-red-600")">
+                                @((Model.Report.TotalLiabilities - Model.Report.PreviousPeriod.TotalLiabilities).ToString("C2"))
+                            </td>
+                            <td class="px-6 py-4 text-right @(Model.Report.PreviousPeriod.LiabilitiesChange <= 0 ? "text-emerald-600" : "text-red-600")">
+                                <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.LiabilitiesChange >= 0 ? "up" : "down")"></i>
+                                @Math.Abs(Model.Report.PreviousPeriod.LiabilitiesChange).ToString("F1")%
+                            </td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-semibold">Total Equity</td>
+                            <td class="px-6 py-4 text-right">@Model.Report.TotalEquity.ToString("C2")</td>
+                            <td class="px-6 py-4 text-right">@Model.Report.PreviousPeriod.TotalEquity.ToString("C2")</td>
+                            <td class="px-6 py-4 text-right @(Model.Report.TotalEquity - Model.Report.PreviousPeriod.TotalEquity >= 0 ? "text-emerald-600" : "text-red-600")">
+                                @((Model.Report.TotalEquity - Model.Report.PreviousPeriod.TotalEquity).ToString("C2"))
+                            </td>
+                            <td class="px-6 py-4 text-right @(Model.Report.PreviousPeriod.EquityChange >= 0 ? "text-emerald-600" : "text-red-600")">
+                                <i class="bi bi-arrow-@(Model.Report.PreviousPeriod.EquityChange >= 0 ? "up" : "down")"></i>
+                                @Math.Abs(Model.Report.PreviousPeriod.EquityChange).ToString("F1")%
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     }
@@ -477,7 +421,7 @@
                 labels: ['Current Assets', 'Non-Current Assets'],
                 datasets: [{
                     data: [@Model.Report.TotalCurrentAssets, @Model.Report.TotalNonCurrentAssets],
-                    backgroundColor: ['#0d6efd', '#6c757d'],
+                    backgroundColor: ['rgb(99, 102, 241)', 'rgb(107, 114, 128)'],
                     borderWidth: 0
                 }]
             },
@@ -485,9 +429,7 @@
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+                    legend: { position: 'bottom' }
                 }
             }
         });
@@ -500,7 +442,7 @@
                 labels: ['Current Liabilities', 'Non-Current Liabilities', 'Equity'],
                 datasets: [{
                     data: [@Model.Report.TotalCurrentLiabilities, @Model.Report.TotalNonCurrentLiabilities, @Model.Report.TotalEquity],
-                    backgroundColor: ['#dc3545', '#fd7e14', '#198754'],
+                    backgroundColor: ['rgb(239, 68, 68)', 'rgb(249, 115, 22)', 'rgb(16, 185, 129)'],
                     borderWidth: 0
                 }]
             },
@@ -508,9 +450,7 @@
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+                    legend: { position: 'bottom' }
                 }
             }
         });

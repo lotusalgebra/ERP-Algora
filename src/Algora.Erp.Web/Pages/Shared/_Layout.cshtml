@@ -76,12 +76,17 @@
             <!-- Navigation -->
             <nav class="py-4 px-3">
                 <!-- Main -->
+                @if (User.HasClaim("permission", "Dashboard.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Main</p>
                 <a href="/Dashboard" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1 @(ViewContext.RouteData.Values["page"]?.ToString() == "/Dashboard/Index" ? "bg-slate-800 text-white border-l-2 border-primary-500" : "")">
                     <i class="bi bi-speedometer2 w-5 mr-3"></i>Dashboard
                 </a>
+                }
 
                 <!-- Finance -->
+                @if (User.HasClaim("permission", "Finance.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Finance</p>
                 <a href="/Finance/Accounts" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-journal-text w-5 mr-3"></i>Chart of Accounts
@@ -98,9 +103,15 @@
                 <a href="/Finance/Reports" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-graph-up w-5 mr-3"></i>Financial Reports
                 </a>
+                }
 
                 <!-- HR & Payroll -->
+                @if (User.HasClaim("permission", "HR.View") || User.HasClaim("permission", "Payroll.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">HR & Payroll</p>
+                }
+                @if (User.HasClaim("permission", "HR.View") || User.IsInRole("Admin"))
+                {
                 <a href="/HR/Employees" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-people w-5 mr-3"></i>Employees
                 </a>
@@ -116,14 +127,20 @@
                 <a href="/HR/Leave" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-calendar-x w-5 mr-3"></i>Leave Requests
                 </a>
+                }
+                @if (User.HasClaim("permission", "Payroll.View") || User.IsInRole("Admin"))
+                {
                 <a href="/Payroll/Components" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-list-ul w-5 mr-3"></i>Salary Components
                 </a>
                 <a href="/Payroll/Runs" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-cash-stack w-5 mr-3"></i>Payroll Runs
                 </a>
+                }
 
                 <!-- Inventory -->
+                @if (User.HasClaim("permission", "Inventory.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Inventory</p>
                 <a href="/Inventory/Products" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-box w-5 mr-3"></i>Products
@@ -134,8 +151,11 @@
                 <a href="/Inventory/Stock" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-clipboard-data w-5 mr-3"></i>Stock Levels
                 </a>
+                }
 
                 <!-- Ecommerce -->
+                @if (User.HasClaim("permission", "Ecommerce.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Ecommerce</p>
                 <a href="/Ecommerce/Products" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-shop w-5 mr-3"></i>Products
@@ -155,8 +175,11 @@
                 <a href="/Ecommerce/Settings" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-gear w-5 mr-3"></i>Store Settings
                 </a>
+                }
 
                 <!-- Procurement -->
+                @if (User.HasClaim("permission", "Procurement.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Procurement</p>
                 <a href="/Procurement/Suppliers" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-truck w-5 mr-3"></i>Suppliers
@@ -170,14 +193,20 @@
                 <a href="/Procurement/PurchaseInvoices" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-receipt w-5 mr-3"></i>Purchase Invoices
                 </a>
+                }
 
                 <!-- Dispatch -->
+                @if (User.HasClaim("permission", "Dispatch.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Dispatch</p>
                 <a href="/Dispatch/DeliveryChallans" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-truck w-5 mr-3"></i>Delivery Challans
                 </a>
+                }
 
                 <!-- Quality -->
+                @if (User.HasClaim("permission", "Quality.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Quality</p>
                 <a href="/Quality/Inspections" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-clipboard-check w-5 mr-3"></i>Inspections
@@ -185,8 +214,11 @@
                 <a href="/Quality/Rejections" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-x-circle w-5 mr-3"></i>Rejections
                 </a>
+                }
 
                 <!-- Sales & CRM -->
+                @if (User.HasClaim("permission", "Sales.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Sales & CRM</p>
                 <a href="/Sales/Customers" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-person-badge w-5 mr-3"></i>Customers
@@ -200,8 +232,11 @@
                 <a href="/Sales/Orders" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-bag-check w-5 mr-3"></i>Sales Orders
                 </a>
+                }
 
                 <!-- Manufacturing -->
+                @if (User.HasClaim("permission", "Manufacturing.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Manufacturing</p>
                 <a href="/Manufacturing/BOM" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-list-nested w-5 mr-3"></i>Bill of Materials
@@ -209,8 +244,11 @@
                 <a href="/Manufacturing/WorkOrders" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-gear w-5 mr-3"></i>Work Orders
                 </a>
+                }
 
                 <!-- Projects -->
+                @if (User.HasClaim("permission", "Projects.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Projects</p>
                 <a href="/Projects" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-kanban w-5 mr-3"></i>Projects
@@ -218,14 +256,20 @@
                 <a href="/Projects/TimeTracking" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-stopwatch w-5 mr-3"></i>Time Tracking
                 </a>
+                }
 
                 <!-- Reports -->
+                @if (User.HasClaim("permission", "Reports.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Reports</p>
                 <a href="/Reports/Cancellations" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-x-octagon w-5 mr-3"></i>Cancellations
                 </a>
+                }
 
                 <!-- Settings -->
+                @if (User.HasClaim("permission", "Settings.View") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Settings</p>
                 <a href="/Settings/Currencies" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-currency-exchange w-5 mr-3"></i>Currencies
@@ -236,8 +280,11 @@
                 <a href="/Settings/GstSlabs" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-percent w-5 mr-3"></i>GST Slabs
                 </a>
+                }
 
                 <!-- Administration -->
+                @if (User.HasClaim("permission", "Admin.View") || User.HasClaim("permission", "Admin.Manage") || User.IsInRole("Admin"))
+                {
                 <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Administration</p>
                 <a href="/Admin/Users" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-person-gear w-5 mr-3"></i>Users
@@ -251,6 +298,7 @@
                 <a href="/Admin/Integrations" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
                     <i class="bi bi-plug w-5 mr-3"></i>Integrations
                 </a>
+                }
             </nav>
         </div>
     </aside>

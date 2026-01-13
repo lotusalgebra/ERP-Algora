@@ -74,7 +74,7 @@
     </div>
 
     <!-- Invoices Table -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm">
         <div class="p-4 border-b border-gray-200">
             <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
                 <div class="md:col-span-2">
@@ -89,6 +89,7 @@
                                hx-get="/Finance/Invoices?handler=Table"
                                hx-trigger="keyup changed delay:300ms"
                                hx-target="#tableContent"
+                               hx-swap="outerHTML"
                                hx-include="#statusFilter,#typeFilter,#dateFrom,#dateTo"
                                name="search">
                     </div>
@@ -99,6 +100,7 @@
                             hx-get="/Finance/Invoices?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
+                            hx-swap="outerHTML"
                             hx-include="#searchInput,#typeFilter,#dateFrom,#dateTo">
                         <option value="">All Status</option>
                         <option value="0">Draft</option>
@@ -116,6 +118,7 @@
                             hx-get="/Finance/Invoices?handler=Table"
                             hx-trigger="change"
                             hx-target="#tableContent"
+                            hx-swap="outerHTML"
                             hx-include="#searchInput,#statusFilter,#dateFrom,#dateTo">
                         <option value="">All Types</option>
                         @foreach (InvoiceType type in Enum.GetValues(typeof(InvoiceType)))
@@ -130,6 +133,7 @@
                            hx-get="/Finance/Invoices?handler=Table"
                            hx-trigger="change"
                            hx-target="#tableContent"
+                           hx-swap="outerHTML"
                            hx-include="#searchInput,#statusFilter,#typeFilter,#dateTo"
                            placeholder="From">
                 </div>
@@ -139,12 +143,13 @@
                            hx-get="/Finance/Invoices?handler=Table"
                            hx-trigger="change"
                            hx-target="#tableContent"
+                           hx-swap="outerHTML"
                            hx-include="#searchInput,#statusFilter,#typeFilter,#dateFrom"
                            placeholder="To">
                 </div>
             </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="min-w-full">
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
@@ -158,12 +163,159 @@
                         <th scope="col" class="px-6 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="tableContent" hx-get="/Finance/Invoices?handler=Table" hx-trigger="load">
-                    <tr>
-                        <td colspan="8" class="px-6 py-8 text-center">
-                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
-                        </td>
-                    </tr>
+                <tbody id="tableContent">
+                    @if (Model.Invoices.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-12 text-gray-500">
+                                <i class="bi bi-inbox text-4xl block mb-3"></i>
+                                No invoices found
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var invoice in Model.Invoices)
+                        {
+                            var statusBadgeClass = invoice.Status switch
+                            {
+                                InvoiceStatus.Draft => "bg-gray-100 text-gray-800",
+                                InvoiceStatus.Pending => "bg-amber-100 text-amber-800",
+                                InvoiceStatus.Sent => "bg-blue-100 text-blue-800",
+                                InvoiceStatus.PartiallyPaid => "bg-primary-100 text-primary-800",
+                                InvoiceStatus.Paid => "bg-emerald-100 text-emerald-800",
+                                InvoiceStatus.Overdue => "bg-red-100 text-red-800",
+                                InvoiceStatus.Void => "bg-gray-700 text-white",
+                                InvoiceStatus.Cancelled => "bg-gray-100 text-gray-800",
+                                _ => "bg-gray-100 text-gray-800"
+                            };
+
+                            var isOverdue = invoice.DueDate < DateTime.UtcNow &&
+                                invoice.Status != InvoiceStatus.Paid &&
+                                invoice.Status != InvoiceStatus.Void &&
+                                invoice.Status != InvoiceStatus.Cancelled;
+
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <a href="/Finance/Invoices/Details/@invoice.Id" class="text-primary-600 hover:underline font-medium">
+                                        @invoice.InvoiceNumber
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4">@invoice.InvoiceDate.ToString("MMM dd, yyyy")</td>
+                                <td class="px-6 py-4">
+                                    @if (invoice.Customer != null)
+                                    {
+                                        <span>@invoice.Customer.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-500">-</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="@(isOverdue ? "text-red-600 font-medium" : "")">
+                                        @invoice.DueDate.ToString("MMM dd, yyyy")
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">@invoice.TotalAmount.ToString("C2")</td>
+                                <td class="px-6 py-4 text-right">
+                                    @if (invoice.BalanceDue > 0)
+                                    {
+                                        <span class="font-medium">@invoice.BalanceDue.ToString("C2")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-500">$0.00</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full @statusBadgeClass">@invoice.Status</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button type="button" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                                            id="dropdownInv@(invoice.Id)" data-dropdown-toggle="dropdownMenuInv@(invoice.Id)" data-dropdown-placement="left-start">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <div class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuInv@(invoice.Id)">
+                                            <ul class="py-2 text-sm text-gray-700">
+                                                <li>
+                                                    <a class="block px-4 py-2 hover:bg-gray-100" href="/Finance/Invoices/Details/@invoice.Id">
+                                                        <i class="bi bi-eye mr-2"></i> View
+                                                    </a>
+                                                </li>
+                                                @if (invoice.Status == InvoiceStatus.Draft)
+                                                {
+                                                    <li>
+                                                        <a class="block px-4 py-2 hover:bg-gray-100" href="/Finance/Invoices/Edit/@invoice.Id">
+                                                            <i class="bi bi-pencil mr-2"></i> Edit
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <button class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                                                hx-post="/Finance/Invoices?handler=Send&id=@invoice.Id"
+                                                                hx-target="#tableContent"
+                                                                hx-swap="outerHTML"
+                                                                hx-confirm="Are you sure you want to send this invoice?">
+                                                            <i class="bi bi-send mr-2"></i> Send
+                                                        </button>
+                                                    </li>
+                                                }
+                                                @if (invoice.Status != InvoiceStatus.Paid && invoice.Status != InvoiceStatus.Void)
+                                                {
+                                                    <li>
+                                                        <a class="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                           hx-get="/Finance/Invoices?handler=PaymentForm&id=@invoice.Id"
+                                                           hx-target="#paymentModalContent"
+                                                           data-modal-target="paymentModal" data-modal-toggle="paymentModal">
+                                                            <i class="bi bi-cash mr-2"></i> Record Payment
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <button class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                                                hx-post="/Finance/Invoices?handler=MarkPaid&id=@invoice.Id"
+                                                                hx-target="#tableContent"
+                                                                hx-swap="outerHTML"
+                                                                hx-confirm="Mark this invoice as fully paid?">
+                                                            <i class="bi bi-check-circle mr-2"></i> Mark as Paid
+                                                        </button>
+                                                    </li>
+                                                }
+                                                <li class="border-t border-gray-100"></li>
+                                                <li>
+                                                    <a class="block px-4 py-2 hover:bg-gray-100" href="/Finance/Invoices/Print/@invoice.Id" target="_blank">
+                                                        <i class="bi bi-printer mr-2"></i> Print
+                                                    </a>
+                                                </li>
+                                                @if (invoice.Status != InvoiceStatus.Paid)
+                                                {
+                                                    <li>
+                                                        <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                                                                hx-delete="/Finance/Invoices?id=@invoice.Id"
+                                                                hx-target="#tableContent"
+                                                                hx-swap="outerHTML"
+                                                                hx-confirm="Are you sure you want to delete this invoice?">
+                                                            <i class="bi bi-trash mr-2"></i> Delete
+                                                        </button>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li>
+                                                        <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-amber-600"
+                                                                hx-post="/Finance/Invoices?handler=Void&id=@invoice.Id"
+                                                                hx-target="#tableContent"
+                                                                hx-swap="outerHTML"
+                                                                hx-confirm="Are you sure you want to void this invoice?">
+                                                            <i class="bi bi-x-circle mr-2"></i> Void
+                                                        </button>
+                                                    </li>
+                                                }
+                                            </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>

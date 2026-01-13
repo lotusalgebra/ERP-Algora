@@ -3,12 +3,14 @@ using Algora.Erp.Domain.Entities.HR;
 using Algora.Erp.Domain.Entities.Projects;
 using Algora.Erp.Domain.Entities.Sales;
 using Algora.Erp.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Projects;
 
+[Authorize(Policy = "CanViewProjects")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

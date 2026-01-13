@@ -41,6 +41,7 @@ public class Invoice : AuditableEntity
     public Guid? GstSlabId { get; set; }
     public GstSlab? GstSlab { get; set; }
     public bool IsInterState { get; set; } // True = IGST, False = CGST+SGST
+    public GstType GstType { get; set; } = GstType.Regular;
     public decimal CgstAmount { get; set; }
     public decimal SgstAmount { get; set; }
     public decimal IgstAmount { get; set; }
@@ -160,4 +161,12 @@ public enum PaymentMethod
     DebitCard = 4,
     PayPal = 5,
     Other = 6
+}
+
+public enum GstType
+{
+    Regular = 0,       // Standard GST (CGST+SGST or IGST)
+    Exempt = 1,        // GST Exempt
+    ZeroRated = 2,     // Zero-rated supply
+    ReverseCharge = 3  // Reverse charge mechanism
 }

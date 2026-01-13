@@ -3,6 +3,7 @@ using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Dispatch;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Sales;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Dispatch.DeliveryChallans;
 
+[Authorize(Policy = "CanViewDispatch")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

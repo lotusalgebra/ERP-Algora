@@ -1,6 +1,7 @@
 @model Algora.Erp.Web.Pages.Sales.Leads.LeadsTableViewModel
 @using Algora.Erp.Domain.Entities.Sales
 
+<tbody id="leadsTableBody">
 @if (Model.Leads.Any())
 {
     foreach (var lead in Model.Leads)
@@ -78,7 +79,7 @@
                             <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
                                hx-delete="/Sales/Leads?id=@lead.Id"
                                hx-target="#leadsTableBody"
-                               hx-swap="innerHTML"
+                               hx-swap="outerHTML"
                                hx-confirm="Delete this lead?">
                                 <i class="bi bi-trash mr-2"></i> Delete
                             </a>
@@ -105,6 +106,7 @@ else
         </td>
     </tr>
 }
+</tbody>
 <script>
     // Re-initialize Flowbite dropdowns and HTMX after content swap
     if (typeof initFlowbite === 'function') { initFlowbite(); }

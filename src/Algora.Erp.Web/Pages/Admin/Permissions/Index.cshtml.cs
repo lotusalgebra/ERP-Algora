@@ -1,11 +1,13 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Administration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Admin.Permissions;
 
+[Authorize(Policy = "CanManageAdmin")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

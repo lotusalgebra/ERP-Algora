@@ -6,11 +6,13 @@ using Algora.Erp.Domain.Entities.Procurement;
 using Algora.Erp.Domain.Entities.Projects;
 using Algora.Erp.Domain.Entities.Sales;
 using Algora.Erp.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Dashboard;
 
+[Authorize(Policy = "CanViewDashboard")]
 public class IndexModel : PageModel
 {
     private readonly IApplicationDbContext _context;

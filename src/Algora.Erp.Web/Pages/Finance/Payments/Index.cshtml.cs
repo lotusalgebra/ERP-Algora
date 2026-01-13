@@ -1,11 +1,13 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Finance;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Algora.Erp.Web.Pages.Finance.Payments;
 
+[Authorize(Policy = "CanViewFinance")]
 public class IndexModel : PageModel
 {
     private readonly IPaymentService _paymentService;

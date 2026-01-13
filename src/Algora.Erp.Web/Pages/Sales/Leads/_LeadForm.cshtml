@@ -1,7 +1,7 @@
 @model Algora.Erp.Web.Pages.Sales.Leads.LeadFormViewModel
 @using Algora.Erp.Domain.Entities.Sales
 
-<form hx-post="/Sales/Leads" hx-target="#leadsTableBody" hx-swap="innerHTML">
+<form hx-post="/Sales/Leads" hx-target="#leadsTableBody" hx-swap="outerHTML">
     <div class="flex items-center justify-between p-4 border-b rounded-t">
         <h5 class="text-xl font-semibold text-gray-900">@(Model.IsEdit ? "Edit Lead" : "New Lead")</h5>
         <button type="button" class="text-gray-400 hover:text-gray-900" data-modal-hide="leadModal">

@@ -1,5 +1,6 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Sales;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using System.Text;
 
 namespace Algora.Erp.Web.Pages.Sales.Quotations;
 
+[Authorize(Policy = "CanViewSales")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

@@ -1,11 +1,13 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.HR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.HR.Departments;
 
+[Authorize(Policy = "CanViewHR")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

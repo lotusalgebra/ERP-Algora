@@ -5,57 +5,57 @@
     ViewData["Title"] = "Cash Flow Statement";
 }
 
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="h3 mb-0">Cash Flow Statement</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance">Finance</a></li>
-                    <li class="breadcrumb-item"><a href="/Finance/Reports">Reports</a></li>
-                    <li class="breadcrumb-item active">Cash Flow Statement</li>
+            <h1 class="text-2xl font-bold text-gray-900">Cash Flow Statement</h1>
+            <nav class="flex mt-1" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm">
+                    <li><a href="/" class="text-gray-500 hover:text-indigo-600">Dashboard</a></li>
+                    <li class="flex items-center"><span class="mx-2 text-gray-400">/</span><a href="/Finance" class="text-gray-500 hover:text-indigo-600">Finance</a></li>
+                    <li class="flex items-center"><span class="mx-2 text-gray-400">/</span><a href="/Finance/Reports" class="text-gray-500 hover:text-indigo-600">Reports</a></li>
+                    <li class="flex items-center"><span class="mx-2 text-gray-400">/</span><span class="text-gray-700">Cash Flow Statement</span></li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
+        <div class="flex gap-2">
             <a href="?handler=ExportPdf&StartDate=@(Model.StartDate?.ToString("yyyy-MM-dd"))&EndDate=@(Model.EndDate?.ToString("yyyy-MM-dd"))"
-               class="btn btn-outline-danger">
-                <i class="bi bi-file-pdf me-1"></i>Export PDF
+               class="inline-flex items-center px-4 py-2 border border-red-300 text-red-700 bg-white rounded-lg hover:bg-red-50 text-sm font-medium transition-colors">
+                <i class="bi bi-file-pdf mr-2"></i>Export PDF
             </a>
             <a href="?handler=ExportCsv&StartDate=@(Model.StartDate?.ToString("yyyy-MM-dd"))&EndDate=@(Model.EndDate?.ToString("yyyy-MM-dd"))"
-               class="btn btn-outline-success">
-                <i class="bi bi-file-excel me-1"></i>Export CSV
+               class="inline-flex items-center px-4 py-2 border border-green-300 text-green-700 bg-white rounded-lg hover:bg-green-50 text-sm font-medium transition-colors">
+                <i class="bi bi-file-excel mr-2"></i>Export CSV
             </a>
         </div>
     </div>
 
     <!-- Date Range Filter -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-control" name="StartDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="p-4 sm:p-6">
+            <form method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                    <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" name="StartDate" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-control" name="EndDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                    <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" name="EndDate" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))">
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search me-1"></i>Generate Report
+                <div>
+                    <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium transition-colors">
+                        <i class="bi bi-search mr-2"></i>Generate Report
                     </button>
                 </div>
-                <div class="col-md-3 text-end">
-                    <div class="btn-group" role="group">
+                <div class="flex justify-end">
+                    <div class="inline-flex rounded-lg shadow-sm" role="group">
                         <a href="?StartDate=@(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).ToString("yyyy-MM-dd"))&EndDate=@(DateTime.Today.ToString("yyyy-MM-dd"))"
-                           class="btn btn-sm btn-outline-secondary">MTD</a>
+                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-50 hover:text-indigo-600">MTD</a>
                         <a href="?StartDate=@(new DateTime(DateTime.Today.Year, (DateTime.Today.Month-1)/3*3+1, 1).ToString("yyyy-MM-dd"))&EndDate=@(DateTime.Today.ToString("yyyy-MM-dd"))"
-                           class="btn btn-sm btn-outline-secondary">QTD</a>
+                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border-t border-b border-gray-300 hover:bg-gray-50 hover:text-indigo-600">QTD</a>
                         <a href="?StartDate=@(new DateTime(DateTime.Today.Year, 1, 1).ToString("yyyy-MM-dd"))&EndDate=@(DateTime.Today.ToString("yyyy-MM-dd"))"
-                           class="btn btn-sm btn-outline-secondary">YTD</a>
+                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-50 hover:text-indigo-600">YTD</a>
                     </div>
                 </div>
             </form>
@@ -63,321 +63,316 @@
     </div>
 
     <!-- Key Metrics Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Operating Cash Flow</h6>
-                            <h3 class="mb-0 @(Model.Report.NetCashFromOperating >= 0 ? "text-success" : "text-danger")">
-                                @Model.Report.NetCashFromOperating.ToString("C0")
-                            </h3>
-                            <small class="text-muted">From operations</small>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-gear text-primary fs-4"></i>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- Operating Cash Flow -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Operating Cash Flow</p>
+                    <p class="text-2xl font-bold @(Model.Report.NetCashFromOperating >= 0 ? "text-green-600" : "text-red-600")">
+                        @Model.Report.NetCashFromOperating.ToString("C0")
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">From operations</p>
+                </div>
+                <div class="p-2.5 bg-indigo-100 rounded-lg">
+                    <i class="bi bi-gear text-indigo-600 text-xl"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Free Cash Flow</h6>
-                            <h3 class="mb-0 @(Model.Report.FreeCashFlow >= 0 ? "text-success" : "text-danger")">
-                                @Model.Report.FreeCashFlow.ToString("C0")
-                            </h3>
-                            <small class="text-muted">Available for distribution</small>
-                        </div>
-                        <div class="bg-success bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-cash-coin text-success fs-4"></i>
-                        </div>
-                    </div>
+
+        <!-- Free Cash Flow -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Free Cash Flow</p>
+                    <p class="text-2xl font-bold @(Model.Report.FreeCashFlow >= 0 ? "text-green-600" : "text-red-600")">
+                        @Model.Report.FreeCashFlow.ToString("C0")
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">Available for distribution</p>
+                </div>
+                <div class="p-2.5 bg-green-100 rounded-lg">
+                    <i class="bi bi-cash-coin text-green-600 text-xl"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Net Change in Cash</h6>
-                            <h3 class="mb-0 @(Model.Report.NetChangeInCash >= 0 ? "text-success" : "text-danger")">
-                                @Model.Report.NetChangeInCash.ToString("C0")
-                            </h3>
-                            <small class="text-muted">Period change</small>
-                        </div>
-                        <div class="bg-info bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-graph-up-arrow text-info fs-4"></i>
-                        </div>
-                    </div>
+
+        <!-- Net Change in Cash -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Net Change in Cash</p>
+                    <p class="text-2xl font-bold @(Model.Report.NetChangeInCash >= 0 ? "text-green-600" : "text-red-600")">
+                        @Model.Report.NetChangeInCash.ToString("C0")
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">Period change</p>
+                </div>
+                <div class="p-2.5 bg-cyan-100 rounded-lg">
+                    <i class="bi bi-graph-up-arrow text-cyan-600 text-xl"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-muted mb-2">Ending Cash Balance</h6>
-                            <h3 class="mb-0">@Model.Report.EndingCashBalance.ToString("C0")</h3>
-                            <small class="text-muted">
-                                @if (Model.Report.IsBalanced)
-                                {
-                                    <span class="text-success"><i class="bi bi-check-circle"></i> Balanced</span>
-                                }
-                                else
-                                {
-                                    <span class="text-danger"><i class="bi bi-exclamation-circle"></i> Imbalanced</span>
-                                }
-                            </small>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 p-2 rounded">
-                            <i class="bi bi-wallet2 text-warning fs-4"></i>
-                        </div>
-                    </div>
+
+        <!-- Ending Cash Balance -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Ending Cash Balance</p>
+                    <p class="text-2xl font-bold text-gray-900">@Model.Report.EndingCashBalance.ToString("C0")</p>
+                    <p class="text-xs mt-1">
+                        @if (Model.Report.IsBalanced)
+                        {
+                            <span class="text-green-600"><i class="bi bi-check-circle mr-1"></i>Balanced</span>
+                        }
+                        else
+                        {
+                            <span class="text-red-600"><i class="bi bi-exclamation-circle mr-1"></i>Imbalanced</span>
+                        }
+                    </p>
+                </div>
+                <div class="p-2.5 bg-amber-100 rounded-lg">
+                    <i class="bi bi-wallet2 text-amber-600 text-xl"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Cash Flow Statement -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">
-                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="bi bi-file-earmark-spreadsheet mr-2 text-indigo-600"></i>
                         Cash Flow Statement
-                        <small class="text-muted ms-2">
+                        <span class="text-sm font-normal text-gray-500 ml-2">
                             @Model.Report.DateRange.StartDate.ToString("MMM dd, yyyy") - @Model.Report.DateRange.EndDate.ToString("MMM dd, yyyy")
-                        </small>
-                    </h5>
+                        </span>
+                    </h2>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <!-- Operating Activities -->
-                            <thead class="bg-primary bg-opacity-10">
-                                <tr>
-                                    <th colspan="2" class="ps-4 py-3">
-                                        <i class="bi bi-gear me-2"></i>CASH FLOWS FROM OPERATING ACTIVITIES
-                                    </th>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <!-- Operating Activities -->
+                        <thead class="bg-indigo-50">
+                            <tr>
+                                <th colspan="2" class="px-6 py-3 text-left text-sm font-semibold text-indigo-800">
+                                    <i class="bi bi-gear mr-2"></i>CASH FLOWS FROM OPERATING ACTIVITIES
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-3 text-sm text-gray-700">Net Income</td>
+                                <td class="px-6 py-3 text-sm font-medium text-right">@Model.Report.NetIncome.ToString("C2")</td>
+                            </tr>
+                            @if (Model.Report.OperatingAdjustments.Any())
+                            {
+                                <tr class="bg-gray-50">
+                                    <td colspan="2" class="px-6 py-2 text-sm text-gray-500 italic">Adjustments to reconcile net income:</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="ps-4">Net Income</td>
-                                    <td class="text-end pe-4 fw-medium">@Model.Report.NetIncome.ToString("C2")</td>
-                                </tr>
-                                @if (Model.Report.OperatingAdjustments.Any())
+                                @foreach (var item in Model.Report.OperatingAdjustments)
                                 {
-                                    <tr class="bg-light">
-                                        <td colspan="2" class="ps-4 fst-italic text-muted">Adjustments to reconcile net income:</td>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-3 text-sm text-gray-700 pl-10">@item.Description</td>
+                                        <td class="px-6 py-3 text-sm font-medium text-right @(item.Amount >= 0 ? "text-green-600" : "text-red-600")">
+                                            @item.Amount.ToString("C2")
+                                        </td>
                                     </tr>
-                                    @foreach (var item in Model.Report.OperatingAdjustments)
-                                    {
-                                        <tr>
-                                            <td class="ps-5">@item.Description</td>
-                                            <td class="text-end pe-4 @(item.Amount >= 0 ? "text-success" : "text-danger")">
-                                                @item.Amount.ToString("C2")
-                                            </td>
-                                        </tr>
-                                    }
                                 }
-                                @if (Model.Report.WorkingCapitalChanges.Any())
-                                {
-                                    <tr class="bg-light">
-                                        <td colspan="2" class="ps-4 fst-italic text-muted">Changes in operating assets and liabilities:</td>
-                                    </tr>
-                                    @foreach (var item in Model.Report.WorkingCapitalChanges)
-                                    {
-                                        <tr>
-                                            <td class="ps-5">@item.Description</td>
-                                            <td class="text-end pe-4 @(item.Amount >= 0 ? "text-success" : "text-danger")">
-                                                @item.Amount.ToString("C2")
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                <tr class="table-secondary">
-                                    <td class="ps-4 fw-bold">Net Cash from Operating Activities</td>
-                                    <td class="text-end pe-4 fw-bold @(Model.Report.NetCashFromOperating >= 0 ? "text-success" : "text-danger")">
-                                        @Model.Report.NetCashFromOperating.ToString("C2")
-                                    </td>
+                            }
+                            @if (Model.Report.WorkingCapitalChanges.Any())
+                            {
+                                <tr class="bg-gray-50">
+                                    <td colspan="2" class="px-6 py-2 text-sm text-gray-500 italic">Changes in operating assets and liabilities:</td>
                                 </tr>
-                            </tbody>
+                                @foreach (var item in Model.Report.WorkingCapitalChanges)
+                                {
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-3 text-sm text-gray-700 pl-10">@item.Description</td>
+                                        <td class="px-6 py-3 text-sm font-medium text-right @(item.Amount >= 0 ? "text-green-600" : "text-red-600")">
+                                            @item.Amount.ToString("C2")
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            <tr class="bg-indigo-100">
+                                <td class="px-6 py-3 text-sm font-bold text-gray-900">Net Cash from Operating Activities</td>
+                                <td class="px-6 py-3 text-sm font-bold text-right @(Model.Report.NetCashFromOperating >= 0 ? "text-green-600" : "text-red-600")">
+                                    @Model.Report.NetCashFromOperating.ToString("C2")
+                                </td>
+                            </tr>
+                        </tbody>
 
-                            <!-- Investing Activities -->
-                            <thead class="bg-info bg-opacity-10">
-                                <tr>
-                                    <th colspan="2" class="ps-4 py-3">
-                                        <i class="bi bi-building me-2"></i>CASH FLOWS FROM INVESTING ACTIVITIES
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.Report.InvestingActivities.Any())
+                        <!-- Investing Activities -->
+                        <thead class="bg-cyan-50">
+                            <tr>
+                                <th colspan="2" class="px-6 py-3 text-left text-sm font-semibold text-cyan-800">
+                                    <i class="bi bi-building mr-2"></i>CASH FLOWS FROM INVESTING ACTIVITIES
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @if (Model.Report.InvestingActivities.Any())
+                            {
+                                @foreach (var item in Model.Report.InvestingActivities)
                                 {
-                                    @foreach (var item in Model.Report.InvestingActivities)
-                                    {
-                                        <tr>
-                                            <td class="ps-4">@item.Description</td>
-                                            <td class="text-end pe-4 @(item.Amount >= 0 ? "text-success" : "text-danger")">
-                                                @item.Amount.ToString("C2")
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="ps-4 text-muted fst-italic">(No investing activities)</td>
-                                        <td class="text-end pe-4 text-muted">$0.00</td>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-3 text-sm text-gray-700">@item.Description</td>
+                                        <td class="px-6 py-3 text-sm font-medium text-right @(item.Amount >= 0 ? "text-green-600" : "text-red-600")">
+                                            @item.Amount.ToString("C2")
+                                        </td>
                                     </tr>
                                 }
-                                <tr class="table-secondary">
-                                    <td class="ps-4 fw-bold">Net Cash from Investing Activities</td>
-                                    <td class="text-end pe-4 fw-bold @(Model.Report.NetCashFromInvesting >= 0 ? "text-success" : "text-danger")">
-                                        @Model.Report.NetCashFromInvesting.ToString("C2")
-                                    </td>
-                                </tr>
-                            </tbody>
-
-                            <!-- Financing Activities -->
-                            <thead class="bg-warning bg-opacity-10">
+                            }
+                            else
+                            {
                                 <tr>
-                                    <th colspan="2" class="ps-4 py-3">
-                                        <i class="bi bi-bank me-2"></i>CASH FLOWS FROM FINANCING ACTIVITIES
-                                    </th>
+                                    <td class="px-6 py-3 text-sm text-gray-400 italic">(No investing activities)</td>
+                                    <td class="px-6 py-3 text-sm text-gray-400 text-right">$0.00</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.Report.FinancingActivities.Any())
+                            }
+                            <tr class="bg-cyan-100">
+                                <td class="px-6 py-3 text-sm font-bold text-gray-900">Net Cash from Investing Activities</td>
+                                <td class="px-6 py-3 text-sm font-bold text-right @(Model.Report.NetCashFromInvesting >= 0 ? "text-green-600" : "text-red-600")">
+                                    @Model.Report.NetCashFromInvesting.ToString("C2")
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <!-- Financing Activities -->
+                        <thead class="bg-amber-50">
+                            <tr>
+                                <th colspan="2" class="px-6 py-3 text-left text-sm font-semibold text-amber-800">
+                                    <i class="bi bi-bank mr-2"></i>CASH FLOWS FROM FINANCING ACTIVITIES
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @if (Model.Report.FinancingActivities.Any())
+                            {
+                                @foreach (var item in Model.Report.FinancingActivities)
                                 {
-                                    @foreach (var item in Model.Report.FinancingActivities)
-                                    {
-                                        <tr>
-                                            <td class="ps-4">@item.Description</td>
-                                            <td class="text-end pe-4 @(item.Amount >= 0 ? "text-success" : "text-danger")">
-                                                @item.Amount.ToString("C2")
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td class="ps-4 text-muted fst-italic">(No financing activities)</td>
-                                        <td class="text-end pe-4 text-muted">$0.00</td>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-3 text-sm text-gray-700">@item.Description</td>
+                                        <td class="px-6 py-3 text-sm font-medium text-right @(item.Amount >= 0 ? "text-green-600" : "text-red-600")">
+                                            @item.Amount.ToString("C2")
+                                        </td>
                                     </tr>
                                 }
-                                <tr class="table-secondary">
-                                    <td class="ps-4 fw-bold">Net Cash from Financing Activities</td>
-                                    <td class="text-end pe-4 fw-bold @(Model.Report.NetCashFromFinancing >= 0 ? "text-success" : "text-danger")">
-                                        @Model.Report.NetCashFromFinancing.ToString("C2")
-                                    </td>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="px-6 py-3 text-sm text-gray-400 italic">(No financing activities)</td>
+                                    <td class="px-6 py-3 text-sm text-gray-400 text-right">$0.00</td>
                                 </tr>
-                            </tbody>
+                            }
+                            <tr class="bg-amber-100">
+                                <td class="px-6 py-3 text-sm font-bold text-gray-900">Net Cash from Financing Activities</td>
+                                <td class="px-6 py-3 text-sm font-bold text-right @(Model.Report.NetCashFromFinancing >= 0 ? "text-green-600" : "text-red-600")">
+                                    @Model.Report.NetCashFromFinancing.ToString("C2")
+                                </td>
+                            </tr>
+                        </tbody>
 
-                            <!-- Summary -->
-                            <thead class="bg-dark text-white">
-                                <tr>
-                                    <th colspan="2" class="ps-4 py-3">
-                                        <i class="bi bi-calculator me-2"></i>SUMMARY
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="ps-4 fw-bold">Net Change in Cash</td>
-                                    <td class="text-end pe-4 fw-bold fs-5 @(Model.Report.NetChangeInCash >= 0 ? "text-success" : "text-danger")">
-                                        @Model.Report.NetChangeInCash.ToString("C2")
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-4">Beginning Cash Balance</td>
-                                    <td class="text-end pe-4">@Model.Report.BeginningCashBalance.ToString("C2")</td>
-                                </tr>
-                                <tr class="table-dark">
-                                    <td class="ps-4 fw-bold fs-5">Ending Cash Balance</td>
-                                    <td class="text-end pe-4 fw-bold fs-5">@Model.Report.EndingCashBalance.ToString("C2")</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                        <!-- Summary -->
+                        <thead class="bg-gray-800">
+                            <tr>
+                                <th colspan="2" class="px-6 py-3 text-left text-sm font-semibold text-white">
+                                    <i class="bi bi-calculator mr-2"></i>SUMMARY
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-3 text-sm font-bold text-gray-900">Net Change in Cash</td>
+                                <td class="px-6 py-3 text-lg font-bold text-right @(Model.Report.NetChangeInCash >= 0 ? "text-green-600" : "text-red-600")">
+                                    @Model.Report.NetChangeInCash.ToString("C2")
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 border-t border-gray-100">
+                                <td class="px-6 py-3 text-sm text-gray-700">Beginning Cash Balance</td>
+                                <td class="px-6 py-3 text-sm text-right">@Model.Report.BeginningCashBalance.ToString("C2")</td>
+                            </tr>
+                            <tr class="bg-gray-800">
+                                <td class="px-6 py-4 text-base font-bold text-white">Ending Cash Balance</td>
+                                <td class="px-6 py-4 text-lg font-bold text-white text-right">@Model.Report.EndingCashBalance.ToString("C2")</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <!-- Charts and Metrics -->
-        <div class="col-lg-4">
+        <div class="space-y-6">
             <!-- Cash Flow Breakdown Chart -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Cash Flow Breakdown</h5>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="bi bi-bar-chart mr-2 text-indigo-600"></i>Cash Flow Breakdown
+                    </h3>
                 </div>
-                <div class="card-body">
+                <div class="p-4">
                     <canvas id="cashFlowBreakdownChart" height="250"></canvas>
                 </div>
             </div>
 
             <!-- Key Ratios -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Key Ratios</h5>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="bi bi-speedometer2 mr-2 text-indigo-600"></i>Key Ratios
+                    </h3>
                 </div>
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Operating CF Ratio</span>
-                            <span class="badge @(Model.Report.OperatingCashFlowRatio >= 1 ? "bg-success" : Model.Report.OperatingCashFlowRatio >= 0.5m ? "bg-warning" : "bg-danger") fs-6">
+                <div class="p-4 space-y-5">
+                    <!-- Operating CF Ratio -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-700">Operating CF Ratio</span>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full @(Model.Report.OperatingCashFlowRatio >= 1 ? "bg-green-100 text-green-800" : Model.Report.OperatingCashFlowRatio >= 0.5m ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800")">
                                 @Model.Report.OperatingCashFlowRatio.ToString("F2")
                             </span>
                         </div>
-                        <div class="progress" style="height: 8px;">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
                             @{
                                 var ocfProgress = Math.Min(Model.Report.OperatingCashFlowRatio * 50, 100);
                             }
-                            <div class="progress-bar @(Model.Report.OperatingCashFlowRatio >= 1 ? "bg-success" : Model.Report.OperatingCashFlowRatio >= 0.5m ? "bg-warning" : "bg-danger")"
+                            <div class="h-2 rounded-full @(Model.Report.OperatingCashFlowRatio >= 1 ? "bg-green-500" : Model.Report.OperatingCashFlowRatio >= 0.5m ? "bg-amber-500" : "bg-red-500")"
                                  style="width: @ocfProgress%"></div>
                         </div>
-                        <small class="text-muted">Operating cash flow / Current liabilities</small>
+                        <p class="text-xs text-gray-500 mt-1">Operating cash flow / Current liabilities</p>
                     </div>
 
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Cash Flow to Debt Ratio</span>
-                            <span class="badge @(Model.Report.CashFlowToDebtRatio >= 0.5m ? "bg-success" : Model.Report.CashFlowToDebtRatio >= 0.25m ? "bg-warning" : "bg-danger") fs-6">
+                    <!-- Cash Flow to Debt Ratio -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-700">Cash Flow to Debt Ratio</span>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full @(Model.Report.CashFlowToDebtRatio >= 0.5m ? "bg-green-100 text-green-800" : Model.Report.CashFlowToDebtRatio >= 0.25m ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800")">
                                 @Model.Report.CashFlowToDebtRatio.ToString("F2")
                             </span>
                         </div>
-                        <div class="progress" style="height: 8px;">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
                             @{
                                 var cftdProgress = Math.Min(Model.Report.CashFlowToDebtRatio * 100, 100);
                             }
-                            <div class="progress-bar @(Model.Report.CashFlowToDebtRatio >= 0.5m ? "bg-success" : Model.Report.CashFlowToDebtRatio >= 0.25m ? "bg-warning" : "bg-danger")"
+                            <div class="h-2 rounded-full @(Model.Report.CashFlowToDebtRatio >= 0.5m ? "bg-green-500" : Model.Report.CashFlowToDebtRatio >= 0.25m ? "bg-amber-500" : "bg-red-500")"
                                  style="width: @cftdProgress%"></div>
                         </div>
-                        <small class="text-muted">Operating cash flow / Total debt</small>
+                        <p class="text-xs text-gray-500 mt-1">Operating cash flow / Total debt</p>
                     </div>
 
-                    <hr>
+                    <hr class="border-gray-200">
 
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <h5 class="mb-1 @(Model.Report.FreeCashFlow >= 0 ? "text-success" : "text-danger")">
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <p class="text-lg font-bold @(Model.Report.FreeCashFlow >= 0 ? "text-green-600" : "text-red-600")">
                                 @Model.Report.FreeCashFlow.ToString("C0")
-                            </h5>
-                            <small class="text-muted">Free Cash Flow</small>
+                            </p>
+                            <p class="text-xs text-gray-500">Free Cash Flow</p>
                         </div>
-                        <div class="col-6">
-                            <h5 class="mb-1">@Model.Report.NetIncome.ToString("C0")</h5>
-                            <small class="text-muted">Net Income</small>
+                        <div>
+                            <p class="text-lg font-bold text-gray-900">@Model.Report.NetIncome.ToString("C0")</p>
+                            <p class="text-xs text-gray-500">Net Income</p>
                         </div>
                     </div>
                 </div>
@@ -386,62 +381,64 @@
             <!-- Period Comparison -->
             @if (Model.Report.PreviousPeriod != null)
             {
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Period Comparison</h5>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <i class="bi bi-arrow-left-right mr-2 text-indigo-600"></i>Period Comparison
+                        </h3>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-sm mb-0">
+                    <div class="p-4">
+                        <table class="w-full text-sm">
                             <thead>
-                                <tr>
-                                    <th></th>
-                                    <th class="text-end">Current</th>
-                                    <th class="text-end">Previous</th>
-                                    <th class="text-end">Change</th>
+                                <tr class="text-gray-500">
+                                    <th class="text-left py-2"></th>
+                                    <th class="text-right py-2">Current</th>
+                                    <th class="text-right py-2">Previous</th>
+                                    <th class="text-right py-2">Change</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-gray-100">
                                 <tr>
-                                    <td>Operating</td>
-                                    <td class="text-end">@Model.Report.NetCashFromOperating.ToString("C0")</td>
-                                    <td class="text-end">@Model.Report.PreviousPeriod.NetCashFromOperating.ToString("C0")</td>
-                                    <td class="text-end">
+                                    <td class="py-2 text-gray-700">Operating</td>
+                                    <td class="py-2 text-right">@Model.Report.NetCashFromOperating.ToString("C0")</td>
+                                    <td class="py-2 text-right">@Model.Report.PreviousPeriod.NetCashFromOperating.ToString("C0")</td>
+                                    <td class="py-2 text-right">
                                         @{
                                             var opChange = Model.Report.PreviousPeriod.NetCashFromOperating != 0
                                                 ? ((Model.Report.NetCashFromOperating - Model.Report.PreviousPeriod.NetCashFromOperating) / Math.Abs(Model.Report.PreviousPeriod.NetCashFromOperating)) * 100
                                                 : 0;
                                         }
-                                        <span class="@(opChange >= 0 ? "text-success" : "text-danger")">
+                                        <span class="@(opChange >= 0 ? "text-green-600" : "text-red-600")">
                                             @(opChange >= 0 ? "+" : "")@opChange.ToString("F1")%
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Investing</td>
-                                    <td class="text-end">@Model.Report.NetCashFromInvesting.ToString("C0")</td>
-                                    <td class="text-end">@Model.Report.PreviousPeriod.NetCashFromInvesting.ToString("C0")</td>
-                                    <td class="text-end">
+                                    <td class="py-2 text-gray-700">Investing</td>
+                                    <td class="py-2 text-right">@Model.Report.NetCashFromInvesting.ToString("C0")</td>
+                                    <td class="py-2 text-right">@Model.Report.PreviousPeriod.NetCashFromInvesting.ToString("C0")</td>
+                                    <td class="py-2 text-right">
                                         @{
                                             var invChange = Model.Report.PreviousPeriod.NetCashFromInvesting != 0
                                                 ? ((Model.Report.NetCashFromInvesting - Model.Report.PreviousPeriod.NetCashFromInvesting) / Math.Abs(Model.Report.PreviousPeriod.NetCashFromInvesting)) * 100
                                                 : 0;
                                         }
-                                        <span class="@(invChange >= 0 ? "text-success" : "text-danger")">
+                                        <span class="@(invChange >= 0 ? "text-green-600" : "text-red-600")">
                                             @(invChange >= 0 ? "+" : "")@invChange.ToString("F1")%
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Financing</td>
-                                    <td class="text-end">@Model.Report.NetCashFromFinancing.ToString("C0")</td>
-                                    <td class="text-end">@Model.Report.PreviousPeriod.NetCashFromFinancing.ToString("C0")</td>
-                                    <td class="text-end">
+                                    <td class="py-2 text-gray-700">Financing</td>
+                                    <td class="py-2 text-right">@Model.Report.NetCashFromFinancing.ToString("C0")</td>
+                                    <td class="py-2 text-right">@Model.Report.PreviousPeriod.NetCashFromFinancing.ToString("C0")</td>
+                                    <td class="py-2 text-right">
                                         @{
                                             var finChange = Model.Report.PreviousPeriod.NetCashFromFinancing != 0
                                                 ? ((Model.Report.NetCashFromFinancing - Model.Report.PreviousPeriod.NetCashFromFinancing) / Math.Abs(Model.Report.PreviousPeriod.NetCashFromFinancing)) * 100
                                                 : 0;
                                         }
-                                        <span class="@(finChange >= 0 ? "text-success" : "text-danger")">
+                                        <span class="@(finChange >= 0 ? "text-green-600" : "text-red-600")">
                                             @(finChange >= 0 ? "+" : "")@finChange.ToString("F1")%
                                         </span>
                                     </td>
@@ -457,16 +454,14 @@
     <!-- Monthly Trend Chart -->
     @if (Model.Report.MonthlyTrend.Any())
     {
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Monthly Cash Flow Trend</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="monthlyTrendChart" height="100"></canvas>
-                    </div>
-                </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">
+                    <i class="bi bi-graph-up mr-2 text-indigo-600"></i>Monthly Cash Flow Trend
+                </h2>
+            </div>
+            <div class="p-4">
+                <canvas id="monthlyTrendChart" height="100"></canvas>
             </div>
         </div>
     }
@@ -494,7 +489,8 @@
                         @(Model.Report.NetCashFromFinancing >= 0 ? "'rgba(245, 158, 11, 0.8)'" : "'rgba(239, 68, 68, 0.8)'"),
                         @(Model.Report.NetChangeInCash >= 0 ? "'rgba(16, 185, 129, 0.8)'" : "'rgba(239, 68, 68, 0.8)'")
                     ],
-                    borderWidth: 0
+                    borderWidth: 0,
+                    borderRadius: 4
                 }]
             },
             options: {

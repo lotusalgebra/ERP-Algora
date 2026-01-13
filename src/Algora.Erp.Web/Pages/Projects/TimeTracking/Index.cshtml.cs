@@ -2,6 +2,7 @@ using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.HR;
 using Algora.Erp.Domain.Entities.Projects;
 using Algora.Erp.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using ProjectTaskStatus = Algora.Erp.Domain.Entities.Projects.TaskStatus;
 
 namespace Algora.Erp.Web.Pages.Projects.TimeTracking;
 
+[Authorize(Policy = "CanViewProjects")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

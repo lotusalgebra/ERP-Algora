@@ -1,11 +1,13 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Sales;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Sales.Leads;
 
+[Authorize(Policy = "CanViewSales")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

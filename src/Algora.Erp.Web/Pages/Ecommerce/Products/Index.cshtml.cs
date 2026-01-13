@@ -1,12 +1,14 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Application.Common.Interfaces.Ecommerce;
 using Algora.Erp.Domain.Entities.Ecommerce;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Algora.Erp.Web.Pages.Ecommerce.Products;
 
+[Authorize(Policy = "CanViewEcommerce")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

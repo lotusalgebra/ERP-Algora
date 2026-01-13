@@ -6,7 +6,7 @@
         <i class="bi bi-x-lg"></i>
     </button>
 </div>
-<form hx-post="/HR/Employees" hx-target="#employeesTableBody" hx-swap="innerHTML">
+<form hx-post="/HR/Employees" hx-target="#employeesTableBody" hx-swap="outerHTML">
     @if (Model.IsEdit && Model.Employee != null)
     {
         <input type="hidden" name="Id" value="@Model.Employee.Id" />

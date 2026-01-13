@@ -139,7 +139,7 @@
                         <th scope="col" class="px-6 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="leadsTableBody" hx-get="/Sales/Leads?handler=Table" hx-trigger="load" hx-swap="innerHTML">
+                <tbody id="leadsTableBody" hx-get="/Sales/Leads?handler=Table" hx-trigger="load" hx-swap="outerHTML">
                     <tr>
                         <td colspan="8" class="px-6 py-8 text-center">
                             <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
@@ -177,7 +177,7 @@
                 sourceFilter: sourceFilter.value,
                 ratingFilter: ratingFilter.value
             });
-            htmx.ajax('GET', `/Sales/Leads?${params}`, {target: '#leadsTableBody', swap: 'innerHTML'});
+            htmx.ajax('GET', `/Sales/Leads?${params}`, {target: '#leadsTableBody', swap: 'outerHTML'});
         }
 
         searchInput?.addEventListener('input', () => {

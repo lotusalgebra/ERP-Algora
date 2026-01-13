@@ -85,9 +85,17 @@ public class AuthService : IAuthService
         user.LockoutEndAt = null;
         user.LastLoginAt = DateTime.UtcNow;
 
-        // Generate tokens
+        // Get roles and permissions
         var roles = user.UserRoles.Select(ur => ur.Role?.Name ?? "User").ToList();
-        var accessToken = GenerateAccessToken(user.Id, tenantId.Value, user.Email, user.FullName, roles);
+        var roleIds = user.UserRoles.Select(ur => ur.RoleId).ToList();
+        var permissions = await _context.RolePermissions
+            .Where(rp => roleIds.Contains(rp.RoleId))
+            .Include(rp => rp.Permission)
+            .Select(rp => rp.Permission!.Code)
+            .Distinct()
+            .ToListAsync();
+
+        var accessToken = GenerateAccessToken(user.Id, tenantId.Value, user.Email, user.FullName, roles, permissions);
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
@@ -105,7 +113,8 @@ public class AuthService : IAuthService
             FullName = user.FullName,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Roles = roles
+            Roles = roles,
+            Permissions = permissions
         });
     }
 
@@ -137,9 +146,17 @@ public class AuthService : IAuthService
             return AuthResult.Failed("Account is disabled");
         }
 
-        // Generate new tokens
+        // Get roles and permissions
         var roles = user.UserRoles.Select(ur => ur.Role?.Name ?? "User").ToList();
-        var newAccessToken = GenerateAccessToken(user.Id, tenantId.Value, user.Email, user.FullName, roles);
+        var roleIds = user.UserRoles.Select(ur => ur.RoleId).ToList();
+        var permissions = await _context.RolePermissions
+            .Where(rp => roleIds.Contains(rp.RoleId))
+            .Include(rp => rp.Permission)
+            .Select(rp => rp.Permission!.Code)
+            .Distinct()
+            .ToListAsync();
+
+        var newAccessToken = GenerateAccessToken(user.Id, tenantId.Value, user.Email, user.FullName, roles, permissions);
         var newRefreshToken = GenerateRefreshToken();
 
         user.RefreshToken = newRefreshToken;
@@ -155,7 +172,8 @@ public class AuthService : IAuthService
             FullName = user.FullName,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Roles = roles
+            Roles = roles,
+            Permissions = permissions
         });
     }
 
@@ -222,8 +240,15 @@ public class AuthService : IAuthService
 
         _logger.LogInformation("New user {Email} registered", request.Email);
 
+        // Load permissions for default role
+        var permissions = await _context.RolePermissions
+            .Where(rp => rp.RoleId == defaultRole.Id)
+            .Include(rp => rp.Permission)
+            .Select(rp => rp.Permission!.Code)
+            .ToListAsync();
+
         // Generate tokens for immediate login
-        var accessToken = GenerateAccessToken(user.Id, tenantId.Value, user.Email, user.FullName, new[] { "User" });
+        var accessToken = GenerateAccessToken(user.Id, tenantId.Value, user.Email, user.FullName, new[] { "User" }, permissions);
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
@@ -238,7 +263,8 @@ public class AuthService : IAuthService
             FullName = user.FullName,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Roles = new List<string> { "User" }
+            Roles = new List<string> { "User" },
+            Permissions = permissions
         });
     }
 
@@ -315,6 +341,14 @@ public class AuthService : IAuthService
             return null;
         }
 
+        var roleIds = user.UserRoles.Select(ur => ur.RoleId).ToList();
+        var permissions = await _context.RolePermissions
+            .Where(rp => roleIds.Contains(rp.RoleId))
+            .Include(rp => rp.Permission)
+            .Select(rp => rp.Permission!.Code)
+            .Distinct()
+            .ToListAsync();
+
         return new AuthUserInfo
         {
             Id = user.Id,
@@ -323,11 +357,12 @@ public class AuthService : IAuthService
             FullName = user.FullName,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Roles = user.UserRoles.Select(ur => ur.Role?.Name ?? "User").ToList()
+            Roles = user.UserRoles.Select(ur => ur.Role?.Name ?? "User").ToList(),
+            Permissions = permissions
         };
     }
 
-    private string GenerateAccessToken(Guid userId, Guid tenantId, string email, string fullName, IEnumerable<string> roles)
+    private string GenerateAccessToken(Guid userId, Guid tenantId, string email, string fullName, IEnumerable<string> roles, IEnumerable<string> permissions)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Jwt.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -344,6 +379,11 @@ public class AuthService : IAuthService
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        foreach (var permission in permissions)
+        {
+            claims.Add(new Claim("permission", permission));
         }
 
         var token = new JwtSecurityToken(

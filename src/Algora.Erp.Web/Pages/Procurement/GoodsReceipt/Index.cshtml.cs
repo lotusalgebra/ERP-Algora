@@ -2,6 +2,7 @@ using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Inventory;
 using Algora.Erp.Domain.Entities.Procurement;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Procurement.GoodsReceipt;
 
+[Authorize(Policy = "CanViewProcurement")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {

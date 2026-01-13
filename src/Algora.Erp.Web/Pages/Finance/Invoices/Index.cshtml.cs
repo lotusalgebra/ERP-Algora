@@ -1,6 +1,7 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Common;
 using Algora.Erp.Domain.Entities.Finance;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using System.Text.Json;
 
 namespace Algora.Erp.Web.Pages.Finance.Invoices;
 
+[Authorize(Policy = "CanViewFinance")]
 [IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {
@@ -23,6 +25,9 @@ public class IndexModel : PageModel
     public int OverdueInvoices { get; set; }
     public decimal TotalOutstanding { get; set; }
     public decimal TotalPaidThisMonth { get; set; }
+
+    // Initial invoices list for server-side rendering
+    public List<Invoice> Invoices { get; set; } = new();
 
     public async Task OnGetAsync()
     {
@@ -40,6 +45,14 @@ public class IndexModel : PageModel
         TotalPaidThisMonth = await _context.InvoicePayments
             .Where(p => p.PaymentDate >= startOfMonth)
             .SumAsync(p => p.Amount);
+
+        // Load initial invoices directly (bypass HTMX for initial load)
+        Invoices = await _context.Invoices
+            .Include(i => i.Customer)
+            .OrderByDescending(i => i.InvoiceDate)
+            .ThenByDescending(i => i.InvoiceNumber)
+            .Take(15)
+            .ToListAsync();
     }
 
     public async Task<IActionResult> OnGetTableAsync(
