@@ -44,7 +44,7 @@ public static class DependencyInjection
             options.Cookie.Name = authSettings.Cookie.CookieName;
             options.Cookie.HttpOnly = true;
             options.Cookie.SameSite = SameSiteMode.Lax;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.ExpireTimeSpan = TimeSpan.FromHours(authSettings.Cookie.ExpireTimeSpanHours);
             options.SlidingExpiration = true;
             options.LoginPath = "/Account/Login";

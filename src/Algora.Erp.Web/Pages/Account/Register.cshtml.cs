@@ -109,7 +109,9 @@ public class RegisterInput
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
+    [StringLength(100, MinimumLength = 12, ErrorMessage = "Password must be at least 12 characters")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$",
+        ErrorMessage = "Password must contain uppercase, lowercase, number, and special character")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
 

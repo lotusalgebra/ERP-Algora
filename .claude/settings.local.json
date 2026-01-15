@@ -80,7 +80,18 @@
       "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" status --short)",
       "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" log --oneline -5)",
       "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" diff --stat HEAD)",
-      "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" add -A)"
+      "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" add -A)",
+      "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" commit -m \"$\\(cat <<''EOF''\nImplement module-level authorization and UI fixes\n\nAuthorization:\n- Add permission claims to JWT tokens in AuthService\n- Define authorization policies for all modules in Program.cs\n- Add [Authorize] attribute to 45+ page models across all modules\n- Update sidebar navigation to show/hide based on permissions\n- Add SeedPermissions.sql for standard module permissions\n\nFinance Reports UI:\n- Convert BalanceSheet, CashFlowStatement, GeneralLedger,\n  ProfitLoss, and TrialBalance to Tailwind CSS\n- Update Invoices page with improved table layout\n\nFixes:\n- Fix HR/Employees form and table row partial issues\n- Fix Sales/Leads form and table row partial issues\n- Add PaymentDueDate property to Invoice entity\n\nSQL Scripts:\n- Add schema sync and fix scripts for UAT environment\n- Add seed data scripts for permissions and remaining data\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C \"C:\\\\SourceCode\\\\lotusalgebra\\\\Algora.Erp\" push origin main)",
+      "Bash(git -C \"C:\\\\SourceCode\\\\AlgoraErpTests\\\\Algora.Erp.SeleniumTests\" remote -v)",
+      "WebFetch(domain:demos.creative-tim.com)",
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.creative-tim.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(cmd /c \"taskkill /F /PID 36084\")",
+      "Bash(del nul)",
+      "Bash(rm:*)"
     ]
   }
 }

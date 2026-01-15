@@ -66,6 +66,17 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
+
+    // Security headers for production
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append("X-Frame-Options", "DENY");
+        context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+        context.Response.Headers.Append("Permissions-Policy", "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()");
+        await next();
+    });
 }
 
 app.UseHttpsRedirection();
@@ -78,7 +89,8 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-// Seed default data on startup
+// Seed default data on startup (development only)
+if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AdminDbContext>();
