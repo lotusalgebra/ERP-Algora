@@ -27,6 +27,14 @@
                             900: '#312e81',
                             950: '#1e1b4b'
                         }
+                    },
+                    boxShadow: {
+                        'soft-xl': '0 20px 27px 0 rgba(0,0,0,0.05)',
+                        'soft-2xl': '0 .3125rem .625rem 0 rgba(0,0,0,0.12)',
+                        'soft-3xl': '0 8px 26px -4px hsla(0,0%,8%,.15),0 8px 9px -5px hsla(0,0%,8%,.06)',
+                    },
+                    maxWidth: {
+                        '62.5': '15.625rem',
                     }
                 }
             }
@@ -43,15 +51,18 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
     <style>
-        .sidebar-scrollbar::-webkit-scrollbar { width: 6px; }
+        /* Sidebar scrollbar */
+        .sidebar-scrollbar::-webkit-scrollbar { width: 4px; }
         .sidebar-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-        .sidebar-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+        /* HTMX indicator */
         .htmx-indicator { display: none; }
         .htmx-request .htmx-indicator { display: inline-block; }
+
         /* Modal backdrop styling */
         [data-modal-backdrop] { background-color: rgba(0, 0, 0, 0.5); }
-        /* Ensure modals have proper backdrop when shown */
         .modal-backdrop {
             position: fixed;
             top: 0;
@@ -61,305 +72,443 @@
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.5);
         }
+
+        /* Soft UI nav transitions */
+        .ease-nav-brand {
+            transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        /* Gradient text */
+        .bg-clip-text {
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        /* Collapsed menu arrow rotation */
+        .collapse-arrow {
+            transition: transform 0.3s ease;
+        }
+        .collapsed .collapse-arrow {
+            transform: rotate(-90deg);
+        }
     </style>
 </head>
-<body class="bg-slate-100">
+<body class="m-0 font-sans text-base antialiased font-normal leading-default bg-gray-50 text-slate-500">
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0">
-        <div class="h-full overflow-y-auto bg-slate-900 sidebar-scrollbar">
-            <!-- Brand -->
-            <div class="px-6 py-4 border-b border-slate-800 flex items-center">
-                <i class="bi bi-box-seam text-primary-400 text-2xl mr-3"></i>
-                <h4 class="text-white font-bold text-lg">Algora ERP</h4>
-            </div>
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex-wrap items-center justify-between w-64 p-0 my-4 ml-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-soft-xl rounded-2xl xl:left-0 xl:translate-x-0 sidebar-scrollbar">
+        <!-- Brand -->
+        <div class="h-20">
+            <i class="absolute top-0 right-0 hidden p-4 opacity-50 cursor-pointer fas fa-times text-slate-400 xl:hidden" id="sidenav-close"></i>
+            <a class="block px-8 py-6 m-0 text-sm whitespace-nowrap text-slate-700" href="/Dashboard">
+                <i class="bi bi-box-seam inline-flex items-center justify-center w-8 h-8 mr-2 text-center text-white bg-gradient-to-tl from-purple-700 to-pink-500 rounded-lg"></i>
+                <span class="ml-1 font-semibold transition-all duration-200">Algora ERP</span>
+            </a>
+        </div>
 
-            <!-- Navigation -->
-            <nav class="py-4 px-3">
-                <!-- Main -->
+        <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
+
+        <!-- Navigation -->
+        <div class="items-center block w-auto max-h-screen overflow-auto grow basis-full">
+            <ul class="flex flex-col pl-0 mb-0 list-none">
+                @{
+                    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+                    var isFinanceActive = currentPage.Contains("/Finance/");
+                    var isHRActive = currentPage.Contains("/HR/") || currentPage.Contains("/Payroll/");
+                    var isInventoryActive = currentPage.Contains("/Inventory/");
+                    var isEcommerceActive = currentPage.Contains("/Ecommerce/");
+                    var isSalesActive = currentPage.Contains("/Sales/");
+                    var isProcurementActive = currentPage.Contains("/Procurement/");
+                    var isManufacturingActive = currentPage.Contains("/Manufacturing/");
+                    var isDispatchActive = currentPage.Contains("/Dispatch/");
+                    var isQualityActive = currentPage.Contains("/Quality/");
+                    var isProjectsActive = currentPage.Contains("/Projects");
+                    var isReportsActive = currentPage.Contains("/Reports/");
+                    var isSettingsActive = currentPage.Contains("/Settings/");
+                    var isAdminActive = currentPage.Contains("/Admin/");
+                }
+
+                <!-- Dashboard -->
                 @if (User.HasClaim("permission", "Dashboard.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Main</p>
-                <a href="/Dashboard" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1 @(ViewContext.RouteData.Values["page"]?.ToString() == "/Dashboard/Index" ? "bg-slate-800 text-white border-l-2 border-primary-500" : "")">
-                    <i class="bi bi-speedometer2 w-5 mr-3"></i>Dashboard
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors @(currentPage.Contains("/Dashboard") ? "shadow-soft-xl bg-white text-slate-700" : "text-slate-500 hover:bg-gray-100")" href="/Dashboard">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(currentPage.Contains("/Dashboard") ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-speedometer2 @(currentPage.Contains("/Dashboard") ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none">Dashboard</span>
+                    </a>
+                </li>
                 }
 
                 <!-- Finance -->
                 @if (User.HasClaim("permission", "Finance.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Finance</p>
-                <a href="/Finance/Accounts" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-journal-text w-5 mr-3"></i>Chart of Accounts
-                </a>
-                <a href="/Finance/JournalEntries" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-receipt w-5 mr-3"></i>Journal Entries
-                </a>
-                <a href="/Finance/Invoices" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-file-earmark-text w-5 mr-3"></i>Invoices
-                </a>
-                <a href="/Finance/Payments" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-cash-stack w-5 mr-3"></i>Payments
-                </a>
-                <a href="/Finance/Reports" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-graph-up w-5 mr-3"></i>Financial Reports
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('financeMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isFinanceActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-currency-dollar @(isFinanceActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Finance</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isFinanceActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="financeMenu" class="overflow-hidden transition-all duration-300 @(isFinanceActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Finance/Accounts") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Finance/Accounts"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Finance/Accounts") ? "bg-purple-600" : "bg-slate-400")"></span>Chart of Accounts</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Finance/JournalEntries") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Finance/JournalEntries"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Finance/JournalEntries") ? "bg-purple-600" : "bg-slate-400")"></span>Journal Entries</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Finance/Invoices") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Finance/Invoices"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Finance/Invoices") ? "bg-purple-600" : "bg-slate-400")"></span>Invoices</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Finance/Payments") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Finance/Payments"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Finance/Payments") ? "bg-purple-600" : "bg-slate-400")"></span>Payments</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Finance/Reports") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Finance/Reports"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Finance/Reports") ? "bg-purple-600" : "bg-slate-400")"></span>Financial Reports</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- HR & Payroll -->
                 @if (User.HasClaim("permission", "HR.View") || User.HasClaim("permission", "Payroll.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">HR & Payroll</p>
-                }
-                @if (User.HasClaim("permission", "HR.View") || User.IsInRole("Admin"))
-                {
-                <a href="/HR/Employees" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-people w-5 mr-3"></i>Employees
-                </a>
-                <a href="/HR/Departments" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-diagram-3 w-5 mr-3"></i>Departments
-                </a>
-                <a href="/HR/Positions" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-person-badge w-5 mr-3"></i>Positions
-                </a>
-                <a href="/HR/Attendance" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-calendar-check w-5 mr-3"></i>Attendance
-                </a>
-                <a href="/HR/Leave" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-calendar-x w-5 mr-3"></i>Leave Requests
-                </a>
-                }
-                @if (User.HasClaim("permission", "Payroll.View") || User.IsInRole("Admin"))
-                {
-                <a href="/Payroll/Components" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-list-ul w-5 mr-3"></i>Salary Components
-                </a>
-                <a href="/Payroll/Runs" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-cash-stack w-5 mr-3"></i>Payroll Runs
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('hrMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isHRActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-people @(isHRActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">HR & Payroll</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isHRActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="hrMenu" class="overflow-hidden transition-all duration-300 @(isHRActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            @if (User.HasClaim("permission", "HR.View") || User.IsInRole("Admin"))
+                            {
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/HR/Employees") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/HR/Employees"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/HR/Employees") ? "bg-purple-600" : "bg-slate-400")"></span>Employees</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/HR/Departments") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/HR/Departments"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/HR/Departments") ? "bg-purple-600" : "bg-slate-400")"></span>Departments</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/HR/Positions") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/HR/Positions"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/HR/Positions") ? "bg-purple-600" : "bg-slate-400")"></span>Positions</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/HR/Attendance") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/HR/Attendance"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/HR/Attendance") ? "bg-purple-600" : "bg-slate-400")"></span>Attendance</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/HR/Leave") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/HR/Leave"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/HR/Leave") ? "bg-purple-600" : "bg-slate-400")"></span>Leave Requests</a></li>
+                            }
+                            @if (User.HasClaim("permission", "Payroll.View") || User.IsInRole("Admin"))
+                            {
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Payroll/Components") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Payroll/Components"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Payroll/Components") ? "bg-purple-600" : "bg-slate-400")"></span>Salary Components</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Payroll/Runs") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Payroll/Runs"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Payroll/Runs") ? "bg-purple-600" : "bg-slate-400")"></span>Payroll Runs</a></li>
+                            }
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Inventory -->
                 @if (User.HasClaim("permission", "Inventory.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Inventory</p>
-                <a href="/Inventory/Products" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-box w-5 mr-3"></i>Products
-                </a>
-                <a href="/Inventory/Warehouses" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-building w-5 mr-3"></i>Warehouses
-                </a>
-                <a href="/Inventory/Stock" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-clipboard-data w-5 mr-3"></i>Stock Levels
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('inventoryMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isInventoryActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-box @(isInventoryActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Inventory</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isInventoryActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="inventoryMenu" class="overflow-hidden transition-all duration-300 @(isInventoryActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Inventory/Products") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Inventory/Products"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Inventory/Products") ? "bg-purple-600" : "bg-slate-400")"></span>Products</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Inventory/Warehouses") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Inventory/Warehouses"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Inventory/Warehouses") ? "bg-purple-600" : "bg-slate-400")"></span>Warehouses</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Inventory/Stock") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Inventory/Stock"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Inventory/Stock") ? "bg-purple-600" : "bg-slate-400")"></span>Stock Levels</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Ecommerce -->
                 @if (User.HasClaim("permission", "Ecommerce.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Ecommerce</p>
-                <a href="/Ecommerce/Products" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-shop w-5 mr-3"></i>Products
-                </a>
-                <a href="/Ecommerce/Categories" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-tags w-5 mr-3"></i>Categories
-                </a>
-                <a href="/Ecommerce/Orders" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-cart3 w-5 mr-3"></i>Web Orders
-                </a>
-                <a href="/Ecommerce/Customers" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-people w-5 mr-3"></i>Web Customers
-                </a>
-                <a href="/Ecommerce/Coupons" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-ticket-perforated w-5 mr-3"></i>Coupons
-                </a>
-                <a href="/Ecommerce/Settings" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-gear w-5 mr-3"></i>Store Settings
-                </a>
-                }
-
-                <!-- Procurement -->
-                @if (User.HasClaim("permission", "Procurement.View") || User.IsInRole("Admin"))
-                {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Procurement</p>
-                <a href="/Procurement/Suppliers" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-truck w-5 mr-3"></i>Suppliers
-                </a>
-                <a href="/Procurement/PurchaseOrders" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-cart-check w-5 mr-3"></i>Purchase Orders
-                </a>
-                <a href="/Procurement/GoodsReceipt" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-box-arrow-in-down w-5 mr-3"></i>Goods Receipt
-                </a>
-                <a href="/Procurement/PurchaseInvoices" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-receipt w-5 mr-3"></i>Purchase Invoices
-                </a>
-                }
-
-                <!-- Dispatch -->
-                @if (User.HasClaim("permission", "Dispatch.View") || User.IsInRole("Admin"))
-                {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Dispatch</p>
-                <a href="/Dispatch/DeliveryChallans" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-truck w-5 mr-3"></i>Delivery Challans
-                </a>
-                }
-
-                <!-- Quality -->
-                @if (User.HasClaim("permission", "Quality.View") || User.IsInRole("Admin"))
-                {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Quality</p>
-                <a href="/Quality/Inspections" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-clipboard-check w-5 mr-3"></i>Inspections
-                </a>
-                <a href="/Quality/Rejections" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-x-circle w-5 mr-3"></i>Rejections
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('ecommerceMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isEcommerceActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-shop @(isEcommerceActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Ecommerce</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isEcommerceActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="ecommerceMenu" class="overflow-hidden transition-all duration-300 @(isEcommerceActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Ecommerce/Products") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Ecommerce/Products"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Ecommerce/Products") ? "bg-purple-600" : "bg-slate-400")"></span>Products</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Ecommerce/Categories") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Ecommerce/Categories"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Ecommerce/Categories") ? "bg-purple-600" : "bg-slate-400")"></span>Categories</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Ecommerce/Orders") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Ecommerce/Orders"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Ecommerce/Orders") ? "bg-purple-600" : "bg-slate-400")"></span>Web Orders</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Ecommerce/Customers") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Ecommerce/Customers"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Ecommerce/Customers") ? "bg-purple-600" : "bg-slate-400")"></span>Web Customers</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Ecommerce/Coupons") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Ecommerce/Coupons"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Ecommerce/Coupons") ? "bg-purple-600" : "bg-slate-400")"></span>Coupons</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Ecommerce/Settings") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Ecommerce/Settings"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Ecommerce/Settings") ? "bg-purple-600" : "bg-slate-400")"></span>Store Settings</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Sales & CRM -->
                 @if (User.HasClaim("permission", "Sales.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Sales & CRM</p>
-                <a href="/Sales/Customers" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-person-badge w-5 mr-3"></i>Customers
-                </a>
-                <a href="/Sales/Leads" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-funnel w-5 mr-3"></i>Leads
-                </a>
-                <a href="/Sales/Quotations" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-file-earmark-text w-5 mr-3"></i>Quotations
-                </a>
-                <a href="/Sales/Orders" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-bag-check w-5 mr-3"></i>Sales Orders
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('salesMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isSalesActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-person-badge @(isSalesActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Sales & CRM</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isSalesActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="salesMenu" class="overflow-hidden transition-all duration-300 @(isSalesActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Sales/Customers") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Sales/Customers"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Sales/Customers") ? "bg-purple-600" : "bg-slate-400")"></span>Customers</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Sales/Leads") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Sales/Leads"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Sales/Leads") ? "bg-purple-600" : "bg-slate-400")"></span>Leads</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Sales/Quotations") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Sales/Quotations"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Sales/Quotations") ? "bg-purple-600" : "bg-slate-400")"></span>Quotations</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Sales/Orders") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Sales/Orders"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Sales/Orders") ? "bg-purple-600" : "bg-slate-400")"></span>Sales Orders</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+
+                <!-- Procurement -->
+                @if (User.HasClaim("permission", "Procurement.View") || User.IsInRole("Admin"))
+                {
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('procurementMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isProcurementActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-truck @(isProcurementActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Procurement</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isProcurementActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="procurementMenu" class="overflow-hidden transition-all duration-300 @(isProcurementActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Procurement/Suppliers") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Procurement/Suppliers"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Procurement/Suppliers") ? "bg-purple-600" : "bg-slate-400")"></span>Suppliers</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Procurement/PurchaseOrders") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Procurement/PurchaseOrders"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Procurement/PurchaseOrders") ? "bg-purple-600" : "bg-slate-400")"></span>Purchase Orders</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Procurement/GoodsReceipt") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Procurement/GoodsReceipt"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Procurement/GoodsReceipt") ? "bg-purple-600" : "bg-slate-400")"></span>Goods Receipt</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Procurement/PurchaseInvoices") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Procurement/PurchaseInvoices"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Procurement/PurchaseInvoices") ? "bg-purple-600" : "bg-slate-400")"></span>Purchase Invoices</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Manufacturing -->
                 @if (User.HasClaim("permission", "Manufacturing.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Manufacturing</p>
-                <a href="/Manufacturing/BOM" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-list-nested w-5 mr-3"></i>Bill of Materials
-                </a>
-                <a href="/Manufacturing/WorkOrders" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-gear w-5 mr-3"></i>Work Orders
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('manufacturingMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isManufacturingActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-gear @(isManufacturingActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Manufacturing</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isManufacturingActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="manufacturingMenu" class="overflow-hidden transition-all duration-300 @(isManufacturingActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Manufacturing/BOM") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Manufacturing/BOM"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Manufacturing/BOM") ? "bg-purple-600" : "bg-slate-400")"></span>Bill of Materials</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Manufacturing/WorkOrders") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Manufacturing/WorkOrders"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Manufacturing/WorkOrders") ? "bg-purple-600" : "bg-slate-400")"></span>Work Orders</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+
+                <!-- Operations (Dispatch + Quality) -->
+                @if (User.HasClaim("permission", "Dispatch.View") || User.HasClaim("permission", "Quality.View") || User.IsInRole("Admin"))
+                {
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('operationsMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isDispatchActive || isQualityActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-clipboard-check @(isDispatchActive || isQualityActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Operations</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isDispatchActive || isQualityActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="operationsMenu" class="overflow-hidden transition-all duration-300 @(isDispatchActive || isQualityActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            @if (User.HasClaim("permission", "Dispatch.View") || User.IsInRole("Admin"))
+                            {
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Dispatch/DeliveryChallans") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Dispatch/DeliveryChallans"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Dispatch/DeliveryChallans") ? "bg-purple-600" : "bg-slate-400")"></span>Delivery Challans</a></li>
+                            }
+                            @if (User.HasClaim("permission", "Quality.View") || User.IsInRole("Admin"))
+                            {
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Quality/Inspections") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Quality/Inspections"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Quality/Inspections") ? "bg-purple-600" : "bg-slate-400")"></span>Inspections</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Quality/Rejections") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Quality/Rejections"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Quality/Rejections") ? "bg-purple-600" : "bg-slate-400")"></span>Rejections</a></li>
+                            }
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Projects -->
                 @if (User.HasClaim("permission", "Projects.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Projects</p>
-                <a href="/Projects" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-kanban w-5 mr-3"></i>Projects
-                </a>
-                <a href="/Projects/TimeTracking" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-stopwatch w-5 mr-3"></i>Time Tracking
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('projectsMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isProjectsActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-kanban @(isProjectsActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Projects</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isProjectsActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="projectsMenu" class="overflow-hidden transition-all duration-300 @(isProjectsActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage == "/Projects/Index" ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Projects"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage == "/Projects/Index" ? "bg-purple-600" : "bg-slate-400")"></span>Projects</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Projects/TimeTracking") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Projects/TimeTracking"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Projects/TimeTracking") ? "bg-purple-600" : "bg-slate-400")"></span>Time Tracking</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Reports -->
                 @if (User.HasClaim("permission", "Reports.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Reports</p>
-                <a href="/Reports/Cancellations" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-x-octagon w-5 mr-3"></i>Cancellations
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(isReportsActive ? "shadow-soft-xl bg-white font-semibold text-slate-700" : "text-slate-500 hover:bg-gray-100")" href="/Reports/Cancellations">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isReportsActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-bar-chart @(isReportsActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Reports</span>
+                    </a>
+                </li>
                 }
 
                 <!-- Settings -->
                 @if (User.HasClaim("permission", "Settings.View") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Settings</p>
-                <a href="/Settings/Currencies" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-currency-exchange w-5 mr-3"></i>Currencies
-                </a>
-                <a href="/Settings/Locations" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-geo-alt w-5 mr-3"></i>Office Locations
-                </a>
-                <a href="/Settings/GstSlabs" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-percent w-5 mr-3"></i>GST Slabs
-                </a>
+                <li class="mt-0.5 w-full">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('settingsMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isSettingsActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-sliders @(isSettingsActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Settings</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isSettingsActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="settingsMenu" class="overflow-hidden transition-all duration-300 @(isSettingsActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Settings/Currencies") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Settings/Currencies"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Settings/Currencies") ? "bg-purple-600" : "bg-slate-400")"></span>Currencies</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Settings/Locations") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Settings/Locations"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Settings/Locations") ? "bg-purple-600" : "bg-slate-400")"></span>Office Locations</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Settings/GstSlabs") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Settings/GstSlabs"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Settings/GstSlabs") ? "bg-purple-600" : "bg-slate-400")"></span>GST Slabs</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
 
                 <!-- Administration -->
                 @if (User.HasClaim("permission", "Admin.View") || User.HasClaim("permission", "Admin.Manage") || User.IsInRole("Admin"))
                 {
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2">Administration</p>
-                <a href="/Admin/Users" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-person-gear w-5 mr-3"></i>Users
-                </a>
-                <a href="/Admin/Roles" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-shield-lock w-5 mr-3"></i>Roles & Permissions
-                </a>
-                <a href="/Admin/Settings" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-sliders w-5 mr-3"></i>Settings
-                </a>
-                <a href="/Admin/Integrations" class="flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-white transition-colors mb-1">
-                    <i class="bi bi-plug w-5 mr-3"></i>Integrations
-                </a>
+                <li class="mt-0.5 w-full mb-4">
+                    <a href="javascript:;" class="py-2.5 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors text-slate-500 hover:bg-gray-100" onclick="toggleMenu('adminMenu', this)">
+                        <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center @(isAdminActive ? "bg-gradient-to-tl from-purple-700 to-pink-500" : "")">
+                            <i class="bi bi-shield-lock @(isAdminActive ? "text-white" : "text-slate-700")"></i>
+                        </div>
+                        <span class="ml-1 duration-300 opacity-100 pointer-events-none font-semibold">Administration</span>
+                        <i class="bi bi-chevron-down ml-auto text-xs transition-transform duration-300 collapse-icon @(isAdminActive ? "" : "rotate-[-90deg]")"></i>
+                    </a>
+                    <div id="adminMenu" class="overflow-hidden transition-all duration-300 @(isAdminActive ? "max-h-96" : "max-h-0")">
+                        <ul class="flex flex-col pl-4 mt-1 mb-1">
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Admin/Users") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Admin/Users"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Admin/Users") ? "bg-purple-600" : "bg-slate-400")"></span>Users</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Admin/Roles") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Admin/Roles"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Admin/Roles") ? "bg-purple-600" : "bg-slate-400")"></span>Roles & Permissions</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Admin/Settings") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Admin/Settings"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Admin/Settings") ? "bg-purple-600" : "bg-slate-400")"></span>Settings</a></li>
+                            <li><a class="py-2 text-sm ease-nav-brand mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors @(currentPage.Contains("/Admin/Integrations") ? "font-semibold text-slate-700" : "text-slate-500 hover:text-slate-700")" href="/Admin/Integrations"><span class="w-1.5 h-1.5 rounded-full mr-3 @(currentPage.Contains("/Admin/Integrations") ? "bg-purple-600" : "bg-slate-400")"></span>Integrations</a></li>
+                        </ul>
+                    </div>
+                </li>
                 }
-            </nav>
+            </ul>
         </div>
     </aside>
 
     <!-- Main Content -->
-    <div class="sm:ml-64">
-        <!-- Top Header -->
-        <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
-            <div class="flex items-center justify-between px-6 py-3">
-                <div class="flex items-center">
-                    <!-- Mobile menu button -->
-                    <button type="button" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')"
-                            class="inline-flex items-center p-2 text-gray-500 rounded-lg sm:hidden hover:bg-gray-100">
-                        <i class="bi bi-list text-xl"></i>
-                    </button>
+    <main class="ease-soft-in-out xl:ml-[17rem] relative h-full max-h-screen rounded-xl transition-all duration-200">
+        <!-- Top Navbar -->
+        <nav class="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all shadow-none duration-250 ease-soft-in rounded-2xl lg:flex-nowrap lg:justify-start">
+            <div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
+                <!-- Breadcrumb & Page Title -->
+                <nav>
+                    <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
+                        <li class="leading-normal text-sm">
+                            <a class="opacity-50 text-slate-700" href="/Dashboard">Dashboard</a>
+                        </li>
+                        <li class="text-sm pl-2 capitalize leading-normal text-slate-700 before:float-left before:pr-2 before:text-gray-600 before:content-['/']">
+                            @ViewData["Title"]
+                        </li>
+                    </ol>
+                    <h6 class="mb-0 font-bold capitalize">@ViewData["Title"]</h6>
+                </nav>
+
+                <div class="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
                     <!-- Search -->
-                    <div class="relative hidden md:block ml-4">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="bi bi-search text-gray-400"></i>
-                        </div>
-                        <input type="search" placeholder="Search..."
-                               class="pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-primary-500 focus:border-primary-500 w-72" />
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <!-- Notifications -->
-                    <button class="relative p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
-                        <i class="bi bi-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
-                    </button>
-                    <!-- User dropdown -->
-                    <div>
-                        <button id="userDropdownButton" data-dropdown-toggle="userDropdown"
-                                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
-                            <div class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center">
-                                <i class="bi bi-person"></i>
-                            </div>
-                            <span class="hidden md:inline font-medium">Admin User</span>
-                            <i class="bi bi-chevron-down text-xs"></i>
-                        </button>
-                        <div id="userDropdown" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-48 border border-gray-200">
-                            <ul class="py-2 text-sm text-gray-700">
-                                <li><a href="/Account/Profile" class="flex items-center px-4 py-2 hover:bg-gray-100"><i class="bi bi-person mr-3"></i>Profile</a></li>
-                                <li><a href="/Admin/Settings" class="flex items-center px-4 py-2 hover:bg-gray-100"><i class="bi bi-gear mr-3"></i>Settings</a></li>
-                            </ul>
-                            <div class="py-2">
-                                <a href="/Account/Logout" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                    <i class="bi bi-box-arrow-right mr-3"></i>Logout
-                                </a>
-                            </div>
+                    <div class="flex items-center md:ml-auto md:pr-4">
+                        <div class="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease-soft">
+                            <span class="text-sm ease-soft leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="pl-9 text-sm focus:shadow-soft-primary-outline ease-soft w-1/100 leading-5.6 relative -ml-px block min-w-0 flex-auto rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 pr-3 text-gray-700 transition-all placeholder:text-gray-500 focus:border-primary-300 focus:outline-none focus:transition-shadow" placeholder="Type here..." />
                         </div>
                     </div>
+
+                    <ul class="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
+                        <!-- Mobile menu toggle -->
+                        <li class="flex items-center xl:hidden">
+                            <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand text-slate-500" id="iconNavbarSidenav" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar').classList.toggle('translate-x-0');">
+                                <div class="w-4.5 overflow-hidden">
+                                    <i class="bi bi-list text-xl ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"></i>
+                                </div>
+                            </a>
+                        </li>
+
+                        <!-- Settings -->
+                        <li class="flex items-center px-4">
+                            <a href="/Admin/Settings" class="p-0 text-sm transition-all ease-nav-brand text-slate-500">
+                                <i class="bi bi-gear cursor-pointer"></i>
+                            </a>
+                        </li>
+
+                        <!-- Notifications -->
+                        <li class="relative flex items-center pr-2">
+                            <p class="hidden transform-dropdown-show"></p>
+                            <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand text-slate-500" data-dropdown-toggle="notificationDropdown">
+                                <i class="bi bi-bell cursor-pointer"></i>
+                            </a>
+                            <div id="notificationDropdown" class="hidden z-50 w-80 bg-white rounded-lg shadow-soft-3xl border border-gray-200">
+                                <div class="p-4 border-b border-gray-200">
+                                    <h6 class="mb-0 font-semibold text-slate-700">Notifications</h6>
+                                </div>
+                                <ul class="max-h-64 overflow-auto">
+                                    <li class="relative flex p-4 border-b border-gray-100">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tl from-purple-700 to-pink-500">
+                                            <i class="bi bi-bell-fill text-white text-sm"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h6 class="mb-0 text-sm font-semibold text-slate-700">New order received</h6>
+                                            <p class="mb-0 text-xs text-slate-500">2 minutes ago</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <!-- User -->
+                        <li class="relative flex items-center">
+                            <a href="javascript:;" class="flex items-center p-0 text-sm transition-all ease-nav-brand text-slate-500" data-dropdown-toggle="userDropdown">
+                                <div class="w-8 h-8 bg-gradient-to-tl from-purple-700 to-pink-500 text-white rounded-full flex items-center justify-center mr-2">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <span class="hidden sm:inline">Admin User</span>
+                            </a>
+                            <div id="userDropdown" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-soft-3xl w-48 border border-gray-200">
+                                <ul class="py-2 text-sm text-gray-700">
+                                    <li><a href="/Account/Profile" class="flex items-center px-4 py-2 hover:bg-gray-100"><i class="bi bi-person mr-3"></i>Profile</a></li>
+                                    <li><a href="/Admin/Settings" class="flex items-center px-4 py-2 hover:bg-gray-100"><i class="bi bi-gear mr-3"></i>Settings</a></li>
+                                </ul>
+                                <div class="py-2">
+                                    <a href="/Account/Logout" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                        <i class="bi bi-box-arrow-right mr-3"></i>Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </header>
+        </nav>
 
         <!-- Page Content -->
-        <main class="p-6">
+        <div class="w-full px-6 py-6 mx-auto">
             @RenderBody()
-        </main>
-    </div>
+        </div>
+    </main>
 
     <!-- Flowbite JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
@@ -447,6 +596,28 @@
                 });
             });
         });
+
+        // Toggle collapsible menu function
+        function toggleMenu(menuId, element) {
+            var menu = document.getElementById(menuId);
+            var icon = element.querySelector('.collapse-icon');
+
+            if (menu.classList.contains('max-h-0')) {
+                // Expand
+                menu.classList.remove('max-h-0');
+                menu.classList.add('max-h-96');
+                if (icon) {
+                    icon.classList.remove('rotate-[-90deg]');
+                }
+            } else {
+                // Collapse
+                menu.classList.add('max-h-0');
+                menu.classList.remove('max-h-96');
+                if (icon) {
+                    icon.classList.add('rotate-[-90deg]');
+                }
+            }
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
