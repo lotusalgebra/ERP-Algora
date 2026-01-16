@@ -19,7 +19,7 @@
                 </ol>
             </nav>
         </div>
-        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" hx-get="/Admin/Users?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-modal-target="userModal" data-modal-toggle="userModal">
+        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" hx-get="/Admin/Users?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" hx-on::after-request="openUserModal()">
             <i class="bi bi-plus-lg mr-2"></i> New User
         </button>
     </div>
@@ -145,6 +145,25 @@
             htmx.ajax('GET', `/Admin/Users?${params}`, {target: '#usersTableBody', swap: 'innerHTML'});
         }
 
+        // Open user modal after form content is loaded
+        function openUserModal() {
+            const modalEl = document.getElementById('userModal');
+            if (modalEl) {
+                // Try Flowbite first
+                let modal = FlowbiteInstances.getInstance('Modal', 'userModal');
+                if (!modal) {
+                    modal = new Modal(modalEl);
+                }
+                modal.show();
+            }
+        }
+
+        // Close modal after successful form submission
+        function closeUserModal() {
+            const modal = FlowbiteInstances.getInstance('Modal', 'userModal');
+            if (modal) modal.hide();
+        }
+
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => loadTable(), 300);
@@ -154,9 +173,9 @@
         roleFilter.addEventListener('change', () => loadTable());
 
         document.body.addEventListener('htmx:afterRequest', (e) => {
-            if (e.detail.elt.closest('#userModal') && e.detail.successful) {
-                const modal = FlowbiteInstances.getInstance('Modal', 'userModal');
-                if (modal) modal.hide();
+            // Close modal after successful form submission
+            if (e.detail.elt.closest('form') && e.detail.elt.closest('#formContainer') && e.detail.successful) {
+                closeUserModal();
             }
         });
     </script>

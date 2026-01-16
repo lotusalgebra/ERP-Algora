@@ -43,7 +43,10 @@ GO
 PRINT 'Roles created/verified';
 GO
 
--- Insert sample users (password hash is for 'Password123!')
+-- Insert sample users (password hash is BCrypt for 'Password123!')
+-- BCrypt hash generated with cost factor 11
+DECLARE @BcryptHash NVARCHAR(100) = '$2a$11$rBbBQMa1kLU/nB4YmY1Jt.1gA7rVwNwsIHYCGKqJ6SFKlzz3oFnlC';
+
 DECLARE @AdminRoleId UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM Roles WHERE Name = 'Administrator');
 DECLARE @ManagerRoleId UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM Roles WHERE Name = 'Manager');
 DECLARE @AccountantRoleId UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM Roles WHERE Name = 'Accountant');
@@ -63,14 +66,14 @@ DECLARE @User8 UNIQUEIDENTIFIER = NEWID();
 -- Insert users
 INSERT INTO Users (Id, Email, FirstName, LastName, PhoneNumber, PasswordHash, Status, LastLoginAt, CreatedAt)
 VALUES
-(@User1, 'admin@algora.com', 'System', 'Administrator', '+1-555-0001', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 0, DATEADD(hour, -1, GETUTCDATE()), GETUTCDATE()),
-(@User2, 'john.manager@algora.com', 'John', 'Peterson', '+1-555-0002', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 0, DATEADD(hour, -3, GETUTCDATE()), GETUTCDATE()),
-(@User3, 'sarah.finance@algora.com', 'Sarah', 'Mitchell', '+1-555-0003', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 0, DATEADD(day, -1, GETUTCDATE()), GETUTCDATE()),
-(@User4, 'mike.hr@algora.com', 'Michael', 'Thompson', '+1-555-0004', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 0, DATEADD(hour, -5, GETUTCDATE()), GETUTCDATE()),
-(@User5, 'emily.sales@algora.com', 'Emily', 'Rodriguez', '+1-555-0005', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 0, DATEADD(minute, -30, GETUTCDATE()), GETUTCDATE()),
-(@User6, 'david.warehouse@algora.com', 'David', 'Kim', '+1-555-0006', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 0, DATEADD(day, -2, GETUTCDATE()), GETUTCDATE()),
-(@User7, 'lisa.inactive@algora.com', 'Lisa', 'Brown', '+1-555-0007', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 1, DATEADD(day, -30, GETUTCDATE()), GETUTCDATE()),
-(@User8, 'james.locked@algora.com', 'James', 'Wilson', '+1-555-0008', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 2, DATEADD(day, -7, GETUTCDATE()), GETUTCDATE());
+(@User1, 'admin@algora.com', 'System', 'Administrator', '+1-555-0001', @BcryptHash, 0, DATEADD(hour, -1, GETUTCDATE()), GETUTCDATE()),
+(@User2, 'john.manager@algora.com', 'John', 'Peterson', '+1-555-0002', @BcryptHash, 0, DATEADD(hour, -3, GETUTCDATE()), GETUTCDATE()),
+(@User3, 'sarah.finance@algora.com', 'Sarah', 'Mitchell', '+1-555-0003', @BcryptHash, 0, DATEADD(day, -1, GETUTCDATE()), GETUTCDATE()),
+(@User4, 'mike.hr@algora.com', 'Michael', 'Thompson', '+1-555-0004', @BcryptHash, 0, DATEADD(hour, -5, GETUTCDATE()), GETUTCDATE()),
+(@User5, 'emily.sales@algora.com', 'Emily', 'Rodriguez', '+1-555-0005', @BcryptHash, 0, DATEADD(minute, -30, GETUTCDATE()), GETUTCDATE()),
+(@User6, 'david.warehouse@algora.com', 'David', 'Kim', '+1-555-0006', @BcryptHash, 0, DATEADD(day, -2, GETUTCDATE()), GETUTCDATE()),
+(@User7, 'lisa.inactive@algora.com', 'Lisa', 'Brown', '+1-555-0007', @BcryptHash, 1, DATEADD(day, -30, GETUTCDATE()), GETUTCDATE()),
+(@User8, 'james.locked@algora.com', 'James', 'Wilson', '+1-555-0008', @BcryptHash, 2, DATEADD(day, -7, GETUTCDATE()), GETUTCDATE());
 GO
 
 PRINT 'Users created';

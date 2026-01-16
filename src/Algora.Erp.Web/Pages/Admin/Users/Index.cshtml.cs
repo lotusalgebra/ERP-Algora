@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 
 namespace Algora.Erp.Web.Pages.Admin.Users;
 
@@ -135,12 +134,9 @@ public class IndexModel : PageModel
             }
 
             user = new User { Id = Guid.NewGuid() };
-            // Set password hash (simple hash for demo - use proper hashing in production)
+            // Set password hash using BCrypt
             var password = input.Password ?? "Password123!";
-            using var sha256 = SHA256.Create();
-            var bytes = System.Text.Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            user.PasswordHash = Convert.ToBase64String(hash);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
             _context.Users.Add(user);
         }
 

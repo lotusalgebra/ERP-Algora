@@ -69,7 +69,7 @@
                                    hx-get="/Admin/Users?handler=EditForm&id=@user.Id"
                                    hx-target="#formContainer"
                                    hx-swap="innerHTML"
-                                   data-modal-target="userModal" data-modal-toggle="userModal">
+                                   hx-on::after-request="openUserModal()">
                                     <i class="bi bi-pencil mr-2"></i> Edit
                                 </a>
                             </li>
