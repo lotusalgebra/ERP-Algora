@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Algora.Erp.Application\Algora.Erp.Application.csproj" />
+    <ProjectReference Include="..\Algora.Erp.Integrations\Algora.Erp.Integrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -138,5 +138,8 @@ public interface IApplicationDbContext
     // Integration Settings
     DbSet<IntegrationSettings> IntegrationSettings { get; }
 
+    // CRM Integration Mappings
+    DbSet<CrmIntegrationMapping> CrmIntegrationMappings { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
