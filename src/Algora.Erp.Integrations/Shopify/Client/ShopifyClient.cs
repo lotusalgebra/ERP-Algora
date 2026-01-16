@@ -1,12 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 using Algora.Erp.Integrations.Common.Exceptions;
-using Algora.Erp.Integrations.Common.Settings;
 using Algora.Erp.Integrations.Shopify.Auth;
 using Algora.Erp.Integrations.Shopify.Models;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Integrations.Shopify.Client;
 
@@ -42,18 +38,13 @@ public class ShopifyClient : IShopifyClient
 {
     private readonly HttpClient _httpClient;
     private readonly IShopifyAuthHandler _authHandler;
-    private readonly ShopifySettings _settings;
 
     public string CrmType => "Shopify";
 
-    public ShopifyClient(
-        HttpClient httpClient,
-        IShopifyAuthHandler authHandler,
-        IOptions<CrmIntegrationsSettings> options)
+    public ShopifyClient(HttpClient httpClient, IShopifyAuthHandler authHandler)
     {
         _httpClient = httpClient;
         _authHandler = authHandler;
-        _settings = options.Value.Shopify;
     }
 
     public async Task<bool> TestConnectionAsync(CancellationToken ct = default)
@@ -71,7 +62,7 @@ public class ShopifyClient : IShopifyClient
 
     public async Task<ShopifyShop?> GetShopInfoAsync(CancellationToken ct = default)
     {
-        var url = BuildUrl("shop.json");
+        var url = await BuildUrlAsync("shop.json", ct);
         var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
         await EnsureSuccessAsync(response, ct);
 
@@ -91,11 +82,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"customers.json?limit={limit}&page_info={pageInfo}");
+                url = await BuildUrlAsync($"customers.json?limit={limit}&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"customers.json?limit={limit}" + (sinceId != null ? $"&since_id={sinceId}" : ""));
+                url = await BuildUrlAsync($"customers.json?limit={limit}" + (sinceId != null ? $"&since_id={sinceId}" : ""), ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -116,7 +107,7 @@ public class ShopifyClient : IShopifyClient
 
     public async Task<ShopifyCustomer?> GetCustomerByIdAsync(long id, CancellationToken ct = default)
     {
-        var url = BuildUrl($"customers/{id}.json");
+        var url = await BuildUrlAsync($"customers/{id}.json", ct);
         var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
@@ -138,11 +129,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"customers.json?limit=250&page_info={pageInfo}");
+                url = await BuildUrlAsync($"customers.json?limit=250&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"customers.json?limit=250&updated_at_min={Uri.EscapeDataString(sinceStr)}");
+                url = await BuildUrlAsync($"customers.json?limit=250&updated_at_min={Uri.EscapeDataString(sinceStr)}", ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -175,11 +166,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"orders.json?limit={limit}&page_info={pageInfo}");
+                url = await BuildUrlAsync($"orders.json?limit={limit}&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"orders.json?limit={limit}&status={status}" + (sinceId != null ? $"&since_id={sinceId}" : ""));
+                url = await BuildUrlAsync($"orders.json?limit={limit}&status={status}" + (sinceId != null ? $"&since_id={sinceId}" : ""), ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -200,7 +191,7 @@ public class ShopifyClient : IShopifyClient
 
     public async Task<ShopifyOrder?> GetOrderByIdAsync(long id, CancellationToken ct = default)
     {
-        var url = BuildUrl($"orders/{id}.json");
+        var url = await BuildUrlAsync($"orders/{id}.json", ct);
         var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
@@ -222,11 +213,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"orders.json?limit=250&page_info={pageInfo}");
+                url = await BuildUrlAsync($"orders.json?limit=250&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"orders.json?limit=250&status=any&updated_at_min={Uri.EscapeDataString(sinceStr)}");
+                url = await BuildUrlAsync($"orders.json?limit=250&status=any&updated_at_min={Uri.EscapeDataString(sinceStr)}", ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -259,11 +250,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"products.json?limit={limit}&page_info={pageInfo}");
+                url = await BuildUrlAsync($"products.json?limit={limit}&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"products.json?limit={limit}" + (sinceId != null ? $"&since_id={sinceId}" : ""));
+                url = await BuildUrlAsync($"products.json?limit={limit}" + (sinceId != null ? $"&since_id={sinceId}" : ""), ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -284,7 +275,7 @@ public class ShopifyClient : IShopifyClient
 
     public async Task<ShopifyProduct?> GetProductByIdAsync(long id, CancellationToken ct = default)
     {
-        var url = BuildUrl($"products/{id}.json");
+        var url = await BuildUrlAsync($"products/{id}.json", ct);
         var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
@@ -306,11 +297,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"products.json?limit=250&page_info={pageInfo}");
+                url = await BuildUrlAsync($"products.json?limit=250&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"products.json?limit=250&updated_at_min={Uri.EscapeDataString(sinceStr)}");
+                url = await BuildUrlAsync($"products.json?limit=250&updated_at_min={Uri.EscapeDataString(sinceStr)}", ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -335,7 +326,7 @@ public class ShopifyClient : IShopifyClient
 
     public async Task<List<ShopifyLocation>> GetLocationsAsync(CancellationToken ct = default)
     {
-        var url = BuildUrl("locations.json");
+        var url = await BuildUrlAsync("locations.json", ct);
         var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
         await EnsureSuccessAsync(response, ct);
 
@@ -353,11 +344,11 @@ public class ShopifyClient : IShopifyClient
             string url;
             if (pageInfo != null)
             {
-                url = BuildUrl($"inventory_levels.json?limit=250&page_info={pageInfo}");
+                url = await BuildUrlAsync($"inventory_levels.json?limit=250&page_info={pageInfo}", ct);
             }
             else
             {
-                url = BuildUrl($"inventory_levels.json?limit=250&location_ids={locationId}");
+                url = await BuildUrlAsync($"inventory_levels.json?limit=250&location_ids={locationId}", ct);
             }
 
             var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
@@ -380,10 +371,10 @@ public class ShopifyClient : IShopifyClient
 
     #region Private Methods
 
-    private string BuildUrl(string endpoint)
+    private async Task<string> BuildUrlAsync(string endpoint, CancellationToken ct)
     {
-        var domain = _authHandler.GetShopDomain();
-        var version = _authHandler.GetApiVersion();
+        var domain = await _authHandler.GetShopDomainAsync(ct);
+        var version = await _authHandler.GetApiVersionAsync(ct);
         return $"https://{domain}/admin/api/{version}/{endpoint}";
     }
 

@@ -1,28 +1,28 @@
 using Algora.Erp.Application.Common.Interfaces;
 using Algora.Erp.Domain.Entities.Settings;
-using Algora.Erp.Integrations.Common.Interfaces;
-using Algora.Erp.Integrations.Salesforce.Auth;
-using Algora.Erp.Integrations.Salesforce.Client;
+using Algora.Erp.Integrations.Shopify.Auth;
+using Algora.Erp.Integrations.Shopify.Client;
+using Algora.Erp.Integrations.Shopify.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Algora.Erp.Web.Pages.Admin.Integrations;
 
-public class SalesforceModel : PageModel
+public class ShopifyModel : PageModel
 {
     private readonly IIntegrationSettingsService _settingsService;
-    private readonly IEnumerable<ICrmSyncService> _syncServices;
+    private readonly IShopifySyncService? _syncService;
     private readonly IServiceProvider _serviceProvider;
 
-    private const string IntegrationType = SalesforceAuthHandler.IntegrationType;
+    private const string IntegrationType = ShopifyAuthHandler.IntegrationType;
 
-    public SalesforceModel(
+    public ShopifyModel(
         IIntegrationSettingsService settingsService,
-        IEnumerable<ICrmSyncService> syncServices,
+        IShopifySyncService? syncService,
         IServiceProvider serviceProvider)
     {
         _settingsService = settingsService;
-        _syncServices = syncServices;
+        _syncService = syncService;
         _serviceProvider = serviceProvider;
     }
 
@@ -34,40 +34,28 @@ public class SalesforceModel : PageModel
     public bool? LastSyncSuccess { get; set; }
 
     [BindProperty]
-    public string ClientId { get; set; } = string.Empty;
+    public string ShopDomain { get; set; } = string.Empty;
 
     [BindProperty]
-    public string ClientSecret { get; set; } = string.Empty;
+    public string AccessToken { get; set; } = string.Empty;
 
     [BindProperty]
-    public string Username { get; set; } = string.Empty;
-
-    [BindProperty]
-    public string Password { get; set; } = string.Empty;
-
-    [BindProperty]
-    public string SecurityToken { get; set; } = string.Empty;
-
-    [BindProperty]
-    public string InstanceUrl { get; set; } = "https://login.salesforce.com";
-
-    [BindProperty]
-    public string ApiVersion { get; set; } = "v58.0";
+    public string ApiVersion { get; set; } = "2024-01";
 
     [BindProperty]
     public int SyncIntervalMinutes { get; set; } = 30;
 
     [BindProperty]
-    public bool SyncContacts { get; set; } = true;
+    public bool SyncCustomers { get; set; } = true;
 
     [BindProperty]
-    public bool SyncLeads { get; set; } = true;
+    public bool SyncOrders { get; set; } = true;
 
     [BindProperty]
-    public bool SyncOpportunities { get; set; } = true;
+    public bool SyncProducts { get; set; } = true;
 
     [BindProperty]
-    public bool SyncAccounts { get; set; } = true;
+    public bool SyncInventory { get; set; } = true;
 
     public async Task OnGetAsync()
     {
@@ -83,21 +71,21 @@ public class SalesforceModel : PageModel
             SyncIntervalMinutes = integration.SyncIntervalMinutes;
         }
 
-        var settings = await _settingsService.GetSettingsAsync<SalesforceSettingsData>(IntegrationType);
+        var settings = await _settingsService.GetSettingsAsync<ShopifySettingsData>(IntegrationType);
         if (settings != null)
         {
-            InstanceUrl = settings.InstanceUrl;
+            ShopDomain = settings.ShopDomain;
             ApiVersion = settings.ApiVersion;
-            Username = settings.Username;
+            SyncCustomers = settings.SyncCustomers;
+            SyncOrders = settings.SyncOrders;
+            SyncProducts = settings.SyncProducts;
+            SyncInventory = settings.SyncInventory;
         }
 
-        var credentials = await _settingsService.GetCredentialsAsync<SalesforceCredentials>(IntegrationType);
+        var credentials = await _settingsService.GetCredentialsAsync<ShopifyCredentials>(IntegrationType);
         if (credentials != null)
         {
-            ClientId = credentials.ClientId;
-            ClientSecret = string.IsNullOrEmpty(credentials.ClientSecret) ? "" : "••••••••";
-            Password = string.IsNullOrEmpty(credentials.Password) ? "" : "••••••••";
-            SecurityToken = string.IsNullOrEmpty(credentials.SecurityToken) ? "" : "••••••••";
+            AccessToken = string.IsNullOrEmpty(credentials.AccessToken) ? "" : "••••••••";
         }
     }
 
@@ -106,21 +94,21 @@ public class SalesforceModel : PageModel
         try
         {
             // Get existing credentials to preserve masked values
-            var existingCredentials = await _settingsService.GetCredentialsAsync<SalesforceCredentials>(IntegrationType);
+            var existingCredentials = await _settingsService.GetCredentialsAsync<ShopifyCredentials>(IntegrationType);
 
-            var settings = new SalesforceSettingsData
+            var settings = new ShopifySettingsData
             {
-                InstanceUrl = InstanceUrl,
+                ShopDomain = ShopDomain,
                 ApiVersion = ApiVersion,
-                Username = Username
+                SyncCustomers = SyncCustomers,
+                SyncOrders = SyncOrders,
+                SyncProducts = SyncProducts,
+                SyncInventory = SyncInventory
             };
 
-            var credentials = new SalesforceCredentials
+            var credentials = new ShopifyCredentials
             {
-                ClientId = ClientId,
-                ClientSecret = ClientSecret == "••••••••" ? existingCredentials?.ClientSecret ?? "" : ClientSecret,
-                Password = Password == "••••••••" ? existingCredentials?.Password ?? "" : Password,
-                SecurityToken = SecurityToken == "••••••••" ? existingCredentials?.SecurityToken ?? "" : SecurityToken
+                AccessToken = AccessToken == "••••••••" ? existingCredentials?.AccessToken ?? "" : AccessToken
             };
 
             await _settingsService.SaveSettingsAsync(
@@ -130,7 +118,7 @@ public class SalesforceModel : PageModel
                 enabled: true,
                 syncIntervalMinutes: SyncIntervalMinutes);
 
-            TempData["Success"] = "Salesforce settings saved successfully";
+            TempData["Success"] = "Shopify settings saved successfully";
         }
         catch (Exception ex)
         {
@@ -147,10 +135,10 @@ public class SalesforceModel : PageModel
             // First save the settings if they've changed
             await OnPostAsync();
 
-            var client = _serviceProvider.GetService<SalesforceClient>();
+            var client = _serviceProvider.GetService<IShopifyClient>();
             if (client == null)
             {
-                TempData["Error"] = "Salesforce client is not configured";
+                TempData["Error"] = "Shopify client is not configured";
                 return RedirectToPage();
             }
 
@@ -162,7 +150,7 @@ public class SalesforceModel : PageModel
 
             if (isConnected)
             {
-                TempData["Success"] = "Connection successful! Salesforce is ready to sync.";
+                TempData["Success"] = "Connection successful! Shopify is ready to sync.";
             }
             else
             {
@@ -180,28 +168,36 @@ public class SalesforceModel : PageModel
 
     public async Task<IActionResult> OnPostSyncAsync()
     {
-        var service = _syncServices.FirstOrDefault(s => s.CrmType == IntegrationType);
-        if (service == null)
+        if (_syncService == null)
         {
-            TempData["Error"] = "Salesforce sync service is not available";
+            TempData["Error"] = "Shopify sync service is not available";
             return RedirectToPage();
         }
 
         try
         {
-            var result = await service.FullSyncAsync();
+            var result = await _syncService.FullSyncAsync();
             await _settingsService.UpdateSyncResultAsync(
                 IntegrationType,
                 result.IsSuccess,
-                result.RecordsProcessed);
+                result.TotalRecordsProcessed);
 
             if (result.IsSuccess)
             {
-                TempData["Success"] = $"Sync completed: {result.RecordsProcessed} records processed, {result.RecordsCreated} created, {result.RecordsUpdated} updated";
+                TempData["Success"] = $"Sync completed: {result.TotalRecordsProcessed} records processed";
             }
             else
             {
-                TempData["Error"] = $"Sync completed with errors: {result.ErrorMessage}";
+                var errors = new List<string>();
+                if (result.CustomerSync != null && !result.CustomerSync.IsSuccess)
+                    errors.Add($"Customers: {result.CustomerSync.ErrorMessage}");
+                if (result.OrderSync != null && !result.OrderSync.IsSuccess)
+                    errors.Add($"Orders: {result.OrderSync.ErrorMessage}");
+                if (result.ProductSync != null && !result.ProductSync.IsSuccess)
+                    errors.Add($"Products: {result.ProductSync.ErrorMessage}");
+                if (result.InventorySync != null && !result.InventorySync.IsSuccess)
+                    errors.Add($"Inventory: {result.InventorySync.ErrorMessage}");
+                TempData["Error"] = $"Sync completed with errors: {string.Join(", ", errors)}";
             }
         }
         catch (Exception ex)
@@ -218,7 +214,7 @@ public class SalesforceModel : PageModel
         try
         {
             await _settingsService.DeleteAsync(IntegrationType);
-            TempData["Success"] = "Salesforce disconnected successfully";
+            TempData["Success"] = "Shopify disconnected successfully";
         }
         catch (Exception ex)
         {

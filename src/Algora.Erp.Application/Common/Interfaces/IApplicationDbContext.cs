@@ -135,5 +135,8 @@ public interface IApplicationDbContext
     // Tenant Settings
     DbSet<TenantSettings> TenantSettings { get; }
 
+    // Integration Settings
+    DbSet<IntegrationSettings> IntegrationSettings { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

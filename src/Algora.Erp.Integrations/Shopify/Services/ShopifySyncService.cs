@@ -1,10 +1,10 @@
+using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Settings;
 using Algora.Erp.Integrations.Common.Interfaces;
 using Algora.Erp.Integrations.Common.Models;
-using Algora.Erp.Integrations.Common.Settings;
+using Algora.Erp.Integrations.Shopify.Auth;
 using Algora.Erp.Integrations.Shopify.Client;
-using Algora.Erp.Integrations.Shopify.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Integrations.Shopify.Services;
 
@@ -21,18 +21,21 @@ public interface IShopifySyncService
 public class ShopifySyncService : IShopifySyncService
 {
     private readonly IShopifyClient _client;
-    private readonly ShopifySettings _settings;
+    private readonly IShopifyAuthHandler _authHandler;
+    private readonly IIntegrationSettingsService _settingsService;
     private readonly ILogger<ShopifySyncService> _logger;
 
-    public string CrmType => "Shopify";
+    public string CrmType => ShopifyAuthHandler.IntegrationType;
 
     public ShopifySyncService(
         IShopifyClient client,
-        IOptions<CrmIntegrationsSettings> options,
+        IShopifyAuthHandler authHandler,
+        IIntegrationSettingsService settingsService,
         ILogger<ShopifySyncService> logger)
     {
         _client = client;
-        _settings = options.Value.Shopify;
+        _authHandler = authHandler;
+        _settingsService = settingsService;
         _logger = logger;
     }
 
@@ -266,31 +269,41 @@ public class ShopifySyncService : IShopifySyncService
 
         _logger.LogInformation("Starting full Shopify sync");
 
+        // Get settings to check what to sync
+        var settings = await _authHandler.GetSettingsAsync(ct);
+
         // Sync customers
-        if (_settings.SyncCustomers)
+        if (settings?.SyncCustomers ?? true)
         {
             summary.CustomerSync = await SyncCustomersAsync(ct);
         }
 
         // Sync orders
-        if (_settings.SyncOrders)
+        if (settings?.SyncOrders ?? true)
         {
             summary.OrderSync = await SyncOrdersAsync(ct);
         }
 
         // Sync products
-        if (_settings.SyncProducts)
+        if (settings?.SyncProducts ?? true)
         {
             summary.ProductSync = await SyncProductsAsync(ct);
         }
 
         // Sync inventory
-        if (_settings.SyncInventory)
+        if (settings?.SyncInventory ?? true)
         {
             summary.InventorySync = await SyncInventoryAsync(ct);
         }
 
         summary.CompletedAt = DateTime.UtcNow;
+
+        // Update sync result in database
+        await _settingsService.UpdateSyncResultAsync(
+            CrmType,
+            summary.IsSuccess,
+            summary.TotalRecordsProcessed,
+            ct);
 
         _logger.LogInformation("Completed full Shopify sync in {Duration}ms",
             (summary.CompletedAt - summary.StartedAt).TotalMilliseconds);

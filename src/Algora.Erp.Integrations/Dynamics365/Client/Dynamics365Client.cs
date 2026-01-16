@@ -7,9 +7,7 @@ using System.Text.Json.Serialization;
 using Algora.Erp.Integrations.Common.Exceptions;
 using Algora.Erp.Integrations.Common.Interfaces;
 using Algora.Erp.Integrations.Common.Models;
-using Algora.Erp.Integrations.Common.Settings;
 using Algora.Erp.Integrations.Dynamics365.Auth;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Integrations.Dynamics365.Client;
 
@@ -17,18 +15,13 @@ public class Dynamics365Client : ICrmClient
 {
     private readonly HttpClient _httpClient;
     private readonly IDynamics365AuthHandler _authHandler;
-    private readonly Dynamics365Settings _settings;
 
     public string CrmType => "Dynamics365";
 
-    public Dynamics365Client(
-        HttpClient httpClient,
-        IDynamics365AuthHandler authHandler,
-        IOptions<CrmIntegrationsSettings> options)
+    public Dynamics365Client(HttpClient httpClient, IDynamics365AuthHandler authHandler)
     {
         _httpClient = httpClient;
         _authHandler = authHandler;
-        _settings = options.Value.Dynamics365;
     }
 
     public async Task<bool> TestConnectionAsync(CancellationToken ct = default)
@@ -36,11 +29,14 @@ public class Dynamics365Client : ICrmClient
         try
         {
             var token = await _authHandler.GetAccessTokenAsync(ct);
+            var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+            var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.GetAsync(
-                $"{_settings.InstanceUrl}/api/data/{_settings.ApiVersion}/WhoAmI", ct);
+                $"{instanceUrl}/api/data/{apiVersion}/WhoAmI", ct);
 
             return response.IsSuccessStatusCode;
         }
@@ -53,7 +49,9 @@ public class Dynamics365Client : ICrmClient
     public async Task<T?> GetByIdAsync<T>(string id, CancellationToken ct = default) where T : class
     {
         var entitySet = GetDataverseEntitySet<T>();
-        var url = $"{_settings.InstanceUrl}/api/data/{_settings.ApiVersion}/{entitySet}({id})";
+        var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+        var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+        var url = $"{instanceUrl}/api/data/{apiVersion}/{entitySet}({id})";
 
         var response = await SendRequestAsync(HttpMethod.Get, url, null, ct);
 
@@ -69,7 +67,9 @@ public class Dynamics365Client : ICrmClient
     public async Task<List<T>> QueryAsync<T>(string query, CancellationToken ct = default) where T : class
     {
         var entitySet = GetDataverseEntitySet<T>();
-        var url = $"{_settings.InstanceUrl}/api/data/{_settings.ApiVersion}/{entitySet}?{query}";
+        var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+        var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+        var url = $"{instanceUrl}/api/data/{apiVersion}/{entitySet}?{query}";
         var results = new List<T>();
         string? nextLink = null;
 
@@ -95,7 +95,9 @@ public class Dynamics365Client : ICrmClient
     public async Task<string> CreateAsync<T>(T entity, CancellationToken ct = default) where T : class
     {
         var entitySet = GetDataverseEntitySet<T>();
-        var url = $"{_settings.InstanceUrl}/api/data/{_settings.ApiVersion}/{entitySet}";
+        var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+        var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+        var url = $"{instanceUrl}/api/data/{apiVersion}/{entitySet}";
 
         var options = new JsonSerializerOptions
         {
@@ -136,7 +138,9 @@ public class Dynamics365Client : ICrmClient
     public async Task UpdateAsync<T>(string id, T entity, CancellationToken ct = default) where T : class
     {
         var entitySet = GetDataverseEntitySet<T>();
-        var url = $"{_settings.InstanceUrl}/api/data/{_settings.ApiVersion}/{entitySet}({id})";
+        var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+        var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+        var url = $"{instanceUrl}/api/data/{apiVersion}/{entitySet}({id})";
 
         var options = new JsonSerializerOptions
         {
@@ -159,7 +163,9 @@ public class Dynamics365Client : ICrmClient
     public async Task DeleteAsync(string id, string entityType, CancellationToken ct = default)
     {
         var entitySet = GetDataverseEntitySetByName(entityType);
-        var url = $"{_settings.InstanceUrl}/api/data/{_settings.ApiVersion}/{entitySet}({id})";
+        var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+        var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+        var url = $"{instanceUrl}/api/data/{apiVersion}/{entitySet}({id})";
 
         var response = await SendRequestAsync(HttpMethod.Delete, url, null, ct);
         await EnsureSuccessAsync(response, ct);

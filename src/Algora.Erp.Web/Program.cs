@@ -20,7 +20,7 @@ builder.Host.UseSerilog();
 // Add services to the container
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddCrmIntegrations(builder.Configuration);
+builder.Services.AddCrmIntegrations();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorPages();

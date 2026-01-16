@@ -1,14 +1,14 @@
 @page
 @model Algora.Erp.Web.Pages.Admin.Integrations.IndexModel
 @{
-    ViewData["Title"] = "CRM Integrations";
+    ViewData["Title"] = "Integrations";
 }
 
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">CRM Integrations</h1>
-            <p class="text-gray-500 mt-1">Connect your ERP with Salesforce and Microsoft Dynamics 365</p>
+            <h1 class="text-2xl font-bold text-gray-900">Integrations</h1>
+            <p class="text-gray-500 mt-1">Connect your ERP with CRM systems and e-commerce platforms</p>
         </div>
     </div>
 
@@ -32,138 +32,226 @@
         </div>
     }
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Salesforce Card -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
-            <div class="p-6">
-                <div class="flex items-center mb-4">
-                    <div class="bg-primary-100 rounded-full p-3 mr-3">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-primary-600">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h5 class="text-lg font-semibold text-gray-900">Salesforce</h5>
-                        <small class="text-gray-500">Sync contacts, leads, opportunities, and accounts</small>
-                    </div>
-                    <div class="ml-auto">
-                        @if (Model.SalesforceEnabled)
-                        {
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
-                        }
-                        else
-                        {
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
-                        }
-                    </div>
-                </div>
-
-                @if (Model.SalesforceEnabled)
-                {
-                    <div class="mb-4">
-                        <div class="grid grid-cols-4 gap-2 text-center">
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Contacts</div>
-                                <small class="text-gray-500">Contacts</small>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Leads</div>
-                                <small class="text-gray-500">Leads</small>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Opportunities</div>
-                                <small class="text-gray-500">Opportunities</small>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.SalesforceStats.Accounts</div>
-                                <small class="text-gray-500">Accounts</small>
-                            </div>
+    <!-- CRM Integrations -->
+    <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">CRM Integrations</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Salesforce Card -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 rounded-full p-3 mr-3">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-primary-600">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-lg font-semibold text-gray-900">Salesforce</h5>
+                            <small class="text-gray-500">Sync contacts, leads, opportunities, and accounts</small>
+                        </div>
+                        <div class="ml-auto">
+                            @if (Model.SalesforceEnabled)
+                            {
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
+                            }
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <a href="/Admin/Integrations/Salesforce" class="text-primary-700 border border-primary-300 hover:bg-primary-50 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-xs px-3 py-2">
-                            <i class="bi bi-gear mr-1"></i>Settings
+
+                    @if (Model.SalesforceEnabled)
+                    {
+                        <div class="mb-4 text-sm text-gray-600">
+                            @if (Model.SalesforceStatus.LastSyncAt.HasValue)
+                            {
+                                <div class="flex items-center justify-between">
+                                    <span>Last sync:</span>
+                                    <span class="font-medium">@Model.SalesforceStatus.LastSyncAt.Value.ToString("MMM d, h:mm tt")</span>
+                                </div>
+                                @if (Model.SalesforceStatus.LastSyncRecords.HasValue)
+                                {
+                                    <div class="flex items-center justify-between">
+                                        <span>Records synced:</span>
+                                        <span class="font-medium">@Model.SalesforceStatus.LastSyncRecords</span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-gray-400">No sync history yet</span>
+                            }
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="/Admin/Integrations/Salesforce" class="text-primary-700 border border-primary-300 hover:bg-primary-50 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-xs px-3 py-2">
+                                <i class="bi bi-gear mr-1"></i>Settings
+                            </a>
+                            <form method="post" asp-page-handler="SyncSalesforce" class="inline">
+                                <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2">
+                                    <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/Admin/Integrations/Salesforce" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                            <i class="bi bi-plug mr-1"></i>Connect Salesforce
                         </a>
-                        <form method="post" asp-page-handler="SyncSalesforce" class="inline">
-                            <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-xs px-3 py-2">
-                                <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
-                            </button>
-                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Dynamics 365 Card -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-100 rounded-full p-3 mr-3">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-cyan-600">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-lg font-semibold text-gray-900">Microsoft Dynamics 365</h5>
+                            <small class="text-gray-500">Sync contacts, leads, opportunities, and accounts</small>
+                        </div>
+                        <div class="ml-auto">
+                            @if (Model.Dynamics365Enabled)
+                            {
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
+                            }
+                        </div>
                     </div>
-                }
-                else
-                {
-                    <a href="/Admin/Integrations/Salesforce" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                        <i class="bi bi-plug mr-1"></i>Connect Salesforce
-                    </a>
-                }
+
+                    @if (Model.Dynamics365Enabled)
+                    {
+                        <div class="mb-4 text-sm text-gray-600">
+                            @if (Model.Dynamics365Status.LastSyncAt.HasValue)
+                            {
+                                <div class="flex items-center justify-between">
+                                    <span>Last sync:</span>
+                                    <span class="font-medium">@Model.Dynamics365Status.LastSyncAt.Value.ToString("MMM d, h:mm tt")</span>
+                                </div>
+                                @if (Model.Dynamics365Status.LastSyncRecords.HasValue)
+                                {
+                                    <div class="flex items-center justify-between">
+                                        <span>Records synced:</span>
+                                        <span class="font-medium">@Model.Dynamics365Status.LastSyncRecords</span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-gray-400">No sync history yet</span>
+                            }
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="/Admin/Integrations/Dynamics365" class="text-cyan-700 border border-cyan-300 hover:bg-cyan-50 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-xs px-3 py-2">
+                                <i class="bi bi-gear mr-1"></i>Settings
+                            </a>
+                            <form method="post" asp-page-handler="SyncDynamics365" class="inline">
+                                <button type="submit" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-xs px-3 py-2">
+                                    <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/Admin/Integrations/Dynamics365" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                            <i class="bi bi-plug mr-1"></i>Connect Dynamics 365
+                        </a>
+                    }
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Dynamics 365 Card -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
-            <div class="p-6">
-                <div class="flex items-center mb-4">
-                    <div class="bg-cyan-100 rounded-full p-3 mr-3">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-cyan-600">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h5 class="text-lg font-semibold text-gray-900">Microsoft Dynamics 365</h5>
-                        <small class="text-gray-500">Sync contacts, leads, opportunities, and accounts</small>
-                    </div>
-                    <div class="ml-auto">
-                        @if (Model.Dynamics365Enabled)
-                        {
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
-                        }
-                        else
-                        {
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
-                        }
-                    </div>
-                </div>
-
-                @if (Model.Dynamics365Enabled)
-                {
-                    <div class="mb-4">
-                        <div class="grid grid-cols-4 gap-2 text-center">
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Contacts</div>
-                                <small class="text-gray-500">Contacts</small>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Leads</div>
-                                <small class="text-gray-500">Leads</small>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Opportunities</div>
-                                <small class="text-gray-500">Opportunities</small>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900">@Model.Dynamics365Stats.Accounts</div>
-                                <small class="text-gray-500">Accounts</small>
-                            </div>
+    <!-- E-commerce Integrations -->
+    <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">E-commerce Integrations</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Shopify Card -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 rounded-full p-3 mr-3">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-green-600">
+                                <path d="M15.337 3.415c-.153-.057-.306.057-.306.057s-.612.076-1.454.076c-.841 0-1.683-.076-1.683-.076s-.153-.114-.306-.057c-1.913.573-2.908 2.101-3.29 3.058-.994-.382-1.836-.344-1.836-.344-.917 0-.994.688-.994.917 0 .229.153 3.592.229 4.126.077.535.306 3.669.535 5.693.229 2.024.612 4.738.612 4.738s.076.344.535.344c.459 0 9.329 0 9.788 0 .459 0 .535-.344.535-.344s.383-2.714.612-4.738c.229-2.024.459-5.158.535-5.693.077-.535.229-3.897.229-4.126 0-.229-.077-.917-.994-.917 0 0-.841-.038-1.836.344-.382-.957-1.377-2.485-3.29-3.058zm-3.214 1.072c.382 0 .765.038 1.148.114.076.267.153.573.229.917-.459.076-.917.114-1.377.114-.459 0-.917-.038-1.377-.114.076-.344.153-.65.229-.917.383-.076.765-.114 1.148-.114zm-2.102 1.568c.535.114 1.148.19 1.76.19.612 0 1.225-.076 1.76-.19.153.612.267 1.301.306 2.024-.688.076-1.377.114-2.066.114-.688 0-1.377-.038-2.066-.114.038-.723.153-1.412.306-2.024z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-lg font-semibold text-gray-900">Shopify</h5>
+                            <small class="text-gray-500">Sync customers, orders, products, and inventory</small>
+                        </div>
+                        <div class="ml-auto">
+                            @if (Model.ShopifyEnabled)
+                            {
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">Not Connected</span>
+                            }
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <a href="/Admin/Integrations/Dynamics365" class="text-cyan-700 border border-cyan-300 hover:bg-cyan-50 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-xs px-3 py-2">
-                            <i class="bi bi-gear mr-1"></i>Settings
+
+                    @if (Model.ShopifyEnabled)
+                    {
+                        <div class="mb-4 text-sm text-gray-600">
+                            @if (Model.ShopifyStatus.LastSyncAt.HasValue)
+                            {
+                                <div class="flex items-center justify-between">
+                                    <span>Last sync:</span>
+                                    <span class="font-medium">@Model.ShopifyStatus.LastSyncAt.Value.ToString("MMM d, h:mm tt")</span>
+                                </div>
+                                @if (Model.ShopifyStatus.LastSyncRecords.HasValue)
+                                {
+                                    <div class="flex items-center justify-between">
+                                        <span>Records synced:</span>
+                                        <span class="font-medium">@Model.ShopifyStatus.LastSyncRecords</span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-gray-400">No sync history yet</span>
+                            }
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="/Admin/Integrations/Shopify" class="text-green-700 border border-green-300 hover:bg-green-50 focus:ring-4 focus:ring-green-200 font-medium rounded-lg text-xs px-3 py-2">
+                                <i class="bi bi-gear mr-1"></i>Settings
+                            </a>
+                            <form method="post" asp-page-handler="SyncShopify" class="inline">
+                                <button type="submit" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-2">
+                                    <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/Admin/Integrations/Shopify" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                            <i class="bi bi-plug mr-1"></i>Connect Shopify
                         </a>
-                        <form method="post" asp-page-handler="SyncDynamics365" class="inline">
-                            <button type="submit" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-xs px-3 py-2">
-                                <i class="bi bi-arrow-repeat mr-1"></i>Sync Now
-                            </button>
-                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Placeholder for future integrations -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full border-2 border-dashed border-gray-200">
+                <div class="p-6 flex flex-col items-center justify-center h-full text-center">
+                    <div class="bg-gray-100 rounded-full p-3 mb-3">
+                        <i class="bi bi-plus-lg text-2xl text-gray-400"></i>
                     </div>
-                }
-                else
-                {
-                    <a href="/Admin/Integrations/Dynamics365" class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                        <i class="bi bi-plug mr-1"></i>Connect Dynamics 365
-                    </a>
-                }
+                    <h5 class="text-lg font-semibold text-gray-400">More Coming Soon</h5>
+                    <small class="text-gray-400">WooCommerce, Magento, and more</small>
+                </div>
             </div>
         </div>
     </div>
@@ -178,7 +266,7 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3">CRM</th>
+                        <th scope="col" class="px-6 py-3">Integration</th>
                         <th scope="col" class="px-6 py-3">Entity Type</th>
                         <th scope="col" class="px-6 py-3">Direction</th>
                         <th scope="col" class="px-6 py-3">Records</th>
@@ -197,9 +285,17 @@
                                     {
                                         <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800">Salesforce</span>
                                     }
-                                    else
+                                    else if (log.CrmType == "Dynamics365")
                                     {
                                         <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800">Dynamics 365</span>
+                                    }
+                                    else if (log.CrmType == "Shopify")
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-800">Shopify</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800">@log.CrmType</span>
                                     }
                                 </td>
                                 <td class="px-6 py-4">@(log.EntityType ?? "Full Sync")</td>
@@ -235,7 +331,7 @@
                     {
                         <tr>
                             <td colspan="6" class="text-center py-8 text-gray-500">
-                                No sync history yet. Connect a CRM to start syncing.
+                                No sync history yet. Connect an integration to start syncing.
                             </td>
                         </tr>
                     }

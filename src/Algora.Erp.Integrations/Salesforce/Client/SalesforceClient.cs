@@ -6,9 +6,7 @@ using System.Text.Json;
 using Algora.Erp.Integrations.Common.Exceptions;
 using Algora.Erp.Integrations.Common.Interfaces;
 using Algora.Erp.Integrations.Common.Models;
-using Algora.Erp.Integrations.Common.Settings;
 using Algora.Erp.Integrations.Salesforce.Auth;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Integrations.Salesforce.Client;
 
@@ -16,18 +14,13 @@ public class SalesforceClient : ICrmClient
 {
     private readonly HttpClient _httpClient;
     private readonly ISalesforceAuthHandler _authHandler;
-    private readonly SalesforceSettings _settings;
 
     public string CrmType => "Salesforce";
 
-    public SalesforceClient(
-        HttpClient httpClient,
-        ISalesforceAuthHandler authHandler,
-        IOptions<CrmIntegrationsSettings> options)
+    public SalesforceClient(HttpClient httpClient, ISalesforceAuthHandler authHandler)
     {
         _httpClient = httpClient;
         _authHandler = authHandler;
-        _settings = options.Value.Salesforce;
     }
 
     public async Task<bool> TestConnectionAsync(CancellationToken ct = default)
@@ -36,12 +29,13 @@ public class SalesforceClient : ICrmClient
         {
             var token = await _authHandler.GetAccessTokenAsync(ct);
             var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
+            var apiVersion = await _authHandler.GetApiVersionAsync(ct);
 
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.GetAsync(
-                $"{instanceUrl}/services/data/{_settings.ApiVersion}/limits", ct);
+                $"{instanceUrl}/services/data/{apiVersion}/limits", ct);
 
             return response.IsSuccessStatusCode;
         }
@@ -151,7 +145,8 @@ public class SalesforceClient : ICrmClient
     private async Task<string> BuildUrlAsync(string endpoint, CancellationToken ct)
     {
         var instanceUrl = await _authHandler.GetInstanceUrlAsync(ct);
-        return $"{instanceUrl}/services/data/{_settings.ApiVersion}/{endpoint}";
+        var apiVersion = await _authHandler.GetApiVersionAsync(ct);
+        return $"{instanceUrl}/services/data/{apiVersion}/{endpoint}";
     }
 
     private async Task<HttpResponseMessage> SendRequestAsync(
