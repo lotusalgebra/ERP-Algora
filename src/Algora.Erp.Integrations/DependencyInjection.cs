@@ -7,6 +7,9 @@ using Algora.Erp.Integrations.Dynamics365.Services;
 using Algora.Erp.Integrations.Salesforce.Auth;
 using Algora.Erp.Integrations.Salesforce.Client;
 using Algora.Erp.Integrations.Salesforce.Services;
+using Algora.Erp.Integrations.Shopify.Auth;
+using Algora.Erp.Integrations.Shopify.Client;
+using Algora.Erp.Integrations.Shopify.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -37,8 +40,14 @@ public static class DependencyInjection
             services.AddDynamics365Integration();
         }
 
+        // Register Shopify integration
+        if (settings.Shopify.Enabled)
+        {
+            services.AddShopifyIntegration();
+        }
+
         // Register background sync service
-        if (settings.Salesforce.Enabled || settings.Dynamics365.Enabled)
+        if (settings.Salesforce.Enabled || settings.Dynamics365.Enabled || settings.Shopify.Enabled)
         {
             services.AddHostedService<CrmSyncBackgroundService>();
         }
@@ -81,6 +90,27 @@ public static class DependencyInjection
 
         // Sync service
         services.AddScoped<ICrmSyncService, Dynamics365SyncService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddShopifyIntegration(this IServiceCollection services)
+    {
+        // Auth handler
+        services.AddHttpClient<IShopifyAuthHandler, ShopifyAuthHandler>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
+        // Shopify client
+        services.AddHttpClient<IShopifyClient, ShopifyClient>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(60);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
+
+        // Sync service
+        services.AddScoped<IShopifySyncService, ShopifySyncService>();
 
         return services;
     }
