@@ -18,7 +18,7 @@
                 </ol>
             </nav>
         </div>
-        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" hx-get="/Admin/Permissions?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" data-modal-target="permissionModal" data-modal-toggle="permissionModal">
+        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" hx-get="/Admin/Permissions?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" >
             <i class="bi bi-plus-lg mr-2"></i> New Permission
         </button>
     </div>
@@ -141,8 +141,7 @@
 
         document.body.addEventListener('htmx:afterRequest', (e) => {
             if (e.detail.elt.closest('#permissionModal') && e.detail.successful) {
-                const modal = FlowbiteInstances.getInstance('Modal', 'permissionModal');
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('');
             }
         });
     </script>

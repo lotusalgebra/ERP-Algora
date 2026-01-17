@@ -40,35 +40,21 @@
                 }
             </td>
             <td class="px-6 py-4 text-right">
-                <div class="relative inline-block">
-                    <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" id="dropdownRole@(role.Id)" data-dropdown-toggle="dropdownMenuRole@(role.Id)" data-dropdown-placement="bottom-end">
-                        <i class="bi bi-three-dots-vertical"></i>
+                <div class="flex items-center justify-end gap-2">
+                    <button type="button" class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg"
+                            onclick="loadRoleEditForm('@role.Id')" title="Edit">
+                        <i class="bi bi-pencil"></i>
                     </button>
-                    <div class="z-50 hidden absolute right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44" id="dropdownMenuRole@(role.Id)">
-                        <ul class="py-2 text-sm text-gray-700">
-                            <li>
-                                <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                   hx-get="/Admin/Roles?handler=EditForm&id=@role.Id"
-                                   hx-target="#formContainer"
-                                   hx-swap="innerHTML"
-                                   data-modal-target="roleModal" data-modal-toggle="roleModal">
-                                    <i class="bi bi-pencil mr-2"></i> Edit
-                                </a>
-                            </li>
-                        </ul>
-                        @if (!role.IsSystemRole)
-                        {
-                            <div class="py-2">
-                                <a class="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
-                                   hx-delete="/Admin/Roles?id=@role.Id"
-                                   hx-target="#rolesTableBody"
-                                   hx-swap="innerHTML"
-                                   hx-confirm="Delete this role?">
-                                    <i class="bi bi-trash mr-2"></i> Delete
-                                </a>
-                            </div>
-                        }
-                    </div>
+                    @if (!role.IsSystemRole)
+                    {
+                        <button type="button" class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                                hx-delete="/Admin/Roles?id=@role.Id"
+                                hx-target="#rolesTableBody"
+                                hx-swap="innerHTML"
+                                hx-confirm="Delete this role?" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
                 </div>
             </td>
         </tr>
@@ -91,7 +77,9 @@ else
     </tr>
 }
 <script>
-    // Re-initialize Flowbite dropdowns and HTMX after content swap
-    if (typeof initFlowbite === 'function') { initFlowbite(); }
-    if (typeof htmx !== 'undefined') { htmx.process(document.body); }
+    // Re-initialize Flowbite dropdowns and HTMX after content swap with slight delay
+    setTimeout(function() {
+        if (typeof initFlowbite === 'function') { initFlowbite(); }
+        if (typeof htmx !== 'undefined') { htmx.process(document.body); }
+    }, 50);
 </script>

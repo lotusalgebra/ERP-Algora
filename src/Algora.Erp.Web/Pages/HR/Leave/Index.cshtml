@@ -23,7 +23,7 @@
         <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                 hx-get="/HR/Leave?handler=CreateForm"
                 hx-target="#formContainer"
-                data-modal-target="leaveModal" data-modal-toggle="leaveModal">
+                >
             <i class="bi bi-plus-lg mr-2"></i> New Leave Request
         </button>
     </div>
@@ -168,7 +168,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Leave Request</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" data-modal-hide="leaveModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" onclick="closeModal('leaveModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>

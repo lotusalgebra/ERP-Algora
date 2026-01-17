@@ -619,7 +619,7 @@
                 <input type="hidden" name="PaymentInput.InvoiceId" value="@Model.Invoice.Id" />
                 <div class="flex items-center justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900"><i class="bi bi-cash mr-2"></i>Record Payment</h3>
-                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="paymentModal">
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('paymentModal')">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -660,7 +660,7 @@
                     </div>
                 </div>
                 <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
-                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="paymentModal">Cancel</button>
+                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" onclick="closeModal('paymentModal')">Cancel</button>
                     <button type="submit" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5">
                         <i class="bi bi-check-lg mr-1"></i>Record Payment
                     </button>
@@ -678,7 +678,7 @@
                 <input type="hidden" name="EmailInput.InvoiceId" value="@Model.Invoice.Id" />
                 <div class="flex items-center justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900"><i class="bi bi-envelope mr-2"></i>Email Invoice to Customer</h3>
-                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="emailModal">
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('emailModal')">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -730,7 +730,7 @@
                     </div>
                 </div>
                 <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
-                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="emailModal">Cancel</button>
+                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" onclick="closeModal('emailModal')">Cancel</button>
                     <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">
                         <i class="bi bi-send mr-1"></i>Send Email
                     </button>

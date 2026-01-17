@@ -215,19 +215,19 @@
 
     <!-- Actions -->
     <div class="mt-4 flex justify-between">
-        <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" data-modal-hide="detailsModal">
+        <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" onclick="closeModal('detailsModal')">
             Close
         </button>
         <div class="flex gap-2">
             @if (Model.Status == SalesOrderStatus.Draft)
             {
-                <button type="button" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2" onclick="updateStatus('@Model.Id', 'Sent'); FlowbiteInstances.getInstance('Modal', 'detailsModal').hide();">
+                <button type="button" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2" onclick="updateStatus('@Model.Id', 'Sent'); window.AlgoraModal.hide('detailsModal');">
                     <i class="bi bi-send mr-1"></i>Send to Customer
                 </button>
             }
             else if (Model.Status == SalesOrderStatus.Confirmed)
             {
-                <button type="button" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2" onclick="convertToOrder('@Model.Id'); FlowbiteInstances.getInstance('Modal', 'detailsModal').hide();">
+                <button type="button" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-4 py-2" onclick="convertToOrder('@Model.Id'); window.AlgoraModal.hide('detailsModal');">
                     <i class="bi bi-bag-plus mr-1"></i>Convert to Order
                 </button>
             }

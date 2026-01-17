@@ -19,7 +19,7 @@
                 </ol>
             </nav>
         </div>
-        <button class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" data-modal-target="currencyModal" data-modal-toggle="currencyModal" onclick="openAddModal()">
+        <button class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"  onclick="openAddModal()">
             <i class="bi bi-plus-lg mr-2"></i> Add Currency
         </button>
     </div>
@@ -69,7 +69,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 border-b rounded-t">
                 <h5 class="text-lg font-semibold text-gray-900" id="modalTitle">Add Currency</h5>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" data-modal-hide="currencyModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center" onclick="closeModal('currencyModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -148,7 +148,7 @@
                     </div>
                 </div>
                 <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2">
-                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="currencyModal">Cancel</button>
+                    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" onclick="closeModal('currencyModal')">Cancel</button>
                     <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
                 </div>
             </form>
@@ -158,16 +158,13 @@
 
 @section Scripts {
     <script>
-        function getModal() {
-            return FlowbiteInstances.getInstance('Modal', 'currencyModal');
-        }
-
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'Add Currency';
             document.getElementById('currencyForm').reset();
             document.getElementById('currencyId').value = '';
             document.getElementById('isActive').checked = true;
             document.getElementById('isBaseCurrency').checked = false;
+            window.AlgoraModal.show('currencyModal');
         }
 
         function editCurrency(currency) {
@@ -184,14 +181,12 @@
             document.getElementById('displayOrder').value = currency.displayOrder;
             document.getElementById('isActive').checked = currency.isActive;
             document.getElementById('isBaseCurrency').checked = currency.isBaseCurrency;
-            const modal = getModal();
-            if (modal) modal.show();
+            window.AlgoraModal.show('currencyModal');
         }
 
         document.getElementById('currencyForm').addEventListener('htmx:afterRequest', function(evt) {
             if (evt.detail.successful) {
-                const modal = getModal();
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('currencyModal');
             }
         });
     </script>

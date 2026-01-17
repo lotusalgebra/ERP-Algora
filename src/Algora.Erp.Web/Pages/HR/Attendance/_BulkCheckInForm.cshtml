@@ -2,7 +2,7 @@
 @using Algora.Erp.Domain.Entities.HR
 
 <form hx-post="/HR/Attendance?handler=BulkCheckIn" hx-target="#tableContent" hx-swap="innerHTML"
-      hx-on::after-request="if(event.detail.successful) { const modal = FlowbiteInstances.getInstance('Modal', 'attendanceModal'); if(modal) modal.hide(); }">
+      hx-on::after-request="if(event.detail.successful) { window.AlgoraModal.hide('attendanceModal'); }">
 
     <input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" />
 
@@ -62,7 +62,7 @@
     </div>
 
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-        <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" data-modal-hide="attendanceModal">Cancel</button>
+        <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" onclick="closeModal('attendanceModal')">Cancel</button>
         <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 @(Model.Employees.Any() ? "" : "opacity-50 cursor-not-allowed")" @(Model.Employees.Any() ? "" : "disabled")>
             <i class="bi bi-clock me-1"></i> Bulk Check-In
         </button>

@@ -22,7 +22,7 @@
         <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                 hx-get="/Projects/TimeTracking?handler=CreateForm"
                 hx-target="#formModalContent"
-                data-modal-target="formModal" data-modal-toggle="formModal">
+                >
             <i class="bi bi-plus-lg mr-2"></i> Log Time
         </button>
     </div>
@@ -175,8 +175,7 @@
         // Close modal after successful form submission
         document.body.addEventListener('htmx:afterSwap', function(event) {
             if (event.detail.target.id === 'timeEntriesTableContainer') {
-                const modal = FlowbiteInstances.getInstance('Modal', 'formModal');
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('');
             }
         });
     </script>

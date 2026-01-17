@@ -513,6 +513,56 @@
     <!-- Flowbite JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 
+    <!-- Global Modal Utility - Production Ready -->
+    <script>
+        // Simple modal utility that works with dynamically loaded content
+        window.AlgoraModal = {
+            show: function(modalId) {
+                const modal = document.getElementById(modalId);
+                const backdrop = this.getOrCreateBackdrop();
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    backdrop.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                }
+            },
+            hide: function(modalId) {
+                const modal = document.getElementById(modalId);
+                const backdrop = document.getElementById('modal-backdrop');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.classList.remove('overflow-hidden');
+                }
+                if (backdrop) {
+                    backdrop.classList.add('hidden');
+                }
+            },
+            getOrCreateBackdrop: function() {
+                let backdrop = document.getElementById('modal-backdrop');
+                if (!backdrop) {
+                    backdrop = document.createElement('div');
+                    backdrop.id = 'modal-backdrop';
+                    backdrop.className = 'fixed inset-0 z-[55] bg-gray-900 bg-opacity-50 hidden';
+                    backdrop.onclick = function() {
+                        // Close any visible modal when clicking backdrop
+                        document.querySelectorAll('[id$="Modal"]:not(.hidden)').forEach(function(m) {
+                            window.AlgoraModal.hide(m.id);
+                        });
+                    };
+                    document.body.appendChild(backdrop);
+                }
+                return backdrop;
+            }
+        };
+
+        // Global close function for modals - can be called from dynamically loaded content
+        window.closeModal = function(modalId) {
+            window.AlgoraModal.hide(modalId);
+        };
+    </script>
+
     <!-- Modal backdrop and Flowbite re-initialization -->
     <script>
         // Re-initialize Flowbite after HTMX content swaps
@@ -533,7 +583,7 @@
             if (!backdrop) {
                 backdrop = document.createElement('div');
                 backdrop.id = 'modal-backdrop';
-                backdrop.className = 'fixed inset-0 z-40 bg-gray-900 bg-opacity-50 hidden';
+                backdrop.className = 'fixed inset-0 z-[55] bg-gray-900 bg-opacity-50 hidden';
                 document.body.appendChild(backdrop);
             }
             return backdrop;

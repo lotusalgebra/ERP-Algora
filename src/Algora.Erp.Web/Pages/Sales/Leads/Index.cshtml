@@ -195,8 +195,7 @@
 
         document.body.addEventListener('htmx:afterRequest', (e) => {
             if (e.detail.elt.closest('#leadModal')) {
-                const modal = FlowbiteInstances.getInstance('Modal', 'leadModal');
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('');
             }
         });
     </script>

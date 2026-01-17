@@ -19,7 +19,7 @@
                 </ol>
             </nav>
         </div>
-        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" hx-get="/Admin/Users?handler=CreateForm" hx-target="#formContainer" hx-swap="innerHTML" hx-on::after-request="openUserModal()">
+        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors" onclick="loadUserCreateForm()">
             <i class="bi bi-plus-lg mr-2"></i> New User
         </button>
     </div>
@@ -119,7 +119,7 @@
 </div>
 
 <!-- User Modal -->
-<div id="userModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<div id="userModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[60] justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-2xl max-h-full">
         <div class="relative bg-white rounded-lg shadow">
             <div id="formContainer"></div>
@@ -145,25 +145,6 @@
             htmx.ajax('GET', `/Admin/Users?${params}`, {target: '#usersTableBody', swap: 'innerHTML'});
         }
 
-        // Open user modal after form content is loaded
-        function openUserModal() {
-            const modalEl = document.getElementById('userModal');
-            if (modalEl) {
-                // Try Flowbite first
-                let modal = FlowbiteInstances.getInstance('Modal', 'userModal');
-                if (!modal) {
-                    modal = new Modal(modalEl);
-                }
-                modal.show();
-            }
-        }
-
-        // Close modal after successful form submission
-        function closeUserModal() {
-            const modal = FlowbiteInstances.getInstance('Modal', 'userModal');
-            if (modal) modal.hide();
-        }
-
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => loadTable(), 300);
@@ -172,10 +153,35 @@
         statusFilter.addEventListener('change', () => loadTable());
         roleFilter.addEventListener('change', () => loadTable());
 
+        // Load create form and open modal
+        window.loadUserCreateForm = function() {
+            fetch('/Admin/Users?handler=CreateForm')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('formContainer').innerHTML = html;
+                    if (typeof htmx !== 'undefined') { htmx.process(document.getElementById('formContainer')); }
+                    window.AlgoraModal.show('userModal');
+                })
+                .catch(err => console.error('Error loading form:', err));
+        };
+
+        // Load edit form and open modal
+        window.loadUserEditForm = function(id) {
+            fetch('/Admin/Users?handler=EditForm&id=' + id)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('formContainer').innerHTML = html;
+                    if (typeof htmx !== 'undefined') { htmx.process(document.getElementById('formContainer')); }
+                    window.AlgoraModal.show('userModal');
+                })
+                .catch(err => console.error('Error loading form:', err));
+        };
+
+        // Close modal after successful form submission
         document.body.addEventListener('htmx:afterRequest', (e) => {
-            // Close modal after successful form submission
             if (e.detail.elt.closest('form') && e.detail.elt.closest('#formContainer') && e.detail.successful) {
-                closeUserModal();
+                window.AlgoraModal.hide('userModal');
+                loadTable();
             }
         });
     </script>
