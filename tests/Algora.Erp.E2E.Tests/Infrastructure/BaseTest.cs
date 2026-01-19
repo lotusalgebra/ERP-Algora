@@ -85,10 +85,18 @@ public abstract class BaseTest : IDisposable
     {
         try
         {
-            var modal = Driver.FindElement(By.Id(modalId));
-            return modal.Displayed && !modal.GetAttribute("class").Contains("hidden");
+            // Use JavaScript to check modal visibility - more reliable than Selenium's Displayed
+            var result = ((IJavaScriptExecutor)Driver).ExecuteScript($@"
+                var modal = document.getElementById('{modalId}');
+                if (!modal) return false;
+                var hasHiddenClass = modal.classList.contains('hidden');
+                var style = window.getComputedStyle(modal);
+                var isDisplayed = style.display !== 'none' && style.visibility !== 'hidden';
+                return !hasHiddenClass && isDisplayed;
+            ");
+            return result != null && (bool)result;
         }
-        catch (NoSuchElementException)
+        catch
         {
             return false;
         }
@@ -101,8 +109,15 @@ public abstract class BaseTest : IDisposable
         {
             try
             {
-                var modal = d.FindElement(By.Id(modalId));
-                return modal.Displayed && !modal.GetAttribute("class").Contains("hidden");
+                var result = ((IJavaScriptExecutor)d).ExecuteScript($@"
+                    var modal = document.getElementById('{modalId}');
+                    if (!modal) return false;
+                    var hasHiddenClass = modal.classList.contains('hidden');
+                    var style = window.getComputedStyle(modal);
+                    var isDisplayed = style.display !== 'none' && style.visibility !== 'hidden';
+                    return !hasHiddenClass && isDisplayed;
+                ");
+                return result != null && (bool)result;
             }
             catch
             {
@@ -118,8 +133,15 @@ public abstract class BaseTest : IDisposable
         {
             try
             {
-                var modal = d.FindElement(By.Id(modalId));
-                return !modal.Displayed || modal.GetAttribute("class").Contains("hidden");
+                var result = ((IJavaScriptExecutor)d).ExecuteScript($@"
+                    var modal = document.getElementById('{modalId}');
+                    if (!modal) return true;
+                    var hasHiddenClass = modal.classList.contains('hidden');
+                    var style = window.getComputedStyle(modal);
+                    var isNotDisplayed = style.display === 'none' || style.visibility === 'hidden';
+                    return hasHiddenClass || isNotDisplayed;
+                ");
+                return result != null && (bool)result;
             }
             catch
             {

@@ -3,6 +3,7 @@ using Algora.Erp.Auth;
 using Algora.Erp.Infrastructure;
 using Algora.Erp.Infrastructure.MultiTenancy;
 using Algora.Erp.Integrations;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -226,6 +227,12 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers(); // For API endpoints
 
+// Seed development data (fix passwords)
+if (app.Environment.IsDevelopment())
+{
+    await SeedDevelopmentDataAsync(app);
+}
+
 try
 {
     Log.Information("Starting Algora ERP application");
@@ -238,4 +245,72 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+// Development seeder to fix user passwords
+static async Task SeedDevelopmentDataAsync(WebApplication app)
+{
+    Log.Information("Running development seeder to fix user passwords...");
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var masterContext = scope.ServiceProvider.GetRequiredService<Algora.Erp.Infrastructure.Data.MasterDbContext>();
+
+        // Get all active tenants
+        var tenants = await masterContext.Tenants.Where(t => t.IsActive).ToListAsync();
+        Log.Information("Found {Count} active tenants", tenants.Count);
+
+        foreach (var tenant in tenants)
+        {
+            Log.Information("Processing tenant: {Tenant}, ConnectionString: {HasCs}", tenant.Name, !string.IsNullOrEmpty(tenant.ConnectionString));
+            if (string.IsNullOrEmpty(tenant.ConnectionString))
+                continue;
+
+            try
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<Algora.Erp.Infrastructure.Data.ApplicationDbContext>();
+                optionsBuilder.UseSqlServer(tenant.ConnectionString);
+
+                var currentUserService = scope.ServiceProvider.GetRequiredService<Algora.Erp.Application.Common.Interfaces.ICurrentUserService>();
+                var dateTime = scope.ServiceProvider.GetRequiredService<Algora.Erp.Application.Common.Interfaces.IDateTime>();
+
+                using var tenantContext = new Algora.Erp.Infrastructure.Data.ApplicationDbContext(optionsBuilder.Options, currentUserService, dateTime);
+
+                // Fix all users with non-BCrypt password hashes
+                Log.Information("Fetching users from tenant database...");
+                var users = await tenantContext.Users.ToListAsync();
+                Log.Information("Found {Count} users in tenant {Tenant}", users.Count, tenant.Name);
+                var fixedCount = 0;
+
+                foreach (var user in users)
+                {
+                    // Force reset all passwords in development mode
+                    Log.Information("Resetting password for user {Email}", user.Email);
+                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!");
+                    user.Status = Algora.Erp.Domain.Enums.UserStatus.Active;
+                    user.FailedLoginAttempts = 0;
+                    user.LockoutEndAt = null;
+                    fixedCount++;
+                }
+
+                if (fixedCount > 0)
+                {
+                    await tenantContext.SaveChangesAsync();
+                    Log.Information("Fixed {Count} user passwords for tenant {Tenant}", fixedCount, tenant.Name);
+                }
+                else
+                {
+                    Log.Information("No users needed password fixes for tenant {Tenant}", tenant.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to seed data for tenant {Tenant}", tenant.Name);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Failed to run development seeder");
+    }
 }

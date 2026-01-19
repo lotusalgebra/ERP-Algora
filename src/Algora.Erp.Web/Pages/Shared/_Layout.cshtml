@@ -544,7 +544,7 @@
                 if (!backdrop) {
                     backdrop = document.createElement('div');
                     backdrop.id = 'modal-backdrop';
-                    backdrop.className = 'fixed inset-0 z-[55] bg-gray-900 bg-opacity-50 hidden';
+                    backdrop.className = 'fixed inset-0 z-[45] bg-gray-900 bg-opacity-50 hidden';
                     backdrop.onclick = function() {
                         // Close any visible modal when clicking backdrop
                         document.querySelectorAll('[id$="Modal"]:not(.hidden)').forEach(function(m) {
@@ -583,7 +583,7 @@
             if (!backdrop) {
                 backdrop = document.createElement('div');
                 backdrop.id = 'modal-backdrop';
-                backdrop.className = 'fixed inset-0 z-[55] bg-gray-900 bg-opacity-50 hidden';
+                backdrop.className = 'fixed inset-0 z-[45] bg-gray-900 bg-opacity-50 hidden';
                 document.body.appendChild(backdrop);
             }
             return backdrop;

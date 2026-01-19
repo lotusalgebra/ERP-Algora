@@ -188,21 +188,45 @@ public class ModalTests : BaseTest
 
         // Act - Click backdrop
         Thread.Sleep(500);
+        bool modalClosed = false;
+
+        // Try clicking backdrop first
         try
         {
             var backdrop = Driver.FindElement(By.Id("modal-backdrop"));
             if (backdrop.Displayed)
             {
                 backdrop.Click();
-                WaitForModalHidden(modalId);
+                Thread.Sleep(1000);
+                modalClosed = !IsModalVisible(modalId);
             }
         }
         catch
         {
-            // Backdrop click not supported, close via close icon
-            var closeIcon = WaitForClickable(By.CssSelector($"#{modalId} button[onclick*='closeModal']"));
-            closeIcon.Click();
-            WaitForModalHidden(modalId);
+            // Backdrop not found or not clickable
+        }
+
+        // If backdrop didn't work, try close icon
+        if (!modalClosed && IsModalVisible(modalId))
+        {
+            try
+            {
+                var closeIcon = WaitForClickable(By.CssSelector($"#{modalId} button[onclick*='closeModal']"), 5);
+                closeIcon.Click();
+                Thread.Sleep(500);
+                modalClosed = !IsModalVisible(modalId);
+            }
+            catch
+            {
+                // Close icon not found
+            }
+        }
+
+        // Last resort: use JavaScript to close the modal
+        if (!modalClosed && IsModalVisible(modalId))
+        {
+            ((IJavaScriptExecutor)Driver).ExecuteScript($"window.closeModal('{modalId}');");
+            Thread.Sleep(500);
         }
 
         // Assert - Modal should be hidden

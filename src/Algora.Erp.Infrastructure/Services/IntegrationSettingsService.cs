@@ -71,15 +71,24 @@ public class IntegrationSettingsService : IIntegrationSettingsService
         if (_cache.TryGetValue(cacheKey, out IntegrationSettings? cached) && cached != null)
             return cached;
 
-        var integration = await _context.IntegrationSettings
-            .FirstOrDefaultAsync(x => x.IntegrationType == integrationType && !x.IsDeleted, ct);
-
-        if (integration != null)
+        try
         {
-            _cache.Set(cacheKey, integration, CacheDuration);
-        }
+            var integration = await _context.IntegrationSettings
+                .FirstOrDefaultAsync(x => x.IntegrationType == integrationType && !x.IsDeleted, ct);
 
-        return integration;
+            if (integration != null)
+            {
+                _cache.Set(cacheKey, integration, CacheDuration);
+            }
+
+            return integration;
+        }
+        catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 208)
+        {
+            // Table doesn't exist yet - return null gracefully
+            _logger.LogDebug("IntegrationSettings table not found, returning null");
+            return null;
+        }
     }
 
     public async Task<IntegrationSettings> SaveSettingsAsync<TSettings, TCredentials>(
@@ -138,10 +147,19 @@ public class IntegrationSettingsService : IIntegrationSettingsService
 
     public async Task<List<string>> GetEnabledIntegrationsAsync(CancellationToken ct = default)
     {
-        return await _context.IntegrationSettings
-            .Where(x => x.IsEnabled && !x.IsDeleted)
-            .Select(x => x.IntegrationType)
-            .ToListAsync(ct);
+        try
+        {
+            return await _context.IntegrationSettings
+                .Where(x => x.IsEnabled && !x.IsDeleted)
+                .Select(x => x.IntegrationType)
+                .ToListAsync(ct);
+        }
+        catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 208)
+        {
+            // Table doesn't exist yet - return empty list gracefully
+            _logger.LogDebug("IntegrationSettings table not found, returning empty list");
+            return new List<string>();
+        }
     }
 
     public async Task UpdateTestResultAsync(string integrationType, bool success, string? error = null, CancellationToken ct = default)
