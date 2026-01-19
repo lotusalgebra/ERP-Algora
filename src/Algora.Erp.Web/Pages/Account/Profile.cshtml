@@ -1,0 +1,165 @@
+@page
+@model Algora.Erp.Web.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="p-4 sm:p-6 lg:p-8">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
+            <p class="mt-1 text-sm text-gray-500">Manage your account settings and preferences</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="p-6 text-center">
+                    @if (Model.CurrentUser != null)
+                    {
+                        <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-3xl font-bold">
+                            @Model.CurrentUser.FirstName[0]@Model.CurrentUser.LastName[0]
+                        </div>
+                        <h5 class="text-xl font-semibold text-gray-900">@Model.CurrentUser.FullName</h5>
+                        <p class="text-gray-500 mb-3">@Model.CurrentUser.Email</p>
+
+                        @if (Model.UserRoles.Any())
+                        {
+                            <div class="flex flex-wrap justify-center gap-2">
+                                @foreach (var role in Model.UserRoles)
+                                {
+                                    <span class="px-3 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-800">@role</span>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="border-t border-gray-200 px-6 py-4">
+                    <div class="flex items-center text-sm text-gray-500 mb-2">
+                        <i class="bi bi-envelope mr-2"></i>
+                        @Model.CurrentUser?.Email
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.CurrentUser?.PhoneNumber))
+                    {
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <i class="bi bi-telephone mr-2"></i>
+                            @Model.CurrentUser.PhoneNumber
+                        </div>
+                    }
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="bi bi-calendar3 mr-2"></i>
+                        Member since @Model.CurrentUser?.CreatedAt.ToString("MMM yyyy")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div class="lg:col-span-2">
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="p-4 mb-4 text-sm text-emerald-800 rounded-lg bg-emerald-50 flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <i class="bi bi-check-circle-fill mr-2"></i>
+                        @Model.SuccessMessage
+                    </div>
+                    <button type="button" class="text-emerald-800 hover:text-emerald-900" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <i class="bi bi-exclamation-circle-fill mr-2"></i>
+                        @Model.ErrorMessage
+                    </div>
+                    <button type="button" class="text-red-800 hover:text-red-900" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            }
+
+            <!-- Profile Information -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h5 class="font-semibold text-gray-900">Profile Information</h5>
+                    <p class="text-sm text-gray-500">Update your personal information</p>
+                </div>
+                <div class="p-6">
+                    <form method="post">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label asp-for="Input.FirstName" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input asp-for="Input.FirstName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required />
+                                <span asp-validation-for="Input.FirstName" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Input.LastName" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input asp-for="Input.LastName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required />
+                                <span asp-validation-for="Input.LastName" class="text-red-500 text-sm"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Input.Email" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input asp-for="Input.Email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 bg-gray-100 cursor-not-allowed" readonly />
+                                <small class="text-gray-500">Email cannot be changed</small>
+                            </div>
+                            <div>
+                                <label asp-for="Input.PhoneNumber" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input asp-for="Input.PhoneNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" />
+                                <span asp-validation-for="Input.PhoneNumber" class="text-red-500 text-sm"></span>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="inline-flex items-center px-5 py-2.5 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm">
+                                <i class="bi bi-check-lg mr-2"></i>
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h5 class="font-semibold text-gray-900">Change Password</h5>
+                    <p class="text-sm text-gray-500">Update your password to keep your account secure</p>
+                </div>
+                <div class="p-6">
+                    <form method="post" asp-page-handler="ChangePassword">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label asp-for="PasswordChange.CurrentPassword" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input type="password" asp-for="PasswordChange.CurrentPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" />
+                            </div>
+                            <div>
+                                <label asp-for="PasswordChange.NewPassword" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input type="password" asp-for="PasswordChange.NewPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" />
+                            </div>
+                            <div>
+                                <label asp-for="PasswordChange.ConfirmPassword" class="block mb-2 text-sm font-medium text-gray-900"></label>
+                                <input type="password" asp-for="PasswordChange.ConfirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" />
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-500">
+                            <i class="bi bi-info-circle mr-1"></i>
+                            Password must be at least 8 characters long
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="inline-flex items-center px-5 py-2.5 text-white bg-amber-600 hover:bg-amber-700 focus:ring-4 focus:ring-amber-300 font-medium rounded-lg text-sm">
+                                <i class="bi bi-key mr-2"></i>
+                                Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -228,7 +228,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Shipping Method</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="shippingModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('shippingModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -247,7 +247,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Payment Method</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="paymentModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('paymentModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -265,10 +265,8 @@
     document.body.addEventListener('htmx:afterRequest', function(evt) {
         if (evt.detail.successful && evt.detail.requestConfig.verb === 'post') {
             // Close any open modals
-            const shippingModal = FlowbiteInstances.getInstance('Modal', 'shippingModal');
-            if (shippingModal) shippingModal.hide();
-            const paymentModal = FlowbiteInstances.getInstance('Modal', 'paymentModal');
-            if (paymentModal) paymentModal.hide();
+            window.AlgoraModal.hide('');
+            window.AlgoraModal.hide('');
             // Refresh shipping/payment lists
             htmx.trigger('#shippingMethods', 'load');
             htmx.trigger('#paymentMethods', 'load');

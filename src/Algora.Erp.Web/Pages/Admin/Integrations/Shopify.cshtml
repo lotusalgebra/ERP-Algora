@@ -1,0 +1,222 @@
+@page
+@model Algora.Erp.Web.Pages.Admin.Integrations.ShopifyModel
+@{
+    ViewData["Title"] = "Shopify Integration";
+}
+
+<div class="space-y-6">
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
+            <li><a href="/Admin/Integrations" class="hover:text-primary-600">Integrations</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium">Shopify</li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Shopify Integration</h1>
+            <p class="text-gray-500 mt-1">Configure your Shopify store connection settings</p>
+        </div>
+        @if (Model.IsConnected)
+        {
+            <span class="text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800">Connected</span>
+        }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="flex items-center p-4 text-emerald-800 rounded-lg bg-emerald-50" role="alert">
+            <i class="bi bi-check-circle mr-2"></i>@TempData["Success"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-emerald-50 text-emerald-500 rounded-lg p-1.5 hover:bg-emerald-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="flex items-center p-4 text-red-800 rounded-lg bg-red-50" role="alert">
+            <i class="bi bi-exclamation-circle mr-2"></i>@TempData["Error"]
+            <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="[role='alert']" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h5 class="text-lg font-semibold text-gray-900">Connection Settings</h5>
+                </div>
+                <div class="p-6">
+                    <form method="post">
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Shop Domain</label>
+                                <div class="flex">
+                                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" asp-for="ShopDomain" placeholder="your-store">
+                                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-l-0 border-gray-300 rounded-r-lg">.myshopify.com</span>
+                                </div>
+                                <small class="text-gray-500">Your Shopify store subdomain</small>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Admin API Access Token</label>
+                                <input type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" asp-for="AccessToken" placeholder="shpat_xxxxxxxxxxxxxxxxxxxx">
+                                <small class="text-gray-500">From your Shopify Admin API app</small>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">API Version</label>
+                                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" asp-for="ApiVersion">
+                                    <option value="2024-01">2024-01 (Stable)</option>
+                                    <option value="2024-04">2024-04</option>
+                                    <option value="2024-07">2024-07</option>
+                                    <option value="2024-10">2024-10</option>
+                                </select>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Sync Interval (minutes)</label>
+                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" asp-for="SyncIntervalMinutes" min="5" max="1440">
+                            </div>
+                        </div>
+
+                        <hr class="my-6 border-gray-200" />
+
+                        <h6 class="text-sm font-medium text-gray-500 mb-3">Sync Options</h6>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncCustomers" id="syncCustomers">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Customers</span>
+                                </label>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncOrders" id="syncOrders">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Orders</span>
+                                </label>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncProducts" id="syncProducts">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Products</span>
+                                </label>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" asp-for="SyncInventory" id="syncInventory">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-900">Sync Inventory</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <button type="submit" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">Save Settings</button>
+                            <button type="submit" asp-page-handler="Test" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">Test Connection</button>
+                            @if (Model.IsConnected)
+                            {
+                                <button type="submit" asp-page-handler="Disconnect" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 ml-auto">Disconnect</button>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h6 class="font-semibold text-gray-900">Setup Instructions</h6>
+                </div>
+                <div class="p-6">
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                        <li>Go to your Shopify Admin</li>
+                        <li>Navigate to Settings > Apps and sales channels</li>
+                        <li>Click "Develop apps"</li>
+                        <li>Create a new app or select existing</li>
+                        <li>Configure Admin API scopes:
+                            <ul class="list-disc list-inside ml-4 mt-1 text-gray-500">
+                                <li>read_customers</li>
+                                <li>read_orders</li>
+                                <li>read_products</li>
+                                <li>read_inventory</li>
+                                <li>read_locations</li>
+                            </ul>
+                        </li>
+                        <li>Install the app</li>
+                        <li>Copy the Admin API access token</li>
+                    </ol>
+                </div>
+            </div>
+
+            @if (Model.IsConnected)
+            {
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h6 class="font-semibold text-gray-900">Connection Status</h6>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        @if (Model.LastTestedAt.HasValue)
+                        {
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">Last Tested:</span>
+                                <span class="text-gray-900">@Model.LastTestedAt.Value.ToString("MMM d, h:mm tt")</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">Status:</span>
+                                @if (Model.LastTestSuccess == true)
+                                {
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Passed</span>
+                                }
+                                else
+                                {
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Failed</span>
+                                }
+                            </div>
+                        }
+                        @if (Model.LastSyncAt.HasValue)
+                        {
+                            <hr class="border-gray-200" />
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">Last Sync:</span>
+                                <span class="text-gray-900">@Model.LastSyncAt.Value.ToString("MMM d, h:mm tt")</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">Status:</span>
+                                @if (Model.LastSyncSuccess == true)
+                                {
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Success</span>
+                                }
+                                else
+                                {
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">Failed</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h6 class="font-semibold text-gray-900">Quick Actions</h6>
+                    </div>
+                    <div class="p-6">
+                        <form method="post" asp-page-handler="Sync">
+                            <button type="submit" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 w-full mb-2">
+                                <i class="bi bi-arrow-repeat mr-2"></i>Sync Now
+                            </button>
+                        </form>
+                        <a href="/Admin/Integrations/SyncHistory?crm=Shopify" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 w-full inline-flex justify-center items-center">
+                            <i class="bi bi-clock-history mr-2"></i>View Sync History
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,10 +1,14 @@
+using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Settings;
 using Algora.Erp.Integrations.Common.Interfaces;
 using Algora.Erp.Integrations.Common.Models;
-using Algora.Erp.Integrations.Common.Settings;
+using Algora.Erp.Integrations.Dynamics365.Auth;
+using Algora.Erp.Integrations.Salesforce.Auth;
+using Algora.Erp.Integrations.Shopify.Auth;
+using Algora.Erp.Integrations.Shopify.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Integrations.BackgroundServices;
 
@@ -12,21 +16,22 @@ public class CrmSyncBackgroundService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<CrmSyncBackgroundService> _logger;
-    private readonly CrmIntegrationsSettings _settings;
+    private const int DefaultIntervalMinutes = 30;
 
     public CrmSyncBackgroundService(
         IServiceProvider serviceProvider,
-        ILogger<CrmSyncBackgroundService> logger,
-        IOptions<CrmIntegrationsSettings> options)
+        ILogger<CrmSyncBackgroundService> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _settings = options.Value;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("CRM Sync Background Service starting");
+
+        // Initial delay to let the application start properly
+        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -40,7 +45,7 @@ public class CrmSyncBackgroundService : BackgroundService
             }
 
             // Wait for the minimum interval among enabled CRMs
-            var intervalMinutes = GetMinimumInterval();
+            var intervalMinutes = await GetMinimumIntervalAsync(stoppingToken);
             _logger.LogInformation("Next CRM sync in {Minutes} minutes", intervalMinutes);
             await Task.Delay(TimeSpan.FromMinutes(intervalMinutes), stoppingToken);
         }
@@ -51,34 +56,114 @@ public class CrmSyncBackgroundService : BackgroundService
     private async Task RunSyncCycleAsync(CancellationToken ct)
     {
         using var scope = _serviceProvider.CreateScope();
-        var syncServices = scope.ServiceProvider.GetServices<ICrmSyncService>();
+        var settingsService = scope.ServiceProvider.GetRequiredService<IIntegrationSettingsService>();
 
-        foreach (var syncService in syncServices)
+        // Get all enabled integrations
+        var enabledIntegrations = await settingsService.GetEnabledIntegrationsAsync(ct);
+
+        if (enabledIntegrations.Count == 0)
         {
-            if (!IsCrmEnabled(syncService.CrmType))
-            {
-                continue;
-            }
+            _logger.LogDebug("No CRM integrations are enabled");
+            return;
+        }
 
-            _logger.LogInformation("Starting sync for {CrmType}", syncService.CrmType);
+        // Sync Salesforce
+        if (enabledIntegrations.Contains(SalesforceAuthHandler.IntegrationType))
+        {
+            await SyncSalesforceAsync(scope.ServiceProvider, ct);
+        }
 
-            try
+        // Sync Dynamics 365
+        if (enabledIntegrations.Contains(Dynamics365AuthHandler.IntegrationType))
+        {
+            await SyncDynamics365Async(scope.ServiceProvider, ct);
+        }
+
+        // Sync Shopify
+        if (enabledIntegrations.Contains(ShopifyAuthHandler.IntegrationType))
+        {
+            await SyncShopifyAsync(scope.ServiceProvider, ct);
+        }
+    }
+
+    private async Task SyncSalesforceAsync(IServiceProvider sp, CancellationToken ct)
+    {
+        _logger.LogInformation("Starting sync for Salesforce");
+
+        try
+        {
+            var syncServices = sp.GetServices<ICrmSyncService>();
+            var salesforceSync = syncServices.FirstOrDefault(s => s.CrmType == SalesforceAuthHandler.IntegrationType);
+
+            if (salesforceSync != null)
             {
-                var result = await syncService.FullSyncAsync(ct);
-                await LogSyncResultAsync(scope.ServiceProvider, result, ct);
+                var result = await salesforceSync.FullSyncAsync(ct);
+                await LogSyncResultAsync(sp, result, ct);
 
                 _logger.LogInformation(
-                    "{CrmType} sync completed: {Processed} processed, {Created} created, {Updated} updated, {Failed} failed",
-                    syncService.CrmType,
+                    "Salesforce sync completed: {Processed} processed, {Created} created, {Updated} updated, {Failed} failed",
                     result.RecordsProcessed,
                     result.RecordsCreated,
                     result.RecordsUpdated,
                     result.RecordsFailed);
             }
-            catch (Exception ex)
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error syncing with Salesforce");
+        }
+    }
+
+    private async Task SyncDynamics365Async(IServiceProvider sp, CancellationToken ct)
+    {
+        _logger.LogInformation("Starting sync for Dynamics 365");
+
+        try
+        {
+            var syncServices = sp.GetServices<ICrmSyncService>();
+            var dynamicsSync = syncServices.FirstOrDefault(s => s.CrmType == Dynamics365AuthHandler.IntegrationType);
+
+            if (dynamicsSync != null)
             {
-                _logger.LogError(ex, "Error syncing with {CrmType}", syncService.CrmType);
+                var result = await dynamicsSync.FullSyncAsync(ct);
+                await LogSyncResultAsync(sp, result, ct);
+
+                _logger.LogInformation(
+                    "Dynamics 365 sync completed: {Processed} processed, {Created} created, {Updated} updated, {Failed} failed",
+                    result.RecordsProcessed,
+                    result.RecordsCreated,
+                    result.RecordsUpdated,
+                    result.RecordsFailed);
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error syncing with Dynamics 365");
+        }
+    }
+
+    private async Task SyncShopifyAsync(IServiceProvider sp, CancellationToken ct)
+    {
+        _logger.LogInformation("Starting sync for Shopify");
+
+        try
+        {
+            var shopifySync = sp.GetService<IShopifySyncService>();
+
+            if (shopifySync != null)
+            {
+                var summary = await shopifySync.FullSyncAsync(ct);
+
+                _logger.LogInformation(
+                    "Shopify sync completed: {Processed} processed, {Failed} failed, Success: {IsSuccess}",
+                    summary.TotalRecordsProcessed,
+                    summary.TotalRecordsFailed,
+                    summary.IsSuccess);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error syncing with Shopify");
         }
     }
 
@@ -111,26 +196,31 @@ public class CrmSyncBackgroundService : BackgroundService
         }
     }
 
-    private bool IsCrmEnabled(string crmType)
+    private async Task<int> GetMinimumIntervalAsync(CancellationToken ct)
     {
-        return crmType switch
+        try
         {
-            "Salesforce" => _settings.Salesforce.Enabled,
-            "Dynamics365" => _settings.Dynamics365.Enabled,
-            _ => false
-        };
-    }
+            using var scope = _serviceProvider.CreateScope();
+            var settingsService = scope.ServiceProvider.GetRequiredService<IIntegrationSettingsService>();
 
-    private int GetMinimumInterval()
-    {
-        var intervals = new List<int>();
+            var enabledIntegrations = await settingsService.GetEnabledIntegrationsAsync(ct);
+            var intervals = new List<int>();
 
-        if (_settings.Salesforce.Enabled)
-            intervals.Add(_settings.Salesforce.SyncIntervalMinutes);
+            foreach (var integrationType in enabledIntegrations)
+            {
+                var integration = await settingsService.GetIntegrationAsync(integrationType, ct);
+                if (integration != null)
+                {
+                    intervals.Add(integration.SyncIntervalMinutes);
+                }
+            }
 
-        if (_settings.Dynamics365.Enabled)
-            intervals.Add(_settings.Dynamics365.SyncIntervalMinutes);
-
-        return intervals.Any() ? intervals.Min() : 30;
+            return intervals.Any() ? intervals.Min() : DefaultIntervalMinutes;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to get sync intervals from database, using default");
+            return DefaultIntervalMinutes;
+        }
     }
 }

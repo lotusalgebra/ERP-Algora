@@ -1,29 +1,37 @@
+using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Settings;
 using Algora.Erp.Integrations.Common.Interfaces;
-using Algora.Erp.Integrations.Common.Settings;
+using Algora.Erp.Integrations.Salesforce.Auth;
 using Algora.Erp.Integrations.Salesforce.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Web.Pages.Admin.Integrations;
 
 public class SalesforceModel : PageModel
 {
-    private readonly IOptions<CrmIntegrationsSettings> _settings;
+    private readonly IIntegrationSettingsService _settingsService;
     private readonly IEnumerable<ICrmSyncService> _syncServices;
     private readonly IServiceProvider _serviceProvider;
 
+    private const string IntegrationType = SalesforceAuthHandler.IntegrationType;
+
     public SalesforceModel(
-        IOptions<CrmIntegrationsSettings> settings,
+        IIntegrationSettingsService settingsService,
         IEnumerable<ICrmSyncService> syncServices,
         IServiceProvider serviceProvider)
     {
-        _settings = settings;
+        _settingsService = settingsService;
         _syncServices = syncServices;
         _serviceProvider = serviceProvider;
     }
 
     public bool IsConnected { get; set; }
+    public DateTime? LastTestedAt { get; set; }
+    public bool? LastTestSuccess { get; set; }
+    public string? LastTestError { get; set; }
+    public DateTime? LastSyncAt { get; set; }
+    public bool? LastSyncSuccess { get; set; }
 
     [BindProperty]
     public string ClientId { get; set; } = string.Empty;
@@ -61,25 +69,74 @@ public class SalesforceModel : PageModel
     [BindProperty]
     public bool SyncAccounts { get; set; } = true;
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        var settings = _settings.Value.Salesforce;
-        IsConnected = settings.Enabled && !string.IsNullOrEmpty(settings.ClientId);
+        var integration = await _settingsService.GetIntegrationAsync(IntegrationType);
+        if (integration != null)
+        {
+            IsConnected = integration.IsEnabled;
+            LastTestedAt = integration.LastTestedAt;
+            LastTestSuccess = integration.LastTestSuccess;
+            LastTestError = integration.LastTestError;
+            LastSyncAt = integration.LastSyncAt;
+            LastSyncSuccess = integration.LastSyncSuccess;
+            SyncIntervalMinutes = integration.SyncIntervalMinutes;
+        }
 
-        ClientId = settings.ClientId;
-        ClientSecret = string.IsNullOrEmpty(settings.ClientSecret) ? "" : "••••••••";
-        Username = settings.Username;
-        Password = string.IsNullOrEmpty(settings.Password) ? "" : "••••••••";
-        SecurityToken = string.IsNullOrEmpty(settings.SecurityToken) ? "" : "••••••••";
-        InstanceUrl = settings.InstanceUrl;
-        ApiVersion = settings.ApiVersion;
-        SyncIntervalMinutes = settings.SyncIntervalMinutes;
+        var settings = await _settingsService.GetSettingsAsync<SalesforceSettingsData>(IntegrationType);
+        if (settings != null)
+        {
+            InstanceUrl = settings.InstanceUrl;
+            ApiVersion = settings.ApiVersion;
+            Username = settings.Username;
+        }
+
+        var credentials = await _settingsService.GetCredentialsAsync<SalesforceCredentials>(IntegrationType);
+        if (credentials != null)
+        {
+            ClientId = credentials.ClientId;
+            ClientSecret = string.IsNullOrEmpty(credentials.ClientSecret) ? "" : "••••••••";
+            Password = string.IsNullOrEmpty(credentials.Password) ? "" : "••••••••";
+            SecurityToken = string.IsNullOrEmpty(credentials.SecurityToken) ? "" : "••••••••";
+        }
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        // In a real implementation, save to database/configuration
-        TempData["Success"] = "Salesforce settings saved successfully";
+        try
+        {
+            // Get existing credentials to preserve masked values
+            var existingCredentials = await _settingsService.GetCredentialsAsync<SalesforceCredentials>(IntegrationType);
+
+            var settings = new SalesforceSettingsData
+            {
+                InstanceUrl = InstanceUrl,
+                ApiVersion = ApiVersion,
+                Username = Username
+            };
+
+            var credentials = new SalesforceCredentials
+            {
+                ClientId = ClientId,
+                ClientSecret = ClientSecret == "••••••••" ? existingCredentials?.ClientSecret ?? "" : ClientSecret,
+                Password = Password == "••••••••" ? existingCredentials?.Password ?? "" : Password,
+                SecurityToken = SecurityToken == "••••••••" ? existingCredentials?.SecurityToken ?? "" : SecurityToken
+            };
+
+            await _settingsService.SaveSettingsAsync(
+                IntegrationType,
+                settings,
+                credentials,
+                enabled: true,
+                syncIntervalMinutes: SyncIntervalMinutes);
+
+            TempData["Success"] = "Salesforce settings saved successfully";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Failed to save settings: {ex.Message}";
+        }
+
         return RedirectToPage();
     }
 
@@ -87,14 +144,22 @@ public class SalesforceModel : PageModel
     {
         try
         {
+            // First save the settings if they've changed
+            await OnPostAsync();
+
             var client = _serviceProvider.GetService<SalesforceClient>();
             if (client == null)
             {
-                TempData["Error"] = "Salesforce client is not configured. Please check your appsettings.json";
+                TempData["Error"] = "Salesforce client is not configured";
                 return RedirectToPage();
             }
 
             var isConnected = await client.TestConnectionAsync();
+            await _settingsService.UpdateTestResultAsync(
+                IntegrationType,
+                isConnected,
+                isConnected ? null : "Connection test returned false");
+
             if (isConnected)
             {
                 TempData["Success"] = "Connection successful! Salesforce is ready to sync.";
@@ -106,6 +171,7 @@ public class SalesforceModel : PageModel
         }
         catch (Exception ex)
         {
+            await _settingsService.UpdateTestResultAsync(IntegrationType, false, ex.Message);
             TempData["Error"] = $"Connection test failed: {ex.Message}";
         }
 
@@ -114,7 +180,7 @@ public class SalesforceModel : PageModel
 
     public async Task<IActionResult> OnPostSyncAsync()
     {
-        var service = _syncServices.FirstOrDefault(s => s.CrmType == "Salesforce");
+        var service = _syncServices.FirstOrDefault(s => s.CrmType == IntegrationType);
         if (service == null)
         {
             TempData["Error"] = "Salesforce sync service is not available";
@@ -124,6 +190,11 @@ public class SalesforceModel : PageModel
         try
         {
             var result = await service.FullSyncAsync();
+            await _settingsService.UpdateSyncResultAsync(
+                IntegrationType,
+                result.IsSuccess,
+                result.RecordsProcessed);
+
             if (result.IsSuccess)
             {
                 TempData["Success"] = $"Sync completed: {result.RecordsProcessed} records processed, {result.RecordsCreated} created, {result.RecordsUpdated} updated";
@@ -135,16 +206,25 @@ public class SalesforceModel : PageModel
         }
         catch (Exception ex)
         {
+            await _settingsService.UpdateSyncResultAsync(IntegrationType, false, 0);
             TempData["Error"] = $"Sync failed: {ex.Message}";
         }
 
         return RedirectToPage();
     }
 
-    public IActionResult OnPostDisconnect()
+    public async Task<IActionResult> OnPostDisconnectAsync()
     {
-        // In a real implementation, clear credentials from database
-        TempData["Success"] = "Salesforce disconnected successfully";
+        try
+        {
+            await _settingsService.DeleteAsync(IntegrationType);
+            TempData["Success"] = "Salesforce disconnected successfully";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Failed to disconnect: {ex.Message}";
+        }
+
         return RedirectToPage();
     }
 }

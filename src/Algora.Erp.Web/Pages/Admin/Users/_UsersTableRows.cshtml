@@ -66,10 +66,7 @@
                         <ul class="py-2 text-sm text-gray-700">
                             <li>
                                 <a class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                   hx-get="/Admin/Users?handler=EditForm&id=@user.Id"
-                                   hx-target="#formContainer"
-                                   hx-swap="innerHTML"
-                                   data-modal-target="userModal" data-modal-toggle="userModal">
+                                   onclick="loadUserEditForm('@user.Id')">
                                     <i class="bi bi-pencil mr-2"></i> Edit
                                 </a>
                             </li>
@@ -114,7 +111,9 @@ else
     </tr>
 }
 <script>
-    // Re-initialize Flowbite dropdowns and HTMX after content swap
-    if (typeof initFlowbite === 'function') { initFlowbite(); }
-    if (typeof htmx !== 'undefined') { htmx.process(document.body); }
+    // Re-initialize Flowbite dropdowns and HTMX after content swap with slight delay
+    setTimeout(function() {
+        if (typeof initFlowbite === 'function') { initFlowbite(); }
+        if (typeof htmx !== 'undefined') { htmx.process(document.body); }
+    }, 50);
 </script>

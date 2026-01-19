@@ -172,7 +172,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Quality Inspection</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="formModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('formModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -191,7 +191,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Inspection Details</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="detailsModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('detailsModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -210,7 +210,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Complete Inspection</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="completeModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('completeModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -227,7 +227,7 @@
 <div id="deleteModal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-lg shadow">
-            <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="deleteModal">
+            <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('deleteModal')">
                 <i class="bi bi-x-lg"></i>
             </button>
             <div class="p-4 md:p-5 text-center">
@@ -237,7 +237,7 @@
                 <button type="button" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center me-2" id="confirmDeleteBtn">
                     Yes, delete
                 </button>
-                <button data-modal-hide="deleteModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900">
+                <button onclick="closeModal('deleteModal')" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900">
                     Cancel
                 </button>
             </div>
@@ -258,16 +258,14 @@
                     target: '#formModalBody',
                     swap: 'innerHTML'
                 });
-                const modal = FlowbiteInstances.getInstance('Modal', 'formModal');
-                if (modal) modal.show();
+                window.AlgoraModal.show('');
             });
             </text>
         }
 
         function confirmDelete(id) {
             deleteId = id;
-            const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
-            if (modal) modal.show();
+            window.AlgoraModal.show('');
         }
 
         document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
@@ -276,8 +274,7 @@
                     target: '#inspectionsTableBody',
                     swap: 'innerHTML'
                 }).then(() => {
-                    const modal = FlowbiteInstances.getInstance('Modal', 'deleteModal');
-                    if (modal) modal.hide();
+                    window.AlgoraModal.hide('');
                     deleteId = null;
                 });
             }
@@ -288,8 +285,7 @@
                 target: '#detailsModalBody',
                 swap: 'innerHTML'
             });
-            const modal = FlowbiteInstances.getInstance('Modal', 'detailsModal');
-            if (modal) modal.show();
+            window.AlgoraModal.show('');
         }
 
         function editInspection(id) {
@@ -297,8 +293,7 @@
                 target: '#formModalBody',
                 swap: 'innerHTML'
             });
-            const modal = FlowbiteInstances.getInstance('Modal', 'formModal');
-            if (modal) modal.show();
+            window.AlgoraModal.show('');
         }
 
         function approveInspection(id) {
@@ -309,10 +304,8 @@
         }
 
         document.body.addEventListener('formSubmitSuccess', function() {
-            const formModal = FlowbiteInstances.getInstance('Modal', 'formModal');
-            if (formModal) formModal.hide();
-            const completeModal = FlowbiteInstances.getInstance('Modal', 'completeModal');
-            if (completeModal) completeModal.hide();
+            window.AlgoraModal.hide('');
+            window.AlgoraModal.hide('');
         });
     </script>
 }

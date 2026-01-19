@@ -136,7 +136,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Coupon</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="couponModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('couponModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -152,8 +152,7 @@
 @section Scripts {
 <script>
     document.body.addEventListener('formSubmitSuccess', function() {
-        const modal = FlowbiteInstances.getInstance('Modal', 'couponModal');
-        if (modal) modal.hide();
+        window.AlgoraModal.hide('');
     });
 </script>
 }

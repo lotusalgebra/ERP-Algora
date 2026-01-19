@@ -148,7 +148,7 @@
         <div class="relative bg-white rounded-lg shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Stock Adjustment</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="adjustmentModal">
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="closeModal('adjustmentModal')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -174,7 +174,7 @@
                     </div>
                 </div>
                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b gap-2">
-                    <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" data-modal-hide="adjustmentModal">Cancel</button>
+                    <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900" onclick="closeModal('adjustmentModal')">Cancel</button>
                     <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5">Apply Adjustment</button>
                 </div>
             </form>
@@ -217,14 +217,12 @@
             document.getElementById('adjustStockLevelId').value = id;
             document.getElementById('adjustProductName').value = productName;
             document.getElementById('adjustCurrentQty').value = currentQty;
-            const modal = FlowbiteInstances.getInstance('Modal', 'adjustmentModal');
-            if (modal) modal.show();
+            window.AlgoraModal.show('');
         }
 
         document.body.addEventListener('htmx:afterRequest', (e) => {
             if (e.detail.elt.closest('#adjustmentModal') && e.detail.successful) {
-                const modal = FlowbiteInstances.getInstance('Modal', 'adjustmentModal');
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('');
             }
         });
     </script>

@@ -4,6 +4,7 @@ using Algora.Erp.Infrastructure.Data;
 using Algora.Erp.Infrastructure.MultiTenancy;
 using Algora.Erp.Infrastructure.Services;
 using Algora.Erp.Infrastructure.Services.Ecommerce;
+using Algora.Erp.Integrations.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,8 @@ public static class DependencyInjection
         services.AddScoped<IFinancialReportService, FinancialReportService>();
         services.AddScoped<ITaxConfigurationService, TaxConfigurationService>();
         services.AddScoped<ITenantSettingsService, TenantSettingsService>();
+        services.AddScoped<IIntegrationSettingsService, IntegrationSettingsService>();
+        services.AddScoped<ICrmMappingService, CrmMappingService>();
 
         // Ecommerce services
         services.AddScoped<IStoreService, StoreService>();

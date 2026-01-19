@@ -292,24 +292,24 @@
 <div class="flex items-center p-4 border-t border-gray-200 rounded-b gap-2 mt-4 px-0 pb-0">
     @if (Model.Status == DeliveryChallanStatus.Draft)
     {
-        <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="editChallan('@Model.Id')" data-modal-hide="detailsModal">
+        <button type="button" class="text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="editChallan('@Model.Id')" onclick="closeModal('detailsModal')">
             <i class="bi bi-pencil mr-2"></i>Edit
         </button>
-        <button type="button" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Confirmed')" data-modal-hide="detailsModal">
+        <button type="button" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Confirmed')" onclick="closeModal('detailsModal')">
             <i class="bi bi-check-circle mr-2"></i>Confirm
         </button>
     }
     @if (Model.Status == DeliveryChallanStatus.Confirmed)
     {
-        <button type="button" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Dispatched')" data-modal-hide="detailsModal">
+        <button type="button" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Dispatched')" onclick="closeModal('detailsModal')">
             <i class="bi bi-truck mr-2"></i>Mark Dispatched
         </button>
     }
     @if (Model.Status == DeliveryChallanStatus.Dispatched)
     {
-        <button type="button" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Delivered')" data-modal-hide="detailsModal">
+        <button type="button" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5" onclick="updateStatus('@Model.Id', 'Delivered')" onclick="closeModal('detailsModal')">
             <i class="bi bi-check-all mr-2"></i>Mark Delivered
         </button>
     }
-    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" data-modal-hide="detailsModal">Close</button>
+    <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" onclick="closeModal('detailsModal')">Close</button>
 </div>

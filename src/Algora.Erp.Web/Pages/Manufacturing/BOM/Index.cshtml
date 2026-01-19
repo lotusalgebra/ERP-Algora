@@ -171,8 +171,7 @@
         // Close modal after successful form submission
         document.body.addEventListener('htmx:afterSwap', function(event) {
             if (event.detail.target.id === 'bomTableContainer') {
-                const modal = FlowbiteInstances.getInstance('Modal', 'formModal');
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('');
             }
         });
     </script>

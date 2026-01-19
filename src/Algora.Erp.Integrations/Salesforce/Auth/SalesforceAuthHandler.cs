@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Algora.Erp.Application.Common.Interfaces;
+using Algora.Erp.Domain.Entities.Settings;
 using Algora.Erp.Integrations.Common.Exceptions;
-using Algora.Erp.Integrations.Common.Settings;
-using Microsoft.Extensions.Options;
 
 namespace Algora.Erp.Integrations.Salesforce.Auth;
 
@@ -10,21 +10,40 @@ public interface ISalesforceAuthHandler
 {
     Task<string> GetAccessTokenAsync(CancellationToken ct = default);
     Task<string> GetInstanceUrlAsync(CancellationToken ct = default);
+    Task<string> GetApiVersionAsync(CancellationToken ct = default);
     void InvalidateToken();
 }
 
 public class SalesforceAuthHandler : ISalesforceAuthHandler
 {
     private readonly HttpClient _httpClient;
-    private readonly SalesforceSettings _settings;
+    private readonly IIntegrationSettingsService _settingsService;
     private string? _accessToken;
     private string? _instanceUrl;
     private DateTime _tokenExpiry = DateTime.MinValue;
 
-    public SalesforceAuthHandler(HttpClient httpClient, IOptions<CrmIntegrationsSettings> options)
+    // Cached settings
+    private SalesforceSettingsData? _cachedSettings;
+    private SalesforceCredentials? _cachedCredentials;
+    private DateTime _settingsCacheExpiry = DateTime.MinValue;
+    private static readonly TimeSpan SettingsCacheDuration = TimeSpan.FromMinutes(5);
+
+    public const string IntegrationType = "Salesforce";
+
+    public SalesforceAuthHandler(HttpClient httpClient, IIntegrationSettingsService settingsService)
     {
         _httpClient = httpClient;
-        _settings = options.Value.Salesforce;
+        _settingsService = settingsService;
+    }
+
+    private async Task EnsureSettingsCacheAsync(CancellationToken ct)
+    {
+        if (_cachedSettings != null && _cachedCredentials != null && DateTime.UtcNow < _settingsCacheExpiry)
+            return;
+
+        _cachedSettings = await _settingsService.GetSettingsAsync<SalesforceSettingsData>(IntegrationType, ct);
+        _cachedCredentials = await _settingsService.GetCredentialsAsync<SalesforceCredentials>(IntegrationType, ct);
+        _settingsCacheExpiry = DateTime.UtcNow.Add(SettingsCacheDuration);
     }
 
     public async Task<string> GetAccessTokenAsync(CancellationToken ct = default)
@@ -49,6 +68,12 @@ public class SalesforceAuthHandler : ISalesforceAuthHandler
         return _instanceUrl!;
     }
 
+    public async Task<string> GetApiVersionAsync(CancellationToken ct = default)
+    {
+        await EnsureSettingsCacheAsync(ct);
+        return _cachedSettings?.ApiVersion ?? "v58.0";
+    }
+
     public void InvalidateToken()
     {
         _accessToken = null;
@@ -58,15 +83,22 @@ public class SalesforceAuthHandler : ISalesforceAuthHandler
 
     private async Task AuthenticateAsync(CancellationToken ct)
     {
-        var tokenUrl = $"{_settings.InstanceUrl}/services/oauth2/token";
+        await EnsureSettingsCacheAsync(ct);
+
+        if (_cachedSettings == null || _cachedCredentials == null)
+        {
+            throw new CrmAuthenticationException(IntegrationType, "Salesforce integration is not configured");
+        }
+
+        var tokenUrl = $"{_cachedSettings.InstanceUrl}/services/oauth2/token";
 
         var parameters = new Dictionary<string, string>
         {
             ["grant_type"] = "password",
-            ["client_id"] = _settings.ClientId,
-            ["client_secret"] = _settings.ClientSecret,
-            ["username"] = _settings.Username,
-            ["password"] = $"{_settings.Password}{_settings.SecurityToken}"
+            ["client_id"] = _cachedCredentials.ClientId,
+            ["client_secret"] = _cachedCredentials.ClientSecret,
+            ["username"] = _cachedSettings.Username,
+            ["password"] = $"{_cachedCredentials.Password}{_cachedCredentials.SecurityToken}"
         };
 
         var content = new FormUrlEncodedContent(parameters);
@@ -78,25 +110,28 @@ public class SalesforceAuthHandler : ISalesforceAuthHandler
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new CrmAuthenticationException("Salesforce",
-                    $"Authentication failed: {responseBody}");
+                await _settingsService.UpdateTestResultAsync(IntegrationType, false, $"Authentication failed: {responseBody}", ct);
+                throw new CrmAuthenticationException(IntegrationType, $"Authentication failed: {responseBody}");
             }
 
             var tokenResponse = await response.Content.ReadFromJsonAsync<SalesforceTokenResponse>(ct);
 
             if (tokenResponse == null)
             {
-                throw new CrmAuthenticationException("Salesforce", "Failed to parse token response");
+                await _settingsService.UpdateTestResultAsync(IntegrationType, false, "Failed to parse token response", ct);
+                throw new CrmAuthenticationException(IntegrationType, "Failed to parse token response");
             }
 
             _accessToken = tokenResponse.AccessToken;
             _instanceUrl = tokenResponse.InstanceUrl;
             _tokenExpiry = DateTime.UtcNow.AddHours(1); // Salesforce tokens typically last 2 hours
+
+            await _settingsService.UpdateTestResultAsync(IntegrationType, true, null, ct);
         }
         catch (HttpRequestException ex)
         {
-            throw new CrmAuthenticationException("Salesforce",
-                $"Failed to connect to Salesforce: {ex.Message}", ex);
+            await _settingsService.UpdateTestResultAsync(IntegrationType, false, ex.Message, ct);
+            throw new CrmAuthenticationException(IntegrationType, $"Failed to connect to Salesforce: {ex.Message}", ex);
         }
     }
 

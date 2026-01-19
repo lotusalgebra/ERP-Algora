@@ -1,4 +1,4 @@
-using Algora.Erp.Integrations.Common.Models;
+using Algora.Erp.Domain.Entities.Settings;
 
 namespace Algora.Erp.Integrations.Common.Interfaces;
 

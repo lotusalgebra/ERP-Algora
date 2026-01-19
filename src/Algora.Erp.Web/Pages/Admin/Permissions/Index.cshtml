@@ -141,8 +141,7 @@
 
         document.body.addEventListener('htmx:afterRequest', (e) => {
             if (e.detail.elt.closest('#permissionModal') && e.detail.successful) {
-                const modal = FlowbiteInstances.getInstance('Modal', 'permissionModal');
-                if (modal) modal.hide();
+                window.AlgoraModal.hide('');
             }
         });
     </script>

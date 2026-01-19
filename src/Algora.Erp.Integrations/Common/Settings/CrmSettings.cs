@@ -6,6 +6,7 @@ public class CrmIntegrationsSettings
 
     public SalesforceSettings Salesforce { get; set; } = new();
     public Dynamics365Settings Dynamics365 { get; set; } = new();
+    public ShopifySettings Shopify { get; set; } = new();
 }
 
 public class SalesforceSettings
@@ -30,4 +31,17 @@ public class Dynamics365Settings
     public string InstanceUrl { get; set; } = string.Empty;
     public string ApiVersion { get; set; } = "v9.2";
     public int SyncIntervalMinutes { get; set; } = 30;
+}
+
+public class ShopifySettings
+{
+    public bool Enabled { get; set; }
+    public string ShopDomain { get; set; } = string.Empty;
+    public string AccessToken { get; set; } = string.Empty;
+    public string ApiVersion { get; set; } = "2024-01";
+    public int SyncIntervalMinutes { get; set; } = 15;
+    public bool SyncCustomers { get; set; } = true;
+    public bool SyncOrders { get; set; } = true;
+    public bool SyncProducts { get; set; } = true;
+    public bool SyncInventory { get; set; } = true;
 }

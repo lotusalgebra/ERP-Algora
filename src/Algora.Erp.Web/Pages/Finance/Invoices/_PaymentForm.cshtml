@@ -7,7 +7,7 @@
         <i class="bi bi-cash-stack mr-2"></i>Record Payment
     </h3>
     <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-            data-modal-hide="paymentModal">
+            onclick="closeModal('paymentModal')">
         <i class="bi bi-x-lg"></i>
     </button>
 </div>
@@ -99,13 +99,13 @@
 
     <!-- Modal Footer -->
     <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-200 rounded-b dark:border-gray-600">
-        <button type="button" data-modal-hide="paymentModal"
+        <button type="button" onclick="closeModal('paymentModal')"
                 class="px-4 py-2.5 text-sm font-medium text-gray-500 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600">
             Cancel
         </button>
         <button type="submit"
                 class="px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg"
-                onclick="FlowbiteInstances.getInstance('Modal', 'paymentModal')?.hide()">
+                onclick="window.AlgoraModal.hide('paymentModal')">
             <i class="bi bi-check-lg mr-1"></i> Record Payment
         </button>
     </div>

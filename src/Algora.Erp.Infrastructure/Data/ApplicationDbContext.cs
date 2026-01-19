@@ -149,6 +149,12 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     // Tenant Settings
     public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
 
+    // Integration Settings
+    public DbSet<IntegrationSettings> IntegrationSettings => Set<IntegrationSettings>();
+
+    // CRM Integration Mappings
+    public DbSet<CrmIntegrationMapping> CrmIntegrationMappings => Set<CrmIntegrationMapping>();
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
